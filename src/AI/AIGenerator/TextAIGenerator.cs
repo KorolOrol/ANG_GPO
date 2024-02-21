@@ -6,7 +6,7 @@ using OpenAI.ObjectModels.RequestModels;
 namespace AIGenerator
 {
     /// <summary>
-    /// Статический класс для генерации текста с помощью OpenAI API
+    /// Класс для генерации текста с помощью OpenAI API
     /// </summary>
     public class TextAIGenerator
     {
@@ -23,7 +23,7 @@ namespace AIGenerator
         /// <summary>
         /// Клиент OpenAI
         /// </summary>
-        private OpenAIService _client = new(new());
+        private OpenAIService _client;
 
         /// <summary>
         /// Модель для генерации текста
@@ -91,6 +91,12 @@ namespace AIGenerator
             set => _model = value;
         }
 
+        /// <summary>
+        /// Генерация текста
+        /// </summary>
+        /// <param name="messages">Список сообщений</param>
+        /// <returns>Сгенерированный текст</returns>
+        /// <exception cref="Exception">Ошибка генерации текста</exception>
         public async Task<string> GenerateText(List<string> messages)
         {
             var completion = await Client.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest()
@@ -106,6 +112,25 @@ namespace AIGenerator
             {
                 throw new Exception("Failed to generate text: " + completion.Error.Message);
             }
+        }
+
+        /// <summary>
+        /// Стандартный конструктор с ключом OpenAI API из переменной окружения
+        /// </summary>
+        public TextAIGenerator()
+        {
+            GetApiKeyFromEnvironment("OpenAIAPIKey");
+        }
+
+        /// <summary>
+        /// Конструктор с ключом API из переменной окружения и адресом API
+        /// </summary>
+        /// <param name="keyEnvVar">Имя переменной окружения с ключом API</param>
+        /// <param name="endpoint">Адрес API</param>
+        public TextAIGenerator(string keyEnvVar, string endpoint)
+        {
+            GetApiKeyFromEnvironment(keyEnvVar);
+            Endpoint = endpoint;
         }
     }
 }
