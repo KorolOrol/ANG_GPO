@@ -33,9 +33,9 @@ namespace BaseClasses.Interface
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированная локация</returns>
         public async Task<Location> GenerateLocation(List<Character>? characters = null,
-                                          List<Location>? locations = null,
-                                          List<Item>? items = null,
-                                          List<Event>? events = null)
+                                                     List<Location>? locations = null,
+                                                     List<Item>? items = null,
+                                                     List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -50,9 +50,9 @@ namespace BaseClasses.Interface
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированный предмет</returns>
         public async Task<Item> GenerateItem(List<Character>? characters = null,
-                                      List<Location>? locations = null,
-                                      List<Item>? items = null,
-                                      List<Event>? events = null)
+                                             List<Location>? locations = null,
+                                             List<Item>? items = null,
+                                             List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -67,9 +67,9 @@ namespace BaseClasses.Interface
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированное событие</returns>
         public async Task<Event> GenerateEvent(List<Character>? characters = null,
-                                       List<Location>? locations = null,
-                                       List<Item>? items = null,
-                                       List<Event>? events = null)
+                                               List<Location>? locations = null,
+                                               List<Item>? items = null,
+                                               List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
