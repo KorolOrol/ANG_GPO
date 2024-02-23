@@ -15,10 +15,14 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированный персонаж</returns>
-        public Character GenerateCharacter(List<Character>? characters = null,
-                                           List<Location>? locations = null,
-                                           List<Item>? items = null,
-                                           List<Event>? events = null);
+        public async Task<Character> GenerateCharacter(List<Character>? characters = null,
+                                                       List<Location>? locations = null,
+                                                       List<Item>? items = null,
+                                                       List<Event>? events = null)
+        {
+            await Task.Run(() => { });
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Генерация локации
@@ -28,10 +32,14 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированная локация</returns>
-        public Character GenerateLocation(List<Character>? characters = null,
+        public async Task<Location> GenerateLocation(List<Character>? characters = null,
                                           List<Location>? locations = null,
                                           List<Item>? items = null,
-                                          List<Event>? events = null);
+                                          List<Event>? events = null)
+        {
+            await Task.Run(() => { });
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Генерация предмета
@@ -41,10 +49,14 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированный предмет</returns>
-        public Character GenerateItem(List<Character>? characters = null,
+        public async Task<Item> GenerateItem(List<Character>? characters = null,
                                       List<Location>? locations = null,
                                       List<Item>? items = null,
-                                      List<Event>? events = null);
+                                      List<Event>? events = null)
+        {
+            await Task.Run(() => { });
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Генерация события
@@ -54,10 +66,14 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированное событие</returns>
-        public Character GenerateEvent(List<Character>? characters = null,
+        public async Task<Event> GenerateEvent(List<Character>? characters = null,
                                        List<Location>? locations = null,
                                        List<Item>? items = null,
-                                       List<Event>? events = null);
+                                       List<Event>? events = null)
+        {
+            await Task.Run(() => { });
+            throw new NotImplementedException();
+        }
 
     }
 }
