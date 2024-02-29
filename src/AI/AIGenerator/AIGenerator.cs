@@ -77,7 +77,7 @@ namespace AIGenerator
                     prompts.Add(string.Format(SystemPrompt["CharacterUsage"],
                                               character.Name,
                                               character.Description,
-                                              character.Temper));
+                                              string.Join(", ", character.Traits)));
                 }
             }
             if (locations != null)

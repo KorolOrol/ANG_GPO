@@ -20,7 +20,7 @@ namespace AIGenerator
         /// <summary>
         /// Характер персонажа
         /// </summary>
-        public string Temper { get; set; }
+        public List<string> Traits { get; set; }
 
         /// <summary>
         /// Отношения персонажа с другими персонажами
@@ -61,7 +61,7 @@ namespace AIGenerator
             Character character = new Character();
             character.Name = Name;
             character.Description = Description;
-            character.Temper = Temper;
+            character.Traits = Traits;
             character.Relations = new Dictionary<Character, double>();
             foreach (var relation in Relations)
             {
