@@ -16,9 +16,9 @@
         public string Description { get; set; }
 
         /// <summary>
-        /// Характер персонажа
+        /// Черты характера персонажа
         /// </summary>
-        public string Temper { get; set; }
+        public List<string> Traits { get; set; }
 
         /// <summary>
         /// Отношения персонажа с другими персонажами
