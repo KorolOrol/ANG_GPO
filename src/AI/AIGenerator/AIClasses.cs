@@ -38,11 +38,6 @@ namespace AIGenerator
         public List<string> Items { get; set; }
 
         /// <summary>
-        /// События, в которых участвует персонаж
-        /// </summary>
-        public List<string> Events { get; set; }
-
-        /// <summary>
         /// Преобразование в стандартный класс персонажа
         /// </summary>
         /// <param name="characters">Список персонажей</param>
@@ -84,12 +79,6 @@ namespace AIGenerator
                 foundItem.Host = character;
             }
             character.Events = new List<Event>();
-            foreach (var ev in Events)
-            {
-                Event @event = events.First(e => e.Name == ev);
-                character.Events.Add(@event);
-                @event.Characters.Add(character);
-            }
             return character;
         }
     }
@@ -118,11 +107,6 @@ namespace AIGenerator
         /// Вещи, находящиеся в локации
         /// </summary>
         public List<string> Items { get; set; }
-
-        /// <summary>
-        /// События, происходящие в локации
-        /// </summary>
-        public List<string> Events { get; set; }
 
         /// <summary>
         /// Преобразование в стандартный класс локации
@@ -158,12 +142,6 @@ namespace AIGenerator
                 foundItem.Location = location;
             }
             location.Events = new List<Event>();
-            foreach (var ev in Events)
-            {
-                Event @event = events.First(e => e.Name == ev);
-                location.Events.Add(@event);
-                @event.Locations.Add(location);
-            }
             return location;
         }
     }
@@ -194,11 +172,6 @@ namespace AIGenerator
         public string Host { get; set; }
 
         /// <summary>
-        /// События, в которых участвует предмет
-        /// </summary>
-        public List<string> Events { get; set; }
-
-        /// <summary>
         /// Преобразование в стандартный класс предмета
         /// </summary>
         /// <param name="characters">Список персонажей</param>
@@ -220,12 +193,6 @@ namespace AIGenerator
             item.Location = locations.First(l => l.Name == Location);
             item.Host = characters.First(c => c.Name == Host);
             item.Events = new List<Event>();
-            foreach (var ev in Events)
-            {
-                Event @event = events.First(e => e.Name == ev);
-                item.Events.Add(@event);
-                @event.Items.Add(item);
-            }
             return item;
         }
     }

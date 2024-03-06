@@ -66,48 +66,58 @@ namespace AIGenerator
         {
             List<string> prompts = new List<string>
             {
-                SystemPrompt[$"{task}Start"],
-                SystemPrompt["Setting"]
+                SystemPrompt["Setting"],
+                SystemPrompt[$"{task}Start"]
             };
             if (characters != null)
             {
-                prompts.Add(SystemPrompt["CharacterUsage"]);
                 foreach (var character in characters)
                 {
                     prompts.Add(string.Format(SystemPrompt["CharacterUsage"],
                                               character.Name,
                                               character.Description,
-                                              string.Join(", ", character.Traits)));
+                                              string.Join(", ", character.Traits),
+                                              string.Join(", ", 
+                    character.Relations.Select(kv => $"{kv.Key.Name}: {kv.Value}")),
+                                              string.Join(", ", character.Locations.Select(l => l.Name)),
+                                              string.Join(", ", character.Items.Select(i => i.Name)),
+                                              string.Join(", ", character.Events.Select(e => e.Name))));
                 }
             }
             if (locations != null)
             {
-                prompts.Add(SystemPrompt["LocationUsage"]);
                 foreach (var location in locations)
                 {
                     prompts.Add(string.Format(SystemPrompt["LocationUsage"],
                                               location.Name,
-                                              location.Description));
+                                              location.Description,
+                                              string.Join(", ", location.Characters.Select(c => c.Name)),
+                                              string.Join(", ", location.Items.Select(i => i.Name)),
+                                              string.Join(", ", location.Events.Select(e => e.Name))));
                 }
             }
             if (items != null)
             {
-                prompts.Add(SystemPrompt["ItemUsage"]);
                 foreach (var item in items)
                 {
                     prompts.Add(string.Format(SystemPrompt["ItemUsage"],
                                               item.Name,
-                                              item.Description));
+                                              item.Description,
+                                              item.Host.Name,
+                                              item.Location.Name,
+                                              string.Join(", ", item.Events.Select(e => e.Name))));
                 }
             }
             if (events != null)
             {
-                prompts.Add(SystemPrompt["EventUsage"]);
                 foreach (var ev in events)
                 {
                     prompts.Add(string.Format(SystemPrompt["EventUsage"],
                                               ev.Name,
-                                              ev.Description));
+                                              ev.Description,
+                                              string.Join(", ", ev.Characters.Select(c => c.Name)),
+                                              string.Join(", ", ev.Locations.Select(l => l.Name)),
+                                              string.Join(", ", ev.Items.Select(i => i.Name))));
                 }
             }
             prompts.Add(SystemPrompt[$"{task}End"]);
