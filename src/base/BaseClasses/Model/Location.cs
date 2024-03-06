@@ -29,5 +29,26 @@
         /// События, происходящие в локации
         /// </summary>
         public List<Event> Events { get; set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override string ToString()
+        {
+            return "Локация: " + Name;
+        }
+
+        /// <summary>
+        /// Возвращает полную информацию о локации
+        /// </summary>
+        /// <returns>Полная информация о локации</returns>
+        public string FullInfo()
+        {
+            return $"Локация: {Name}\n" +
+                   $"Описание: {Description}\n" +
+                   $"Персонажи: {string.Join(", ", Characters.Select(c => c.Name))}\n" +
+                   $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
+                   $"События: {string.Join(", ", Events.Select(e => e.Name))}\n";
+        }
     }
 }

@@ -39,5 +39,28 @@
         /// События, в которых участвует персонаж
         /// </summary>
         public List<Event> Events { get; set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override string ToString()
+        {
+            return "Персонаж: " + Name;
+        }
+
+        /// <summary>
+        /// Возвращает полную информацию о персонаже
+        /// </summary>
+        /// <returns>Полная информация о персонаже</returns>
+        public string FullInfo()
+        {
+            return $"Персонаж: {Name}\n" +
+                   $"Описание: {Description}\n" +
+                   $"Черты характера: {string.Join(", ", Traits)}\n" +
+                   $"Отношения: {string.Join(", ", Relations.Select(r => $"{r.Key.Name} ({r.Value})"))}\n" +
+                   $"Местоположение: {string.Join(", ", Locations.Select(l => l.Name))}\n" +
+                   $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
+                   $"События: {string.Join(", ", Events.Select(e => e.Name))}\n";
+        }
     }
 }

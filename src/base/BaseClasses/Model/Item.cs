@@ -29,5 +29,26 @@
         /// События, в которых участвует предмет
         /// </summary>
         public List<Event> Events { get; set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override string ToString()
+        {
+            return "Предмет: " + Name;
+        }
+
+        /// <summary>
+        /// Возвращает полную информацию о предмете
+        /// </summary>
+        /// <returns>Полная информация о предмете</returns>
+        public string FullInfo()
+        {
+            return $"Предмет: {Name}\n" +
+                   $"Описание: {Description}\n" +
+                   $"Хозяин: {Host?.Name ?? "нет"}\n" +
+                   $"Локация: {Location?.Name ?? "нет"}\n" +
+                   $"События: {string.Join(", ", Events.Select(e => e.Name))}\n";
+        }
     }
 }
