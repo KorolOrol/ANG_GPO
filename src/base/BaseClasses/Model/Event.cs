@@ -29,5 +29,26 @@
         /// Вещи, участвующие в событии
         /// </summary>
         public List<Item> Items { get; set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public override string ToString()
+        {
+            return "Событие: " + Name;
+        }
+
+        /// <summary>
+        /// Возвращает полную информацию о событии
+        /// </summary>
+        /// <returns>Полная информация о событии</returns>
+        public string FullInfo()
+        {
+            return $"Событие: {Name}\n" +
+                   $"Описание: {Description}\n" +
+                   $"Персонажи: {string.Join(", ", Characters.Select(c => c.Name))}\n" +
+                   $"Локации: {string.Join(", ", Locations.Select(l => l.Name))}\n" +
+                   $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n";
+        }
     }
 }
