@@ -15,10 +15,10 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированный персонаж</returns>
-        public async Task<Character> GenerateCharacter(List<Character>? characters = null,
-                                                       List<Location>? locations = null,
-                                                       List<Item>? items = null,
-                                                       List<Event>? events = null)
+        public async Task<Character> GenerateCharacterAsync(List<Character>? characters = null,
+                                                            List<Location>? locations = null,
+                                                            List<Item>? items = null,
+                                                            List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -32,10 +32,10 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированная локация</returns>
-        public async Task<Location> GenerateLocation(List<Character>? characters = null,
-                                                     List<Location>? locations = null,
-                                                     List<Item>? items = null,
-                                                     List<Event>? events = null)
+        public async Task<Location> GenerateLocationAsync(List<Character>? characters = null,
+                                                          List<Location>? locations = null,
+                                                          List<Item>? items = null,
+                                                          List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -49,10 +49,10 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированный предмет</returns>
-        public async Task<Item> GenerateItem(List<Character>? characters = null,
-                                             List<Location>? locations = null,
-                                             List<Item>? items = null,
-                                             List<Event>? events = null)
+        public async Task<Item> GenerateItemAsync(List<Character>? characters = null,
+                                                  List<Location>? locations = null,
+                                                  List<Item>? items = null,
+                                                  List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -66,10 +66,10 @@ namespace BaseClasses.Interface
         /// <param name="items">Предметы, уже существующие в истории</param>
         /// <param name="events">События, уже существующие в истории</param>
         /// <returns>Сгенерированное событие</returns>
-        public async Task<Event> GenerateEvent(List<Character>? characters = null,
-                                               List<Location>? locations = null,
-                                               List<Item>? items = null,
-                                               List<Event>? events = null)
+        public async Task<Event> GenerateEventAsync(List<Character>? characters = null,
+                                                    List<Location>? locations = null,
+                                                    List<Item>? items = null,
+                                                    List<Event>? events = null)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
