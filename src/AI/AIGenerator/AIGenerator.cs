@@ -69,7 +69,7 @@ namespace AIGenerator
                 SystemPrompt["Setting"],
                 SystemPrompt[$"{task}Start"]
             };
-            if (characters != null)
+            if (characters != null && characters.Count != 0)
             {
                 foreach (var character in characters)
                 {
@@ -84,7 +84,11 @@ namespace AIGenerator
                                               string.Join(", ", character.Events.Select(e => e.Name))));
                 }
             }
-            if (locations != null)
+            else
+            {
+                prompts.Add(SystemPrompt["CharacterEmpty"]);
+            }
+            if (locations != null && locations.Count != 0)
             {
                 foreach (var location in locations)
                 {
@@ -95,8 +99,12 @@ namespace AIGenerator
                                               string.Join(", ", location.Items.Select(i => i.Name)),
                                               string.Join(", ", location.Events.Select(e => e.Name))));
                 }
+            } 
+            else
+            {
+                prompts.Add(SystemPrompt["LocationEmpty"]);
             }
-            if (items != null)
+            if (items != null && items.Count != 0)
             {
                 foreach (var item in items)
                 {
@@ -107,8 +115,12 @@ namespace AIGenerator
                                               item.Location.Name,
                                               string.Join(", ", item.Events.Select(e => e.Name))));
                 }
+            } 
+            else
+            {
+                prompts.Add(SystemPrompt["ItemEmpty"]);
             }
-            if (events != null)
+            if (events != null && events.Count != 0)
             {
                 foreach (var ev in events)
                 {
@@ -119,6 +131,10 @@ namespace AIGenerator
                                               string.Join(", ", ev.Locations.Select(l => l.Name)),
                                               string.Join(", ", ev.Items.Select(i => i.Name))));
                 }
+            } 
+            else
+            {
+                prompts.Add(SystemPrompt["EventEmpty"]);
             }
             prompts.Add(SystemPrompt[$"{task}End"]);
             return prompts;

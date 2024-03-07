@@ -58,33 +58,55 @@ namespace AIGenerator
             character.Description = Description;
             character.Traits = Traits;
             character.Relations = new Dictionary<Character, double>();
-            if (characters != null)
+            if (characters != null && characters.Count != 0)
             {
                 foreach (var relation in Relations)
                 {
-                    Character rel = characters.First(c => c.Name == relation.Key);
-                    character.Relations.Add(rel, relation.Value);
-                    rel.Relations.Add(character, relation.Value);
+                    try
+                    {
+                        Character rel = characters.First(c => c.Name == relation.Key);
+                        character.Relations.Add(rel, relation.Value);
+                        rel.Relations.Add(character, relation.Value);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
                 }
             }
             character.Locations = new List<Location>();
-            if (locations != null)
+            if (locations != null && locations.Count != 0)
             {
                 foreach (var location in Locations)
                 {
-                    Location loc = locations.First(l => l.Name == location);
-                    character.Locations.Add(loc);
-                    loc.Characters.Add(character);
+                    try
+                    {
+                        Location loc = locations.First(l => l.Name == location);
+                        character.Locations.Add(loc);
+                        loc.Characters.Add(character);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
                 }
             }
             character.Items = new List<Item>();
-            if (items != null)
+            if (items != null && items.Count != 0)
             {
                 foreach (var item in Items)
                 {
-                    Item foundItem = items.First(i => i.Name == item);
-                    character.Items.Add(foundItem);
-                    foundItem.Host = character;
+                    try
+                    {
+                        Item foundItem = items.First(i => i.Name == item);
+                        if (foundItem.Host != null) continue;
+                        character.Items.Add(foundItem);
+                        foundItem.Host = character;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
                 }
             }
             character.Events = new List<Event>();
@@ -137,18 +159,38 @@ namespace AIGenerator
             location.Name = Name;
             location.Description = Description;
             location.Characters = new List<Character>();
-            foreach (var character in Characters)
+            if (characters != null && characters.Count != 0)
             {
-                Character charac = characters.First(c => c.Name == character);
-                location.Characters.Add(charac);
-                charac.Locations.Add(location);
+                foreach (var character in Characters)
+                {
+                    try
+                    {
+                        Character charac = characters.First(c => c.Name == character);
+                        location.Characters.Add(charac);
+                        charac.Locations.Add(location);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
             }
             location.Items = new List<Item>();
-            foreach (var item in Items)
+            if (items != null && items.Count != 0)
             {
-                Item foundItem = items.First(i => i.Name == item);
-                location.Items.Add(foundItem);
-                foundItem.Location = location;
+                foreach (var item in Items)
+                {
+                    try
+                    {
+                        Item foundItem = items.First(i => i.Name == item);
+                        location.Items.Add(foundItem);
+                        foundItem.Location = location;
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
             }
             location.Events = new List<Event>();
             return location;
@@ -199,8 +241,22 @@ namespace AIGenerator
             Item item = new Item();
             item.Name = Name;
             item.Description = Description;
-            item.Location = locations.First(l => l.Name == Location);
-            item.Host = characters.First(c => c.Name == Host);
+            try
+            {
+                item.Location = locations.First(l => l.Name == Location);
+            }
+            catch (InvalidOperationException)
+            {
+                item.Location = null;
+            }
+            try
+            {
+                item.Host = characters.First(c => c.Name == Host);
+            }
+            catch (InvalidOperationException)
+            {
+                item.Host = null;
+            }
             item.Events = new List<Event>();
             return item;
         }
@@ -256,25 +312,55 @@ namespace AIGenerator
             @event.Name = Name;
             @event.Description = Description;
             @event.Characters = new List<Character>();
-            foreach (var character in Characters)
+            if (characters != null && characters.Count != 0)
             {
-                Character charac = characters.First(c => c.Name == character);
-                @event.Characters.Add(charac);
-                charac.Events.Add(@event);
+                foreach (var character in Characters)
+                {
+                    try
+                    {
+                        Character charac = characters.First(c => c.Name == character);
+                        @event.Characters.Add(charac);
+                        charac.Events.Add(@event);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
             }
             @event.Locations = new List<Location>();
-            foreach (var location in Locations)
+            if (locations != null && locations.Count != 0)
             {
-                Location loc = locations.First(l => l.Name == location);
-                @event.Locations.Add(loc);
-                loc.Events.Add(@event);
+                foreach (var location in Locations)
+                {
+                    try
+                    {
+                        Location loc = locations.First(l => l.Name == location);
+                        @event.Locations.Add(loc);
+                        loc.Events.Add(@event);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
             }
             @event.Items = new List<Item>();
-            foreach (var item in Items)
+            if (items != null && items.Count != 0)
             {
-                Item foundItem = items.First(i => i.Name == item);
-                @event.Items.Add(foundItem);
-                foundItem.Events.Add(@event);
+                foreach (var item in Items)
+                {
+                    try
+                    {
+                        Item foundItem = items.First(i => i.Name == item);
+                        @event.Items.Add(foundItem);
+                        foundItem.Events.Add(@event);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
             }
             return @event;
         }
