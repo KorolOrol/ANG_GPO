@@ -58,25 +58,34 @@ namespace AIGenerator
             character.Description = Description;
             character.Traits = Traits;
             character.Relations = new Dictionary<Character, double>();
-            foreach (var relation in Relations)
+            if (characters != null)
             {
-                Character rel = characters.First(c => c.Name == relation.Key);
-                character.Relations.Add(rel, relation.Value);
-                rel.Relations.Add(character, relation.Value);
+                foreach (var relation in Relations)
+                {
+                    Character rel = characters.First(c => c.Name == relation.Key);
+                    character.Relations.Add(rel, relation.Value);
+                    rel.Relations.Add(character, relation.Value);
+                }
             }
             character.Locations = new List<Location>();
-            foreach (var location in Locations)
+            if (locations != null)
             {
-                Location loc = locations.First(l => l.Name == location);
-                character.Locations.Add(loc);
-                loc.Characters.Add(character);
+                foreach (var location in Locations)
+                {
+                    Location loc = locations.First(l => l.Name == location);
+                    character.Locations.Add(loc);
+                    loc.Characters.Add(character);
+                }
             }
             character.Items = new List<Item>();
-            foreach (var item in Items)
+            if (items != null)
             {
-                Item foundItem = items.First(i => i.Name == item);
-                character.Items.Add(foundItem);
-                foundItem.Host = character;
+                foreach (var item in Items)
+                {
+                    Item foundItem = items.First(i => i.Name == item);
+                    character.Items.Add(foundItem);
+                    foundItem.Host = character;
+                }
             }
             character.Events = new List<Event>();
             return character;

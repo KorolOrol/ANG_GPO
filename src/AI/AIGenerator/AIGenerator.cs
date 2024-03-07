@@ -153,7 +153,7 @@ namespace AIGenerator
         /// <param name="items">Предметы, которые уже есть в истории</param>
         /// <param name="events">События, которые уже есть в истории</param>
         /// <returns>Сгенерированная локация</returns>
-        public async Task<Location> GenerateLocation(List<Character>? characters = null, 
+        public async Task<Location> GenerateLocationAsync(List<Character>? characters = null, 
                                                      List<Location>? locations = null, 
                                                      List<Item>? items = null, 
                                                      List<Event>? events = null)
@@ -174,7 +174,7 @@ namespace AIGenerator
         /// <param name="items">Предметы, которые уже есть в истории</param>
         /// <param name="events">События, которые уже есть в истории</param>
         /// <returns>Сгенерированный предмет</returns>
-        public async Task<Item> GenerateItem(List<Character>? characters = null, 
+        public async Task<Item> GenerateItemAsync(List<Character>? characters = null, 
                                              List<Location>? locations = null, 
                                              List<Item>? items = null, 
                                              List<Event>? events = null)
@@ -195,7 +195,7 @@ namespace AIGenerator
         /// <param name="items">Предметы, которые уже есть в истории</param>
         /// <param name="events">События, которые уже есть в истории</param>
         /// <returns>Сгенерированное событие</returns>
-        public async Task<Event> GenerateEvent(List<Character>? characters = null, 
+        public async Task<Event> GenerateEventAsync(List<Character>? characters = null, 
                                                List<Location>? locations = null, 
                                                List<Item>? items = null, 
                                                List<Event>? events = null)

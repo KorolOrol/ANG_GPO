@@ -9,11 +9,15 @@
 
   <ItemGroup>
     <PackageReference Include="Betalgo.OpenAI" Version="7.4.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="AIGenerator">
       <HintPath>..\AIGenerator\bin\Debug\net8.0\AIGenerator.dll</HintPath>
+    </Reference>
+    <Reference Include="BaseClasses">
+      <HintPath>..\..\base\BaseClasses\bin\Debug\net8.0\BaseClasses.dll</HintPath>
     </Reference>
   </ItemGroup>
 
