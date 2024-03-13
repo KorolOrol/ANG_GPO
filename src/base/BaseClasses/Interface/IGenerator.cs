@@ -10,15 +10,9 @@ namespace BaseClasses.Interface
         /// <summary>
         /// Генерация персонажа
         /// </summary>
-        /// <param name="characters">Персонажи, уже существующие в истории</param>
-        /// <param name="locations">Локации, уже существующие в истории</param>
-        /// <param name="items">Предметы, уже существующие в истории</param>
-        /// <param name="events">События, уже существующие в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированный персонаж</returns>
-        public async Task<Character> GenerateCharacterAsync(List<Character>? characters = null,
-                                                            List<Location>? locations = null,
-                                                            List<Item>? items = null,
-                                                            List<Event>? events = null)
+        public async Task<Character> GenerateCharacterAsync(Plot plot)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -27,15 +21,9 @@ namespace BaseClasses.Interface
         /// <summary>
         /// Генерация локации
         /// </summary>
-        /// <param name="characters">Персонажи, уже существующие в истории</param>
-        /// <param name="locations">Локации, уже существующие в истории</param>
-        /// <param name="items">Предметы, уже существующие в истории</param>
-        /// <param name="events">События, уже существующие в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированная локация</returns>
-        public async Task<Location> GenerateLocationAsync(List<Character>? characters = null,
-                                                          List<Location>? locations = null,
-                                                          List<Item>? items = null,
-                                                          List<Event>? events = null)
+        public async Task<Location> GenerateLocationAsync(Plot plot)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -44,15 +32,9 @@ namespace BaseClasses.Interface
         /// <summary>
         /// Генерация предмета
         /// </summary>
-        /// <param name="characters">Персонажи, уже существующие в истории</param>
-        /// <param name="locations">Локации, уже существующие в истории</param>
-        /// <param name="items">Предметы, уже существующие в истории</param>
-        /// <param name="events">События, уже существующие в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированный предмет</returns>
-        public async Task<Item> GenerateItemAsync(List<Character>? characters = null,
-                                                  List<Location>? locations = null,
-                                                  List<Item>? items = null,
-                                                  List<Event>? events = null)
+        public async Task<Item> GenerateItemAsync(Plot plot)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
@@ -61,15 +43,9 @@ namespace BaseClasses.Interface
         /// <summary>
         /// Генерация события
         /// </summary>
-        /// <param name="characters">Персонажи, уже существующие в истории</param>
-        /// <param name="locations">Локации, уже существующие в истории</param>
-        /// <param name="items">Предметы, уже существующие в истории</param>
-        /// <param name="events">События, уже существующие в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированное событие</returns>
-        public async Task<Event> GenerateEventAsync(List<Character>? characters = null,
-                                                    List<Location>? locations = null,
-                                                    List<Item>? items = null,
-                                                    List<Event>? events = null)
+        public async Task<Event> GenerateEventAsync(Plot plot)
         {
             await Task.Run(() => { });
             throw new NotImplementedException();
