@@ -40,14 +40,10 @@ namespace AIGenerator
         /// <summary>
         /// Преобразование в стандартный класс персонажа
         /// </summary>
-        /// <param name="characters">Список персонажей</param>
-        /// <param name="locations">Список локаций</param>
-        /// <param name="items">Список предметов</param>
-        /// <param name="events">Список событий</param>
+        /// <param name="plot">История</param>
         /// <returns>Стандартный класс персонажа</returns>
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
-        public Character ToCharacter(List<Character> characters, List<Location> locations, 
-                                     List<Item> items, List<Event> events)
+        public Character ToCharacter(Plot plot)
         {
             if (this == null)
             {
@@ -58,13 +54,13 @@ namespace AIGenerator
             character.Description = Description;
             character.Traits = Traits;
             character.Relations = new Dictionary<Character, double>();
-            if (characters != null && characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
                 foreach (var relation in Relations)
                 {
                     try
                     {
-                        Character rel = characters.First(c => c.Name == relation.Key);
+                        Character rel = plot.Characters.First(c => c.Name == relation.Key);
                         character.Relations.Add(rel, relation.Value);
                         rel.Relations.Add(character, relation.Value);
                     }
@@ -75,13 +71,13 @@ namespace AIGenerator
                 }
             }
             character.Locations = new List<Location>();
-            if (locations != null && locations.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
                 foreach (var location in Locations)
                 {
                     try
                     {
-                        Location loc = locations.First(l => l.Name == location);
+                        Location loc = plot.Locations.First(l => l.Name == location);
                         character.Locations.Add(loc);
                         loc.Characters.Add(character);
                     }
@@ -92,13 +88,13 @@ namespace AIGenerator
                 }
             }
             character.Items = new List<Item>();
-            if (items != null && items.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
                 foreach (var item in Items)
                 {
                     try
                     {
-                        Item foundItem = items.First(i => i.Name == item);
+                        Item foundItem = plot.Items.First(i => i.Name == item);
                         if (foundItem.Host != null) continue;
                         character.Items.Add(foundItem);
                         foundItem.Host = character;
@@ -142,14 +138,10 @@ namespace AIGenerator
         /// <summary>
         /// Преобразование в стандартный класс локации
         /// </summary>
-        /// <param name="characters">Список персонажей</param>
-        /// <param name="locations">Список локаций</param>
-        /// <param name="items">Список предметов</param>
-        /// <param name="events">Список событий</param>
+        /// <param name="plot">История</param>
         /// <returns>Стандартный класс локации</returns>
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
-        public Location ToLocation(List<Character> characters, List<Location> locations, 
-                                   List<Item> items, List<Event> events)
+        public Location ToLocation(Plot plot)
         {
             if (this == null)
             {
@@ -159,13 +151,13 @@ namespace AIGenerator
             location.Name = Name;
             location.Description = Description;
             location.Characters = new List<Character>();
-            if (characters != null && characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
                 foreach (var character in Characters)
                 {
                     try
                     {
-                        Character charac = characters.First(c => c.Name == character);
+                        Character charac = plot.Characters.First(c => c.Name == character);
                         location.Characters.Add(charac);
                         charac.Locations.Add(location);
                     }
@@ -176,13 +168,13 @@ namespace AIGenerator
                 }
             }
             location.Items = new List<Item>();
-            if (items != null && items.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
                 foreach (var item in Items)
                 {
                     try
                     {
-                        Item foundItem = items.First(i => i.Name == item);
+                        Item foundItem = plot.Items.First(i => i.Name == item);
                         location.Items.Add(foundItem);
                         foundItem.Location = location;
                     }
@@ -225,14 +217,10 @@ namespace AIGenerator
         /// <summary>
         /// Преобразование в стандартный класс предмета
         /// </summary>
-        /// <param name="characters">Список персонажей</param>
-        /// <param name="locations">Список локаций</param>
-        /// <param name="items">Список предметов</param>
-        /// <param name="events">Список событий</param>
+        /// <param name="plot">История</param>
         /// <returns>Стандартный класс предмета</returns>
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
-        public Item ToItem(List<Character> characters, List<Location> locations, 
-                           List<Item> items, List<Event> events)
+        public Item ToItem(Plot plot)
         {
             if (this == null)
             {
@@ -243,7 +231,7 @@ namespace AIGenerator
             item.Description = Description;
             try
             {
-                item.Location = locations.First(l => l.Name == Location);
+                item.Location = plot.Locations.First(l => l.Name == Location);
             }
             catch (InvalidOperationException)
             {
@@ -251,7 +239,7 @@ namespace AIGenerator
             }
             try
             {
-                item.Host = characters.First(c => c.Name == Host);
+                item.Host = plot.Characters.First(c => c.Name == Host);
             }
             catch (InvalidOperationException)
             {
@@ -295,14 +283,10 @@ namespace AIGenerator
         /// <summary>
         /// Преобразование в стандартный класс события
         /// </summary>
-        /// <param name="characters">Список персонажей</param>
-        /// <param name="locations">Список локаций</param>
-        /// <param name="items">Список предметов</param>
-        /// <param name="events">Список событий</param>
+        /// <param name="plot">История</param>
         /// <returns>Стандартный класс события</returns>
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
-        public Event ToEvent(List<Character> characters, List<Location> locations, 
-                             List<Item> items, List<Event> events)
+        public Event ToEvent(Plot plot)
         {
             if (this == null)
             {
@@ -312,13 +296,13 @@ namespace AIGenerator
             @event.Name = Name;
             @event.Description = Description;
             @event.Characters = new List<Character>();
-            if (characters != null && characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
                 foreach (var character in Characters)
                 {
                     try
                     {
-                        Character charac = characters.First(c => c.Name == character);
+                        Character charac = plot.Characters.First(c => c.Name == character);
                         @event.Characters.Add(charac);
                         charac.Events.Add(@event);
                     }
@@ -329,13 +313,13 @@ namespace AIGenerator
                 }
             }
             @event.Locations = new List<Location>();
-            if (locations != null && locations.Count != 0)
+            if (plot.Locations != null && plot.Locations.Count != 0)
             {
                 foreach (var location in Locations)
                 {
                     try
                     {
-                        Location loc = locations.First(l => l.Name == location);
+                        Location loc = plot.Locations.First(l => l.Name == location);
                         @event.Locations.Add(loc);
                         loc.Events.Add(@event);
                     }
@@ -346,13 +330,13 @@ namespace AIGenerator
                 }
             }
             @event.Items = new List<Item>();
-            if (items != null && items.Count != 0)
+            if (plot.Items != null && plot.Items.Count != 0)
             {
                 foreach (var item in Items)
                 {
                     try
                     {
-                        Item foundItem = items.First(i => i.Name == item);
+                        Item foundItem = plot.Items.First(i => i.Name == item);
                         @event.Items.Add(foundItem);
                         foundItem.Events.Add(@event);
                     }

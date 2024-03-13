@@ -55,23 +55,18 @@ namespace AIGenerator
         /// Получение подсказок для генерации
         /// </summary>
         /// <param name="task">Необходимый элемент истории</param>
-        /// <param name="characters">Список персонажей</param>
-        /// <param name="locations">Список локаций</param>
-        /// <param name="items">Список предметов</param>
-        /// <param name="events">Список событий</param>
+        /// <param name="plot">История</param>
         /// <returns>Список подсказок</returns>
-        private List<string> GetPromptForResponse(string task, List<Character>? characters, 
-                                                  List<Location>? locations, List<Item>? items, 
-                                                  List<Event>? events)
+        private List<string> GetPromptForResponse(string task, Plot plot)
         {
             List<string> prompts = new List<string>
             {
                 SystemPrompt["Setting"],
                 SystemPrompt[$"{task}Start"]
             };
-            if (characters != null && characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
-                foreach (var character in characters)
+                foreach (var character in plot.Characters)
                 {
                     prompts.Add(string.Format(SystemPrompt["CharacterUsage"],
                                               character.Name,
@@ -88,9 +83,9 @@ namespace AIGenerator
             {
                 prompts.Add(SystemPrompt["CharacterEmpty"]);
             }
-            if (locations != null && locations.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
-                foreach (var location in locations)
+                foreach (var location in plot.Locations)
                 {
                     prompts.Add(string.Format(SystemPrompt["LocationUsage"],
                                               location.Name,
@@ -104,9 +99,9 @@ namespace AIGenerator
             {
                 prompts.Add(SystemPrompt["LocationEmpty"]);
             }
-            if (items != null && items.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
-                foreach (var item in items)
+                foreach (var item in plot.Items)
                 {
                     prompts.Add(string.Format(SystemPrompt["ItemUsage"],
                                               item.Name,
@@ -120,9 +115,9 @@ namespace AIGenerator
             {
                 prompts.Add(SystemPrompt["ItemEmpty"]);
             }
-            if (events != null && events.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0)
             {
-                foreach (var ev in events)
+                foreach (var ev in plot.Events)
                 {
                     prompts.Add(string.Format(SystemPrompt["EventUsage"],
                                               ev.Name,
@@ -143,85 +138,60 @@ namespace AIGenerator
         /// <summary>
         /// Генерация персонажа
         /// </summary>
-        /// <param name="characters">Персонажи, которые уже есть в истории</param>
-        /// <param name="locations">Локации, которые уже есть в истории</param>
-        /// <param name="items">Предметы, которые уже есть в истории</param>
-        /// <param name="events">События, которые уже есть в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированный персонаж</returns>
-        public async Task<Character> GenerateCharacterAsync(List<Character>? characters = null, 
-                                                            List<Location>? locations = null, 
-                                                            List<Item>? items = null, 
-                                                            List<Event>? events = null)
+        public async Task<Character> GenerateCharacterAsync(Plot plot)
         {
-            List<string> prompts = GetPromptForResponse("Character", characters, locations, items, events);
+            List<string> prompts = GetPromptForResponse("Character", plot);
             string response = await TextAIGenerator.GenerateText(prompts);
-            return JsonConvert.DeserializeObject<AICharacter>(response).ToCharacter(characters, 
-                                                                                    locations, 
-                                                                                    items, 
-                                                                                    events);
+            Character character = JsonConvert.DeserializeObject<AICharacter>(response)
+                                             .ToCharacter(plot);
+            plot.Characters.Add(character);
+            return character;
         }
 
         /// <summary>
         /// Генерация локации
         /// </summary>
-        /// <param name="characters">Персонажи, которые уже есть в истории</param>
-        /// <param name="locations">Локации, которые уже есть в истории</param>
-        /// <param name="items">Предметы, которые уже есть в истории</param>
-        /// <param name="events">События, которые уже есть в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированная локация</returns>
-        public async Task<Location> GenerateLocationAsync(List<Character>? characters = null, 
-                                                     List<Location>? locations = null, 
-                                                     List<Item>? items = null, 
-                                                     List<Event>? events = null)
+        public async Task<Location> GenerateLocationAsync(Plot plot)
         {
-            List<string> prompts = GetPromptForResponse("Location", characters, locations, items, events);
+            List<string> prompts = GetPromptForResponse("Location", plot);
             string response = await TextAIGenerator.GenerateText(prompts);
-            return JsonConvert.DeserializeObject<AILocation>(response).ToLocation(characters,
-                                                                                  locations,
-                                                                                  items,
-                                                                                  events);
+            Location location = JsonConvert.DeserializeObject<AILocation>(response)
+                                           .ToLocation(plot);
+            plot.Locations.Add(location);
+            return location;
         }
 
         /// <summary>
         /// Генерация предмета
         /// </summary>
-        /// <param name="characters">Персонажи, которые уже есть в истории</param>
-        /// <param name="locations">Локации, которые уже есть в истории</param>
-        /// <param name="items">Предметы, которые уже есть в истории</param>
-        /// <param name="events">События, которые уже есть в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированный предмет</returns>
-        public async Task<Item> GenerateItemAsync(List<Character>? characters = null, 
-                                             List<Location>? locations = null, 
-                                             List<Item>? items = null, 
-                                             List<Event>? events = null)
+        public async Task<Item> GenerateItemAsync(Plot plot)
         {
-            List<string> prompts = GetPromptForResponse("Item", characters, locations, items, events);
+            List<string> prompts = GetPromptForResponse("Item", plot);
             string response = await TextAIGenerator.GenerateText(prompts);
-            return JsonConvert.DeserializeObject<AIItem>(response).ToItem(characters,
-                                                                          locations,
-                                                                          items,
-                                                                          events);
+            Item item = JsonConvert.DeserializeObject<AIItem>(response)
+                                   .ToItem(plot);
+            plot.Items.Add(item);
+            return item;
         }
 
         /// <summary>
         /// Генерация события
         /// </summary>
-        /// <param name="characters">Персонажи, которые уже есть в истории</param>
-        /// <param name="locations">Локации, которые уже есть в истории</param>
-        /// <param name="items">Предметы, которые уже есть в истории</param>
-        /// <param name="events">События, которые уже есть в истории</param>
+        /// <param name="plot">История</param>
         /// <returns>Сгенерированное событие</returns>
-        public async Task<Event> GenerateEventAsync(List<Character>? characters = null, 
-                                               List<Location>? locations = null, 
-                                               List<Item>? items = null, 
-                                               List<Event>? events = null)
+        public async Task<Event> GenerateEventAsync(Plot plot)
         {
-            List<string> prompts = GetPromptForResponse("Event", characters, locations, items, events);
+            List<string> prompts = GetPromptForResponse("Event", plot);
             string response = await TextAIGenerator.GenerateText(prompts);
-            return JsonConvert.DeserializeObject<AIEvent>(response).ToEvent(characters,
-                                                                            locations,
-                                                                            items,
-                                                                            events);
+            Event @event = JsonConvert.DeserializeObject<AIEvent>(response)
+                                      .ToEvent(plot);
+            return @event;
         }
     }
 }

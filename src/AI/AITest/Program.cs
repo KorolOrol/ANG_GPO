@@ -2,12 +2,9 @@
 using AIGen = AIGenerator.AIGenerator;
 
 string path = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-AIGen gen = new AIGen(path);
+AIGen gen = new AIGen(path, "NeuroAPIKey", "https://s2.neuroapi.host");
 
-List<Character> characters = new List<Character>();
-List<Location> locations = new List<Location>();
-List<Item> items = new List<Item>();
-List<Event> events = new List<Event>();
+Plot plot = new Plot();
 
 while (true)
 {
@@ -15,42 +12,27 @@ while (true)
     switch (choise)
     {
         case 1:
-            Character character = await gen.GenerateCharacterAsync(characters, locations, items, events);
-            characters.Add(character);
+            Character character = await gen.GenerateCharacterAsync(plot);
+            plot.Characters.Add(character);
             Console.WriteLine(character.FullInfo());
             break;
         case 2:
-            Location location = await gen.GenerateLocationAsync(characters, locations, items, events);
-            locations.Add(location);
+            Location location = await gen.GenerateLocationAsync(plot);
+            plot.Locations.Add(location);
             Console.WriteLine(location.FullInfo());
             break;
         case 3:
-            Item item = await gen.GenerateItemAsync(characters, locations, items, events);
-            items.Add(item);
+            Item item = await gen.GenerateItemAsync(plot);
+            plot.Items.Add(item);
             Console.WriteLine(item.FullInfo());
             break;
         case 4:
-            Event ev = await gen.GenerateEventAsync(characters, locations, items, events);
-            events.Add(ev);
+            Event ev = await gen.GenerateEventAsync(plot);
+            plot.Events.Add(ev);
             Console.WriteLine(ev.FullInfo());
             break;
         case 5:
-            foreach(var c in characters)
-            {
-                Console.WriteLine(c.FullInfo());
-            }
-            foreach(var l in locations)
-            {
-                Console.WriteLine(l.FullInfo());
-            }
-            foreach(var i in items)
-            {
-                Console.WriteLine(i.FullInfo());
-            }
-            foreach (var e in events)
-            {
-                Console.WriteLine(e.FullInfo());
-            }
+            Console.WriteLine(plot.FullInfo());
             break;
         case 0:
             return;
