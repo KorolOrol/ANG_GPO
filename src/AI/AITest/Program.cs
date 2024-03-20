@@ -2,7 +2,10 @@
 using AIGen = AIGenerator.AIGenerator;
 
 string path = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-AIGen gen = new AIGen(path, "NeuroAPIKey", "https://s2.neuroapi.host");
+AIGen Ngen = new AIGen(path, "NeuroAPIKey", "https://lk.neuroapi.host");
+AIGen Ogen = new AIGen(path);
+
+AIGen gen = Ogen;
 
 Plot plot = new Plot();
 
@@ -12,26 +15,54 @@ while (true)
     switch (choise)
     {
         case 1:
-            Character character = await gen.GenerateCharacterAsync(plot);
-            plot.Characters.Add(character);
-            Console.WriteLine(character.FullInfo());
-            break;
+            {
+                Character character = await gen.GenerateCharacterAsync(plot);
+                Console.WriteLine(character.FullInfo());
+                break;
+            }
         case 2:
-            Location location = await gen.GenerateLocationAsync(plot);
-            plot.Locations.Add(location);
-            Console.WriteLine(location.FullInfo());
-            break;
+            {
+                Location location = await gen.GenerateLocationAsync(plot);
+                Console.WriteLine(location.FullInfo());
+                break;
+            }
         case 3:
-            Item item = await gen.GenerateItemAsync(plot);
-            plot.Items.Add(item);
-            Console.WriteLine(item.FullInfo());
-            break;
+            {
+                Item item = await gen.GenerateItemAsync(plot);
+                Console.WriteLine(item.FullInfo());
+                break;
+            }
         case 4:
-            Event ev = await gen.GenerateEventAsync(plot);
-            plot.Events.Add(ev);
-            Console.WriteLine(ev.FullInfo());
-            break;
+            {
+                Event ev = await gen.GenerateEventAsync(plot);
+                Console.WriteLine(ev.FullInfo());
+                break;
+            }
         case 5:
+            {
+                Character character = await gen.GenerateCharacterChainAsync(plot);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case 6:
+            {
+                Location location = await gen.GenerateLocationChainAsync(plot);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case 7:
+            {
+                Item item = await gen.GenerateItemChainAsync(plot);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case 8:
+            {
+                Event @event = await gen.GenerateEventChainAsync(plot);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case 9:
             Console.WriteLine(plot.FullInfo());
             break;
         case 0:

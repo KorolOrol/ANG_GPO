@@ -7,7 +7,7 @@ namespace AIGenerator
     /// <summary>
     /// ИИ-генератор
     /// </summary>
-    public class AIGenerator : IGenerator
+    public class AIGenerator : IGenerator, IChainGenerator
     {
         /// <summary>
         /// Генератор текста
@@ -57,7 +57,7 @@ namespace AIGenerator
         /// <param name="task">Необходимый элемент истории</param>
         /// <param name="plot">История</param>
         /// <returns>Список подсказок</returns>
-        private List<string> GetPromptForResponse(string task, Plot plot)
+        private List<string> GetPromptForResponse(string task, Plot plot, string name = "")
         {
             List<string> prompts = new List<string>
             {
@@ -83,7 +83,7 @@ namespace AIGenerator
             {
                 prompts.Add(SystemPrompt["CharacterEmpty"]);
             }
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Locations != null && plot.Locations.Count != 0)
             {
                 foreach (var location in plot.Locations)
                 {
@@ -99,15 +99,17 @@ namespace AIGenerator
             {
                 prompts.Add(SystemPrompt["LocationEmpty"]);
             }
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Items != null && plot.Items.Count != 0)
             {
                 foreach (var item in plot.Items)
                 {
                     prompts.Add(string.Format(SystemPrompt["ItemUsage"],
                                               item.Name,
                                               item.Description,
-                                              item.Host.Name,
-                                              item.Location.Name,
+                                              item.Host != null ? item.Host.Name : 
+                                                                  SystemPrompt["None"],
+                                              item.Location != null ? item.Location.Name : 
+                                                                      SystemPrompt["None"],
                                               string.Join(", ", item.Events.Select(e => e.Name))));
                 }
             } 
@@ -115,7 +117,7 @@ namespace AIGenerator
             {
                 prompts.Add(SystemPrompt["ItemEmpty"]);
             }
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Events != null && plot.Events.Count != 0)
             {
                 foreach (var ev in plot.Events)
                 {
@@ -130,6 +132,10 @@ namespace AIGenerator
             else
             {
                 prompts.Add(SystemPrompt["EventEmpty"]);
+            }
+            if (name != "")
+            {
+                prompts.Add(string.Format(SystemPrompt[$"{task}Chain"], name));
             }
             prompts.Add(SystemPrompt[$"{task}End"]);
             return prompts;
@@ -191,7 +197,182 @@ namespace AIGenerator
             string response = await TextAIGenerator.GenerateText(prompts);
             Event @event = JsonConvert.DeserializeObject<AIEvent>(response)
                                       .ToEvent(plot);
+            plot.Events.Add(@event);
             return @event;
+        }
+
+        public async Task<Character> GenerateCharacterChainAsync(Plot plot, int recursion = 3, string name = "")
+        {
+            List<string> prompts = GetPromptForResponse("Character", plot, name);
+            string response = await TextAIGenerator.GenerateText(prompts);
+            AICharacter character = JsonConvert.DeserializeObject<AICharacter>(response);
+            Character returnCharacter = character.ToCharacter(plot);
+            plot.Characters.Add(returnCharacter);
+            if (recursion > 0)
+            {
+                foreach (string n in character.NewRelations(plot))
+                {
+                    Character relation = await GenerateCharacterChainAsync(plot, recursion - 1, n);
+                    if (!returnCharacter.Relations.ContainsKey(relation))
+                    {
+                        returnCharacter.Relations.Add(relation, character.Relations[n]);
+                        relation.Relations.Add(returnCharacter, character.Relations[n]);
+                    }
+                    else
+                    {
+                        returnCharacter.Relations[relation] = character.Relations[n];
+                        relation.Relations[returnCharacter] = character.Relations[n];
+                    }
+                }
+                foreach (string n in character.NewLocations(plot))
+                {
+                    Location location = await GenerateLocationChainAsync(plot, recursion - 1, n);
+                    if (!returnCharacter.Locations.Contains(location))
+                        returnCharacter.Locations.Add(location);
+                    if (!location.Characters.Contains(returnCharacter))
+                        location.Characters.Add(returnCharacter);
+                }
+                foreach (string n in character.NewItems(plot))
+                {
+                    Item item = await GenerateItemChainAsync(plot, recursion - 1, n);
+                    if (!returnCharacter.Items.Contains(item))
+                        returnCharacter.Items.Add(item);
+                    if (item.Host != returnCharacter)
+                    {
+                        item.Host.Items.Remove(item);
+                        item.Host = returnCharacter;
+                    }
+                }
+                foreach (string n in character.NewEvents(plot))
+                {
+                    Event @event = await GenerateEventChainAsync(plot, recursion - 1, n);
+                    if (!returnCharacter.Events.Contains(@event))
+                        returnCharacter.Events.Add(@event);
+                    if (!@event.Characters.Contains(returnCharacter))
+                        @event.Characters.Add(returnCharacter);
+                }
+            }
+            return returnCharacter;
+        }
+
+        public async Task<Location> GenerateLocationChainAsync(Plot plot, int recursion = 3, string name = "")
+        {
+            List<string> prompts = GetPromptForResponse("Location", plot, name);
+            string response = await TextAIGenerator.GenerateText(prompts);
+            AILocation location = JsonConvert.DeserializeObject<AILocation>(response);
+            Location returnLocation = location.ToLocation(plot);
+            plot.Locations.Add(returnLocation);
+            if (recursion > 0)
+            {
+                foreach (string n in location.NewCharacters(plot))
+                {
+                    Character character = await GenerateCharacterChainAsync(plot, recursion - 1, n);
+                    if (!returnLocation.Characters.Contains(character))
+                        returnLocation.Characters.Add(character);
+                    if (!character.Locations.Contains(returnLocation))
+                        character.Locations.Add(returnLocation);
+                }
+                foreach (string n in location.NewItems(plot))
+                {
+                    Item item = await GenerateItemChainAsync(plot, recursion - 1, n);
+                    if (!returnLocation.Items.Contains(item))
+                        returnLocation.Items.Add(item);
+                    if (item.Location != returnLocation)
+                    {
+                        item.Location.Items.Remove(item);
+                        item.Location = returnLocation;
+                    }
+                }
+                foreach (string n in location.NewEvents(plot))
+                {
+                    Event @event = await GenerateEventChainAsync(plot, recursion - 1, n);
+                    if (!returnLocation.Events.Contains(@event))
+                        returnLocation.Events.Add(@event);
+                    if (!@event.Locations.Contains(returnLocation))
+                        @event.Locations.Add(returnLocation);
+                }
+            }
+            return returnLocation;
+        }
+
+        public async Task<Item> GenerateItemChainAsync(Plot plot, int recursion = 3, string name = "")
+        {
+            List<string> prompts = GetPromptForResponse("Item", plot, name);
+            string response = await TextAIGenerator.GenerateText(prompts);
+            AIItem item = JsonConvert.DeserializeObject<AIItem>(response);
+            Item returnItem = item.ToItem(plot);
+            plot.Items.Add(returnItem);
+            if (recursion > 0)
+            {
+                if (item.NewHost(plot) != null)
+                {
+                    Character host = await GenerateCharacterChainAsync(plot, recursion - 1, item.Host);
+                    if (returnItem.Host != host)
+                    {
+                        returnItem.Host.Items.Remove(returnItem);
+                        returnItem.Host = host;
+                    }
+                    if (!host.Items.Contains(returnItem))
+                        host.Items.Add(returnItem);
+                }
+                if (item.NewLocation(plot) != null)
+                {
+                    Location location = await GenerateLocationChainAsync(plot, recursion - 1, item.Location);
+                    if (returnItem.Location != location)
+                    {
+                        returnItem.Location.Items.Remove(returnItem);
+                        returnItem.Location = location;
+                    }
+                    if (!location.Items.Contains(returnItem))
+                        location.Items.Add(returnItem);
+                }
+                foreach (string n in item.NewEvents(plot))
+                {
+                    Event @event = await GenerateEventChainAsync(plot, recursion - 1, n);
+                    if (!returnItem.Events.Contains(@event))
+                        returnItem.Events.Add(@event);
+                    if (!@event.Items.Contains(returnItem))
+                        @event.Items.Add(returnItem);
+                }
+            }
+            return returnItem;
+        }
+
+        public async Task<Event> GenerateEventChainAsync(Plot plot, int recursion = 3, string name = "")
+        {
+            List<string> prompts = GetPromptForResponse("Event", plot, name);
+            string response = await TextAIGenerator.GenerateText(prompts);
+            AIEvent @event = JsonConvert.DeserializeObject<AIEvent>(response);
+            Event returnEvent = @event.ToEvent(plot);
+            plot.Events.Add(returnEvent);
+            if (recursion > 0)
+            {
+                foreach (string n in @event.NewCharacters(plot))
+                {
+                    Character character = await GenerateCharacterChainAsync(plot, recursion - 1, n);
+                    if (!returnEvent.Characters.Contains(character))
+                        returnEvent.Characters.Add(character);
+                    if (!character.Events.Contains(returnEvent))
+                        character.Events.Add(returnEvent);
+                }
+                foreach (string n in @event.NewLocations(plot))
+                {
+                    Location location = await GenerateLocationChainAsync(plot, recursion - 1, n);
+                    if (!returnEvent.Locations.Contains(location))
+                        returnEvent.Locations.Add(location);
+                    if (!location.Events.Contains(returnEvent))
+                        location.Events.Add(returnEvent);
+                }
+                foreach (string n in @event.NewItems(plot))
+                {
+                    Item item = await GenerateItemChainAsync(plot, recursion - 1, n);
+                    if (!returnEvent.Items.Contains(item))
+                        returnEvent.Items.Add(item);
+                    if (!item.Events.Contains(returnEvent))
+                        item.Events.Add(returnEvent);
+                }
+            }
+            return returnEvent;
         }
     }
 }

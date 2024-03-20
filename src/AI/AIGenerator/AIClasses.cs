@@ -38,6 +38,11 @@ namespace AIGenerator
         public List<string> Items { get; set; }
 
         /// <summary>
+        /// События, в которых участвует персонаж
+        /// </summary>
+        public List<string> Events { get; set; }
+
+        /// <summary>
         /// Преобразование в стандартный класс персонажа
         /// </summary>
         /// <param name="plot">История</param>
@@ -54,7 +59,7 @@ namespace AIGenerator
             character.Description = Description;
             character.Traits = Traits;
             character.Relations = new Dictionary<Character, double>();
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0 && Relations != null)
             {
                 foreach (var relation in Relations)
                 {
@@ -71,7 +76,7 @@ namespace AIGenerator
                 }
             }
             character.Locations = new List<Location>();
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Locations != null && plot.Locations.Count != 0 && Locations != null)
             {
                 foreach (var location in Locations)
                 {
@@ -88,7 +93,7 @@ namespace AIGenerator
                 }
             }
             character.Items = new List<Item>();
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Items != null && plot.Items.Count != 0 && Items != null)
             {
                 foreach (var item in Items)
                 {
@@ -106,7 +111,95 @@ namespace AIGenerator
                 }
             }
             character.Events = new List<Event>();
+            if (plot.Events != null && plot.Events.Count != 0 && Events != null)
+            {
+                foreach (var @event in Events)
+                {
+                    try
+                    {
+                        Event foundEvent = plot.Events.First(e => e.Name == @event);
+                        character.Events.Add(foundEvent);
+                        foundEvent.Characters.Add(character);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
+            }
             return character;
+        }
+
+        /// <summary>
+        /// Получение новых отношений для персонажа
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых отношений</returns>
+        public List<string> NewRelations(Plot plot)
+        {
+            List<string> newRelations = new List<string>();
+            foreach (string name in Relations.Keys)
+            {
+                if (plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                {
+                    newRelations.Add(name);
+                }
+            }
+            return newRelations;
+        }
+
+        /// <summary>
+        /// Получение новых местоположений для персонажа
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns></returns>
+        public List<string> NewLocations(Plot plot)
+        {
+            List<string> newLocations = new List<string>();
+            foreach (string name in Locations)
+            {
+                if (plot.Locations.FirstOrDefault(l => l.Name == name) == null)
+                {
+                    newLocations.Add(name);
+                }
+            }
+            return newLocations;
+        }
+
+        /// <summary>
+        /// Получение новых вещей для персонажа
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых вещей</returns>
+        public List<string> NewItems(Plot plot)
+        {
+            List<string> newItems = new List<string>();
+            foreach (string name in Items)
+            {
+                if (plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                {
+                    newItems.Add(name);
+                }
+            }
+            return newItems;
+        }
+
+        /// <summary>
+        /// Получение новых событий для персонажа
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых событий</returns>
+        public List<string> NewEvents(Plot plot)
+        {
+            List<string> newEvents = new List<string>();
+            foreach (string name in Events)
+            {
+                if (plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                {
+                    newEvents.Add(name);
+                }
+            }
+            return newEvents;
         }
     }
 
@@ -136,6 +229,11 @@ namespace AIGenerator
         public List<string> Items { get; set; }
 
         /// <summary>
+        /// События, происходящие в локации
+        /// </summary>
+        public List<string> Events { get; set; }
+
+        /// <summary>
         /// Преобразование в стандартный класс локации
         /// </summary>
         /// <param name="plot">История</param>
@@ -151,7 +249,7 @@ namespace AIGenerator
             location.Name = Name;
             location.Description = Description;
             location.Characters = new List<Character>();
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0 && Characters != null)
             {
                 foreach (var character in Characters)
                 {
@@ -168,7 +266,7 @@ namespace AIGenerator
                 }
             }
             location.Items = new List<Item>();
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Items != null && plot.Items.Count != 0 && Items != null)
             {
                 foreach (var item in Items)
                 {
@@ -185,7 +283,77 @@ namespace AIGenerator
                 }
             }
             location.Events = new List<Event>();
+            if (plot.Events != null && plot.Events.Count != 0 && Events != null)
+            {
+                foreach (var @event in Events)
+                {
+                    try
+                    {
+                        Event foundEvent = plot.Events.First(e => e.Name == @event);
+                        location.Events.Add(foundEvent);
+                        foundEvent.Locations.Add(location);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
+            }
             return location;
+        }
+
+        /// <summary>
+        /// Получение новых персонажей для локации
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых персонажей</returns>
+        public List<string> NewCharacters(Plot plot)
+        {
+            List<string> newCharacters = new List<string>();
+            foreach (string name in Characters)
+            {
+                if (plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                {
+                    newCharacters.Add(name);
+                }
+            }
+            return newCharacters;
+        }
+
+        /// <summary>
+        /// Получение новых вещей для локации
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых вещей</returns>
+        public List<string> NewItems(Plot plot)
+        {
+            List<string> newItems = new List<string>();
+            foreach (string name in Items)
+            {
+                if (plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                {
+                    newItems.Add(name);
+                }
+            }
+            return newItems;
+        }
+
+        /// <summary>
+        /// Получение новых событий для локации
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых событий</returns>
+        public List<string> NewEvents(Plot plot)
+        {
+            List<string> newEvents = new List<string>();
+            foreach (string name in Events)
+            {
+                if (plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                {
+                    newEvents.Add(name);
+                }
+            }
+            return newEvents;
         }
     }
 
@@ -215,6 +383,11 @@ namespace AIGenerator
         public string Host { get; set; }
 
         /// <summary>
+        /// События, в которых участвует предмет
+        /// </summary>
+        public List<string> Events { get; set; }
+
+        /// <summary>
         /// Преобразование в стандартный класс предмета
         /// </summary>
         /// <param name="plot">История</param>
@@ -232,6 +405,7 @@ namespace AIGenerator
             try
             {
                 item.Location = plot.Locations.First(l => l.Name == Location);
+                item.Location.Items.Add(item);
             }
             catch (InvalidOperationException)
             {
@@ -240,13 +414,76 @@ namespace AIGenerator
             try
             {
                 item.Host = plot.Characters.First(c => c.Name == Host);
+                item.Host.Items.Add(item);
             }
             catch (InvalidOperationException)
             {
                 item.Host = null;
             }
             item.Events = new List<Event>();
+            if (plot.Events != null && plot.Events.Count != 0 && Events != null)
+            {
+                foreach (var @event in Events)
+                {
+                    try
+                    {
+                        Event foundEvent = plot.Events.First(e => e.Name == @event);
+                        item.Events.Add(foundEvent);
+                        foundEvent.Items.Add(item);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        continue;
+                    }
+                }
+            }
             return item;
+        }
+
+        /// <summary>
+        /// Получение новый хозяин для предмета
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Новый хозяин</returns>
+        public string NewHost(Plot plot)
+        {
+            if (plot.Characters.FirstOrDefault(c => c.Name == Host) == null)
+            {
+                return Host;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Получение новой локации для предмета
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Новая локация</returns>
+        public string NewLocation(Plot plot)
+        {
+            if (plot.Locations.FirstOrDefault(l => l.Name == Location) == null)
+            {
+                return Location;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Получение новых событий для предмета
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых событий</returns>
+        public List<string> NewEvents(Plot plot)
+        {
+            List<string> newEvents = new List<string>();
+            foreach (string name in Events)
+            {
+                if (plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                {
+                    newEvents.Add(name);
+                }
+            }
+            return newEvents;
         }
     }
 
@@ -296,7 +533,7 @@ namespace AIGenerator
             @event.Name = Name;
             @event.Description = Description;
             @event.Characters = new List<Character>();
-            if (plot.Characters != null && plot.Characters.Count != 0)
+            if (plot.Characters != null && plot.Characters.Count != 0 && Characters != null)
             {
                 foreach (var character in Characters)
                 {
@@ -313,7 +550,7 @@ namespace AIGenerator
                 }
             }
             @event.Locations = new List<Location>();
-            if (plot.Locations != null && plot.Locations.Count != 0)
+            if (plot.Locations != null && plot.Locations.Count != 0 && Locations != null)
             {
                 foreach (var location in Locations)
                 {
@@ -330,7 +567,7 @@ namespace AIGenerator
                 }
             }
             @event.Items = new List<Item>();
-            if (plot.Items != null && plot.Items.Count != 0)
+            if (plot.Items != null && plot.Items.Count != 0 && Items != null)
             {
                 foreach (var item in Items)
                 {
@@ -347,6 +584,60 @@ namespace AIGenerator
                 }
             }
             return @event;
+        }
+
+        /// <summary>
+        /// Получение новых персонажей для события
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых персонажей</returns>
+        public List<string> NewCharacters(Plot plot)
+        {
+            List<string> newCharacters = new List<string>();
+            foreach (string name in Characters)
+            {
+                if (plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                {
+                    newCharacters.Add(name);
+                }
+            }
+            return newCharacters;
+        }
+
+        /// <summary>
+        /// Получение новых локаций для события
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых локаций</returns>
+        public List<string> NewLocations(Plot plot)
+        {
+            List<string> newLocations = new List<string>();
+            foreach (string name in Locations)
+            {
+                if (plot.Locations.FirstOrDefault(l => l.Name == name) == null)
+                {
+                    newLocations.Add(name);
+                }
+            }
+            return newLocations;
+        }
+
+        /// <summary>
+        /// Получение новых вещей для события
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Список новых вещей</returns>
+        public List<string> NewItems(Plot plot)
+        {
+            List<string> newItems = new List<string>();
+            foreach (string name in Items)
+            {
+                if (plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                {
+                    newItems.Add(name);
+                }
+            }
+            return newItems;
         }
     }
 }

@@ -110,6 +110,11 @@ namespace AIGenerator
             }
             else
             {
+                if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                {
+                    await Task.Delay(5000);
+                    return await GenerateText(messages);
+                }
                 throw new Exception("Failed to generate text: " + completion.Error.Message);
             }
         }
