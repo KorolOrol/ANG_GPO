@@ -7,6 +7,10 @@ using System.Runtime.Intrinsics.X86;
 public class Character
 {
 
+    /// <summary>
+    ///  Три Слэша - Всему Голова (ну и всё перефакторить ес, названия)
+    /// </summary>
+
     #region [ Character characteristics ]
 
     public string name;
@@ -140,7 +144,7 @@ public class Character
     #endregion
 
     #region [Additional methods]
-    private List<int> createArr(int i)
+    private List<int> CreateArr(int i)
     {
         List<int> list = new List<int>();
 
@@ -151,7 +155,7 @@ public class Character
 
         return list;
     }
-    private List<Trait> sortListByAff(List<Trait> traits)
+    private List<Trait> SortListByAff(List<Trait> traits)
     {
 
         for (int step = 0; step < (traits.Count() - 1); ++step)
@@ -177,7 +181,7 @@ public class Character
 
         return traits;
     }
-    private bool checkTabl(int i)
+    private bool CheckTabl(int i)
     {
         foreach (Trait a in traits)
         {
@@ -197,7 +201,7 @@ public class Character
     #endregion
 
     #region [Create Character from Zero]  // TODO: Add more ways to generation
-    public void create_full_random(int traits_count)
+    public void CreateByChaoticRandom(int traits_count)
     {
         if (max_possible_traits <= traits_count)
         {
@@ -214,7 +218,7 @@ public class Character
         }
     }
 
-    public void create_logic_random(int traits_count) // Стоит ли удалять из traits_list и tabl? Типо это метод генерации через таблицу. Думаю стоит, но и думаю, что не стоит
+    public void CreateByLogicRandom(int traits_count) // Стоит ли удалять из traits_list и tabl? Типо это метод генерации через таблицу. Думаю стоит, но и думаю, что не стоит
     {
         if (max_possible_traits <= traits_count)
         {
@@ -222,14 +226,14 @@ public class Character
         }
         else
         {
-            List<int> ids = createArr(traits_list.Count);
+            List<int> ids = CreateArr(traits_list.Count);
             /*Console.WriteLine(string.Join(" ", ids));*/
 
             for (int i = 0; i < traits_count; i++)
             {
                 var random = new Random().Next(traits_list.Count);
 
-                if (traits.Count == 0 || checkTabl(random) && ids.Contains(random)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(random) && ids.Contains(random)) // Тут || или && ?
                 {
                     traits.Add(traits_list[random]);
                     traits[i].id = random;
@@ -246,7 +250,7 @@ public class Character
     #endregion
 
     #region [Create Character from Parents]
-    public void create_by_two_parents_random_half(int traits_count, Character mama, Character papa, string name) // А что если черты не будут сходиться? Нужно решить этот вопросик -> генерить новую черту
+    public void CreateByTwoParentsHalfRandom(int traits_count, Character mama, Character papa, string name) // А что если черты не будут сходиться? Нужно решить этот вопросик -> генерить новую черту
     {
         if (mama.traits == null || papa.traits == null)
         {
@@ -259,7 +263,7 @@ public class Character
         }
         else if (traits_count == (mama.traits.Count + papa.traits.Count) / 2)
         {
-            create_by_two_parents_random_half(mama, papa, name);
+            CreateByTwoParentsHalf(mama, papa, name);
         }
 
         else if (traits_count > (mama.traits.Count + papa.traits.Count) / 2)
@@ -276,7 +280,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || checkTabl(combined_traits[random].id)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[random].id)) // Тут || или && ?
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -290,7 +294,7 @@ public class Character
             {
                 var random = new Random().Next(traits_list.Count);
 
-                if (traits.Count == 0 || checkTabl(random)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(random)) // Тут || или && ?
                 {
                     traits.Add(traits_list[random]);
                     traits[i].id = random;
@@ -316,7 +320,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || checkTabl(combined_traits[random].id)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[random].id)) // Тут || или && ?
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -333,7 +337,7 @@ public class Character
         }
     }
 
-    public void create_by_two_parents_random_half(Character mama, Character papa, string name) // А что если черты не будут сходиться? Нужно решить этот вопросик -> генерить новую черту
+    public void CreateByTwoParentsHalf(Character mama, Character papa, string name) // А что если черты не будут сходиться? Нужно решить этот вопросик -> генерить новую черту
     {
         if (mama.traits == null || papa.traits == null)
         {
@@ -353,7 +357,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || checkTabl(combined_traits[random].id)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[random].id)) // Тут || или && ?
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -365,7 +369,7 @@ public class Character
         }
     }
 
-    public void create_by_two_parents_logic(int traits_count, Character mama, Character papa, string name) // Большой affection -> больше шанс передаться ребёночку
+    public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name) // Большой affection -> больше шанс передаться ребёночку
     {
         this.name = name;
 
@@ -374,7 +378,7 @@ public class Character
         combined_traits.AddRange(mama.traits);
         combined_traits.AddRange(papa.traits);
 
-        combined_traits = sortListByAff(combined_traits);
+        combined_traits = SortListByAff(combined_traits);
 
         for (int i = 0; i < combined_traits.Count; i++)
         {
@@ -383,7 +387,7 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || checkTabl(combined_traits[i].id) && random <= 0.55d) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[i].id) && random <= 0.85d) // Тут || или && ?
                 {
                     traits.Add(combined_traits[i]);
                     Console.WriteLine(random);
@@ -397,7 +401,7 @@ public class Character
     #endregion
 
     #region [Output]
-    public void write_all_traits()
+    public void WriteAllTraits()
     {
         Console.Write($"{name} has this traits: ");
         foreach (var trait in traits)
@@ -406,7 +410,7 @@ public class Character
         }
     }
 
-    public void write_all_traits_with_aff()
+    public void WriteAllTraitsWithAff()
     {
         Console.Write($"{name} has this traits: ");
         Console.WriteLine("\n");
@@ -418,7 +422,7 @@ public class Character
         }
     }
 
-    public void write_all_traits_with_description()
+    public void WriteAllTraitsWithAffDesc()
     {
         Console.Write($"{name} has this traits: ");
 
@@ -470,12 +474,15 @@ public class Character
     #endregion
 
     #region [Deprecated methods]
-    // Третий вариант создания персонажа через "якорь".
-    // Например, 0 - отрицательный персонаж, а 1 - положительный.
-    // Создаётся рандомный/введённый "якорь" от 0 до 1                                  // Ну или якорь от 0 до 3))
-    // От этого создать генератор так, чтобы 1 был без плохих черт, а 0 без хороших.
-    // А 0.5 мог и то, и то.
-    public bool checkTablAnchor(int id, int anchor) // row 7 - BOB = i; row 3 - BRV already in traits[0]  = 2
+
+
+    /// <summary>
+    /// Проверяет черту по всем якорям.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="anchor"></param>
+    /// <returns></returns>
+    public bool CheckTablAnchor(int id, int anchor)
     {
         foreach (Trait a in traits)
         {
@@ -493,7 +500,14 @@ public class Character
         return true;
     }
 
-    public bool checkAnchor(int anchor, int traits_count, int id)
+    /// <summary>
+    /// Проверяет возможность создания персонажа с введённым якорем.
+    /// </summary>
+    /// <param name="anchor"></param>
+    /// <param name="traits_count"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public bool CheckAnchorPossibility(int anchor, int traits_count, int id)
     {
         int cnt = 0;
 
@@ -515,10 +529,16 @@ public class Character
         return true;
     }
 
-    [Obsolete("create_logic_anchor_random is deprecated, please use create_logic_random instead."/*, true*/)] // Вернуть, чтобы ес шо вызывал ошибку
-    public void create_logic_anchor_random(int traits_count, int anchor)
+
+    /// <summary>
+    /// Создание персонажа через "якорь". Якорь - число от 0 до 3. Чем якорь больше, тем персонаж будет интереснее (сомнительнее)
+    /// </summary>
+    /// <param name="traits_count"></param>
+    /// <param name="anchor"></param>
+    [Obsolete("CreateByAnchorLogic is deprecated, please use CreateByAnchorLogic instead."/*, true*/)]
+    public void CreateByAnchorLogic(int traits_count, int anchor)
     {
-        if (traits_list.Count / 4 < traits_count)
+        if (max_possible_traits <= traits_count)
         {
             Console.WriteLine("Not enough traits in data base");
         }
@@ -528,10 +548,10 @@ public class Character
             {
                 var random = new Random().Next(traits_list.Count);
 
-                List<int> ids = createArr(traits_list.Count);
+                List<int> ids = CreateArr(traits_list.Count);
                 /*Console.WriteLine(string.Join(" ", ids));*/
 
-                if (checkAnchor(anchor, traits_count, random) && checkTablAnchor(random, anchor) && ids.Contains(random))
+                if (CheckAnchorPossibility(anchor, traits_count, random) && CheckTablAnchor(random, anchor) && ids.Contains(random))
                 {
                     traits.Add(traits_list[random]);
                     traits[iv].id = random;
