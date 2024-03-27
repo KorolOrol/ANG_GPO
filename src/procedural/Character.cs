@@ -11,7 +11,7 @@ public class Character
     ///  Три Слэша - Всему Голова (ну и всё перефакторить ес, названия)
     /// </summary>
 
-    #region [ Character characteristics ]
+    #region [Character characteristics]
 
     public string name;
     public int    age;
@@ -144,6 +144,12 @@ public class Character
     #endregion
 
     #region [Additional methods]
+
+    /// <summary>
+    /// Создаёт массив натуральных чисел от 0 до i
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
     private List<int> CreateArr(int i)
     {
         List<int> list = new List<int>();
@@ -155,6 +161,12 @@ public class Character
 
         return list;
     }
+
+    /// <summary>
+    /// Сортирует лист черт от наибольшей склонности к наименьшей
+    /// </summary>
+    /// <param name="traits"></param>
+    /// <returns></returns>
     private List<Trait> SortListByAff(List<Trait> traits)
     {
 
@@ -181,6 +193,12 @@ public class Character
 
         return traits;
     }
+
+    /// <summary>
+    /// Проверяет, можно ли добавить черту по её айди в лист черт (совместимость)
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
     private bool CheckTabl(int i)
     {
         foreach (Trait a in traits)
@@ -201,11 +219,16 @@ public class Character
     #endregion
 
     #region [Create Character from Zero]  // TODO: Add more ways to generation
+
+    /// <summary>
+    /// Генерация черт персонажа через обычный рандом
+    /// </summary>
+    /// <param name="traits_count"></param>
     public void CreateByChaoticRandom(int traits_count)
     {
         if (max_possible_traits <= traits_count)
         {
-            Console.WriteLine("Not enough traits in data base to create_full_random");
+            Console.WriteLine("Not enough traits in data base to CreateByChaoticRandom");
         }
         else
         {
@@ -218,11 +241,15 @@ public class Character
         }
     }
 
-    public void CreateByLogicRandom(int traits_count) // Стоит ли удалять из traits_list и tabl? Типо это метод генерации через таблицу. Думаю стоит, но и думаю, что не стоит
+    /// <summary>
+    /// Генерация черт персонажа с помощью логики. Все черты совместимы друг с другом
+    /// </summary>
+    /// <param name="traits_count"></param>
+    public void CreateByLogicRandom(int traits_count)
     {
         if (max_possible_traits <= traits_count)
         {
-            Console.WriteLine("Not enough traits in data base to create_logic_random");
+            Console.WriteLine("Not enough traits in data base to CreateByLogicRandom");
         }
         else
         {
@@ -250,7 +277,15 @@ public class Character
     #endregion
 
     #region [Create Character from Parents]
-    public void CreateByTwoParentsHalfRandom(int traits_count, Character mama, Character papa, string name) // А что если черты не будут сходиться? Нужно решить этот вопросик -> генерить новую черту
+
+    /// <summary>
+    /// Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы. Дополнительные черты при необходимости генерятся по логике
+    /// </summary>
+    /// <param name="traits_count"></param>
+    /// <param name="mama"></param>
+    /// <param name="papa"></param>
+    /// <param name="name"></param>
+    public void CreateByTwoParentsHalfRandom(int traits_count, Character mama, Character papa, string name)
     {
         if (mama.traits == null || papa.traits == null)
         {
@@ -259,7 +294,7 @@ public class Character
 
         else if (max_possible_traits <= traits_count)
         {
-            Console.WriteLine("Not enough traits in data base to create_by_two_parents_random_half");
+            Console.WriteLine("Not enough traits in data base to CreateByTwoParentsHalfRandom");
         }
         else if (traits_count == (mama.traits.Count + papa.traits.Count) / 2)
         {
@@ -280,7 +315,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[random].id)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[random].id))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -294,7 +329,7 @@ public class Character
             {
                 var random = new Random().Next(traits_list.Count);
 
-                if (traits.Count == 0 || CheckTabl(random)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(random))
                 {
                     traits.Add(traits_list[random]);
                     traits[i].id = random;
@@ -337,7 +372,13 @@ public class Character
         }
     }
 
-    public void CreateByTwoParentsHalf(Character mama, Character papa, string name) // А что если черты не будут сходиться? Нужно решить этот вопросик -> генерить новую черту
+    /// <summary>
+    ///  Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы
+    /// </summary>
+    /// <param name="mama"></param>
+    /// <param name="papa"></param>
+    /// <param name="name"></param>
+    public void CreateByTwoParentsHalf(Character mama, Character papa, string name)
     {
         if (mama.traits == null || papa.traits == null)
         {
@@ -369,7 +410,14 @@ public class Character
         }
     }
 
-    public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name) // Большой affection -> больше шанс передаться ребёночку
+    /// <summary>
+    ///  Генерация черт персонажа с помощью двух родителей. Берутся черты с большой склонностью
+    /// </summary>
+    /// <param name="traits_count"></param>
+    /// <param name="mama"></param>
+    /// <param name="papa"></param>
+    /// <param name="name"></param>
+    public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name)
     {
         this.name = name;
 
@@ -453,7 +501,8 @@ public class Character
 
     #endregion
 
-    #region [Construstors]
+    #region [Construstors] // TODO: DO
+
     public Character(string name, float affected_by_traits)
     {
         this.name = name;
@@ -474,7 +523,6 @@ public class Character
     #endregion
 
     #region [Deprecated methods]
-
 
     /// <summary>
     /// Проверяет черту по всем якорям.
