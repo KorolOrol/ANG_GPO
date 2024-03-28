@@ -15,6 +15,7 @@ public class Character
 
     public string name;
     public int    age;
+    // TODO: Пол
     public string description;
     public string location;
     public float  affected_by_traits = 0.5f;
@@ -78,66 +79,66 @@ public class Character
 
     List<Trait> traits_list = new List<Trait>()
     {
-        new Trait(  "Ambitious",        true), // Амбициозный
-        new Trait(  "Content",          true), // Приземлённый
+        new Trait(  "Амбициозный",      true), // Ambitious
+        new Trait(  "Приземлённый",     true), // Content
 
-        new Trait(  "Brave",            true), // Храбрый
-        new Trait(  "Craven",           true), // Трусливый
+        new Trait(  "Храбрый",          true), // Brave
+        new Trait(  "Трусливый",        true), // Craven
 
-        new Trait(  "Calm",             true), // Спокойный
-        new Trait(  "Wrathful",         true), // Гневный
+        new Trait(  "Спокойный",        true), // Calm
+        new Trait(  "Гневный",          true), // Wrathful
 
-        new Trait(  "Chastle",          true), // Целомудренный
-        new Trait(  "Lustful",          true), // Похотливый
+        new Trait(  "Целомудренный",    true), // Chastle
+        new Trait(  "Похотливый",       true), // Lustful
 
-        new Trait(  "Diligent",         true), // Усердный
-        new Trait(  "Lazy",             true), // Ленивый
+        new Trait(  "Усердный",         true), // Diligent
+        new Trait(  "Ленивый",          true), // Lazy
 
-        new Trait(  "Generous",         true), // Общительный
-        new Trait(  "Shy",              true), // Стеснительный
+        new Trait(  "Общительный",      true), // Generous
+        new Trait(  "Стеснительный",    true), // Shy
 
-        new Trait(  "Gregarious",       true), // Щедрый
-        new Trait(  "Greedy",           true), // Жадный
+        new Trait(  "Щедрый",           true), // Gregarious
+        new Trait(  "Жадный",           true), // Greedy
 
-        new Trait(  "Honest",           true), // Честный
-        new Trait(  "Deceitful",        true), // Лживый
+        new Trait(  "Честный",          true), // Honest
+        new Trait(  "Лживый",           true), // Deceitful
 
-        new Trait(  "Humble",           true), // Скромный
-        new Trait(  "Arrogant",         true), // Высокомерный
+        new Trait(  "Скромный",         true), // Humble
+        new Trait(  "Высокомерный",     true), // Arrogant
 
-        new Trait(  "Just",             true), // Взвешенный
-        new Trait(  "Arbitrary",        true), // Взбалмошный
+        new Trait(  "Взвешенный",       true), // Just
+        new Trait(  "Взбалмошный",      true), // Arbitrary
 
-        new Trait(  "Patient",          true), // Терпеливый
-        new Trait(  "Impatient",        true), // Нетерпеливый
+        new Trait(  "Терпеливый",       true), // Patient
+        new Trait(  "Нетерпеливый",     true), // Impatient
 
-        new Trait(  "Temperate",        true), // Сдержанный
-        new Trait(  "Gluttonous",       true), // Прожорливый
+        new Trait(  "Сдержанный",       true), // Temperate
+        new Trait(  "Прожорливый",      true), // Gluttonous
 
-        new Trait(  "Trusting",         true), // Доверчивый
-        new Trait(  "Paranoid",         true), // Параноик
+        new Trait(  "Доверчивый",       true), // Trusting
+        new Trait(  "Параноик",         true), // Paranoid
 
-        new Trait(  "Zealous",          true), // Ревностный
-        new Trait(  "Cynical",          true), // Циничный
+        new Trait(  "Ревностный",       true), // Zealous
+        new Trait(  "Циничный",         true), // Cynical
 
-        new Trait(  "Compassionate",    true), // Сочувствующий
-        new Trait(  "Callous",          true), // Жестокий
+        new Trait(  "Сочувствующий",    true), // Compassionate
+        new Trait(  "Жестокий",         true), // Callous
 
-        new Trait(  "Fickle",           true), // Переменчивый
-        new Trait(  "Stubborn",         true), // Упёртый
+        new Trait(  "Переменчивый",     true), // Fickle
+        new Trait(  "Упёртый",          true), // Stubborn
 
-        new Trait(  "Ordinary",         true), // Заурядный
-        new Trait(  "Eccentric",        true), // Эксцентричный
+        new Trait(  "Заурядный",        true), // Ordinary
+        new Trait(  "Эксцентричный",    true), // Eccentric
 
-        new Trait(  "Sadistic",         true), // Садист
-        new Trait(  "Masochism",        true), // Мазохист
+        new Trait(  "Садист",           true), // Sadistic
+        new Trait(  "Мазохист",         true), // Masochism
 
-        new Trait(  "Religious",        true), // Религиозный
-        new Trait(  "Fanatic",          true), // Фанатик
-        new Trait(  "Aetheist",         true), // Атеист
+        new Trait(  "Религиозный",      true), // Religious
+        new Trait(  "Фанатик",          true), // Fanatic
+        new Trait(  "Атеист",           true), // Aetheist
 
-        new Trait(  "Fair",             true), // Справедливый
-        new Trait(  "Unfair",           true), // Несправедливый
+        new Trait(  "Справедливый",     true), // Fair
+        new Trait(  "Несправедливый",   true), // Unfair
 
     };
 
@@ -205,14 +206,14 @@ public class Character
         {
             if (tabl[a.id, i] == 0)
             {
-                Console.WriteLine("Trait {0} NOT compatible with trait {1}", a.title, traits_list[i].title);
+                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[i].title);*/
                 return false;
             }
 
-            Console.WriteLine("Trait {0} compatible with trait {1}", a.title, traits_list[i].title);
+            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, traits_list[i].title);*/
         }
 
-        Console.WriteLine("");
+        /*Console.WriteLine("");*/
         return true;
     }
 
@@ -226,9 +227,9 @@ public class Character
     /// <param name="traits_count"></param>
     public void CreateByChaoticRandom(int traits_count)
     {
-        if (max_possible_traits <= traits_count)
+        if (max_possible_traits < traits_count)
         {
-            Console.WriteLine("Not enough traits in data base to CreateByChaoticRandom");
+            Console.WriteLine("Недостаточно черт в базе данных для CreateByChaoticRandom");
         }
         else
         {
@@ -247,9 +248,9 @@ public class Character
     /// <param name="traits_count"></param>
     public void CreateByLogicRandom(int traits_count)
     {
-        if (max_possible_traits <= traits_count)
+        if (max_possible_traits < traits_count)
         {
-            Console.WriteLine("Not enough traits in data base to CreateByLogicRandom");
+            Console.WriteLine("Недостаточно черт в базе данных для CreateByLogicRandom");
         }
         else
         {
@@ -289,12 +290,12 @@ public class Character
     {
         if (mama.traits == null || papa.traits == null)
         {
-            Console.WriteLine("Mama and/or Papa have no traits :c");
+            Console.WriteLine("У Мамы и/или Папы нет черт");
         }
 
-        else if (max_possible_traits <= traits_count)
+        else if (max_possible_traits < traits_count)
         {
-            Console.WriteLine("Not enough traits in data base to CreateByTwoParentsHalfRandom");
+            Console.WriteLine("Недостаточно черт в базе данных для CreateByTwoParentsHalfRandom");
         }
         else if (traits_count == (mama.traits.Count + papa.traits.Count) / 2)
         {
@@ -325,7 +326,7 @@ public class Character
                 }
             }
 
-            for (int i = cmb_traits_count; i < traits_count; i++)
+            for (int i = traits_list.Count(); i < traits_count; i++)
             {
                 var random = new Random().Next(traits_list.Count);
 
@@ -355,7 +356,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[random].id)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[random].id))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -382,7 +383,7 @@ public class Character
     {
         if (mama.traits == null || papa.traits == null)
         {
-            Console.WriteLine("Mama and/or Papa have no traits :c");
+            Console.WriteLine("У Мамы и/или Папы нет черт");
         }
         else
         {
@@ -411,13 +412,13 @@ public class Character
     }
 
     /// <summary>
-    ///  Генерация черт персонажа с помощью двух родителей. Берутся черты с большой склонностью
+    ///  Генерация черт персонажа с помощью двух родителей. Берутся черты с большой склонностью. Дополнительные черты при необходимости генерятся по логике
     /// </summary>
     /// <param name="traits_count"></param>
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name)
+    public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name) // Разветвление добавить (конструктор)
     {
         this.name = name;
 
@@ -435,13 +436,69 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[i].id) && random <= 0.85d) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(combined_traits[i].id) && random <= 0.85d)
                 {
                     traits.Add(combined_traits[i]);
-                    Console.WriteLine(random);
                 }
 
                 // Генерятся не все черты, типо скипает некоторые, нужно догенерировать их как в прошлом методе
+            }
+        }
+
+        for (int i = traits_list.Count(); i < traits_count; i++)
+        {
+            var random = new Random().Next(traits_list.Count);
+
+            if (traits.Count == 0 || CheckTabl(random))
+            {
+                traits.Add(traits_list[random]);
+                traits[i].id = random;
+            }
+            else
+            {
+                i--;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Генерация черт персонажа с помощью двух родителей. Берутся черты с большой склонностью
+    /// </summary>
+    /// <param name="mama"></param>
+    /// <param name="papa"></param>
+    /// <param name="name"></param>
+    public void CreateByTwoParentsLogic(Character mama, Character papa, string name)
+    {
+        if (mama.traits == null || papa.traits == null)
+        {
+            Console.WriteLine("У Мамы и/или Папы нет черт");
+        }
+        else
+        {
+            this.name = name;
+
+            List<Trait> combined_traits = new List<Trait> { };
+            combined_traits.AddRange(mama.traits);
+            combined_traits.AddRange(papa.traits);
+
+            combined_traits = SortListByAff(combined_traits);
+
+            int cmb_traits_count = (combined_traits.Count) / 2;
+
+            for (int i = 0; i < cmb_traits_count; i++)
+            {
+                Random rand = new Random();
+                double random = Math.Round(rand.NextSingle(), 3);
+
+                if (traits.Count == 0 || CheckTabl(combined_traits[i].id) && random <= 0.85d)
+                {
+                    traits.Add(combined_traits[i]);
+                }
+                else
+                {
+                    combined_traits.RemoveAt(i);
+                    i--;
+                }
             }
         }
     }
@@ -451,7 +508,7 @@ public class Character
     #region [Output]
     public void WriteAllTraits()
     {
-        Console.Write($"{name} has this traits: ");
+        Console.Write($"{name} имеет такие черты: ");
         foreach (var trait in traits)
         {
             Console.Write($"{trait.title} ");
@@ -460,7 +517,7 @@ public class Character
 
     public void WriteAllTraitsWithAff()
     {
-        Console.Write($"{name} has this traits: ");
+        Console.Write($"{name} имеет такие черты: ");
         Console.WriteLine("\n");
 
         foreach (var trait in traits)
@@ -472,7 +529,7 @@ public class Character
 
     public void WriteAllTraitsWithAffDesc()
     {
-        Console.Write($"{name} has this traits: ");
+        Console.Write($"{name} имеет такие черты: ");
 
         foreach (var trait in traits)
         {
@@ -512,7 +569,6 @@ public class Character
     public Character(string name)
     {
         this.name = name;
-        Console.WriteLine("Character {0} is created", name);
     }
 
     public Character()
@@ -537,14 +593,14 @@ public class Character
 
             if (tabl[a.id, id] == 0 || tabl[a.id, id] != anchor)
             {
-                Console.WriteLine("Trait {0} NOT compatible with trait {1}", a.title, traits_list[id].title);
+                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[id].title);*/
                 return false;
             }
 
-            Console.WriteLine("Trait {0} compatible with trait {1}", a.title, traits_list[id].title);
+            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, traits_list[id].title);*/
         }
 
-        Console.WriteLine("");
+        /*Console.WriteLine("");*/
         return true;
     }
 
@@ -569,7 +625,7 @@ public class Character
 
         if (cnt < traits_count)
         {
-            Console.WriteLine("Traits was cleared because trait {0} has cnt {1}", traits_list[id].title, cnt);
+            Console.WriteLine("Черты были очищены, потому что черта {0} имеет cnt {1}", traits_list[id].title, cnt);
             return false;
         }
 
@@ -586,9 +642,9 @@ public class Character
     [Obsolete("CreateByAnchorLogic is deprecated, please use CreateByAnchorLogic instead."/*, true*/)]
     public void CreateByAnchorLogic(int traits_count, int anchor)
     {
-        if (max_possible_traits <= traits_count)
+        if (max_possible_traits < traits_count)
         {
-            Console.WriteLine("Not enough traits in data base");
+            Console.WriteLine("Недостаточно черт в базе данных");
         }
         else
         {
