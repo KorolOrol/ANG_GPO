@@ -2,13 +2,15 @@
 using OpenAI.Managers;
 using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.RequestModels;
+using OpenAI.ObjectModels.ResponseModels;
+using System.Text.RegularExpressions;
 
-namespace AIGenerator
+namespace AIGenerator.TextGenerator
 {
     /// <summary>
     /// Класс для генерации текста с помощью OpenAI API
     /// </summary>
-    public class TextAIGenerator
+    public class OpenAIGenerator : ITextAIGenerator
     {
         /// <summary>
         /// Ключ API для OpenAI
@@ -68,9 +70,13 @@ namespace AIGenerator
         /// Получить ключ API из переменной окружения
         /// </summary>
         /// <param name="envVar">Имя переменной окружения</param>
-        public void GetApiKeyFromEnvironment(string envVar)
+        public void GetApiKeyFromEnvironment(string envVarName)
         {
-            ApiKey = Environment.GetEnvironmentVariable(envVar, EnvironmentVariableTarget.User);
+            string envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            if (envVar != null)
+            {
+                ApiKey = envVar;
+            }
         }
 
         /// <summary>
@@ -97,7 +103,7 @@ namespace AIGenerator
         /// <param name="messages">Список сообщений</param>
         /// <returns>Сгенерированный текст</returns>
         /// <exception cref="Exception">Ошибка генерации текста</exception>
-        public async Task<string> GenerateText(List<string> messages)
+        public async Task<string> GenerateTextAsync(List<string> messages)
         {
             var completion = await Client.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest()
             {
@@ -106,14 +112,14 @@ namespace AIGenerator
             });
             if (completion.Successful)
             {
-                return completion.Choices.First().Message.Content;
+                return Regex.Match(completion.Choices.First().Message.Content, @"\{.*\}", RegexOptions.Singleline).Value;
             }
             else
             {
                 if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     await Task.Delay(5000);
-                    return await GenerateText(messages);
+                    return await GenerateTextAsync(messages);
                 }
                 throw new Exception("Failed to generate text: " + completion.Error.Message);
             }
@@ -122,7 +128,7 @@ namespace AIGenerator
         /// <summary>
         /// Стандартный конструктор с ключом OpenAI API из переменной окружения
         /// </summary>
-        public TextAIGenerator()
+        public OpenAIGenerator()
         {
             GetApiKeyFromEnvironment("OpenAIAPIKey");
         }
@@ -132,7 +138,7 @@ namespace AIGenerator
         /// </summary>
         /// <param name="keyEnvVar">Имя переменной окружения с ключом API</param>
         /// <param name="endpoint">Адрес API</param>
-        public TextAIGenerator(string keyEnvVar, string endpoint)
+        public OpenAIGenerator(string keyEnvVar, string endpoint)
         {
             GetApiKeyFromEnvironment(keyEnvVar);
             Endpoint = endpoint;

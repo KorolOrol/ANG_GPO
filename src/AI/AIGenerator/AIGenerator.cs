@@ -1,4 +1,5 @@
-﻿using BaseClasses.Interface;
+﻿using AIGenerator.TextGenerator;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using Newtonsoft.Json;
 
@@ -12,7 +13,7 @@ namespace AIGenerator
         /// <summary>
         /// Генератор текста
         /// </summary>
-        public TextAIGenerator TextAIGenerator { get; set; }
+        public ITextAIGenerator TextAIGenerator { get; set; }
 
         /// <summary>
         /// Системные подсказки
@@ -36,7 +37,7 @@ namespace AIGenerator
         public AIGenerator(string promptPath)
         {
             LoadSystemPrompt(promptPath);
-            TextAIGenerator = new TextAIGenerator();
+            TextAIGenerator = new OpenAIGenerator();
         }
 
         /// <summary>
@@ -45,10 +46,10 @@ namespace AIGenerator
         /// <param name="promptPath">Путь к файлу с подсказками</param>
         /// <param name="apiKey">Переменная среды с ключом API</param>
         /// <param name="endpoint">Переменная среды с конечной точкой</param>
-        public AIGenerator(string promptPath, string apiKey, string endpoint)
+        public AIGenerator(string promptPath, ITextAIGenerator textAIGenerator)
         {
             LoadSystemPrompt(promptPath);
-            TextAIGenerator = new TextAIGenerator(apiKey, endpoint);
+            TextAIGenerator = textAIGenerator;
         }
 
         /// <summary>
@@ -149,7 +150,7 @@ namespace AIGenerator
         public async Task<Character> GenerateCharacterAsync(Plot plot)
         {
             List<string> prompts = GetPromptForResponse("Character", plot);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             Character character = JsonConvert.DeserializeObject<AICharacter>(response)
                                              .ToCharacter(plot);
             plot.Characters.Add(character);
@@ -164,7 +165,7 @@ namespace AIGenerator
         public async Task<Location> GenerateLocationAsync(Plot plot)
         {
             List<string> prompts = GetPromptForResponse("Location", plot);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             Location location = JsonConvert.DeserializeObject<AILocation>(response)
                                            .ToLocation(plot);
             plot.Locations.Add(location);
@@ -179,7 +180,7 @@ namespace AIGenerator
         public async Task<Item> GenerateItemAsync(Plot plot)
         {
             List<string> prompts = GetPromptForResponse("Item", plot);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             Item item = JsonConvert.DeserializeObject<AIItem>(response)
                                    .ToItem(plot);
             plot.Items.Add(item);
@@ -194,7 +195,7 @@ namespace AIGenerator
         public async Task<Event> GenerateEventAsync(Plot plot)
         {
             List<string> prompts = GetPromptForResponse("Event", plot);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             Event @event = JsonConvert.DeserializeObject<AIEvent>(response)
                                       .ToEvent(plot);
             plot.Events.Add(@event);
@@ -204,7 +205,7 @@ namespace AIGenerator
         public async Task<Character> GenerateCharacterChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Character", plot, name);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             AICharacter character = JsonConvert.DeserializeObject<AICharacter>(response);
             Character returnCharacter = character.ToCharacter(plot);
             plot.Characters.Add(returnCharacter);
@@ -258,7 +259,7 @@ namespace AIGenerator
         public async Task<Location> GenerateLocationChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Location", plot, name);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             AILocation location = JsonConvert.DeserializeObject<AILocation>(response);
             Location returnLocation = location.ToLocation(plot);
             plot.Locations.Add(returnLocation);
@@ -298,7 +299,7 @@ namespace AIGenerator
         public async Task<Item> GenerateItemChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Item", plot, name);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             AIItem item = JsonConvert.DeserializeObject<AIItem>(response);
             Item returnItem = item.ToItem(plot);
             plot.Items.Add(returnItem);
@@ -320,7 +321,8 @@ namespace AIGenerator
                     Location location = await GenerateLocationChainAsync(plot, recursion - 1, item.Location);
                     if (returnItem.Location != location)
                     {
-                        returnItem.Location.Items.Remove(returnItem);
+                        if (returnItem.Location != null)
+                            returnItem.Location.Items.Remove(returnItem);
                         returnItem.Location = location;
                     }
                     if (!location.Items.Contains(returnItem))
@@ -341,7 +343,7 @@ namespace AIGenerator
         public async Task<Event> GenerateEventChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Event", plot, name);
-            string response = await TextAIGenerator.GenerateText(prompts);
+            string response = await TextAIGenerator.GenerateTextAsync(prompts);
             AIEvent @event = JsonConvert.DeserializeObject<AIEvent>(response);
             Event returnEvent = @event.ToEvent(plot);
             plot.Events.Add(returnEvent);

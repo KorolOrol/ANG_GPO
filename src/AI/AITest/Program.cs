@@ -1,11 +1,13 @@
 ﻿using BaseClasses.Model;
+using AIGenerator.TextGenerator;
 using AIGen = AIGenerator.AIGenerator;
 
 string path = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-AIGen Ngen = new AIGen(path, "NeuroAPIKey", "https://lk.neuroapi.host");
+AIGen Ngen = new AIGen(path, new OpenAIGenerator("NeuroAPIKey", "https://eu.neuroapi.host"));
+AIGen Vgen = new AIGen(path, new VisionCraftGenerator());
 AIGen Ogen = new AIGen(path);
 
-AIGen gen = Ogen;
+AIGen gen = Vgen;
 
 Plot plot = new Plot();
 
