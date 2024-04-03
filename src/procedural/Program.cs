@@ -13,17 +13,17 @@ Bob.write_all_traits();*/
 Console.WriteLine("\n");
 
 Character Tony = new Character("Тони");
-Tony.CreateByLogicRandom(1);
+Tony.CreateByLogicRandom(4);
 Tony.WriteAllTraitsWithAff();
 
 Console.WriteLine("\n");
 
 Character Ivanna = new Character("Иванна");
-Ivanna.CreateByLogicRandom(10);
+Ivanna.CreateByLogicRandom(4);
 Ivanna.WriteAllTraitsWithAff();
 
 Console.WriteLine("\n");
 
 Character Kid = new Character();
-Kid.CreateByTwoParentsLogic(Ivanna, Tony, "ШиШи");
+Kid.CreateByTwoParentsLogicRandom(8, Ivanna, Tony, "ШиШи");
 Kid.WriteAllTraitsWithAff();

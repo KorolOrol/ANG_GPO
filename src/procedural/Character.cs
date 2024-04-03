@@ -429,7 +429,7 @@ public class Character
 
         combined_traits = SortListByAff(combined_traits);
 
-        for (int i = 0; i < combined_traits.Count; i++)
+        for (int i = 0; i < combined_traits.Count / 2; i++)
         {
             if (traits_count != traits.Count)
             {
@@ -440,16 +440,19 @@ public class Character
                 {
                     traits.Add(combined_traits[i]);
                 }
-
-                // Генерятся не все черты, типо скипает некоторые, нужно догенерировать их как в прошлом методе
+                else
+                {
+                    combined_traits.RemoveAt(i);
+                    i--;
+                }
             }
         }
 
-        for (int i = traits_list.Count(); i < traits_count; i++)
+        for (int i = traits.Count(); i < traits_count; i++)
         {
             var random = new Random().Next(traits_list.Count);
 
-            if (traits.Count == 0 || CheckTabl(random))
+            if (CheckTabl(random))
             {
                 traits.Add(traits_list[random]);
                 traits[i].id = random;
