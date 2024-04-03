@@ -147,23 +147,6 @@ public class Character
     #region [Additional methods]
 
     /// <summary>
-    /// Создаёт массив натуральных чисел от 0 до i
-    /// </summary>
-    /// <param name="i"></param>
-    /// <returns></returns>
-    private List<int> CreateArr(int i)
-    {
-        List<int> list = new List<int>();
-
-        for (int a = 0; a < i; a++)
-        {
-            list.Add(a);
-        }
-
-        return list;
-    }
-
-    /// <summary>
     /// Сортирует лист черт от наибольшей склонности к наименьшей
     /// </summary>
     /// <param name="traits"></param>
@@ -204,17 +187,29 @@ public class Character
     {
         foreach (Trait a in traits)
         {
-            if (tabl[a.id, i] == 0)
+            if (tabl[traits_list.IndexOf(a), i] == 0)
             {
-                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[i].title);*/
+                Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[i].title);
                 return false;
             }
 
-            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, traits_list[i].title);*/
+            Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, traits_list[i].title);
         }
 
-        /*Console.WriteLine("");*/
+        Console.WriteLine("");
         return true;
+    }
+
+    private Trait CheckTraitInList(string name)
+    {
+        foreach (Trait a in traits_list)
+        {
+            if(a.title == name)
+            {
+                return a;
+            }
+        }
+        return null;
     }
 
     #endregion
@@ -254,18 +249,13 @@ public class Character
         }
         else
         {
-            List<int> ids = CreateArr(traits_list.Count);
-            /*Console.WriteLine(string.Join(" ", ids));*/
-
             for (int i = 0; i < traits_count; i++)
             {
                 var random = new Random().Next(traits_list.Count);
 
-                if (traits.Count == 0 || CheckTabl(random) && ids.Contains(random)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(random))
                 {
                     traits.Add(traits_list[random]);
-                    traits[i].id = random;
-                    ids.Remove(random);
                 }
                 else
                 {
@@ -288,14 +278,13 @@ public class Character
     /// <param name="name"></param>
     public void CreateByTwoParentsHalfRandom(int traits_count, Character mama, Character papa, string name)
     {
+        if (max_possible_traits < traits_count)
+        {
+            Console.WriteLine("Недостаточно черт в базе данных для CreateByTwoParentsHalfRandom");
+        }
         if (mama.traits == null || papa.traits == null)
         {
             Console.WriteLine("У Мамы и/или Папы нет черт");
-        }
-
-        else if (max_possible_traits < traits_count)
-        {
-            Console.WriteLine("Недостаточно черт в базе данных для CreateByTwoParentsHalfRandom");
         }
         else if (traits_count == (mama.traits.Count + papa.traits.Count) / 2)
         {
@@ -316,7 +305,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[random].id))
+                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[random])))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -333,7 +322,6 @@ public class Character
                 if (traits.Count == 0 || CheckTabl(random))
                 {
                     traits.Add(traits_list[random]);
-                    traits[i].id = random;
                 }
                 else
                 {
@@ -356,7 +344,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[random].id))
+                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[random])))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -399,7 +387,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[random].id)) // Тут || или && ?
+                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[random])))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -436,7 +424,7 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[i].id) && random <= 0.85d)
+                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
                     traits.Add(combined_traits[i]);
                 }
@@ -455,7 +443,6 @@ public class Character
             if (CheckTabl(random))
             {
                 traits.Add(traits_list[random]);
-                traits[i].id = random;
             }
             else
             {
@@ -493,7 +480,7 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(combined_traits[i].id) && random <= 0.85d)
+                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
                     traits.Add(combined_traits[i]);
                 }
@@ -505,6 +492,43 @@ public class Character
             }
         }
     }
+
+    #endregion
+
+    #region [Create Character from Input traits]
+
+    //
+    public void CreateByInputTrait(string trait_name, int traits_count)
+    {
+        if (max_possible_traits < traits_count)
+        {
+            Console.WriteLine("Недостаточно черт в базе данных для CreateByInputTrait");
+        }
+        if (!traits_list.Any(trait => trait.title == trait_name))
+        {
+            Console.WriteLine("Данная черта не найдена в базе данных для CreateByInputTrait");
+        }
+        else
+        {
+            Trait trait = CheckTraitInList(trait_name);
+            traits.Add(trait);
+
+            for (int i = 1; i < traits_count; i++)
+            {
+                var random = new Random().Next(traits_list.Count);
+
+                if (traits.Count == 0 || CheckTabl(random))
+                {
+                    traits.Add(traits_list[random]);
+                }
+                else
+                {
+                    i--;
+                }
+            }
+        }
+    }
+
 
     #endregion
 
@@ -594,7 +618,7 @@ public class Character
         foreach (Trait a in traits)
         {
 
-            if (tabl[a.id, id] == 0 || tabl[a.id, id] != anchor)
+            if (tabl[traits_list.IndexOf(a), id] == 0 || tabl[traits_list.IndexOf(a), id] != anchor)
             {
                 /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[id].title);*/
                 return false;
@@ -655,14 +679,9 @@ public class Character
             {
                 var random = new Random().Next(traits_list.Count);
 
-                List<int> ids = CreateArr(traits_list.Count);
-                /*Console.WriteLine(string.Join(" ", ids));*/
-
-                if (CheckAnchorPossibility(anchor, traits_count, random) && CheckTablAnchor(random, anchor) && ids.Contains(random))
+                if (CheckAnchorPossibility(anchor, traits_count, random) && CheckTablAnchor(random, anchor))
                 {
                     traits.Add(traits_list[random]);
-                    traits[iv].id = random;
-                    ids.Remove(random);
                 }
                 else
                 {

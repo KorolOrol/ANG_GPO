@@ -10,7 +10,7 @@ Tom.write_all_traits();*/
 Bob.create_logic_anchor_random(5, 2);
 Bob.write_all_traits();*/
 
-Console.WriteLine("\n");
+/*Console.WriteLine("\n");
 
 Character Tony = new Character("Тони");
 Tony.CreateByLogicRandom(4);
@@ -26,4 +26,8 @@ Console.WriteLine("\n");
 
 Character Kid = new Character();
 Kid.CreateByTwoParentsLogicRandom(8, Ivanna, Tony, "ШиШи");
-Kid.WriteAllTraitsWithAff();
+Kid.WriteAllTraitsWithAff();*/
+
+Character Ache = new Character("Боль");
+Ache.CreateByInputTrait("Доверчивый", 10);
+Ache.WriteAllTraits();

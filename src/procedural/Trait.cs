@@ -1,8 +1,6 @@
 ﻿using System;
 public class Trait
 {
-    public int id;
-
 	public string title;
 	public float affection;
 	public string description;
