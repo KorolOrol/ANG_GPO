@@ -8,7 +8,7 @@ public class Character
 {
 
     /// <summary>
-    ///  Три Слэша - Всему Голова (ну и всё перефакторить ес, названия)
+    /// Три Слэша - Всему Голова (ну и всё перефакторить ес, названия)
     /// </summary>
 
     #region [Character characteristics]
@@ -497,7 +497,11 @@ public class Character
 
     #region [Create Character from Input traits]
 
-    //
+    /// <summary>
+    /// Генерация черт персонажа с помощью одной введённой черты. Использует логику
+    /// </summary>
+    /// <param name="trait_name"></param>
+    /// <param name="traits_count"></param>
     public void CreateByInputTrait(string trait_name, int traits_count)
     {
         if (max_possible_traits < traits_count)
