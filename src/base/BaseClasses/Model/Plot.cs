@@ -26,6 +26,11 @@
         public List<Event> Events { get; set; } = new();
 
         /// <summary>
+        /// Время
+        /// </summary>
+        public int Time { get; set; } = 0;
+
+        /// <summary>
         /// Полная информация об истории
         /// </summary>
         /// <returns>Полная информация об истории</returns>
