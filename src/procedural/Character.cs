@@ -200,6 +200,11 @@ public class Character
         return true;
     }
 
+    /// <summary>
+    /// Проверяет имя черты в листе черт. Возвращает черту с совпадением имени
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     private Trait CheckTraitInList(string name)
     {
         foreach (Trait a in traits_list)
@@ -503,6 +508,38 @@ public class Character
     /// <param name="trait_name"></param>
     /// <param name="traits_count"></param>
     public void CreateByInputTrait(string trait_name, int traits_count)
+    {
+        if (max_possible_traits < traits_count)
+        {
+            Console.WriteLine("Недостаточно черт в базе данных для CreateByInputTrait");
+        }
+        if (!traits_list.Any(trait => trait.title == trait_name))
+        {
+            Console.WriteLine("Данная черта не найдена в базе данных для CreateByInputTrait");
+        }
+        else
+        {
+            Trait trait = CheckTraitInList(trait_name);
+            traits.Add(trait);
+
+            for (int i = 1; i < traits_count; i++)
+            {
+                var random = new Random().Next(traits_list.Count);
+
+                if (traits.Count == 0 || CheckTabl(random))
+                {
+                    traits.Add(traits_list[random]);
+                }
+                else
+                {
+                    i--;
+                }
+            }
+        }
+    }
+
+    //
+    public void CreateByInputTraits(List<string> traits_names, int traits_count)
     {
         if (max_possible_traits < traits_count)
         {
