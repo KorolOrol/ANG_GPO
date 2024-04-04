@@ -7,7 +7,7 @@ AIGen Ngen = new AIGen(path, new OpenAIGenerator("NeuroAPIKey", "https://eu.neur
 AIGen Vgen = new AIGen(path, new VisionCraftGenerator());
 AIGen Ogen = new AIGen(path);
 
-AIGen gen = Vgen;
+AIGen gen = Ngen;
 
 Plot plot = new Plot();
 

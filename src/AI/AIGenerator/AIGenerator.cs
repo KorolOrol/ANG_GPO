@@ -202,6 +202,13 @@ namespace AIGenerator
             return @event;
         }
 
+        /// <summary>
+        /// Генерация персонажа с цепочкой
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <param name="recursion">Глубина рекурсии</param>
+        /// <param name="name">Имя персонажа</param>
+        /// <returns>Сгенерированный персонаж</returns>
         public async Task<Character> GenerateCharacterChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Character", plot, name);
@@ -256,6 +263,13 @@ namespace AIGenerator
             return returnCharacter;
         }
 
+        /// <summary>
+        /// Генерация локации с цепочкой
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <param name="recursion">Глубина рекурсии</param>
+        /// <param name="name">Имя локации</param>
+        /// <returns>Сгенерированная локация</returns>
         public async Task<Location> GenerateLocationChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Location", plot, name);
@@ -296,6 +310,13 @@ namespace AIGenerator
             return returnLocation;
         }
 
+        /// <summary>
+        /// Генерация предмета с цепочкой
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <param name="recursion">Глубина рекурсии</param>
+        /// <param name="name">Имя предмета</param>
+        /// <returns>Сгенерированный предмет</returns>
         public async Task<Item> GenerateItemChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Item", plot, name);
@@ -340,6 +361,13 @@ namespace AIGenerator
             return returnItem;
         }
 
+        /// <summary>
+        /// Генерация события с цепочкой
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <param name="recursion">Глубина рекурсии</param>
+        /// <param name="name">Имя события</param>
+        /// <returns>Сгенерированное событие</returns>
         public async Task<Event> GenerateEventChainAsync(Plot plot, int recursion = 3, string name = "")
         {
             List<string> prompts = GetPromptForResponse("Event", plot, name);
