@@ -27,7 +27,7 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Модель для генерации текста
         /// </summary>
-        private string _model = "Mixtral-8x7B-Instruct-v1.0";
+        private string _model = "Mixtral-8x7B-Instruct-v0.1";
 
         /// <summary>
         /// Настройки для генерации текста
@@ -74,18 +74,7 @@ namespace AIGenerator.TextGenerator
             }
             set
             {
-                using (var client = new HttpClient())
-                {
-                    var response = client.GetAsync(_endpoint + "/models-llm");
-
-                    List<string> available_models = 
-                        JsonConvert.DeserializeObject<List<string>>(response.Result.ToString());
-                    
-                    if (available_models != null && available_models.Contains(value))
-                    {
-                        _model = value;
-                    }
-                }
+                _model = value;
             }
         }
 

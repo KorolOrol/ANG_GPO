@@ -3,8 +3,9 @@ using AIGenerator.TextGenerator;
 using AIGen = AIGenerator.AIGenerator;
 
 string path = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-AIGen Ngen = new AIGen(path, new OpenAIGenerator("NeuroAPIKey", "https://eu.neuroapi.host"));
+AIGen Ngen = new AIGen(path, new OpenAIGenerator("NeuroAPIKey", "https://lk.neuroapi.host"));
 AIGen Vgen = new AIGen(path, new VisionCraftGenerator());
+Vgen.TextAIGenerator.Model = "dolphin-2.6-mixtral-8x7b";
 AIGen Ogen = new AIGen(path);
 
 AIGen gen = Ngen;
