@@ -8,7 +8,7 @@ public class Character
 {
 
     /// <summary>
-    /// Три Слэша - Всему Голова (ну и всё перефакторить ес, названия)
+    /// Три Слэша - Всему Голова
     /// </summary>
 
     #region [Character characteristics]
@@ -18,7 +18,6 @@ public class Character
     // TODO: Пол
     public string description;
     public string location;
-    public float  affected_by_traits = 0.5f;
     private const int max_possible_traits = 10;
 
     public List<Trait> traits = new List<Trait>();
@@ -634,12 +633,6 @@ public class Character
     #endregion
 
     #region [Construstors] // TODO: DO
-
-    public Character(string name, float affected_by_traits)
-    {
-        this.name = name;
-        this.affected_by_traits = affected_by_traits;
-    }
 
     public Character(string name)
     {
