@@ -538,7 +538,11 @@ public class Character
         }
     }
 
-    //
+    /// <summary>
+    /// Генерация черт персонажа с помощью введённого списка черт. Использует логику
+    /// </summary>
+    /// <param name="traits_names"></param>
+    /// <param name="traits_count"></param>
     public void CreateByInputTraits(List<string> traits_names, int traits_count)
     {
         if (max_possible_traits < traits_count)

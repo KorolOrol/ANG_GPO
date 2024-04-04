@@ -28,7 +28,7 @@ Character Kid = new Character();
 Kid.CreateByTwoParentsLogicRandom(8, Ivanna, Tony, "ШиШи");
 Kid.WriteAllTraitsWithAff();*/
 
-Character Pain = new Character("Боль");
+Character Pain = new Character("Пэйн");
 List<string> traits = new List<string>()
 {
     "Доверчивый",
