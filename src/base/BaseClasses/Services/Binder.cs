@@ -18,7 +18,7 @@ namespace BaseClasses.Services
         /// <param name="character1">Первый персонаж</param>
         /// <param name="character2">Второй персонаж</param>
         /// <param name="relations">Отношения между персонажами</param>
-        public static void Bind(Character character1, Character character2, int relations)
+        public static void Bind(Character character1, Character character2, double relations)
         {
             if (character1.Relations.ContainsKey(character2))
             {
