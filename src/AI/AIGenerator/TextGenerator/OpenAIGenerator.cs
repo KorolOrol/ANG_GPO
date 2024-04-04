@@ -112,7 +112,14 @@ namespace AIGenerator.TextGenerator
             });
             if (completion.Successful)
             {
-                return Regex.Match(completion.Choices.First().Message.Content, @"\{.*\}", RegexOptions.Singleline).Value;
+                string trimmedResult = Regex.Match(completion.Choices.First().Message.Content, 
+                                                   @"\{.*\}", RegexOptions.Singleline).Value;
+                if (trimmedResult == "")
+                {
+                    throw new Exception("Failed to generate text: " + 
+                        completion.Choices.First().Message.Content);
+                }
+                return trimmedResult;
             }
             else
             {

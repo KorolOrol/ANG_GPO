@@ -21,4 +21,8 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SavingPath\" />
+  </ItemGroup>
+
 </Project>

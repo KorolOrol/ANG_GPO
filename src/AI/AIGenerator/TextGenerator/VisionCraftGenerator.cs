@@ -100,8 +100,11 @@ namespace AIGenerator.TextGenerator
         /// <returns>Сгенерированный текст</returns>
         public async Task<string> GenerateTextAsync(List<string> messages)
         {
-            var completion = new List<Message>();
-            foreach (var message in messages)
+            var completion = new List<Message>
+            {
+                new() { role = "system", content = messages[0] }
+            };
+            foreach (var message in messages.Slice(1, messages.Count - 1))
             {
                 completion.Add(new() { role = "user", content = message});
             }
@@ -125,19 +128,29 @@ namespace AIGenerator.TextGenerator
                 var response = await client.PostAsync(Endpoint + "/llm", content);
                 if (response.IsSuccessStatusCode)
                 {
-                    Response result = JsonConvert.DeserializeObject<Response>(response.Content.ReadAsStringAsync().Result);
-                    return Regex.Match(result.choices.First().message.content, @"\{.*\}", RegexOptions.Singleline).Value;
+                    Response result = JsonConvert.DeserializeObject<Response>(response.Content
+                                                 .ReadAsStringAsync().Result);
+                    string trimmedResult = Regex.Match(result.choices.First().message.content, 
+                                                       @"\{.*\}", RegexOptions.Singleline).Value;
+                    if (trimmedResult == "")
+                    {
+                        throw new Exception("Failed to generate text: " + 
+                            result.choices.First().message.content);
+                    }
+                    return trimmedResult;
                 }
                 else
                 {
-                    if(response.StatusCode == HttpStatusCode.TooManyRequests)
+                    if (response.StatusCode == HttpStatusCode.TooManyRequests || 
+                       response.StatusCode == HttpStatusCode.Forbidden)
                     {
                         await Task.Delay(5000);
                         return await GenerateTextAsync(messages);
                     }
                     else
                     {
-                        throw new Exception("Failed to generate text: " + response.Content.ReadAsStringAsync().Result);
+                        throw new Exception("Failed to generate text: " + 
+                            response.Content.ReadAsStringAsync().Result);
                     }
                 }
             }
