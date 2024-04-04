@@ -103,7 +103,7 @@ namespace AIGenerator.TextGenerator
             var completion = new List<Message>();
             foreach (var message in messages)
             {
-                completion.Add(new() { role = "system", content = message});
+                completion.Add(new() { role = "user", content = message});
             }
             var data = new
             {
