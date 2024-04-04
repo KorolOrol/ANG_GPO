@@ -545,27 +545,30 @@ public class Character
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByInputTrait");
         }
-        if (!traits_list.Any(trait => trait.title == trait_name))
+        foreach (string name in traits_names)
         {
-            Console.WriteLine("Данная черта не найдена в базе данных для CreateByInputTrait");
-        }
-        else
-        {
-            Trait trait = CheckTraitInList(trait_name);
-            traits.Add(trait);
-
-            for (int i = 1; i < traits_count; i++)
+            if (!traits_list.Any(trait => trait.title == name))
             {
-                var random = new Random().Next(traits_list.Count);
+                Console.WriteLine("Черта {0} не найдена в базе данных для CreateByInputTraits", name);
+            }
+            else
+            {
+                Trait trait = CheckTraitInList(name);
+                traits.Add(trait);
+            }
+        }
 
-                if (traits.Count == 0 || CheckTabl(random))
-                {
-                    traits.Add(traits_list[random]);
-                }
-                else
-                {
-                    i--;
-                }
+        for (int i = 1; i < traits_count; i++)
+        {
+            var random = new Random().Next(traits_list.Count);
+
+            if (traits.Count == 0 || CheckTabl(random))
+            {
+                traits.Add(traits_list[random]);
+            }
+            else
+            {
+                i--;
             }
         }
     }
