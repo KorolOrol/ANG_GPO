@@ -2,6 +2,7 @@
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using Newtonsoft.Json;
+using BaseClasses.Services;
 
 namespace AIGenerator
 {
@@ -221,43 +222,22 @@ namespace AIGenerator
                 foreach (string n in character.NewRelations(plot))
                 {
                     Character relation = await GenerateCharacterChainAsync(plot, recursion - 1, n);
-                    if (!returnCharacter.Relations.ContainsKey(relation))
-                    {
-                        returnCharacter.Relations.Add(relation, character.Relations[n]);
-                        relation.Relations.Add(returnCharacter, character.Relations[n]);
-                    }
-                    else
-                    {
-                        returnCharacter.Relations[relation] = character.Relations[n];
-                        relation.Relations[returnCharacter] = character.Relations[n];
-                    }
+                    Binder.Bind(returnCharacter, relation, character.Relations[n]);
                 }
                 foreach (string n in character.NewLocations(plot))
                 {
                     Location location = await GenerateLocationChainAsync(plot, recursion - 1, n);
-                    if (!returnCharacter.Locations.Contains(location))
-                        returnCharacter.Locations.Add(location);
-                    if (!location.Characters.Contains(returnCharacter))
-                        location.Characters.Add(returnCharacter);
+                    Binder.Bind(returnCharacter, location);
                 }
                 foreach (string n in character.NewItems(plot))
                 {
                     Item item = await GenerateItemChainAsync(plot, recursion - 1, n);
-                    if (!returnCharacter.Items.Contains(item))
-                        returnCharacter.Items.Add(item);
-                    if (item.Host != returnCharacter)
-                    {
-                        item.Host.Items.Remove(item);
-                        item.Host = returnCharacter;
-                    }
+                    Binder.Bind(returnCharacter, item);
                 }
                 foreach (string n in character.NewEvents(plot))
                 {
                     Event @event = await GenerateEventChainAsync(plot, recursion - 1, n);
-                    if (!returnCharacter.Events.Contains(@event))
-                        returnCharacter.Events.Add(@event);
-                    if (!@event.Characters.Contains(returnCharacter))
-                        @event.Characters.Add(returnCharacter);
+                    Binder.Bind(returnCharacter, @event);
                 }
             }
             return returnCharacter;
@@ -282,29 +262,17 @@ namespace AIGenerator
                 foreach (string n in location.NewCharacters(plot))
                 {
                     Character character = await GenerateCharacterChainAsync(plot, recursion - 1, n);
-                    if (!returnLocation.Characters.Contains(character))
-                        returnLocation.Characters.Add(character);
-                    if (!character.Locations.Contains(returnLocation))
-                        character.Locations.Add(returnLocation);
+                    Binder.Bind(returnLocation, character);
                 }
                 foreach (string n in location.NewItems(plot))
                 {
                     Item item = await GenerateItemChainAsync(plot, recursion - 1, n);
-                    if (!returnLocation.Items.Contains(item))
-                        returnLocation.Items.Add(item);
-                    if (item.Location != returnLocation)
-                    {
-                        item.Location.Items.Remove(item);
-                        item.Location = returnLocation;
-                    }
+                    Binder.Bind(returnLocation, item);
                 }
                 foreach (string n in location.NewEvents(plot))
                 {
                     Event @event = await GenerateEventChainAsync(plot, recursion - 1, n);
-                    if (!returnLocation.Events.Contains(@event))
-                        returnLocation.Events.Add(@event);
-                    if (!@event.Locations.Contains(returnLocation))
-                        @event.Locations.Add(returnLocation);
+                    Binder.Bind(returnLocation, @event);
                 }
             }
             return returnLocation;
@@ -329,33 +297,17 @@ namespace AIGenerator
                 if (item.NewHost(plot) != null)
                 {
                     Character host = await GenerateCharacterChainAsync(plot, recursion - 1, item.Host);
-                    if (returnItem.Host != host)
-                    {
-                        returnItem.Host.Items.Remove(returnItem);
-                        returnItem.Host = host;
-                    }
-                    if (!host.Items.Contains(returnItem))
-                        host.Items.Add(returnItem);
+                    Binder.Bind(returnItem, host);
                 }
                 if (item.NewLocation(plot) != null)
                 {
                     Location location = await GenerateLocationChainAsync(plot, recursion - 1, item.Location);
-                    if (returnItem.Location != location)
-                    {
-                        if (returnItem.Location != null)
-                            returnItem.Location.Items.Remove(returnItem);
-                        returnItem.Location = location;
-                    }
-                    if (!location.Items.Contains(returnItem))
-                        location.Items.Add(returnItem);
+                    Binder.Bind(returnItem, location);
                 }
                 foreach (string n in item.NewEvents(plot))
                 {
                     Event @event = await GenerateEventChainAsync(plot, recursion - 1, n);
-                    if (!returnItem.Events.Contains(@event))
-                        returnItem.Events.Add(@event);
-                    if (!@event.Items.Contains(returnItem))
-                        @event.Items.Add(returnItem);
+                    Binder.Bind(returnItem, @event);
                 }
             }
             return returnItem;
@@ -380,26 +332,17 @@ namespace AIGenerator
                 foreach (string n in @event.NewCharacters(plot))
                 {
                     Character character = await GenerateCharacterChainAsync(plot, recursion - 1, n);
-                    if (!returnEvent.Characters.Contains(character))
-                        returnEvent.Characters.Add(character);
-                    if (!character.Events.Contains(returnEvent))
-                        character.Events.Add(returnEvent);
+                    Binder.Bind(returnEvent, character);
                 }
                 foreach (string n in @event.NewLocations(plot))
                 {
                     Location location = await GenerateLocationChainAsync(plot, recursion - 1, n);
-                    if (!returnEvent.Locations.Contains(location))
-                        returnEvent.Locations.Add(location);
-                    if (!location.Events.Contains(returnEvent))
-                        location.Events.Add(returnEvent);
+                    Binder.Bind(returnEvent, location);
                 }
                 foreach (string n in @event.NewItems(plot))
                 {
                     Item item = await GenerateItemChainAsync(plot, recursion - 1, n);
-                    if (!returnEvent.Items.Contains(item))
-                        returnEvent.Items.Add(item);
-                    if (!item.Events.Contains(returnEvent))
-                        item.Events.Add(returnEvent);
+                    Binder.Bind(returnEvent, item);
                 }
             }
             return returnEvent;

@@ -1,4 +1,5 @@
 ﻿using BaseClasses.Model;
+using BaseClasses.Services;
 
 namespace AIGenerator
 {
@@ -59,15 +60,15 @@ namespace AIGenerator
             character.Description = Description;
             character.Traits = Traits;
             character.Relations = new Dictionary<Character, double>();
+            character.Time = plot.Time++;
             if (plot.Characters != null && plot.Characters.Count != 0 && Relations != null)
             {
                 foreach (var relation in Relations)
                 {
                     try
                     {
-                        Character rel = plot.Characters.First(c => c.Name == relation.Key);
-                        character.Relations.Add(rel, relation.Value);
-                        rel.Relations.Add(character, relation.Value);
+                        Character foundCharacter = plot.Characters.First(c => c.Name == relation.Key);
+                        Binder.Bind(character, foundCharacter, relation.Value);
                     }
                     catch (InvalidOperationException)
                     {
@@ -82,9 +83,8 @@ namespace AIGenerator
                 {
                     try
                     {
-                        Location loc = plot.Locations.First(l => l.Name == location);
-                        character.Locations.Add(loc);
-                        loc.Characters.Add(character);
+                        Location foundLocation = plot.Locations.First(l => l.Name == location);
+                        Binder.Bind(character, foundLocation);
                     }
                     catch (InvalidOperationException)
                     {
@@ -101,8 +101,7 @@ namespace AIGenerator
                     {
                         Item foundItem = plot.Items.First(i => i.Name == item);
                         if (foundItem.Host != null) continue;
-                        character.Items.Add(foundItem);
-                        foundItem.Host = character;
+                        Binder.Bind(character, foundItem);
                     }
                     catch (InvalidOperationException)
                     {
@@ -118,8 +117,7 @@ namespace AIGenerator
                     try
                     {
                         Event foundEvent = plot.Events.First(e => e.Name == @event);
-                        character.Events.Add(foundEvent);
-                        foundEvent.Characters.Add(character);
+                        Binder.Bind(character, foundEvent);
                     }
                     catch (InvalidOperationException)
                     {
@@ -137,14 +135,9 @@ namespace AIGenerator
         /// <returns>Список новых отношений</returns>
         public List<string> NewRelations(Plot plot)
         {
-            List<string> newRelations = new List<string>();
-            foreach (string name in Relations.Keys)
-            {
-                if (plot.Characters.FirstOrDefault(c => c.Name == name) == null)
-                {
-                    newRelations.Add(name);
-                }
-            }
+            List<string> newRelations = 
+                Relations.Keys.Where(name => plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                              .ToList();
             return newRelations;
         }
 
@@ -152,17 +145,12 @@ namespace AIGenerator
         /// Получение новых местоположений для персонажа
         /// </summary>
         /// <param name="plot">История</param>
-        /// <returns></returns>
+        /// <returns>Список новых локаций</returns>
         public List<string> NewLocations(Plot plot)
         {
-            List<string> newLocations = new List<string>();
-            foreach (string name in Locations)
-            {
-                if (plot.Locations.FirstOrDefault(l => l.Name == name) == null)
-                {
-                    newLocations.Add(name);
-                }
-            }
+            List<string> newLocations = 
+                Locations.Where(name => plot.Locations.FirstOrDefault(l => l.Name == name) == null)
+                         .ToList();
             return newLocations;
         }
 
@@ -173,14 +161,9 @@ namespace AIGenerator
         /// <returns>Список новых вещей</returns>
         public List<string> NewItems(Plot plot)
         {
-            List<string> newItems = new List<string>();
-            foreach (string name in Items)
-            {
-                if (plot.Items.FirstOrDefault(i => i.Name == name) == null)
-                {
-                    newItems.Add(name);
-                }
-            }
+            List<string> newItems = 
+                Items.Where(name => plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                     .ToList();
             return newItems;
         }
 
@@ -191,14 +174,9 @@ namespace AIGenerator
         /// <returns>Список новых событий</returns>
         public List<string> NewEvents(Plot plot)
         {
-            List<string> newEvents = new List<string>();
-            foreach (string name in Events)
-            {
-                if (plot.Events.FirstOrDefault(e => e.Name == name) == null)
-                {
-                    newEvents.Add(name);
-                }
-            }
+            List<string> newEvents = 
+                Events.Where(name => plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                      .ToList();
             return newEvents;
         }
     }
@@ -249,15 +227,15 @@ namespace AIGenerator
             location.Name = Name;
             location.Description = Description;
             location.Characters = new List<Character>();
+            location.Time = plot.Time++;
             if (plot.Characters != null && plot.Characters.Count != 0 && Characters != null)
             {
                 foreach (var character in Characters)
                 {
                     try
                     {
-                        Character charac = plot.Characters.First(c => c.Name == character);
-                        location.Characters.Add(charac);
-                        charac.Locations.Add(location);
+                        Character foundCharacter = plot.Characters.First(c => c.Name == character);
+                        Binder.Bind(location, foundCharacter);
                     }
                     catch (InvalidOperationException)
                     {
@@ -273,8 +251,8 @@ namespace AIGenerator
                     try
                     {
                         Item foundItem = plot.Items.First(i => i.Name == item);
-                        location.Items.Add(foundItem);
-                        foundItem.Location = location;
+                        if (foundItem.Location != null) continue;
+                        Binder.Bind(location, foundItem);
                     }
                     catch (InvalidOperationException)
                     {
@@ -290,8 +268,7 @@ namespace AIGenerator
                     try
                     {
                         Event foundEvent = plot.Events.First(e => e.Name == @event);
-                        location.Events.Add(foundEvent);
-                        foundEvent.Locations.Add(location);
+                        Binder.Bind(location, foundEvent);
                     }
                     catch (InvalidOperationException)
                     {
@@ -309,14 +286,9 @@ namespace AIGenerator
         /// <returns>Список новых персонажей</returns>
         public List<string> NewCharacters(Plot plot)
         {
-            List<string> newCharacters = new List<string>();
-            foreach (string name in Characters)
-            {
-                if (plot.Characters.FirstOrDefault(c => c.Name == name) == null)
-                {
-                    newCharacters.Add(name);
-                }
-            }
+            List<string> newCharacters = 
+                Characters.Where(name => plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                          .ToList();
             return newCharacters;
         }
 
@@ -327,14 +299,9 @@ namespace AIGenerator
         /// <returns>Список новых вещей</returns>
         public List<string> NewItems(Plot plot)
         {
-            List<string> newItems = new List<string>();
-            foreach (string name in Items)
-            {
-                if (plot.Items.FirstOrDefault(i => i.Name == name) == null)
-                {
-                    newItems.Add(name);
-                }
-            }
+            List<string> newItems = 
+                Items.Where(name => plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                     .ToList();
             return newItems;
         }
 
@@ -345,14 +312,9 @@ namespace AIGenerator
         /// <returns>Список новых событий</returns>
         public List<string> NewEvents(Plot plot)
         {
-            List<string> newEvents = new List<string>();
-            foreach (string name in Events)
-            {
-                if (plot.Events.FirstOrDefault(e => e.Name == name) == null)
-                {
-                    newEvents.Add(name);
-                }
-            }
+            List<string> newEvents = 
+                Events.Where(name => plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                      .ToList();
             return newEvents;
         }
     }
@@ -402,10 +364,11 @@ namespace AIGenerator
             Item item = new Item();
             item.Name = Name;
             item.Description = Description;
+            item.Time = plot.Time++;
             try
             {
-                item.Location = plot.Locations.First(l => l.Name == Location);
-                item.Location.Items.Add(item);
+                Location foundLocation = plot.Locations.First(l => l.Name == Location);
+                Binder.Bind(item, foundLocation);
             }
             catch (InvalidOperationException)
             {
@@ -413,8 +376,8 @@ namespace AIGenerator
             }
             try
             {
-                item.Host = plot.Characters.First(c => c.Name == Host);
-                item.Host.Items.Add(item);
+                Character foundHost = plot.Characters.First(c => c.Name == Host);
+                Binder.Bind(item, foundHost);
             }
             catch (InvalidOperationException)
             {
@@ -428,8 +391,7 @@ namespace AIGenerator
                     try
                     {
                         Event foundEvent = plot.Events.First(e => e.Name == @event);
-                        item.Events.Add(foundEvent);
-                        foundEvent.Items.Add(item);
+                        Binder.Bind(item, foundEvent);
                     }
                     catch (InvalidOperationException)
                     {
@@ -475,14 +437,9 @@ namespace AIGenerator
         /// <returns>Список новых событий</returns>
         public List<string> NewEvents(Plot plot)
         {
-            List<string> newEvents = new List<string>();
-            foreach (string name in Events)
-            {
-                if (plot.Events.FirstOrDefault(e => e.Name == name) == null)
-                {
-                    newEvents.Add(name);
-                }
-            }
+            List<string> newEvents = 
+                Events.Where(name => plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                      .ToList();
             return newEvents;
         }
     }
@@ -533,15 +490,15 @@ namespace AIGenerator
             @event.Name = Name;
             @event.Description = Description;
             @event.Characters = new List<Character>();
+            @event.Time = plot.Time++;
             if (plot.Characters != null && plot.Characters.Count != 0 && Characters != null)
             {
                 foreach (var character in Characters)
                 {
                     try
                     {
-                        Character charac = plot.Characters.First(c => c.Name == character);
-                        @event.Characters.Add(charac);
-                        charac.Events.Add(@event);
+                        Character foundCharacter = plot.Characters.First(c => c.Name == character);
+                        Binder.Bind(@event, foundCharacter);
                     }
                     catch (InvalidOperationException)
                     {
@@ -556,9 +513,8 @@ namespace AIGenerator
                 {
                     try
                     {
-                        Location loc = plot.Locations.First(l => l.Name == location);
-                        @event.Locations.Add(loc);
-                        loc.Events.Add(@event);
+                        Location foundLocation = plot.Locations.First(l => l.Name == location);
+                        Binder.Bind(@event, foundLocation);
                     }
                     catch (InvalidOperationException)
                     {
@@ -574,8 +530,7 @@ namespace AIGenerator
                     try
                     {
                         Item foundItem = plot.Items.First(i => i.Name == item);
-                        @event.Items.Add(foundItem);
-                        foundItem.Events.Add(@event);
+                        Binder.Bind(@event, foundItem);
                     }
                     catch (InvalidOperationException)
                     {
@@ -593,14 +548,9 @@ namespace AIGenerator
         /// <returns>Список новых персонажей</returns>
         public List<string> NewCharacters(Plot plot)
         {
-            List<string> newCharacters = new List<string>();
-            foreach (string name in Characters)
-            {
-                if (plot.Characters.FirstOrDefault(c => c.Name == name) == null)
-                {
-                    newCharacters.Add(name);
-                }
-            }
+            List<string> newCharacters = 
+                Characters.Where(name => plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                          .ToList();
             return newCharacters;
         }
 
@@ -611,14 +561,9 @@ namespace AIGenerator
         /// <returns>Список новых локаций</returns>
         public List<string> NewLocations(Plot plot)
         {
-            List<string> newLocations = new List<string>();
-            foreach (string name in Locations)
-            {
-                if (plot.Locations.FirstOrDefault(l => l.Name == name) == null)
-                {
-                    newLocations.Add(name);
-                }
-            }
+            List<string> newLocations = 
+                Locations.Where(name => plot.Locations.FirstOrDefault(l => l.Name == name) == null)
+                         .ToList();
             return newLocations;
         }
 
@@ -629,14 +574,9 @@ namespace AIGenerator
         /// <returns>Список новых вещей</returns>
         public List<string> NewItems(Plot plot)
         {
-            List<string> newItems = new List<string>();
-            foreach (string name in Items)
-            {
-                if (plot.Items.FirstOrDefault(i => i.Name == name) == null)
-                {
-                    newItems.Add(name);
-                }
-            }
+            List<string> newItems = 
+                Items.Where(name => plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                     .ToList();
             return newItems;
         }
     }
