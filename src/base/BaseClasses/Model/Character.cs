@@ -41,6 +41,11 @@
         public List<Event> Events { get; set; }
 
         /// <summary>
+        /// Время создания персонажа
+        /// </summary>
+        public int Time { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public override string ToString()
@@ -60,7 +65,8 @@
                    $"Отношения: {string.Join(", ", Relations.Select(r => $"{r.Key.Name} ({r.Value})"))}\n" +
                    $"Местоположение: {string.Join(", ", Locations.Select(l => l.Name))}\n" +
                    $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
-                   $"События: {string.Join(", ", Events.Select(e => e.Name))}\n";
+                   $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
+                   $"Время создания: {Time}";
         }
     }
 }

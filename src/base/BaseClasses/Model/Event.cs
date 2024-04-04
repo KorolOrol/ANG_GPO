@@ -31,6 +31,11 @@
         public List<Item> Items { get; set; }
 
         /// <summary>
+        /// Время события
+        /// </summary>
+        public int Time { get; set; }
+
+        /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public override string ToString()
@@ -48,7 +53,8 @@
                    $"Описание: {Description}\n" +
                    $"Персонажи: {string.Join(", ", Characters.Select(c => c.Name))}\n" +
                    $"Локации: {string.Join(", ", Locations.Select(l => l.Name))}\n" +
-                   $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n";
+                   $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
+                   $"Время события: {Time}";
         }
     }
 }
