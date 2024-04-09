@@ -23,7 +23,7 @@
         /// <summary>
         /// Отношения персонажа с другими персонажами
         /// </summary>
-        public Dictionary<Character, double> Relations { get; set; }
+        public List<Relation> Relations { get; set; }
 
         /// <summary>
         /// Местоположение персонажа
@@ -62,7 +62,8 @@
             return $"Персонаж: {Name}\n" +
                    $"Описание: {Description}\n" +
                    $"Черты характера: {string.Join(", ", Traits)}\n" +
-                   $"Отношения: {string.Join(", ", Relations.Select(r => $"{r.Key.Name} ({r.Value})"))}\n" +
+                   $"Отношения: {string.Join(", ", Relations.Select(r => 
+                                                   $"{r.Character.Name} ({r.Value})"))}\n" +
                    $"Местоположение: {string.Join(", ", Locations.Select(l => l.Name))}\n" +
                    $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
                    $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
