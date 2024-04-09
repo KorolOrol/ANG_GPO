@@ -75,7 +75,7 @@ namespace AIGenerator
                                               character.Description,
                                               string.Join(", ", character.Traits),
                                               string.Join(", ", 
-                    character.Relations.Select(kv => $"{kv.Key.Name}: {kv.Value}")),
+                    character.Relations.Select(kv => $"{kv.Character.Name}: {kv.Value}")),
                                               string.Join(", ", character.Locations.Select(l => l.Name)),
                                               string.Join(", ", character.Items.Select(i => i.Name)),
                                               string.Join(", ", character.Events.Select(e => e.Name))));

@@ -51,29 +51,19 @@ namespace AIGenerator
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Character ToCharacter(Plot plot)
         {
-            if (this == null)
-            {
-                throw new ArgumentNullException("ИИ вернул пустой ответ");
-            }
             Character character = new Character();
             character.Name = Name;
             character.Description = Description;
             character.Traits = Traits;
-            character.Relations = new Dictionary<Character, double>();
+            character.Relations = new List<Relation>();
             character.Time = plot.Time++;
             if (plot.Characters != null && plot.Characters.Count != 0 && Relations != null)
             {
                 foreach (var relation in Relations)
                 {
-                    try
-                    {
-                        Character foundCharacter = plot.Characters.First(c => c.Name == relation.Key);
-                        Binder.Bind(character, foundCharacter, relation.Value);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Character foundCharacter = plot.Characters.FirstOrDefault(c => c.Name == relation.Key);
+                    if (foundCharacter == null) continue;
+                    Binder.Bind(character, foundCharacter, relation.Value);
                 }
             }
             character.Locations = new List<Location>();
@@ -81,15 +71,9 @@ namespace AIGenerator
             {
                 foreach (var location in Locations)
                 {
-                    try
-                    {
-                        Location foundLocation = plot.Locations.First(l => l.Name == location);
-                        Binder.Bind(character, foundLocation);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == location);
+                    if (foundLocation == null) continue;
+                    Binder.Bind(character, foundLocation);
                 }
             }
             character.Items = new List<Item>();
@@ -97,16 +81,9 @@ namespace AIGenerator
             {
                 foreach (var item in Items)
                 {
-                    try
-                    {
-                        Item foundItem = plot.Items.First(i => i.Name == item);
-                        if (foundItem.Host != null) continue;
-                        Binder.Bind(character, foundItem);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Item foundItem = plot.Items.FirstOrDefault(i => i.Name == item);
+                    if (foundItem == null || foundItem.Host != null) continue;
+                    Binder.Bind(character, foundItem);
                 }
             }
             character.Events = new List<Event>();
@@ -114,15 +91,9 @@ namespace AIGenerator
             {
                 foreach (var @event in Events)
                 {
-                    try
-                    {
-                        Event foundEvent = plot.Events.First(e => e.Name == @event);
-                        Binder.Bind(character, foundEvent);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Event foundEvent = plot.Events.FirstOrDefault(e => e.Name == @event);
+                    if (foundEvent == null) continue;
+                    Binder.Bind(character, foundEvent);
                 }
             }
             return character;
@@ -219,10 +190,6 @@ namespace AIGenerator
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Location ToLocation(Plot plot)
         {
-            if (this == null)
-            {
-                throw new ArgumentNullException("ИИ вернул пустой ответ");
-            }
             Location location = new Location();
             location.Name = Name;
             location.Description = Description;
@@ -232,15 +199,9 @@ namespace AIGenerator
             {
                 foreach (var character in Characters)
                 {
-                    try
-                    {
-                        Character foundCharacter = plot.Characters.First(c => c.Name == character);
-                        Binder.Bind(location, foundCharacter);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Character foundCharacter = plot.Characters.FirstOrDefault(c => c.Name == character);
+                    if (foundCharacter == null) continue;
+                    Binder.Bind(location, foundCharacter);
                 }
             }
             location.Items = new List<Item>();
@@ -248,16 +209,9 @@ namespace AIGenerator
             {
                 foreach (var item in Items)
                 {
-                    try
-                    {
-                        Item foundItem = plot.Items.First(i => i.Name == item);
-                        if (foundItem.Location != null) continue;
-                        Binder.Bind(location, foundItem);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Item foundItem = plot.Items.FirstOrDefault(i => i.Name == item);
+                    if (foundItem == null || foundItem.Location != null) continue;
+                    Binder.Bind(location, foundItem);
                 }
             }
             location.Events = new List<Event>();
@@ -265,15 +219,9 @@ namespace AIGenerator
             {
                 foreach (var @event in Events)
                 {
-                    try
-                    {
-                        Event foundEvent = plot.Events.First(e => e.Name == @event);
-                        Binder.Bind(location, foundEvent);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Event foundEvent = plot.Events.FirstOrDefault(e => e.Name == @event);
+                    if (foundEvent == null) continue;
+                    Binder.Bind(location, foundEvent);
                 }
             }
             return location;
@@ -357,29 +305,25 @@ namespace AIGenerator
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Item ToItem(Plot plot)
         {
-            if (this == null)
-            {
-                throw new ArgumentNullException("ИИ вернул пустой ответ");
-            }
             Item item = new Item();
             item.Name = Name;
             item.Description = Description;
             item.Time = plot.Time++;
-            try
+            Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == Location);
+            if (foundLocation != null)
             {
-                Location foundLocation = plot.Locations.First(l => l.Name == Location);
                 Binder.Bind(item, foundLocation);
             }
-            catch (InvalidOperationException)
+            else
             {
                 item.Location = null;
             }
-            try
+            Character foundHost = plot.Characters.FirstOrDefault(c => c.Name == Host);
+            if (foundHost != null)
             {
-                Character foundHost = plot.Characters.First(c => c.Name == Host);
                 Binder.Bind(item, foundHost);
             }
-            catch (InvalidOperationException)
+            else
             {
                 item.Host = null;
             }
@@ -388,15 +332,9 @@ namespace AIGenerator
             {
                 foreach (var @event in Events)
                 {
-                    try
-                    {
-                        Event foundEvent = plot.Events.First(e => e.Name == @event);
-                        Binder.Bind(item, foundEvent);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Event foundEvent = plot.Events.FirstOrDefault(e => e.Name == @event);
+                    if (foundEvent == null) continue;
+                    Binder.Bind(item, foundEvent);
                 }
             }
             return item;
@@ -482,10 +420,6 @@ namespace AIGenerator
         /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Event ToEvent(Plot plot)
         {
-            if (this == null)
-            {
-                throw new ArgumentNullException("ИИ вернул пустой ответ");
-            }
             Event @event = new Event();
             @event.Name = Name;
             @event.Description = Description;
@@ -495,15 +429,9 @@ namespace AIGenerator
             {
                 foreach (var character in Characters)
                 {
-                    try
-                    {
-                        Character foundCharacter = plot.Characters.First(c => c.Name == character);
-                        Binder.Bind(@event, foundCharacter);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Character foundCharacter = plot.Characters.FirstOrDefault(c => c.Name == character);
+                    if (foundCharacter == null) continue;
+                    Binder.Bind(@event, foundCharacter);
                 }
             }
             @event.Locations = new List<Location>();
@@ -511,15 +439,9 @@ namespace AIGenerator
             {
                 foreach (var location in Locations)
                 {
-                    try
-                    {
-                        Location foundLocation = plot.Locations.First(l => l.Name == location);
-                        Binder.Bind(@event, foundLocation);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == location);
+                    if (foundLocation == null) continue;
+                    Binder.Bind(@event, foundLocation);
                 }
             }
             @event.Items = new List<Item>();
@@ -527,15 +449,9 @@ namespace AIGenerator
             {
                 foreach (var item in Items)
                 {
-                    try
-                    {
-                        Item foundItem = plot.Items.First(i => i.Name == item);
-                        Binder.Bind(@event, foundItem);
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        continue;
-                    }
+                    Item foundItem = plot.Items.FirstOrDefault(i => i.Name == item);
+                    if (foundItem == null) continue;
+                    Binder.Bind(@event, foundItem);
                 }
             }
             return @event;

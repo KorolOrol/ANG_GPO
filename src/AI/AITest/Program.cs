@@ -1,7 +1,6 @@
 ﻿using BaseClasses.Model;
 using AIGenerator.TextGenerator;
 using AIGen = AIGenerator.AIGenerator;
-using static OpenAI.ObjectModels.SharedModels.IOpenAiModels;
 using BaseClasses.Services;
 
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
@@ -11,7 +10,7 @@ AIGen Vgen = new AIGen(promptPath, new VisionCraftGenerator());
 Vgen.TextAIGenerator.Model = "Mixtral-8x7B-Instruct-v0.1";
 AIGen Ogen = new AIGen(promptPath);
 
-AIGen gen = Vgen;
+AIGen gen = Ngen;
 
 Plot plot = new Plot();
 
