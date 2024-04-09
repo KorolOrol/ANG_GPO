@@ -20,21 +20,21 @@ namespace BaseClasses.Services
         /// <param name="relations">Отношения между персонажами</param>
         public static void Bind(Character character1, Character character2, double relations)
         {
-            if (character1.Relations.ContainsKey(character2))
+            if (character1.Relations.FirstOrDefault(rel => rel.Character == character2) != null)
             {
-                character1.Relations[character2] = relations;
+                character1.Relations.FirstOrDefault(rel => rel.Character == character2).Value = relations;
             }
             else
             {
-                character1.Relations.Add(character2, relations);
+                character1.Relations.Add(new Relation { Character = character2, Value = relations });
             }
-            if (character2.Relations.ContainsKey(character1))
+            if (character2.Relations.FirstOrDefault(rel => rel.Character == character1) != null)
             {
-                character2.Relations[character1] = relations;
+                character2.Relations.FirstOrDefault(rel => rel.Character == character1).Value = relations;
             }
             else
             {
-                character2.Relations.Add(character1, relations);
+                character2.Relations.Add(new Relation { Character = character1, Value = relations });
             }
         }
 
