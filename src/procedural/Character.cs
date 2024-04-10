@@ -78,66 +78,66 @@ public class Character
 
     List<Trait> traits_list = new List<Trait>()
     {
-        new Trait(  "Амбициозный",      true), // Ambitious
-        new Trait(  "Приземлённый",     true), // Content
+        new Trait(  "Амбициозный"), // Ambitious
+        new Trait(  "Приземлённый"), // Content
 
-        new Trait(  "Храбрый",          true), // Brave
-        new Trait(  "Трусливый",        true), // Craven
+        new Trait(  "Храбрый"), // Brave
+        new Trait(  "Трусливый"), // Craven
 
-        new Trait(  "Спокойный",        true), // Calm
-        new Trait(  "Гневный",          true), // Wrathful
+        new Trait(  "Спокойный"), // Calm
+        new Trait(  "Гневный"), // Wrathful
 
-        new Trait(  "Целомудренный",    true), // Chastle
-        new Trait(  "Похотливый",       true), // Lustful
+        new Trait(  "Целомудренный"), // Chastle
+        new Trait(  "Похотливый"), // Lustful
 
-        new Trait(  "Усердный",         true), // Diligent
-        new Trait(  "Ленивый",          true), // Lazy
+        new Trait(  "Усердный"), // Diligent
+        new Trait(  "Ленивый"), // Lazy
 
-        new Trait(  "Общительный",      true), // Generous
-        new Trait(  "Стеснительный",    true), // Shy
+        new Trait(  "Общительный"), // Generous
+        new Trait(  "Стеснительный"), // Shy
 
-        new Trait(  "Щедрый",           true), // Gregarious
-        new Trait(  "Жадный",           true), // Greedy
+        new Trait(  "Щедрый"), // Gregarious
+        new Trait(  "Жадный"), // Greedy
 
-        new Trait(  "Честный",          true), // Honest
-        new Trait(  "Лживый",           true), // Deceitful
+        new Trait(  "Честный"), // Honest
+        new Trait(  "Лживый"), // Deceitful
 
-        new Trait(  "Скромный",         true), // Humble
-        new Trait(  "Высокомерный",     true), // Arrogant
+        new Trait(  "Скромный"), // Humble
+        new Trait(  "Высокомерный"), // Arrogant
 
-        new Trait(  "Взвешенный",       true), // Just
-        new Trait(  "Взбалмошный",      true), // Arbitrary
+        new Trait(  "Взвешенный"), // Just
+        new Trait(  "Взбалмошный"), // Arbitrary
 
-        new Trait(  "Терпеливый",       true), // Patient
-        new Trait(  "Нетерпеливый",     true), // Impatient
+        new Trait(  "Терпеливый"), // Patient
+        new Trait(  "Нетерпеливый"), // Impatient
 
-        new Trait(  "Сдержанный",       true), // Temperate
-        new Trait(  "Прожорливый",      true), // Gluttonous
+        new Trait(  "Сдержанный"), // Temperate
+        new Trait(  "Прожорливый"), // Gluttonous
 
-        new Trait(  "Доверчивый",       true), // Trusting
-        new Trait(  "Параноик",         true), // Paranoid
+        new Trait(  "Доверчивый"), // Trusting
+        new Trait(  "Параноик"), // Paranoid
 
-        new Trait(  "Ревностный",       true), // Zealous
-        new Trait(  "Циничный",         true), // Cynical
+        new Trait(  "Ревностный"), // Zealous
+        new Trait(  "Циничный"), // Cynical
 
-        new Trait(  "Сочувствующий",    true), // Compassionate
-        new Trait(  "Жестокий",         true), // Callous
+        new Trait(  "Сочувствующий"), // Compassionate
+        new Trait(  "Жестокий"), // Callous
 
-        new Trait(  "Переменчивый",     true), // Fickle
-        new Trait(  "Упёртый",          true), // Stubborn
+        new Trait(  "Переменчивый"), // Fickle
+        new Trait(  "Упёртый"), // Stubborn
 
-        new Trait(  "Заурядный",        true), // Ordinary
-        new Trait(  "Эксцентричный",    true), // Eccentric
+        new Trait(  "Заурядный"), // Ordinary
+        new Trait(  "Эксцентричный"), // Eccentric
 
-        new Trait(  "Садист",           true), // Sadistic
-        new Trait(  "Мазохист",         true), // Masochism
+        new Trait(  "Садист"), // Sadistic
+        new Trait(  "Мазохист"), // Masochism
 
-        new Trait(  "Религиозный",      true), // Religious
-        new Trait(  "Фанатик",          true), // Fanatic
-        new Trait(  "Атеист",           true), // Aetheist
+        new Trait(  "Религиозный"), // Religious
+        new Trait(  "Фанатик"), // Fanatic
+        new Trait(  "Атеист"), // Aetheist
 
-        new Trait(  "Справедливый",     true), // Fair
-        new Trait(  "Несправедливый",   true), // Unfair
+        new Trait(  "Справедливый"), // Fair
+        new Trait(  "Несправедливый"), // Unfair
 
     };
 
