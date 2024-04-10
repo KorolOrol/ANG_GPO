@@ -78,11 +78,24 @@ public class Character
 
     List<Trait> traits_list = new List<Trait>()
     {
-        new Trait("Амбициозный"),    // Ambitious
-        new Trait("Приземлённый"),   // Content
+        new Trait("Амбициозный", "Имеющий или проявляющий притязания на достижение значительных целей, больших успехов."),    // Ambitious
+        new Trait("Приземлённый", "Трезво оценивающий реальную действительность, избегающий иллюзий."),   // Content
                                      
-        new Trait("Храбрый"),        // Brave
-        new Trait("Трусливый"),      // Craven
+        new Trait("Храбрый", new List<string>
+        {
+            "Не знающий страха, решительный.",
+            "Не знает страха в минуту опасности, способен преодолеть его.",
+            "Легко рискующий своей жизнью ради достижения цели или спасения другого человека."
+
+
+        }),        // Brave
+        new Trait("Трусливый", new List<string>
+        {
+            "Робкий, боязливый.",
+            "Склонен к боязни и панике, избегает опасных ситуаций.",
+            "Боящийся даже незначительных опасностей."
+
+        }),      // Craven
                                      
         new Trait("Спокойный"),      // Calm
         new Trait("Гневный"),        // Wrathful
@@ -580,6 +593,10 @@ public class Character
     #endregion
 
     #region [Output]
+
+    /// <summary>
+    /// Выводит все черты персонажа
+    /// </summary>
     public void WriteAllTraits()
     {
         Console.Write($"{name} имеет такие черты: ");
@@ -589,6 +606,9 @@ public class Character
         }
     }
 
+    /// <summary>
+    /// Выводит все черты персонажа с параметром их влияния 
+    /// </summary>
     public void WriteAllTraitsWithAff()
     {
         Console.Write($"{name} имеет такие черты: ");
@@ -601,6 +621,9 @@ public class Character
         }
     }
 
+    /// <summary>
+    /// Выводит все черты персонажа с префиксными словами, определяющими уровень влияния черты
+    /// </summary>
     public void WriteAllTraitsWithAffDesc()
     {
         Console.Write($"{name} имеет такие черты: ");
@@ -627,6 +650,37 @@ public class Character
             {
                 Console.Write($"absolutely {trait.title} ");
             }
+        }
+    }
+
+    /// <summary>
+    /// Выводит описание персонажа
+    /// </summary>
+    public void WriteDesc()
+    {
+        Console.Write($"Персонажа {name} можно описать так. ");
+
+        foreach (var trait in traits)
+        {
+            if (trait.description.Count != 0)
+            {
+                if (trait.description.Count > 1)
+                {
+                    Random rand = new Random();
+                    string desc = trait.description[rand.Next(trait.description.Count)];
+                    Console.WriteLine($"{desc} ");
+                }
+                else
+                {
+                    Console.WriteLine($"{trait.description[0]} ");
+                }
+            }
+            else
+            {
+                Console.Write($"{trait.title} {trait.affection} ");
+            }
+
+
         }
     }
 

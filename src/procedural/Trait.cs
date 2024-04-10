@@ -15,7 +15,7 @@ public class Trait
     public Trait(string title, string description)
     {
         this.title = title;
-        this.description[0] = description;
+        this.description.Add(description);
     }
 
     public Trait(string title, List<string> description)

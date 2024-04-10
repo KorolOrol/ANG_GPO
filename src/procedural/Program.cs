@@ -31,8 +31,12 @@ Kid.WriteAllTraitsWithAff();*/
 Character Pain = new Character("Пэйн");
 List<string> traits = new List<string>()
 {
-    "Доверчивый",
-    "Фанатик"
+    "Приземлённый",
+    "Трусливый"
 };
 Pain.CreateByInputTraits(traits, 10);
 Pain.WriteAllTraits();
+
+Console.WriteLine("\n");
+
+Pain.WriteDesc();
