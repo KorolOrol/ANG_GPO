@@ -5,15 +5,20 @@ public class Trait
 
     public string title;
     public float affection = rand.NextSingle();
-    public string description;
+    public List<string> description = new List<string> {};
 
     public Trait(string title)
     {
         this.title = title;
-        description = "";
     }
 
     public Trait(string title, string description)
+    {
+        this.title = title;
+        this.description[0] = description;
+    }
+
+    public Trait(string title, List<string> description)
     {
         this.title = title;
         this.description = description;
