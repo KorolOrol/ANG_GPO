@@ -78,66 +78,66 @@ public class Character
 
     List<Trait> traits_list = new List<Trait>()
     {
-        new Trait(  "Амбициозный"), // Ambitious
-        new Trait(  "Приземлённый"), // Content
-
-        new Trait(  "Храбрый"), // Brave
-        new Trait(  "Трусливый"), // Craven
-
-        new Trait(  "Спокойный"), // Calm
-        new Trait(  "Гневный"), // Wrathful
-
-        new Trait(  "Целомудренный"), // Chastle
-        new Trait(  "Похотливый"), // Lustful
-
-        new Trait(  "Усердный"), // Diligent
-        new Trait(  "Ленивый"), // Lazy
-
-        new Trait(  "Общительный"), // Generous
-        new Trait(  "Стеснительный"), // Shy
-
-        new Trait(  "Щедрый"), // Gregarious
-        new Trait(  "Жадный"), // Greedy
-
-        new Trait(  "Честный"), // Honest
-        new Trait(  "Лживый"), // Deceitful
-
-        new Trait(  "Скромный"), // Humble
-        new Trait(  "Высокомерный"), // Arrogant
-
-        new Trait(  "Взвешенный"), // Just
-        new Trait(  "Взбалмошный"), // Arbitrary
-
-        new Trait(  "Терпеливый"), // Patient
-        new Trait(  "Нетерпеливый"), // Impatient
-
-        new Trait(  "Сдержанный"), // Temperate
-        new Trait(  "Прожорливый"), // Gluttonous
-
-        new Trait(  "Доверчивый"), // Trusting
-        new Trait(  "Параноик"), // Paranoid
-
-        new Trait(  "Ревностный"), // Zealous
-        new Trait(  "Циничный"), // Cynical
-
-        new Trait(  "Сочувствующий"), // Compassionate
-        new Trait(  "Жестокий"), // Callous
-
-        new Trait(  "Переменчивый"), // Fickle
-        new Trait(  "Упёртый"), // Stubborn
-
-        new Trait(  "Заурядный"), // Ordinary
-        new Trait(  "Эксцентричный"), // Eccentric
-
-        new Trait(  "Садист"), // Sadistic
-        new Trait(  "Мазохист"), // Masochism
-
-        new Trait(  "Религиозный"), // Religious
-        new Trait(  "Фанатик"), // Fanatic
-        new Trait(  "Атеист"), // Aetheist
-
-        new Trait(  "Справедливый"), // Fair
-        new Trait(  "Несправедливый"), // Unfair
+        new Trait("Амбициозный"),    // Ambitious
+        new Trait("Приземлённый"),   // Content
+                                     
+        new Trait("Храбрый"),        // Brave
+        new Trait("Трусливый"),      // Craven
+                                     
+        new Trait("Спокойный"),      // Calm
+        new Trait("Гневный"),        // Wrathful
+                                     
+        new Trait("Целомудренный"),  // Chastle
+        new Trait("Похотливый"),     // Lustful
+                                     
+        new Trait("Усердный"),       // Diligent
+        new Trait("Ленивый"),        // Lazy
+                                     
+        new Trait("Общительный"),    // Generous
+        new Trait("Стеснительный"),  // Shy
+                                     
+        new Trait("Щедрый"),         // Gregarious
+        new Trait("Жадный"),         // Greedy
+                                     
+        new Trait("Честный"),        // Honest
+        new Trait("Лживый"),         // Deceitful
+                                     
+        new Trait("Скромный"),       // Humble
+        new Trait("Высокомерный"),   // Arrogant
+                                     
+        new Trait("Взвешенный"),     // Just
+        new Trait("Взбалмошный"),    // Arbitrary
+                                     
+        new Trait("Терпеливый"),     // Patient
+        new Trait("Нетерпеливый"),   // Impatient
+                                     
+        new Trait("Сдержанный"),     // Temperate
+        new Trait("Прожорливый"),    // Gluttonous
+                                     
+        new Trait("Доверчивый"),     // Trusting
+        new Trait("Параноик"),       // Paranoid
+                                     
+        new Trait("Ревностный"),     // Zealous
+        new Trait("Циничный"),       // Cynical
+                                     
+        new Trait("Сочувствующий"),  // Compassionate
+        new Trait("Жестокий"),       // Callous
+                                     
+        new Trait("Переменчивый"),   // Fickle
+        new Trait("Упёртый"),        // Stubborn
+                                     
+        new Trait("Заурядный"),      // Ordinary
+        new Trait("Эксцентричный"),  // Eccentric
+                                     
+        new Trait("Садист"),         // Sadistic
+        new Trait("Мазохист"),       // Masochism
+                                     
+        new Trait("Религиозный"),    // Religious
+        new Trait("Фанатик"),        // Fanatic
+        new Trait("Атеист"),         // Aetheist
+                                     
+        new Trait("Справедливый"),   // Fair
+        new Trait("Несправедливый"), // Unfair
 
     };
 
