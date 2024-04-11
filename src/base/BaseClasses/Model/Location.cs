@@ -1,4 +1,6 @@
-﻿namespace BaseClasses.Model
+﻿using BaseClasses.Services;
+
+namespace BaseClasses.Model
 {
     /// <summary>
     /// Локация в истории
@@ -8,32 +10,67 @@
         /// <summary>
         /// Название локации
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Описание локации
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         /// <summary>
         /// Персонажи, находящиеся в локации
         /// </summary>
-        public List<Character> Characters { get; set; }
+        public List<Character> Characters { get; set; } = new List<Character>();
 
         /// <summary>
         /// Вещи, находящиеся в локации
         /// </summary>
-        public List<Item> Items { get; set; }
+        public List<Item> Items { get; set; } = new List<Item>();
 
         /// <summary>
         /// События, происходящие в локации
         /// </summary>
-        public List<Event> Events { get; set; }
+        public List<Event> Events { get; set; } = new List<Event>();
 
         /// <summary>
         /// Время создания локации
         /// </summary>
         public int Time { get; set; }
+
+        /// <summary>
+        /// Объединение локации с другой локацией
+        /// </summary>
+        /// <param name="location">Локация, с которой объединяется текущая</param>
+        public void Merge(Location location)
+        {
+            if (Name == "")
+            {
+                Name = location.Name;
+            }
+            if (Description == "")
+            {
+                Description = location.Description;
+            }
+            foreach (var character in location.Characters.ToList())
+            {
+                Binder.Bind(this, character);
+                Binder.Unbind(location, character);
+            }
+            foreach (var item in location.Items.ToList())
+            {
+                Binder.Bind(this, item);
+                Binder.Unbind(location, item);
+            }
+            foreach (var ev in location.Events.ToList())
+            {
+                Binder.Bind(this, ev);
+                Binder.Unbind(location, ev);
+            }
+            if (Time == -1)
+            {
+                Time = location.Time;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -54,7 +91,7 @@
                    $"Персонажи: {string.Join(", ", Characters.Select(c => c.Name))}\n" +
                    $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
                    $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
-                   $"Время создания: {Time}";
+                   $"Время создания: {Time}\n";
         }
     }
 }

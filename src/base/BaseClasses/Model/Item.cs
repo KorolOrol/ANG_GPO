@@ -1,4 +1,6 @@
-﻿namespace BaseClasses.Model
+﻿using BaseClasses.Services;
+
+namespace BaseClasses.Model
 {
     /// <summary>
     /// Предмет в истории
@@ -8,32 +10,57 @@
         /// <summary>
         /// Название предмета
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Описание предмета
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         /// <summary>
         /// Хозяин предмета
         /// </summary>
-        public Character Host { get; set; }
+        public Character Host { get; set; } = null;
 
         /// <summary>
         /// Локация, в которой находится предмет
         /// </summary>
-        public Location Location { get; set; }
+        public Location Location { get; set; } = null;
 
         /// <summary>
         /// События, в которых участвует предмет
         /// </summary>
-        public List<Event> Events { get; set; }
+        public List<Event> Events { get; set; } = new List<Event>();
 
         /// <summary>
         /// Время создания предмета
         /// </summary>
-        public int Time { get; set; }
+        public int Time { get; set; } = -1;
+
+        /// <summary>
+        /// Объединение предмета с другим предметом
+        /// </summary>
+        /// <param name="item">Предмет, с которым объединяется текущий</param>
+        public void Merge(Item item)
+        {
+            if (Name == "")
+            {
+                Name = item.Name;
+            }
+            if (Description == "")
+            {
+                Description = item.Description;
+            }
+            Binder.Bind(this, item.Host);
+            Binder.Unbind(item, item.Host);
+            Binder.Bind(this, item.Location);
+            Binder.Unbind(item, item.Location);
+            foreach (var ev in item.Events.ToList())
+            {
+                Binder.Bind(this, ev);
+                Binder.Unbind(item, ev);
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -54,7 +81,7 @@
                    $"Хозяин: {Host?.Name ?? "нет"}\n" +
                    $"Локация: {Location?.Name ?? "нет"}\n" +
                    $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
-                   $"Время создания: {Time}";
+                   $"Время создания: {Time}\n";
         }
     }
 }
