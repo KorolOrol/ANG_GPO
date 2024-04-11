@@ -34,7 +34,7 @@ List<string> traits = new List<string>()
     "Приземлённый",
     "Трусливый"
 };
-Pain.CreateByInputTraits(traits, 10);
+Pain.CreateByInputTraits(traits, 4);
 Pain.WriteAllTraits();
 
 Console.WriteLine("\n");

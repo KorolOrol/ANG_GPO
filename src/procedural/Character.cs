@@ -86,15 +86,12 @@ public class Character
             "Не знающий страха, решительный.",
             "Не знает страха в минуту опасности, способен преодолеть его.",
             "Легко рискующий своей жизнью ради достижения цели или спасения другого человека."
-
-
         }),        // Brave
         new Trait("Трусливый", new List<string>
         {
             "Робкий, боязливый.",
             "Склонен к боязни и панике, избегает опасных ситуаций.",
             "Боящийся даже незначительных опасностей."
-
         }),      // Craven
                                      
         new Trait("Спокойный"),      // Calm
@@ -668,16 +665,16 @@ public class Character
                 {
                     Random rand = new Random();
                     string desc = trait.description[rand.Next(trait.description.Count)];
-                    Console.WriteLine($"{desc} ");
+                    Console.Write($"{desc} ");
                 }
                 else
                 {
-                    Console.WriteLine($"{trait.description[0]} ");
+                    Console.Write($"{trait.description[0]} ");
                 }
             }
             else
             {
-                Console.Write($"{trait.title} {trait.affection} ");
+                Console.Write($"{trait.title} {trait.affection}. ");
             }
 
 
