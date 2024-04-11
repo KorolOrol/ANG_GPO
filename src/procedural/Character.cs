@@ -28,130 +28,6 @@ public class Character
 
     #endregion
 
-    #region [Tabl and Traits List]
-
-    public int[,] tabl = new int[,]
-    {
-        {0, 0, 3, 2, 3, 2, 2, 2, 3, 1, 2, 1, 1, 3, 2, 2, 0, 3, 3, 1, 2, 3, 1, 1, 1, 3, 3, 2, 1, 2, 1, 2, 0, 3, 1, 1, 3, 3, 1, 1, 2},
-        {0, 0, 1, 3, 2, 2, 3, 1, 1, 3, 1, 2, 1, 1, 2, 1, 3, 0, 2, 1, 2, 0, 2, 1, 2, 1, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 2, 1},
-        {3, 1, 0, 0, 2, 2, 2, 2, 2, 1, 2, 1, 2, 1, 2, 2, 1, 1, 2, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 2, 3, 1, 3, 1},
-        {2, 3, 0, 0, 1, 2, 1, 1, 1, 1, 2, 2, 1, 2, 1, 3, 1, 2, 3, 1, 1, 2, 1, 2, 0, 3, 2, 1, 1, 2, 3, 2, 1, 1, 1, 1, 3, 2, 1, 1, 2},
-        {3, 2, 2, 1, 0, 0, 2, 1, 2, 2, 2, 1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 0, 2, 1, 1, 0, 0, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 0, 1, 1, 1},
-        {2, 2, 2, 2, 0, 0, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 0, 3, 1, 1, 2, 2, 3, 2, 1, 2, 2, 2, 1, 2, 2, 0, 2, 3, 1, 2, 1},
-        {2, 3, 2, 1, 2, 1, 0, 0, 2, 1, 1, 1, 1, 1, 2, 1, 3, 1, 2, 1, 2, 1, 2, 1, 1, 3, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1},
-        {2, 1, 2, 1, 1, 1, 0, 0, 1, 1, 2, 2, 1, 2, 3, 2, 2, 3, 1, 2, 2, 3, 1, 1, 1, 3, 2, 1, 1, 1, 1, 1, 1, 1, 3, 3, 3, 3, 1, 1, 1},
-        {3, 1, 2, 1, 2, 1, 2, 1, 0, 0, 1, 1, 1, 2, 2, 1, 2, 2, 2, 1, 3, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 3, 1, 1, 1},
-        {1, 3, 1, 1, 2, 1, 1, 1, 0, 0, 1, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 2, 1, 3, 1, 2, 1, 2, 1, 1, 2, 3, 2, 1, 2, 3, 1, 1, 1, 1, 1},
-        {2, 1, 2, 2, 2, 2, 1, 2, 1, 1, 0, 0, 2, 1, 1, 3, 1, 1, 1, 3, 1, 3, 1, 1, 2, 2, 1, 1, 2, 1, 1, 1, 2, 2, 1, 1, 3, 3, 2, 2, 1},
-        {1, 2, 1, 2, 1, 1, 1, 2, 1, 1, 0, 0, 2, 1, 1, 1, 2, 1, 1, 1, 2, 3, 2, 1, 1, 2, 0, 2, 1, 2, 1, 1, 2, 0, 2, 2, 1, 1, 1, 1, 1},
-        {1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 2, 0, 0, 2, 1, 2, 0, 3, 2, 1, 3, 1, 0, 2, 1, 2, 0, 3, 1, 1, 1, 1, 1, 2, 1, 2, 2, 1, 3, 0},
-        {3, 1, 1, 2, 1, 1, 1, 2, 2, 2, 1, 1, 0, 0, 1, 2, 1, 3, 2, 1, 1, 3, 2, 2, 0, 3, 2, 2, 1, 2, 1, 3, 1, 2, 3, 3, 3, 1, 1, 1, 2},
-        {2, 2, 2, 1, 2, 2, 2, 3, 2, 1, 1, 1, 2, 1, 0, 0, 2, 1, 2, 1, 2, 2, 2, 1, 2, 2, 3, 1, 2, 2, 1, 2, 1, 2, 2, 2, 2, 1, 2, 2, 1},
-        {2, 1, 2, 3, 2, 1, 1, 2, 1, 2, 3, 1, 1, 2, 0, 0, 1, 2, 1, 1, 2, 2, 1, 2, 0, 2, 2, 2, 1, 1, 2, 2, 2, 2, 1, 1, 1, 2, 1, 2, 2},
-        {0, 3, 1, 1, 2, 1, 3, 2, 2, 1, 1, 2, 2, 1, 2, 1, 0, 0, 1, 1, 2, 0, 1, 1, 1, 1, 2, 1, 2, 1, 1, 2, 3, 1, 0, 3, 2, 1, 1, 1, 1},
-        {3, 0, 1, 2, 1, 2, 1, 3, 2, 2, 1, 1, 0, 3, 1, 2, 0, 0, 1, 1, 1, 2, 1, 2, 1, 3, 3, 3, 1, 2, 2, 3, 0, 3, 3, 1, 2, 3, 2, 0, 3},
-        {3, 2, 2, 3, 1, 1, 2, 1, 2, 1, 1, 1, 3, 2, 2, 1, 1, 1, 0, 0, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 0, 3, 2, 1, 3, 1, 2, 0, 2, 2, 2},
-        {1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 3, 1, 2, 1, 1, 1, 1, 1, 0, 0, 2, 3, 0, 2, 2, 1, 1, 1, 1, 1, 3, 3, 1, 3, 2, 2, 1, 3, 1, 1, 1},
-        {2, 2, 1, 1, 2, 0, 2, 2, 3, 2, 1, 2, 1, 1, 2, 2, 2, 2, 2, 1, 0, 0, 2, 1, 1, 1, 0, 1, 1, 2, 1, 3, 1, 1, 1, 3, 1, 1, 1, 1, 2},
-        {3, 0, 2, 2, 0, 3, 1, 3, 1, 2, 3, 3, 3, 3, 2, 2, 0, 2, 1, 3, 0, 0, 0, 2, 1, 3, 3, 1, 1, 3, 3, 3, 1, 2, 3, 3, 1, 3, 1, 2, 1},
-        {1, 2, 1, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 2, 1, 1, 1, 2, 1, 2, 0, 0, 0, 1, 2, 1, 1, 1, 1, 0, 3, 2, 1, 3, 3, 2, 1, 1, 2, 2},
-        {1, 1, 1, 2, 1, 1, 1, 1, 1, 3, 1, 1, 0, 2, 1, 2, 1, 2, 1, 2, 0, 2, 0, 0, 1, 3, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 1, 2, 1, 1, 1},
-        {1, 2, 2, 0, 1, 2, 1, 1, 1, 1, 2, 1, 2, 0, 2, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 3, 1, 2, 2, 1, 1, 0, 3, 3, 3, 0, 2, 1},
-        {3, 1, 1, 3, 0, 2, 3, 3, 2, 2, 2, 2, 1, 3, 2, 2, 1, 3, 1, 1, 1, 3, 2, 3, 0, 0, 3, 1, 2, 1, 3, 3, 1, 2, 1, 3, 3, 3, 1, 1, 1},
-        {3, 1, 1, 2, 0, 3, 2, 2, 2, 1, 1, 0, 2, 2, 3, 2, 2, 3, 1, 1, 0, 3, 1, 1, 0, 3, 0, 0, 1, 1, 1, 2, 1, 3, 1, 1, 2, 3, 1, 2, 1},
-        {2, 1, 1, 1, 2, 2, 1, 1, 1, 2, 1, 2, 0, 2, 1, 2, 1, 3, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 2, 1, 1, 1, 1, 2, 0, 1, 2, 1, 2, 1},
-        {1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 3, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 3, 2, 1, 0, 0, 0, 1, 2, 2, 1, 0, 0, 2, 1, 1, 2, 3},
-        {2, 1, 2, 2, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 2, 1, 1, 2, 1, 1, 2, 3, 1, 1, 1, 1, 1, 2, 0, 0, 2, 2, 1, 2, 3, 3, 2, 3, 1, 3, 2},
-        {1, 1, 1, 3, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 0, 3, 1, 3, 0, 2, 2, 3, 1, 1, 1, 2, 0, 0, 1, 2, 2, 2, 0, 1, 1, 0, 1},
-        {2, 2, 1, 2, 1, 2, 2, 1, 2, 3, 1, 1, 1, 3, 2, 2, 2, 3, 3, 3, 3, 3, 3, 2, 2, 3, 2, 1, 2, 2, 0, 0, 1, 3, 2, 3, 2, 3, 1, 3, 2},
-        {0, 2, 1, 1, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 1, 2, 3, 0, 2, 1, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 1, 1, 0, 0, 0, 0, 2, 0, 1, 1, 2},
-        {3, 1, 1, 1, 1, 2, 1, 1, 2, 1, 2, 0, 1, 2, 2, 2, 1, 3, 1, 3, 1, 2, 1, 1, 1, 2, 3, 1, 1, 2, 2, 3, 0, 0, 3, 3, 3, 3, 2, 2, 3},
-        {1, 1, 1, 1, 1, 2, 1, 3, 2, 2, 1, 2, 2, 3, 2, 1, 0, 3, 3, 2, 1, 3, 3, 1, 0, 1, 1, 2, 0, 3, 2, 2, 0, 3, 0, 3, 2, 3, 1, 1, 2},
-        {1, 1, 1, 1, 1, 0, 1, 3, 2, 3, 1, 2, 1, 3, 2, 1, 3, 1, 1, 2, 3, 3, 3, 2, 3, 3, 1, 0, 0, 3, 2, 3, 0, 3, 3, 0, 3, 2, 1, 1, 1},
-        {3, 2, 2, 3, 1, 2, 2, 3, 2, 1, 3, 1, 2, 3, 2, 1, 2, 2, 2, 1, 1, 1, 2, 1, 3, 3, 2, 1, 2, 2, 0, 2, 2, 3, 2, 3, 0, 3, 0, 3, 3},
-        {3, 2, 3, 2, 0, 3, 1, 3, 3, 1, 3, 1, 2, 1, 1, 2, 1, 3, 0, 3, 1, 3, 1, 2, 3, 3, 3, 2, 1, 3, 1, 3, 0, 3, 3, 2, 3, 0, 3, 0, 3},
-        {1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2, 2, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 0, 3, 0, 1, 1},
-        {1, 2, 3, 1, 1, 2, 1, 1, 1, 1, 2, 1, 3, 1, 2, 2, 1, 0, 2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 3, 0, 3, 1, 2, 1, 1, 3, 0, 1, 0, 0},
-        {2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 2, 1, 3, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 3, 2, 1, 2, 2, 3, 2, 1, 3, 3, 1, 0, 0},
-    };
-
-    List<Trait> traits_list = new List<Trait>()
-    {
-        new Trait("Амбициозный", "Имеющий или проявляющий притязания на достижение значительных целей, больших успехов."),    // Ambitious
-        new Trait("Приземлённый", "Трезво оценивающий реальную действительность, избегающий иллюзий."),   // Content
-                                     
-        new Trait("Храбрый", new List<string>
-        {
-            "Не знающий страха, решительный.",
-            "Не знает страха в минуту опасности, способен преодолеть его.",
-            "Легко рискующий своей жизнью ради достижения цели или спасения другого человека."
-        }),        // Brave
-        new Trait("Трусливый", new List<string>
-        {
-            "Робкий, боязливый.",
-            "Склонен к боязни и панике, избегает опасных ситуаций.",
-            "Боящийся даже незначительных опасностей."
-        }),      // Craven
-                                     
-        new Trait("Спокойный"),      // Calm
-        new Trait("Гневный"),        // Wrathful
-                                     
-        new Trait("Целомудренный"),  // Chastle
-        new Trait("Похотливый"),     // Lustful
-                                     
-        new Trait("Усердный"),       // Diligent
-        new Trait("Ленивый"),        // Lazy
-                                     
-        new Trait("Общительный"),    // Generous
-        new Trait("Стеснительный"),  // Shy
-                                     
-        new Trait("Щедрый"),         // Gregarious
-        new Trait("Жадный"),         // Greedy
-                                     
-        new Trait("Честный"),        // Honest
-        new Trait("Лживый"),         // Deceitful
-                                     
-        new Trait("Скромный"),       // Humble
-        new Trait("Высокомерный"),   // Arrogant
-                                     
-        new Trait("Взвешенный"),     // Just
-        new Trait("Взбалмошный"),    // Arbitrary
-                                     
-        new Trait("Терпеливый"),     // Patient
-        new Trait("Нетерпеливый"),   // Impatient
-                                     
-        new Trait("Сдержанный"),     // Temperate
-        new Trait("Прожорливый"),    // Gluttonous
-                                     
-        new Trait("Доверчивый"),     // Trusting
-        new Trait("Параноик"),       // Paranoid
-                                     
-        new Trait("Ревностный"),     // Zealous
-        new Trait("Циничный"),       // Cynical
-                                     
-        new Trait("Сочувствующий"),  // Compassionate
-        new Trait("Жестокий"),       // Callous
-                                     
-        new Trait("Переменчивый"),   // Fickle
-        new Trait("Упёртый"),        // Stubborn
-                                     
-        new Trait("Заурядный"),      // Ordinary
-        new Trait("Эксцентричный"),  // Eccentric
-                                     
-        new Trait("Садист"),         // Sadistic
-        new Trait("Мазохист"),       // Masochism
-                                     
-        new Trait("Религиозный"),    // Religious
-        new Trait("Фанатик"),        // Fanatic
-        new Trait("Атеист"),         // Aetheist
-                                     
-        new Trait("Справедливый"),   // Fair
-        new Trait("Несправедливый"), // Unfair
-
-    };
-
-    #endregion
-
     #region [Additional methods]
 
     /// <summary>
@@ -195,13 +71,13 @@ public class Character
     {
         foreach (Trait a in traits)
         {
-            if (tabl[traits_list.IndexOf(a), i] == 0)
+            if (GlobalData.tabl[GlobalData.traits_list.IndexOf(a), i] == 0)
             {
-                Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[i].title);
+                Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, GlobalData.traits_list[i].title);
                 return false;
             }
 
-            Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, traits_list[i].title);
+            Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, GlobalData.traits_list[i].title);
         }
 
         Console.WriteLine("");
@@ -215,7 +91,7 @@ public class Character
     /// <returns></returns>
     private Trait CheckTraitInList(string name)
     {
-        foreach (Trait a in traits_list)
+        foreach (Trait a in GlobalData.traits_list)
         {
             if(a.title == name)
             {
@@ -243,9 +119,9 @@ public class Character
         {
             for (int i = 0; i < traits_count; i++)
             {
-                var random = new Random().Next(traits_list.Count);
-                traits.Add(traits_list[random]);
-                traits_list.Remove(traits_list[random]);
+                var random = new Random().Next(GlobalData.traits_list.Count);
+                traits.Add(GlobalData.traits_list[random]);
+                GlobalData.traits_list.Remove(GlobalData.traits_list[random]);
             }
         }
     }
@@ -264,11 +140,11 @@ public class Character
         {
             for (int i = 0; i < traits_count; i++)
             {
-                var random = new Random().Next(traits_list.Count);
+                var random = new Random().Next(GlobalData.traits_list.Count);
 
                 if (traits.Count == 0 || CheckTabl(random))
                 {
-                    traits.Add(traits_list[random]);
+                    traits.Add(GlobalData.traits_list[random]);
                 }
                 else
                 {
@@ -318,7 +194,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[random])))
+                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[random])))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -328,13 +204,13 @@ public class Character
                 }
             }
 
-            for (int i = traits_list.Count(); i < traits_count; i++)
+            for (int i = GlobalData.traits_list.Count(); i < traits_count; i++)
             {
-                var random = new Random().Next(traits_list.Count);
+                var random = new Random().Next(GlobalData.traits_list.Count);
 
                 if (traits.Count == 0 || CheckTabl(random))
                 {
-                    traits.Add(traits_list[random]);
+                    traits.Add(GlobalData.traits_list[random]);
                 }
                 else
                 {
@@ -357,7 +233,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[random])))
+                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[random])))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -400,7 +276,7 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[random])))
+                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[random])))
                 {
                     traits.Add(combined_traits[random]);
                 }
@@ -437,7 +313,7 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
+                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
                     traits.Add(combined_traits[i]);
                 }
@@ -451,11 +327,11 @@ public class Character
 
         for (int i = traits.Count(); i < traits_count; i++)
         {
-            var random = new Random().Next(traits_list.Count);
+            var random = new Random().Next(GlobalData.traits_list.Count);
 
             if (CheckTabl(random))
             {
-                traits.Add(traits_list[random]);
+                traits.Add(GlobalData.traits_list[random]);
             }
             else
             {
@@ -493,7 +369,7 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
+                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
                     traits.Add(combined_traits[i]);
                 }
@@ -521,7 +397,7 @@ public class Character
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByInputTrait");
         }
-        if (!traits_list.Any(trait => trait.title == trait_name))
+        if (!GlobalData.traits_list.Any(trait => trait.title == trait_name))
         {
             Console.WriteLine("Данная черта не найдена в базе данных для CreateByInputTrait");
         }
@@ -532,11 +408,11 @@ public class Character
 
             for (int i = 1; i < traits_count; i++)
             {
-                var random = new Random().Next(traits_list.Count);
+                var random = new Random().Next(GlobalData.traits_list.Count);
 
                 if (traits.Count == 0 || CheckTabl(random))
                 {
-                    traits.Add(traits_list[random]);
+                    traits.Add(GlobalData.traits_list[random]);
                 }
                 else
                 {
@@ -559,7 +435,7 @@ public class Character
         }
         foreach (string name in traits_names)
         {
-            if (!traits_list.Any(trait => trait.title == name))
+            if (!GlobalData.traits_list.Any(trait => trait.title == name))
             {
                 Console.WriteLine("Черта {0} не найдена в базе данных для CreateByInputTraits", name);
             }
@@ -572,11 +448,11 @@ public class Character
 
         for (int i = 1; i < traits_count; i++)
         {
-            var random = new Random().Next(traits_list.Count);
+            var random = new Random().Next(GlobalData.traits_list.Count);
 
             if (traits.Count == 0 || CheckTabl(random))
             {
-                traits.Add(traits_list[random]);
+                traits.Add(GlobalData.traits_list[random]);
             }
             else
             {
@@ -709,13 +585,13 @@ public class Character
         foreach (Trait a in traits)
         {
 
-            if (tabl[traits_list.IndexOf(a), id] == 0 || tabl[traits_list.IndexOf(a), id] != anchor)
+            if (GlobalData.tabl[GlobalData.traits_list.IndexOf(a), id] == 0 || GlobalData.tabl[GlobalData.traits_list.IndexOf(a), id] != anchor)
             {
-                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, traits_list[id].title);*/
+                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
                 return false;
             }
 
-            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, traits_list[id].title);*/
+            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
         }
 
         /*Console.WriteLine("");*/
@@ -733,9 +609,9 @@ public class Character
     {
         int cnt = 0;
 
-        for (int i = 0; i < traits_list.Count; i++)
+        for (int i = 0; i < GlobalData.traits_list.Count; i++)
         {
-            if (tabl[id, i] == anchor)
+            if (GlobalData.tabl[id, i] == anchor)
             {
                 cnt++;
             }
@@ -743,7 +619,7 @@ public class Character
 
         if (cnt < traits_count)
         {
-            Console.WriteLine("Черты были очищены, потому что черта {0} имеет cnt {1}", traits_list[id].title, cnt);
+            Console.WriteLine("Черты были очищены, потому что черта {0} имеет cnt {1}", GlobalData.traits_list[id].title, cnt);
             return false;
         }
 
@@ -768,11 +644,11 @@ public class Character
         {
             for (int iv = 0; iv < traits_count; iv++)
             {
-                var random = new Random().Next(traits_list.Count);
+                var random = new Random().Next(GlobalData.traits_list.Count);
 
                 if (CheckAnchorPossibility(anchor, traits_count, random) && CheckTablAnchor(random, anchor))
                 {
-                    traits.Add(traits_list[random]);
+                    traits.Add(GlobalData.traits_list[random]);
                 }
                 else
                 {
