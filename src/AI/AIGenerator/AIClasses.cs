@@ -100,6 +100,25 @@ namespace AIGenerator
         }
 
         /// <summary>
+        /// Перевод из стандартного класса персонажа в класс персонажа ИИ
+        /// </summary>
+        /// <param name="character">Стандартный класс персонажа</param>
+        public AICharacter(Character character)
+        {
+            Name = character.Name;
+            Description = character.Description;
+            Traits = character.Traits;
+            Relations = new Dictionary<string, double>();
+            foreach (var relation in character.Relations)
+            {
+                Relations.Add(relation.Character.Name, relation.Value);
+            }
+            Locations = character.Locations.Select(l => l.Name).ToList();
+            Items = character.Items.Select(i => i.Name).ToList();
+            Events = character.Events.Select(e => e.Name).ToList();
+        }
+
+        /// <summary>
         /// Получение новых отношений для персонажа
         /// </summary>
         /// <param name="plot">История</param>
@@ -228,6 +247,19 @@ namespace AIGenerator
         }
 
         /// <summary>
+        /// Перевод из стандартного класса локации в класс локации ИИ
+        /// </summary>
+        /// <param name="location">Стандартный класс локации</param>
+        public AILocation(Location location)
+        {
+            Name = location.Name;
+            Description = location.Description;
+            Characters = location.Characters.Select(c => c.Name).ToList();
+            Items = location.Items.Select(i => i.Name).ToList();
+            Events = location.Events.Select(e => e.Name).ToList();
+        }
+
+        /// <summary>
         /// Получение новых персонажей для локации
         /// </summary>
         /// <param name="plot">История</param>
@@ -338,6 +370,19 @@ namespace AIGenerator
                 }
             }
             return item;
+        }
+
+        /// <summary>
+        /// Перевод из стандартного класса предмета в класс предмета ИИ
+        /// </summary>
+        /// <param name="item">Стандартный класс предмета</param>
+        public AIItem(Item item)
+        {
+            Name = item.Name;
+            Description = item.Description;
+            Location = item.Location?.Name;
+            Host = item.Host?.Name;
+            Events = item.Events.Select(e => e.Name).ToList();
         }
 
         /// <summary>
@@ -455,6 +500,19 @@ namespace AIGenerator
                 }
             }
             return @event;
+        }
+
+        /// <summary>
+        /// Перевод из стандартного класса события в класс события ИИ
+        /// </summary>
+        /// <param name="event">Стандартный класс события</param>
+        public AIEvent(Event @event)
+        {
+            Name = @event.Name;
+            Description = @event.Description;
+            Characters = @event.Characters.Select(c => c.Name).ToList();
+            Locations = @event.Locations.Select(l => l.Name).ToList();
+            Items = @event.Items.Select(i => i.Name).ToList();
         }
 
         /// <summary>
