@@ -15,15 +15,15 @@ public class Character
 
     public string name;
     public int    age;
-    // TODO: Пол
+    public string gender;
     public string description;
     public string location;
     private const int max_possible_traits = 10;
 
+    public Dictionary<Character, float> relations;
     public List<Trait> traits = new List<Trait>();
     /*public List<Item> items = new List<Item>();*/
     /*public List<Event> events = new List<Event>;*/
-    public Dictionary<Character, float> relations;
     // TODO: Фобии
 
     #endregion
@@ -108,19 +108,10 @@ public class Character
     {
         foreach (var trait in traits)
         {
-            if (trait.description.Count != 0)
+            if(trait.description != "")
             {
-                if (trait.description.Count > 1)
-                {
-                    Random rand = new Random();
-                    string desc = trait.description[rand.Next(trait.description.Count)] + " ";
-                    description += desc;
-                }
-                else
-                {
-                    string desc = trait.description[0] + " ";
-                    description += desc;
-                }
+                string desc = trait.description + " ";
+                description += desc;
             }
         }
     }

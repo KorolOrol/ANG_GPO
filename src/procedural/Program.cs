@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 
 /*Character Tom = new Character("Tom");
 Tom.create_full_random(5);
@@ -40,3 +41,8 @@ Pain.WriteAllTraits();
 Console.WriteLine("\n");
 
 Pain.WriteDesc();
+
+Console.WriteLine("\n");
+
+string json = JsonConvert.SerializeObject(Pain, Formatting.Indented);
+Console.WriteLine(json);
