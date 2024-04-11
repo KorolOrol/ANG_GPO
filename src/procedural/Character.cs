@@ -101,6 +101,30 @@ public class Character
         return null;
     }
 
+    /// <summary>
+    /// Создаёт описание персонажа по его чертам
+    /// </summary>
+    private void CreateDesc()
+    {
+        foreach (var trait in traits)
+        {
+            if (trait.description.Count != 0)
+            {
+                if (trait.description.Count > 1)
+                {
+                    Random rand = new Random();
+                    string desc = trait.description[rand.Next(trait.description.Count)] + " ";
+                    description += desc;
+                }
+                else
+                {
+                    string desc = trait.description[0] + " ";
+                    description += desc;
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region [Create Character from Zero]  // TODO: Add more ways to generation
@@ -530,30 +554,9 @@ public class Character
     /// </summary>
     public void WriteDesc()
     {
+        CreateDesc();
         Console.Write($"Персонажа {name} можно описать так. ");
-
-        foreach (var trait in traits)
-        {
-            if (trait.description.Count != 0)
-            {
-                if (trait.description.Count > 1)
-                {
-                    Random rand = new Random();
-                    string desc = trait.description[rand.Next(trait.description.Count)];
-                    Console.Write($"{desc} ");
-                }
-                else
-                {
-                    Console.Write($"{trait.description[0]} ");
-                }
-            }
-            else
-            {
-                Console.Write($"{trait.title} {trait.affection}. ");
-            }
-
-
-        }
+        Console.Write(description);
     }
 
     #endregion
