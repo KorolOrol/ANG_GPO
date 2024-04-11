@@ -6,6 +6,7 @@ using BaseClasses.Services;
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
 string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
 AIGen Ngen = new AIGen(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://lk.neuroapi.host"));
+Ngen.AIPriority = true;
 AIGen Vgen = new AIGen(promptPath, new VisionCraftGenerator());
 Vgen.TextAIGenerator.Model = "Mixtral-8x7B-Instruct-v0.1";
 AIGen Ogen = new AIGen(promptPath);
@@ -16,86 +17,134 @@ Plot plot = new Plot();
 
 while (true)
 {
-    Console.WriteLine("1: Создать одного персонажа");
-    Console.WriteLine("2: Создать одно место");
-    Console.WriteLine("3: Создать один предмет");
-    Console.WriteLine("4: Создать одно событие");
-    Console.WriteLine("5: Создать цепочку персонажей");
-    Console.WriteLine("6: Создать цепочку мест");
-    Console.WriteLine("7: Создать цепочку предметов");
-    Console.WriteLine("8: Создать цепочку событий");
-    Console.WriteLine("9: Вывести всю информацию");
-    Console.WriteLine("10: Сохранить в файл");
-    Console.WriteLine("11: Загрузить из файла");
-    Console.WriteLine("12: Напечатать в файл");
+    Console.WriteLine("11: Создать одного персонажа");
+    Console.WriteLine("12: Создать одно место");
+    Console.WriteLine("13: Создать один предмет");
+    Console.WriteLine("14: Создать одно событие");
+    Console.WriteLine("21: Создать цепочку персонажей");
+    Console.WriteLine("22: Создать цепочку мест");
+    Console.WriteLine("23: Создать цепочку предметов");
+    Console.WriteLine("24: Создать цепочку событий");
+    Console.WriteLine("31: Создать цепочку с заготовленным персонажем");
+    Console.WriteLine("32: Создать цепочку с заготовленным местом");
+    Console.WriteLine("33: Создать цепочку с заготовленным предметом");
+    Console.WriteLine("34: Создать цепочку с заготовленным событием");
+    Console.WriteLine("01: Вывести всю информацию");
+    Console.WriteLine("02: Сохранить в файл");
+    Console.WriteLine("03: Загрузить из файла");
+    Console.WriteLine("04: Напечатать в файл");
     Console.WriteLine("0: Выход");
     string choise = Console.ReadLine();
     switch (choise)
     {
-        case "1":
+        case "11":
             {
                 Character character = await gen.GenerateCharacterAsync(plot);
                 Console.WriteLine(character.FullInfo());
                 break;
             }
-        case "2":
+        case "12":
             {
                 Location location = await gen.GenerateLocationAsync(plot);
                 Console.WriteLine(location.FullInfo());
                 break;
             }
-        case "3":
+        case "13":
             {
                 Item item = await gen.GenerateItemAsync(plot);
                 Console.WriteLine(item.FullInfo());
                 break;
             }
-        case "4":
+        case "14":
             {
                 Event ev = await gen.GenerateEventAsync(plot);
                 Console.WriteLine(ev.FullInfo());
                 break;
             }
-        case "5":
+        case "21":
             {
                 Character character = await gen.GenerateCharacterChainAsync(plot);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
-        case "6":
+        case "22":
             {
                 Location location = await gen.GenerateLocationChainAsync(plot);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
-        case "7":
+        case "23":
             {
                 Item item = await gen.GenerateItemChainAsync(plot);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
-        case "8":
+        case "24":
             {
                 Event @event = await gen.GenerateEventChainAsync(plot);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
-        case "9":
+        case "31":
+            {
+                Character preparedCharacter = new Character();
+                preparedCharacter.Name = Console.ReadLine();
+                preparedCharacter.Description = Console.ReadLine();
+                preparedCharacter.Locations.Add(
+                    plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine()));
+                Character character = await gen.GenerateCharacterChainAsync(plot, preparedCharacter);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case "32":
+            {
+                Location preparedLocation = new Location();
+                preparedLocation.Name = Console.ReadLine();
+                preparedLocation.Description = Console.ReadLine();
+                preparedLocation.Characters.Add(
+                    plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine()));
+                Location location = await gen.GenerateLocationChainAsync(plot, preparedLocation);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case "33":
+            {
+                Item preparedItem = new Item();
+                preparedItem.Name = Console.ReadLine();
+                preparedItem.Description = Console.ReadLine();
+                preparedItem.Location = 
+                    plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                Item item = await gen.GenerateItemChainAsync(plot, preparedItem);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case "34":
+            {
+                Event preparedEvent = new Event();
+                preparedEvent.Name = Console.ReadLine();
+                preparedEvent.Description = Console.ReadLine();
+                preparedEvent.Locations.Add(
+                    plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine()));
+                Event ev = await gen.GenerateEventChainAsync(plot, preparedEvent);
+                Console.WriteLine(plot.FullInfo());
+                break;
+            }
+        case "01":
             Console.WriteLine(plot.FullInfo());
             break;
-        case "10":
+        case "02":
             {
                 string name = Console.ReadLine();
                 Serializer.Serialize(plot, savingPath + name + ".txt");
                 break;
             }
-        case "11":
+        case "03":
             {
                 string name = Console.ReadLine();
                 plot = Serializer.Deserialize<Plot>(savingPath + name + ".txt");
                 break;
             }
-        case "12":
+        case "04":
             {
                 string name = Console.ReadLine();
                 Serializer.Print(plot, savingPath + name + ".txt");

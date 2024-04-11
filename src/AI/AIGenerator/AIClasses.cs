@@ -11,44 +11,43 @@ namespace AIGenerator
         /// <summary>
         /// Имя персонажа
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Описание персонажа
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         /// <summary>
         /// Характер персонажа
         /// </summary>
-        public List<string> Traits { get; set; }
+        public List<string> Traits { get; set; } = new List<string>();
 
         /// <summary>
         /// Отношения персонажа с другими персонажами
         /// </summary>
-        public Dictionary<string, double> Relations { get; set; }
+        public Dictionary<string, double> Relations { get; set; } = new Dictionary<string, double>();
 
         /// <summary>
         /// Местоположение персонажа
         /// </summary>
-        public List<string> Locations { get; set; }
+        public List<string> Locations { get; set; } = new List<string>();
 
         /// <summary>
         /// Вещи персонажа
         /// </summary>
-        public List<string> Items { get; set; }
+        public List<string> Items { get; set; } = new List<string>();
 
         /// <summary>
         /// События, в которых участвует персонаж
         /// </summary>
-        public List<string> Events { get; set; }
+        public List<string> Events { get; set; } = new List<string>();
 
         /// <summary>
         /// Преобразование в стандартный класс персонажа
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс персонажа</returns>
-        /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Character ToCharacter(Plot plot)
         {
             Character character = new Character();
@@ -105,6 +104,7 @@ namespace AIGenerator
         /// <param name="character">Стандартный класс персонажа</param>
         public AICharacter(Character character)
         {
+            if (character == null) return;
             Name = character.Name;
             Description = character.Description;
             Traits = character.Traits;
@@ -179,34 +179,33 @@ namespace AIGenerator
         /// <summary>
         /// Название локации
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Описание локации
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         /// <summary>
         /// Персонажи, находящиеся в локации
         /// </summary>
-        public List<string> Characters { get; set; }
+        public List<string> Characters { get; set; } = new List<string>();
 
         /// <summary>
         /// Вещи, находящиеся в локации
         /// </summary>
-        public List<string> Items { get; set; }
+        public List<string> Items { get; set; } = new List<string>();
 
         /// <summary>
         /// События, происходящие в локации
         /// </summary>
-        public List<string> Events { get; set; }
+        public List<string> Events { get; set; } = new List<string>();
 
         /// <summary>
         /// Преобразование в стандартный класс локации
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс локации</returns>
-        /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Location ToLocation(Plot plot)
         {
             Location location = new Location();
@@ -252,6 +251,7 @@ namespace AIGenerator
         /// <param name="location">Стандартный класс локации</param>
         public AILocation(Location location)
         {
+            if (location == null) return;
             Name = location.Name;
             Description = location.Description;
             Characters = location.Characters.Select(c => c.Name).ToList();
@@ -307,34 +307,33 @@ namespace AIGenerator
         /// <summary>
         /// Название предмета
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Описание предмета
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         /// <summary>
         /// Местоположение предмета
         /// </summary>
-        public string Location { get; set; }
+        public string Location { get; set; } = "";
 
         /// <summary>
         /// Хозяин предмета
         /// </summary>
-        public string Host { get; set; }
+        public string Host { get; set; } = "";
 
         /// <summary>
         /// События, в которых участвует предмет
         /// </summary>
-        public List<string> Events { get; set; }
+        public List<string> Events { get; set; } = new List<string>();
 
         /// <summary>
         /// Преобразование в стандартный класс предмета
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс предмета</returns>
-        /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Item ToItem(Plot plot)
         {
             Item item = new Item();
@@ -378,6 +377,7 @@ namespace AIGenerator
         /// <param name="item">Стандартный класс предмета</param>
         public AIItem(Item item)
         {
+            if (item == null) return;
             Name = item.Name;
             Description = item.Description;
             Location = item.Location?.Name;
@@ -435,34 +435,33 @@ namespace AIGenerator
         /// <summary>
         /// Название события
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         /// <summary>
         /// Описание события
         /// </summary>
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         /// <summary>
         /// Персонажи, участвующие в событии
         /// </summary>
-        public List<string> Characters { get; set; }
+        public List<string> Characters { get; set; } = new List<string>();
 
         /// <summary>
         /// Локации, в которых происходит событие
         /// </summary>
-        public List<string> Locations { get; set; }
+        public List<string> Locations { get; set; } = new List<string>();
 
         /// <summary>
         /// Вещи, участвующие в событии
         /// </summary>
-        public List<string> Items { get; set; }
+        public List<string> Items { get; set; } = new List<string>();
 
         /// <summary>
         /// Преобразование в стандартный класс события
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс события</returns>
-        /// <exception cref="ArgumentNullException">ИИ вернул пустой ответ</exception>
         public Event ToEvent(Plot plot)
         {
             Event @event = new Event();
@@ -508,6 +507,7 @@ namespace AIGenerator
         /// <param name="event">Стандартный класс события</param>
         public AIEvent(Event @event)
         {
+            if (@event == null) return;
             Name = @event.Name;
             Description = @event.Description;
             Characters = @event.Characters.Select(c => c.Name).ToList();
