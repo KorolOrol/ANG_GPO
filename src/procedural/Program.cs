@@ -30,12 +30,7 @@ Kid.CreateByTwoParentsLogicRandom(8, Ivanna, Tony, "ШиШи");
 Kid.WriteAllTraitsWithAff();*/
 
 Character Pain = new Character("Пэйн");
-List<string> traits = new List<string>()
-{
-    "Приземлённый",
-    "Трусливый"
-};
-Pain.CreateByInputTraits(traits, 4);
+Pain.CreateByLogicRandom(6);
 Pain.WriteAllTraits();
 
 Console.WriteLine("\n");
