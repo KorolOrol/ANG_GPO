@@ -32,6 +32,14 @@ namespace AIGenerator
 
 		public bool AIPriority { get; set; } = false;
 
+		private static readonly Dictionary<Type, Type> Classes = new Dictionary<Type, Type>
+		{
+			{ typeof(Character), typeof(AICharacter) },
+			{ typeof(Location), typeof(AILocation) },
+			{ typeof(Item), typeof(AIItem) },
+			{ typeof(Event), typeof(AIEvent) }
+        };
+
 		/// <summary>
 		/// Загрузка системных подсказок
 		/// </summary>
@@ -180,6 +188,51 @@ namespace AIGenerator
 			return prompts;
 		}
 
+		public async Task<T> GenerateAsync<T>(Plot plot, T preparedPart)
+		{
+			List<string> prompts = GetPromptForResponse(typeof(T), plot, preparedPart);
+			string response = await TextAIGenerator.GenerateTextAsync(prompts);
+			try
+			{
+                object aiPart = JsonConvert.DeserializeObject(response, Classes[typeof(T)]);
+				T part;
+				switch (aiPart)
+				{
+					case AICharacter c:
+						{
+                            part = (T)c.ToBase(plot);
+                            plot.Characters.Add(part as Character);
+							return part;
+                        }
+					case AILocation l:
+						{
+                            part = (T)l.ToBase(plot);
+                            plot.Locations.Add(part as Location);
+                            return part;
+                        }
+					case AIItem i:
+						{
+                            part = (T)i.ToBase(plot);
+                            plot.Items.Add(part as Item);
+							return part;
+                        }
+					case AIEvent e:
+						{
+                            part = (T)e.ToBase(plot);
+                            plot.Events.Add(part as Event);
+                            return part;
+                        }
+				}
+				return default;
+            }
+            catch (JsonReaderException e)
+			{
+                throw new Exception(response, e);
+            }
+		}
+
+		/*
+
 		/// <summary>
 		/// Генерация персонажа
 		/// </summary>
@@ -266,6 +319,16 @@ namespace AIGenerator
 			{
 				throw new Exception(response, e);
 			}
+		}
+
+		*/
+		
+		public async Task<T> GenerateChainAsync<T>(Plot plot, 
+												   T preparedPart, 
+												   Queue<object> generationQueue = null, 
+												   int recursion = 3)
+		{
+
 		}
 
 		/// <summary>

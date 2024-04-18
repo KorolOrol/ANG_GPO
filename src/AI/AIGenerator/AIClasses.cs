@@ -3,10 +3,15 @@ using BaseClasses.Services;
 
 namespace AIGenerator
 {
+    public interface IAIClass
+    {
+        public object ToBase(Plot plot);
+    }
+
     /// <summary>
     /// Персонаж истории, полученный от ИИ
     /// </summary>
-    public class AICharacter
+    public class AICharacter : IAIClass
     {
         /// <summary>
         /// Имя персонажа
@@ -48,7 +53,7 @@ namespace AIGenerator
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс персонажа</returns>
-        public Character ToCharacter(Plot plot)
+        public object ToBase(Plot plot)
         {
             Character character = new Character();
             character.Name = Name;
@@ -174,7 +179,7 @@ namespace AIGenerator
     /// <summary>
     /// Локация в истории, полученная от ИИ
     /// </summary>
-    public class AILocation
+    public class AILocation : IAIClass
     {
         /// <summary>
         /// Название локации
@@ -206,7 +211,7 @@ namespace AIGenerator
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс локации</returns>
-        public Location ToLocation(Plot plot)
+        public object ToBase(Plot plot)
         {
             Location location = new Location();
             location.Name = Name;
@@ -302,7 +307,7 @@ namespace AIGenerator
     /// <summary>
     /// Предмет в истории, полученный от ИИ
     /// </summary>
-    public class AIItem
+    public class AIItem : IAIClass
     {
         /// <summary>
         /// Название предмета
@@ -334,7 +339,7 @@ namespace AIGenerator
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс предмета</returns>
-        public Item ToItem(Plot plot)
+        public object ToBase(Plot plot)
         {
             Item item = new Item();
             item.Name = Name;
@@ -430,7 +435,7 @@ namespace AIGenerator
     /// <summary>
     /// Событие в истории, полученное от ИИ
     /// </summary>
-    public class AIEvent
+    public class AIEvent : IAIClass
     {
         /// <summary>
         /// Название события
@@ -462,7 +467,7 @@ namespace AIGenerator
         /// </summary>
         /// <param name="plot">История</param>
         /// <returns>Стандартный класс события</returns>
-        public Event ToEvent(Plot plot)
+        public object ToBase(Plot plot)
         {
             Event @event = new Event();
             @event.Name = Name;
