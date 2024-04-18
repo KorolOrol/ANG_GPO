@@ -5,7 +5,7 @@ public class Trait
     public static Random rand = new Random();
 
     public string title;
-    public float affection = rand.NextSingle();
+    public double affection = Math.Round(rand.NextSingle(), 3);
     public string description;
 
     public Trait(string title)
