@@ -20,6 +20,10 @@ namespace BaseClasses.Services
         /// <param name="relations">Отношения между персонажами</param>
         public static void Bind(Character character1, Character character2, double relations)
         {
+            if (character1 == null || character2 == null || character1 == character2)
+            {
+                return;
+            }
             if (character1.Relations.FirstOrDefault(rel => rel.Character == character2) != null)
             {
                 character1.Relations.FirstOrDefault(rel => rel.Character == character2).Value = relations;
@@ -45,6 +49,10 @@ namespace BaseClasses.Services
         /// <param name="character2">Второй персонаж</param>
         public static void Unbind(Character character1, Character character2)
         {
+            if (character1 == null || character2 == null || character1 == character2)
+            {
+                return;
+            }
             Relation rel1 = character1.Relations.FirstOrDefault(rel => rel.Character == character2);
             Relation rel2 = character2.Relations.FirstOrDefault(rel => rel.Character == character1);
             if (rel1 != null)
@@ -64,6 +72,10 @@ namespace BaseClasses.Services
         /// <param name="location">Локация</param>
         public static void Bind(Character character, Location location)
         {
+            if (character == null || location == null)
+            {
+                return;
+            }
             if (!character.Locations.Contains(location))
             {
                 character.Locations.Add(location);
@@ -81,6 +93,10 @@ namespace BaseClasses.Services
         /// <param name="location">Локация</param>
         public static void Unbind(Character character, Location location)
         {
+            if (character == null || location == null)
+            {
+                return;
+            }
             if (character.Locations.Contains(location))
             {
                 character.Locations.Remove(location);
@@ -98,6 +114,10 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         public static void Bind(Character character, Item item)
         {
+            if (character == null || item == null)
+            {
+                return;
+            }
             if (!character.Items.Contains(item))
             {
                 character.Items.Add(item);
@@ -116,6 +136,10 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         public static void Unbind(Character character, Item item)
         {
+            if (character == null || item == null)
+            {
+                return;
+            }
             if (character.Items.Contains(item))
             {
                 character.Items.Remove(item);
@@ -133,6 +157,10 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         public static void Bind(Character character, Event @event)
         {
+            if (character == null || @event == null)
+            {
+                return;
+            }
             if (!character.Events.Contains(@event))
             {
                 character.Events.Add(@event);
@@ -150,6 +178,10 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         public static void Unbind(Character character, Event @event)
         {
+            if (character == null || @event == null)
+            {
+                return;
+            }
             if (character.Events.Contains(@event))
             {
                 character.Events.Remove(@event);
@@ -187,6 +219,10 @@ namespace BaseClasses.Services
         /// <param name="item">Событие</param>
         public static void Bind(Location location, Item item)
         {
+            if (location == null || item == null)
+            {
+                return;
+            }
             if (!location.Items.Contains(item))
             {
                 location.Items.Add(item);
@@ -205,6 +241,10 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         public static void Unbind(Location location, Item item)
         {
+            if (location == null || item == null)
+            {
+                return;
+            }
             if (location.Items.Contains(item))
             {
                 location.Items.Remove(item);
@@ -222,6 +262,10 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         public static void Bind(Location location, Event @event)
         {
+            if (location == null || @event == null)
+            {
+                return;
+            }
             if (!location.Events.Contains(@event))
             {
                 location.Events.Add(@event);
@@ -239,6 +283,10 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         public static void Unbind(Location location, Event @event)
         {
+            if (location == null || @event == null)
+            {
+                return;
+            }
             if (location.Events.Contains(@event))
             {
                 location.Events.Remove(@event);
@@ -296,6 +344,10 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         public static void Bind(Item item, Event @event)
         {
+            if (item == null || @event == null)
+            {
+                return;
+            }
             if (!item.Events.Contains(@event))
             {
                 item.Events.Add(@event);
@@ -313,6 +365,10 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         public static void Unbind(Item item, Event @event)
         {
+            if (item == null || @event == null)
+            {
+                return;
+            }
             if (item.Events.Contains(@event))
             {
                 item.Events.Remove(@event);
