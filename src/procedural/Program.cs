@@ -8,7 +8,7 @@ Tom.create_full_random(5);
 Tom.write_all_traits();*/
 
 Character Bob = new Character("Bob");
-Bob.CreateByAnchorLogic(5, 3);
+Bob.CreateByLogicRandom(5);
 Bob.WriteAllTraits();
 
 /*Console.WriteLine("\n");

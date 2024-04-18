@@ -352,4 +352,6 @@ public class GlobalData
             "Поступающий вопреки нормам морали и нарушающий правила."
         }),
     };
+
+    public static int charactersCreated = 0;
 }

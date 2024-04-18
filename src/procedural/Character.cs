@@ -13,6 +13,8 @@ public class Character
 
     #region [Character characteristics]
 
+    public int id;
+
     public string name;
     public string surname;
     public int    age;
@@ -21,7 +23,7 @@ public class Character
     public string ?location;
     private const int max_possible_traits = 10;
 
-    public Dictionary<Character, double> relations = new Dictionary<Character, double>();
+    public Dictionary<int, double> relations = new Dictionary<int, double>();
     public List<Trait> traits = new List<Trait>();
     /*public List<Item> items = new List<Item>();*/
     /*public List<Event> events = new List<Event>;*/
@@ -129,7 +131,7 @@ public class Character
         }
         else
         {
-            this.relations.Add(opponent, 0.5);
+            this.relations.Add(opponent.id, 0.5);
         }
     }
 
@@ -573,14 +575,20 @@ public class Character
 
     public Character(string name)
     {
+        GlobalData.charactersCreated++;
+
         this.name = name;
         this.surname = "";
+        this.id = GlobalData.charactersCreated;
     }
 
     public Character(string name, string surname)
     {
+        GlobalData.charactersCreated++;
+
         this.name = name;
         this.surname = surname;
+        this.id = GlobalData.charactersCreated;
     }
 
     #endregion
