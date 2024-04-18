@@ -8,59 +8,17 @@ namespace BaseClasses.Interface
     public interface IChainGenerator
     {
         /// <summary>
-        /// Генерация персонажа с цепочкой
+        /// Генерация цепочки частей истории
         /// </summary>
+        /// <typeparam name="T">Тип компонента</typeparam>
         /// <param name="plot">История</param>
+        /// <param name="preparedPart">Подготовленная часть</param>
+        /// <param name="generationQueue">Очередь генерации</param>
         /// <param name="recursion">Глубина рекурсии</param>
-        /// <param name="name">Имя персонажа</param>
-        /// <returns>Сгенерированный персонаж</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<Character> GenerateCharacterChainAsync(Plot plot, int recursion = 3, string name = "")
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Генерация локации с цепочкой
-        /// </summary>
-        /// <param name="plot">История</param>
-        /// <param name="recursion">Глубина рекурсии</param>
-        /// <param name="name">Название локации</param>
-        /// <returns>Сгенерированная локация</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<Location> GenerateLocationChainAsync(Plot plot, int recursion = 3, string name = "")
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Генерация предмета с цепочкой
-        /// </summary>
-        /// <param name="plot">История</param>
-        /// <param name="recursion">Глубина рекурсии</param>
-        /// <param name="name">Название предмета</param>
-        /// <returns>Сгененрированный предмет</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<Item> GenerateItemChainAsync(Plot plot, int recursion = 3, string name = "")
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Генерация события с цепочкой
-        /// </summary>
-        /// <param name="plot">История</param>
-        /// <param name="recursion">Глубина рекурсии</param>
-        /// <param name="name">Названия события</param>
-        /// <returns>Сгенерированное событие</returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<Event> GenerateEventChainAsync(Plot plot, int recursion = 3, string name = "")
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
+        /// <returns>Сгенерированная цепочка частей</returns>
+        public Task<T> GenerateChainAsync<T>(Plot plot,
+                                             T preparedPart,
+                                             Queue<object> generationQueue = null,
+                                             int recursion = 3);
     }
 }
