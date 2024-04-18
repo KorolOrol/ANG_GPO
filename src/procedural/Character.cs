@@ -14,13 +14,14 @@ public class Character
     #region [Character characteristics]
 
     public string name;
+    public string surname;
     public int    age;
-    public string gender;
-    public string description;
-    public string location;
+    public string ?gender;
+    public string ?description;
+    public string ?location;
     private const int max_possible_traits = 10;
 
-    public Dictionary<Character, float> relations;
+    public Dictionary<Character, double> relations = new Dictionary<Character, double>();
     public List<Trait> traits = new List<Trait>();
     /*public List<Item> items = new List<Item>();*/
     /*public List<Event> events = new List<Event>;*/
@@ -113,6 +114,22 @@ public class Character
                 string desc = trait.description + " ";
                 description += desc;
             }
+        }
+    }
+
+    /// <summary>
+    /// Добавляет в словарь отношений значение, зависящее от черт оппонента
+    /// </summary>
+    /// <param name="a"></param>
+    public void GetRelations(Character opponent) // TODO: Доделать
+    {
+        if (opponent == null)
+        {
+            Console.WriteLine("NULL");
+        }
+        else
+        {
+            this.relations.Add(opponent, 0.5);
         }
     }
 
@@ -557,11 +574,13 @@ public class Character
     public Character(string name)
     {
         this.name = name;
+        this.surname = "";
     }
 
-    public Character()
+    public Character(string name, string surname)
     {
-        this.name = "Undefined";
+        this.name = name;
+        this.surname = surname;
     }
 
     #endregion

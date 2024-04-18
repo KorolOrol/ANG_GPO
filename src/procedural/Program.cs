@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 Tom.create_full_random(5);
 Tom.write_all_traits();*/
 
-/*Character Bob = new Character("Bob");
-Bob.create_logic_anchor_random(5, 2);
-Bob.write_all_traits();*/
+Character Bob = new Character("Bob");
+Bob.CreateByAnchorLogic(5, 3);
+Bob.WriteAllTraits();
 
 /*Console.WriteLine("\n");
 
@@ -38,6 +38,8 @@ Console.WriteLine("\n");
 Pain.WriteDesc();
 
 Console.WriteLine("\n");
+
+Pain.GetRelations(Bob);
 
 string json = JsonConvert.SerializeObject(Pain, Formatting.Indented);
 Console.WriteLine(json);
