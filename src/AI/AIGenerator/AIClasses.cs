@@ -6,6 +6,8 @@ namespace AIGenerator
     public interface IAIClass
     {
         public object ToBase(Plot plot);
+
+        public Dictionary<Type, List<string>> NewParts(Plot plot);
     }
 
     /// <summary>
@@ -101,6 +103,37 @@ namespace AIGenerator
                 }
             }
             return character;
+        }
+
+        public Dictionary<Type, List<string>> NewParts(Plot plot)
+        {
+            return new Dictionary<Type, List<string>>
+            {
+                {
+                    typeof(Character),
+                    Relations.Keys
+                        .Where(name => plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Location),
+                    Locations
+                        .Where(name => plot.Locations.FirstOrDefault(l => l.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Item),
+                    Items
+                        .Where(name => plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Event),
+                    Events
+                        .Where(name => plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                        .ToList()
+                }
+            };
         }
 
         /// <summary>
@@ -250,6 +283,31 @@ namespace AIGenerator
             return location;
         }
 
+        public Dictionary<Type, List<string>> NewParts(Plot plot)
+        {
+            return new Dictionary<Type, List<string>>()
+            {
+                {
+                    typeof(Character),
+                    Characters
+                        .Where(name => plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Item),
+                    Items
+                        .Where(name => plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Event),
+                    Events
+                        .Where(name => plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                        .ToList()
+                }
+            };
+        }
+
         /// <summary>
         /// Перевод из стандартного класса локации в класс локации ИИ
         /// </summary>
@@ -374,6 +432,31 @@ namespace AIGenerator
                 }
             }
             return item;
+        }
+
+        public Dictionary<Type, List<string>> NewParts(Plot plot)
+        {
+            return new Dictionary<Type, List<string>>()
+            {
+                {
+                    typeof(Location),
+                    Location != null && plot.Locations.FirstOrDefault(l => l.Name == Location) == null
+                        ? new List<string> { Location }
+                        : new List<string>()
+                },
+                {
+                    typeof(Character),
+                    Host != null && plot.Characters.FirstOrDefault(c => c.Name == Host) == null
+                        ? new List<string> { Host }
+                        : new List<string>()
+                },
+                {
+                    typeof(Event),
+                    Events
+                        .Where(name => plot.Events.FirstOrDefault(e => e.Name == name) == null)
+                        .ToList()
+                }
+            };
         }
 
         /// <summary>
@@ -504,6 +587,31 @@ namespace AIGenerator
                 }
             }
             return @event;
+        }
+
+        public Dictionary<Type, List<string>> NewParts(Plot plot)
+        {
+            return new Dictionary<Type, List<string>>()
+            {
+                {
+                    typeof(Character),
+                    Characters
+                        .Where(name => plot.Characters.FirstOrDefault(c => c.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Location),
+                    Locations
+                        .Where(name => plot.Locations.FirstOrDefault(l => l.Name == name) == null)
+                        .ToList()
+                },
+                {
+                    typeof(Item),
+                    Items
+                        .Where(name => plot.Items.FirstOrDefault(i => i.Name == name) == null)
+                        .ToList()
+                }
+            };
         }
 
         /// <summary>
