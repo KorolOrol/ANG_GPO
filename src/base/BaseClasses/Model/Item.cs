@@ -1,11 +1,12 @@
-﻿using BaseClasses.Services;
+﻿using BaseClasses.Interface;
+using BaseClasses.Services;
 
 namespace BaseClasses.Model
 {
     /// <summary>
     /// Предмет в истории
     /// </summary>
-    public class Item
+    public class Item : IPart
     {
         /// <summary>
         /// Название предмета
@@ -41,8 +42,11 @@ namespace BaseClasses.Model
         /// Объединение предмета с другим предметом
         /// </summary>
         /// <param name="item">Предмет, с которым объединяется текущий</param>
-        public void Merge(Item item)
+        public void Merge(IPart part)
         {
+            if (part is null) throw new ArgumentNullException("Персонаж не может быть null");
+            if (part is not Item) throw new ArgumentException("Неверный тип объекта");
+            Item item = (Item)part;
             if (Name == "")
             {
                 Name = item.Name;

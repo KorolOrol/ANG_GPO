@@ -18,7 +18,7 @@ namespace BaseClasses.Interface
         /// <returns>Сгенерированная цепочка частей</returns>
         public Task<T> GenerateChainAsync<T>(Plot plot,
                                              T preparedPart,
-                                             Queue<(object, int)> generationQueue = null,
+                                             Queue<(IPart, IPart, int)> generationQueue = null,
                                              int recursion = 3);
     }
 }
