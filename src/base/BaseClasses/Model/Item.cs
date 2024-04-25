@@ -87,5 +87,15 @@ namespace BaseClasses.Model
                    $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
                    $"Время создания: {Time}\n";
         }
+
+        /// <summary>
+        /// Проверка на пустоту предмета
+        /// </summary>
+        /// <returns>True, если предмет пустой, иначе false</returns>
+        public bool IsEmpty()
+        {
+            return Name == "" && Description == "" && Host == null && 
+                   Location == null && Events.Count == 0 && Time == -1;
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace BaseClasses.Model
         /// <summary>
         /// Время создания локации
         /// </summary>
-        public int Time { get; set; }
+        public int Time { get; set; } = -1;
 
         /// <summary>
         /// Объединение локации с другой локацией
@@ -96,6 +96,16 @@ namespace BaseClasses.Model
                    $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
                    $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
                    $"Время создания: {Time}\n";
+        }
+
+        /// <summary>
+        /// Проверка на пустоту локации
+        /// </summary>
+        /// <returns>True, если локация пуста, иначе false</returns>
+        public bool IsEmpty()
+        {
+            return Name == "" && Description == "" && Characters.Count == 0 && 
+                   Items.Count == 0 && Events.Count == 0 && Time == -1;
         }
     }
 }

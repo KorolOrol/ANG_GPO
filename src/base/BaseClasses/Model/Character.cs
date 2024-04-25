@@ -122,5 +122,15 @@ namespace BaseClasses.Model
                    $"События: {string.Join(", ", Events.Select(e => e.Name))}\n" +
                    $"Время создания: {Time}\n";
         }
+
+        /// <summary>
+        /// Проверка на пустоту персонажа
+        /// </summary>
+        /// <returns>True, если персонаж пуст, иначе false</returns>
+        public bool IsEmpty()
+        {
+            return Name == "" && Description == "" && Traits.Count == 0 && Relations.Count == 0 &&
+                   Locations.Count == 0 && Items.Count == 0 && Events.Count == 0 && Time == -1;
+        }
     }
 }
