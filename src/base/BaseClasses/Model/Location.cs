@@ -45,7 +45,7 @@ namespace BaseClasses.Model
         public void Merge(IPart part)
         {
             if (part is null) throw new ArgumentNullException("Персонаж не может быть null");
-            if (part is not Character) throw new ArgumentException("Неверный тип объекта");
+            if (part is not Location) throw new ArgumentException("Неверный тип объекта");
             Location location = (Location)part;
             if (Name == "")
             {
