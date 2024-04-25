@@ -54,7 +54,6 @@ public class GlobalData
             "Имеющий или проявляющий притязания на достижение значительных целей, больших успехов.",
             "Имеющий или демонстрирующий амбиции, т.е. притязания на успех в соответствии с большими запросами и целями.",
             "Ставит перед собой высокие цели, стремится к успеху и постоянно работает над развитием своих навыков."
-
         }),
         new Trait("Приземлённый", new List<string> // Content
         {
@@ -355,7 +354,20 @@ public class GlobalData
 
     public static List<Trait> PhobiasList = new List<Trait>
     {
+        new Trait("Акрофобия", new List<string> // Acrophobia
+        {
+            ""
+        }),
 
+        new Trait("Арахнофобия", new List<string> // Arachnophobia
+        {
+            ""
+        }),
+
+        new Trait("Клаустрофобия", new List<string> // Claustrophobia
+        {
+            ""
+        }),
     };
 
     public static int CharactersCreated = 0;
