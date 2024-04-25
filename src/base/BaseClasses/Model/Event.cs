@@ -93,5 +93,15 @@ namespace BaseClasses.Model
                    $"Вещи: {string.Join(", ", Items.Select(i => i.Name))}\n" +
                    $"Время события: {Time}";
         }
+
+        /// <summary>
+        /// Проверка на пустоту события
+        /// </summary>
+        /// <returns>True, если событие пустое, иначе false</returns>
+        public bool IsEmpty()
+        {
+            return Name == "" && Description == "" && Characters.Count == 0 &&
+                   Locations.Count == 0 && Items.Count == 0 && Time == -1;
+        }
     }
 }

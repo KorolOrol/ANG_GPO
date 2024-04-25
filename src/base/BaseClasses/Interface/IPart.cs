@@ -15,5 +15,7 @@ namespace BaseClasses.Interface
         public void Merge(IPart part);
 
         public string FullInfo();
+
+        public bool IsEmpty();
     }
 }
