@@ -334,50 +334,48 @@ namespace AIGenerator
 		/// <summary>
 		/// Генерация цепочки элементов истории
 		/// </summary>
-		/// <typeparam name="T">Тип элемента истории</typeparam>
 		/// <param name="plot">История</param>
 		/// <param name="preparedPart">Подготовленный элемент истории</param>
 		/// <param name="generationQueue">Очередь генерации, следует оставить пустым</param>
 		/// <param name="recursion">Глубина рекурсии</param>
 		/// <returns>Сгенерированный элемент истории</returns>
 		/// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
-		// Сделать интерфейс для базовых классов и все object заменить на него
-		public async Task<T> GenerateChainAsync<T>(Plot plot, 
-												   T preparedPart, 
-												   Queue<(object, object, int)> generationQueue = null, 
-												   int recursion = 3)
+		public async Task<IPart> GenerateChainAsync(Plot plot, 
+											 IPart preparedPart, 
+											 Queue<(IPart, IPart, int)> generationQueue = null, 
+											 int recursion = 3)
 		{
-			bool root = generationQueue == null;
-			if (root) generationQueue = new();
-			List<string> prompts = GetPromptForResponse(typeof(T), plot, preparedPart);
+			bool isRoot = generationQueue == null;
+			if (isRoot) generationQueue = new();
+			List<string> prompts = GetPromptForResponse(preparedPart.GetType(), plot, preparedPart);
 			string response = await TextAIGenerator.GenerateTextAsync(prompts);
 			try
 			{
-				object aiPart = JsonConvert.DeserializeObject(response, Classes[typeof(T)]);
-				T? part;
+				object aiPart = JsonConvert.DeserializeObject(response, Classes[preparedPart.GetType()]);
+				IPart part;
                 switch (aiPart)
                 {
                     case AICharacter c:
                         {
-                            part = (T)c.ToBase(plot);
+                            part = (IPart)c.ToBase(plot);
                             plot.Characters.Add(part as Character);
 							break;
                         }
                     case AILocation l:
                         {
-                            part = (T)l.ToBase(plot);
+                            part = (IPart)l.ToBase(plot);
                             plot.Locations.Add(part as Location);
 							break;
                         }
                     case AIItem i:
                         {
-                            part = (T)i.ToBase(plot);
+                            part = (IPart)i.ToBase(plot);
                             plot.Items.Add(part as Item);
                             break;
                         }
                     case AIEvent e:
                         {
-                            part = (T)e.ToBase(plot);
+                            part = (IPart)e.ToBase(plot);
                             plot.Events.Add(part as Event);
                             break;
                         }
@@ -387,7 +385,18 @@ namespace AIGenerator
 							break;
 						}
                 }
-				// Реализовать merge
+                if (preparedPart != null)
+                {
+                    if (AIPriority)
+                    {
+                        part.Merge(preparedPart);
+                    }
+                    else
+                    {
+                        preparedPart.Merge(part);
+                        part = preparedPart;
+                    }
+                }
                 if (recursion > 0)
 				{
 					foreach (var (type, list) in (aiPart as IAIClass).NewParts(plot))
@@ -407,7 +416,7 @@ namespace AIGenerator
 											Value = (aiPart as AICharacter).Relations[c]
 										}
 									}
-								}, part, recursion - 1));
+                                }, (IPart)part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Location)) {
@@ -420,7 +429,7 @@ namespace AIGenerator
 									{
 										part as Character
 									}
-								}, part, recursion - 1));
+								}, (IPart)part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Item))
@@ -431,7 +440,7 @@ namespace AIGenerator
 								{
 									Name = i,
 									Host = part as Character
-								}, part, recursion - 1));
+								}, (IPart)part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Event))
@@ -445,12 +454,12 @@ namespace AIGenerator
 									{
 										part as Character
 									}
-								}, part, recursion - 1));
+								}, (IPart)part, recursion - 1));
 							}
 						}	
 					}
 				}
-				while (root && generationQueue.Count > 0)
+				while (isRoot && generationQueue.Count > 0)
 				{
                     var (newPart, parent, rec) = generationQueue.Dequeue();
                     newPart = await GenerateChainAsync(plot, newPart, generationQueue, rec);
@@ -459,41 +468,41 @@ namespace AIGenerator
                     if (parent is Character c)
 					{
 						if (newPart is Character)
-							Binder.Bind(part as Character, newPart as Character, 
+							Binder.Bind(parent as Character, newPart as Character, 
 								(newPart as AICharacter).Relations[c.Name]);
 						else if (newPart is Location)
-							Binder.Bind(part as Character, newPart as Location);
+							Binder.Bind(parent as Character, newPart as Location);
 						else if (newPart is Item)
-							Binder.Bind(part as Character, newPart as Item);
+							Binder.Bind(parent as Character, newPart as Item);
 						else if (newPart is Event)
-							Binder.Bind(part as Character, newPart as Event);
+							Binder.Bind(parent as Character, newPart as Event);
                     }
 					else if (parent is Location l)
 					{
 						if (newPart is Character)
-                            Binder.Bind(part as Location, newPart as Character);
+                            Binder.Bind(parent as Location, newPart as Character);
                         else if (newPart is Item)
-                            Binder.Bind(part as Location, newPart as Item);
+                            Binder.Bind(parent as Location, newPart as Item);
                         else if (newPart is Event)
-                            Binder.Bind(part as Location, newPart as Event);
+                            Binder.Bind(parent as Location, newPart as Event);
                     }
                     else if (parent is Item i)
 					{
                         if (newPart is Character)
-                            Binder.Bind(part as Item, newPart as Character);
+                            Binder.Bind(parent as Item, newPart as Character);
                         else if (newPart is Location)
-                            Binder.Bind(part as Item, newPart as Location);
+                            Binder.Bind(parent as Item, newPart as Location);
                         else if (newPart is Event)
-                            Binder.Bind(part as Item, newPart as Event);
+                            Binder.Bind(parent as Item, newPart as Event);
                     }
                     else if (parent is Event e)
 					{
                         if (newPart is Character)
-                            Binder.Bind(part as Event, newPart as Character);
+                            Binder.Bind(parent as Event, newPart as Character);
                         else if (newPart is Location)
-                            Binder.Bind(part as Event, newPart as Location);
+                            Binder.Bind(parent as Event, newPart as Location);
                         else if (newPart is Item)
-                            Binder.Bind(part as Event, newPart as Item);
+                            Binder.Bind(parent as Event, newPart as Item);
                     }
                 }
 				return part;
