@@ -1,11 +1,12 @@
-﻿using BaseClasses.Services;
+﻿using BaseClasses.Interface;
+using BaseClasses.Services;
 
 namespace BaseClasses.Model
 {
     /// <summary>
     /// Локация в истории
     /// </summary>
-    public class Location
+    public class Location : IPart
     {
         /// <summary>
         /// Название локации
@@ -41,8 +42,11 @@ namespace BaseClasses.Model
         /// Объединение локации с другой локацией
         /// </summary>
         /// <param name="location">Локация, с которой объединяется текущая</param>
-        public void Merge(Location location)
+        public void Merge(IPart part)
         {
+            if (part is null) throw new ArgumentNullException("Персонаж не может быть null");
+            if (part is not Character) throw new ArgumentException("Неверный тип объекта");
+            Location location = (Location)part;
             if (Name == "")
             {
                 Name = location.Name;

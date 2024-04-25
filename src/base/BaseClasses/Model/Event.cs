@@ -1,11 +1,12 @@
-﻿using BaseClasses.Services;
+﻿using BaseClasses.Interface;
+using BaseClasses.Services;
 
 namespace BaseClasses.Model
 {
     /// <summary>
     /// Событие в истории
     /// </summary>
-    public class Event
+    public class Event : IPart
     {
         /// <summary>
         /// Название события
@@ -41,8 +42,11 @@ namespace BaseClasses.Model
         /// Объединение события с другим событием
         /// </summary>
         /// <param name="event">Событие, с которым объединяется текущее</param>
-        public void Merge(Event @event)
+        public void Merge(IPart part)
         {
+            if (part is null) throw new ArgumentNullException("Персонаж не может быть null");
+            if (part is not Event) throw new ArgumentException("Неверный тип объекта");
+            Event @event = (Event)part;
             if (Name == "")
             {
                 Name = @event.Name;
