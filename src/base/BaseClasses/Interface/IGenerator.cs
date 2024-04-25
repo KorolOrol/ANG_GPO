@@ -10,10 +10,9 @@ namespace BaseClasses.Interface
         /// <summary>
         /// Генерация компонента истории
         /// </summary>
-        /// <typeparam name="T">Тип компонента</typeparam>
         /// <param name="plot">История</param>
         /// <param name="preparedPart">Подготовленная часть</param>
         /// <returns>Сгенерированный компонент</returns>
-        public Task<T> GenerateAsync<T>(Plot plot, T preparedPart);
+        public Task<IPart> GenerateAsync(Plot plot, IPart preparedPart);
     }
 }

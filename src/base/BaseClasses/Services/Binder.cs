@@ -1,4 +1,5 @@
-﻿using BaseClasses.Model;
+﻿using BaseClasses.Interface;
+using BaseClasses.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,88 @@ namespace BaseClasses.Services
     public static class Binder
     {
         /// <summary>
+        /// Связывание двух частей истории
+        /// </summary>
+        /// <param name="part1">Первая часть истории</param>
+        /// <param name="part2">Вторая часть истории</param>
+        /// <param name="param">Параметр отношений (если связываются два персонажа)</param>
+        public static void Bind(IPart part1, IPart part2, double param = 0) 
+        { 
+            switch (part1)
+            {
+                case Character character1:
+                    switch (part2)
+                    {
+                        case Character character2:
+                            Bind(character1, character2, param);
+                            break;
+                        case Location location:
+                            Bind(character1, location);
+                            break;
+                        case Item item:
+                            Bind(character1, item);
+                            break;
+                        case Event @event:
+                            Bind(character1, @event);
+                            break;
+                    }
+                    break;
+                case Location location1:
+                    switch (part2)
+                    {
+                        case Character character:
+                            Bind(location1, character);
+                            break;
+                        case Location location2:
+                            Bind(location1, location2);
+                            break;
+                        case Item item:
+                            Bind(location1, item);
+                            break;
+                        case Event @event:
+                            Bind(location1, @event);
+                            break;
+                    }
+                    break;
+                case Item item1:
+                    switch (part2)
+                    {
+                        case Character character:
+                            Bind(item1, character);
+                            break;
+                        case Location location:
+                            Bind(item1, location);
+                            break;
+                        case Item item2:
+                            Bind(item1, item2);
+                            break;
+                        case Event @event:
+                            Bind(item1, @event);
+                            break;
+                    }
+                    break;
+                case Event @event1:
+                    switch (part2)
+                    {
+                        case Character character:
+                            Bind(@event1, character);
+                            break;
+                        case Location location:
+                            Bind(@event1, location);
+                            break;
+                        case Item item:
+                            Bind(@event1, item);
+                            break;
+                        case Event @event2:
+                            Bind(@event1, @event2);
+                            break;
+                    }
+                    break;
+            }
+        }
+
+
+        /// <summary>
         /// Связывание двух персонажей
         /// </summary>
         /// <param name="character1">Первый персонаж</param>
@@ -20,7 +103,7 @@ namespace BaseClasses.Services
         /// <param name="relations">Отношения между персонажами</param>
         public static void Bind(Character character1, Character character2, double relations)
         {
-            if (character1 == null || character2 == null || character1 == character2)
+            if (character1 == null || character2 == null || character1 == character2 || relations == 0)
             {
                 return;
             }
