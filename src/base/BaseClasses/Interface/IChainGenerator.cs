@@ -16,9 +16,9 @@ namespace BaseClasses.Interface
         /// <param name="generationQueue">Очередь генерации</param>
         /// <param name="recursion">Глубина рекурсии</param>
         /// <returns>Сгенерированная цепочка частей</returns>
-        public Task<T> GenerateChainAsync<T>(Plot plot,
-                                             T preparedPart,
-                                             Queue<(IPart, IPart, int)> generationQueue = null,
-                                             int recursion = 3);
+        public Task<IPart> GenerateChainAsync(Plot plot,
+                                              IPart preparedPart,
+                                              Queue<(IPart, IPart, int)> generationQueue = null,
+                                              int recursion = 3);
     }
 }
