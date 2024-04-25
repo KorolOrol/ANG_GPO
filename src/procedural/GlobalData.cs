@@ -47,7 +47,7 @@ public class GlobalData
         {2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 2, 1, 3, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 3, 2, 1, 2, 2, 3, 2, 1, 3, 3, 1, 0, 0},
     };
 
-    public static List<Trait> traits_list = new List<Trait>()
+    public static List<Trait> TraitsList = new List<Trait>()
     {
         new Trait("Амбициозный", new List<string> // Ambitious
         {
@@ -353,5 +353,10 @@ public class GlobalData
         }),
     };
 
-    public static int charactersCreated = 0;
+    public static List<Trait> PhobiasList = new List<Trait>
+    {
+
+    };
+
+    public static int CharactersCreated = 0;
 }

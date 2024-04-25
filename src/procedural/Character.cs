@@ -15,19 +15,19 @@ public class Character
 
     public int id;
 
-    public string name;
-    public string surname;
-    public int    age;
-    public string ?gender;
-    public string ?description;
-    public string ?location;
-    private const int max_possible_traits = 10;
+    public string Name;
+    public string Surname;
+    public int    Age;
+    public string ?Gender;
+    public string ?Description;
+    public string ?Location;
+    private const int _MaxPossibleTraits = 10;
 
-    public Dictionary<int, double> relations = new Dictionary<int, double>();
-    public List<Trait> traits = new List<Trait>();
-    public List<Trait> phobias = new List<Trait>();
-    /*public List<Item> items = new List<Item>();*/
-    /*public List<Event> events = new List<Event>;*/
+    public Dictionary<int, double> Relations = new Dictionary<int, double>();
+    public List<Trait> Traits = new List<Trait>();
+    public List<Trait> Phobias = new List<Trait>();
+    /*public List<Item> Items = new List<Item>();*/
+    /*public List<Event> Events = new List<Event>;*/
     // TODO: Фобии
 
     #endregion
@@ -49,7 +49,7 @@ public class Character
 
             for (int i = 0; i < (traits.Count() - step - 1); ++i)
             {
-                if (traits[i].affection < traits[i + 1].affection)
+                if (traits[i].Affection < traits[i + 1].Affection)
                 {
                     Trait temp = traits[i];
                     traits[i] = traits[i + 1];
@@ -73,15 +73,15 @@ public class Character
     /// <returns></returns>
     private bool CheckTabl(int i)
     {
-        foreach (Trait a in traits)
+        foreach (Trait a in Traits)
         {
-            if (GlobalData.tabl[GlobalData.traits_list.IndexOf(a), i] == 0)
+            if (GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), i] == 0)
             {
-                Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, GlobalData.traits_list[i].title);
+                Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
                 return false;
             }
 
-            Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, GlobalData.traits_list[i].title);
+            Console.WriteLine("Черта {0} совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
         }
 
         Console.WriteLine("");
@@ -95,9 +95,9 @@ public class Character
     /// <returns></returns>
     private Trait CheckTraitInList(string name)
     {
-        foreach (Trait a in GlobalData.traits_list)
+        foreach (Trait a in GlobalData.TraitsList)
         {
-            if(a.title == name)
+            if(a.Title == name)
             {
                 return a;
             }
@@ -110,12 +110,12 @@ public class Character
     /// </summary>
     private void CreateDesc()
     {
-        foreach (var trait in traits)
+        foreach (var trait in Traits)
         {
-            if(trait.description != "")
+            if(trait.Description != "")
             {
-                string desc = trait.description + " ";
-                description += desc;
+                string desc = trait.Description + " ";
+                Description += desc;
             }
         }
     }
@@ -132,7 +132,7 @@ public class Character
         }
         else
         {
-            this.relations.Add(opponent.id, 0.5);
+            this.Relations.Add(opponent.id, 0.5);
         }
     }
 
@@ -146,7 +146,7 @@ public class Character
     /// <param name="traits_count"></param>
     public void CreateByChaoticRandom(int traits_count)
     {
-        if (max_possible_traits < traits_count)
+        if (_MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByChaoticRandom");
         }
@@ -154,9 +154,9 @@ public class Character
         {
             for (int i = 0; i < traits_count; i++)
             {
-                var random = new Random().Next(GlobalData.traits_list.Count);
-                traits.Add(GlobalData.traits_list[random]);
-                GlobalData.traits_list.Remove(GlobalData.traits_list[random]);
+                var random = new Random().Next(GlobalData.TraitsList.Count);
+                Traits.Add(GlobalData.TraitsList[random]);
+                GlobalData.TraitsList.Remove(GlobalData.TraitsList[random]);
             }
         }
     }
@@ -167,7 +167,7 @@ public class Character
     /// <param name="traits_count"></param>
     public void CreateByLogicRandom(int traits_count)
     {
-        if (max_possible_traits < traits_count)
+        if (_MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByLogicRandom");
         }
@@ -175,11 +175,11 @@ public class Character
         {
             for (int i = 0; i < traits_count; i++)
             {
-                var random = new Random().Next(GlobalData.traits_list.Count);
+                var random = new Random().Next(GlobalData.TraitsList.Count);
 
-                if (traits.Count == 0 || CheckTabl(random))
+                if (Traits.Count == 0 || CheckTabl(random))
                 {
-                    traits.Add(GlobalData.traits_list[random]);
+                    Traits.Add(GlobalData.TraitsList[random]);
                 }
                 else
                 {
@@ -202,26 +202,26 @@ public class Character
     /// <param name="name"></param>
     public void CreateByTwoParentsHalfRandom(int traits_count, Character mama, Character papa, string name)
     {
-        if (max_possible_traits < traits_count)
+        if (_MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByTwoParentsHalfRandom");
         }
-        if (mama.traits == null || papa.traits == null)
+        if (mama.Traits == null || papa.Traits == null)
         {
             Console.WriteLine("У Мамы и/или Папы нет черт");
         }
-        else if (traits_count == (mama.traits.Count + papa.traits.Count) / 2)
+        else if (traits_count == (mama.Traits.Count + papa.Traits.Count) / 2)
         {
             CreateByTwoParentsHalf(mama, papa, name);
         }
 
-        else if (traits_count > (mama.traits.Count + papa.traits.Count) / 2)
+        else if (traits_count > (mama.Traits.Count + papa.Traits.Count) / 2)
         {
-            this.name = name;
+            this.Name = name;
 
             List<Trait> combined_traits = new List<Trait> { };
-            combined_traits.AddRange(mama.traits);
-            combined_traits.AddRange(papa.traits);
+            combined_traits.AddRange(mama.Traits);
+            combined_traits.AddRange(papa.Traits);
 
             int cmb_traits_count = (combined_traits.Count) / 2;
 
@@ -229,9 +229,9 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[random])))
+                if (Traits.Count == 0 || CheckTabl(GlobalData.TraitsList.IndexOf(combined_traits[random])))
                 {
-                    traits.Add(combined_traits[random]);
+                    Traits.Add(combined_traits[random]);
                 }
                 else
                 {
@@ -239,13 +239,13 @@ public class Character
                 }
             }
 
-            for (int i = GlobalData.traits_list.Count(); i < traits_count; i++)
+            for (int i = GlobalData.TraitsList.Count(); i < traits_count; i++)
             {
-                var random = new Random().Next(GlobalData.traits_list.Count);
+                var random = new Random().Next(GlobalData.TraitsList.Count);
 
-                if (traits.Count == 0 || CheckTabl(random))
+                if (Traits.Count == 0 || CheckTabl(random))
                 {
-                    traits.Add(GlobalData.traits_list[random]);
+                    Traits.Add(GlobalData.TraitsList[random]);
                 }
                 else
                 {
@@ -254,13 +254,13 @@ public class Character
             }
         }
 
-        else if (traits_count < (mama.traits.Count + papa.traits.Count) / 2)
+        else if (traits_count < (mama.Traits.Count + papa.Traits.Count) / 2)
         {
-            this.name = name;
+            this.Name = name;
 
             List<Trait> combined_traits = new List<Trait> { };
-            combined_traits.AddRange(mama.traits);
-            combined_traits.AddRange(papa.traits);
+            combined_traits.AddRange(mama.Traits);
+            combined_traits.AddRange(papa.Traits);
 
             int cmb_traits_count = (combined_traits.Count) / 2;
 
@@ -268,9 +268,9 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[random])))
+                if (Traits.Count == 0 || CheckTabl(GlobalData.TraitsList.IndexOf(combined_traits[random])))
                 {
-                    traits.Add(combined_traits[random]);
+                    Traits.Add(combined_traits[random]);
                 }
                 else
                 {
@@ -280,7 +280,7 @@ public class Character
 
             for (int i = cmb_traits_count - 1; i >= traits_count; i--)
             {
-                traits.RemoveAt(i);
+                Traits.RemoveAt(i);
             }
         }
     }
@@ -293,17 +293,17 @@ public class Character
     /// <param name="name"></param>
     public void CreateByTwoParentsHalf(Character mama, Character papa, string name)
     {
-        if (mama.traits == null || papa.traits == null)
+        if (mama.Traits == null || papa.Traits == null)
         {
             Console.WriteLine("У Мамы и/или Папы нет черт");
         }
         else
         {
-            this.name = name;
+            this.Name = name;
 
             List<Trait> combined_traits = new List<Trait> { };
-            combined_traits.AddRange(mama.traits);
-            combined_traits.AddRange(papa.traits);
+            combined_traits.AddRange(mama.Traits);
+            combined_traits.AddRange(papa.Traits);
 
             int cmb_traits_count = (combined_traits.Count) / 2;
 
@@ -311,9 +311,9 @@ public class Character
             {
                 var random = new Random().Next(combined_traits.Count);
 
-                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[random])))
+                if (Traits.Count == 0 || CheckTabl(GlobalData.TraitsList.IndexOf(combined_traits[random])))
                 {
-                    traits.Add(combined_traits[random]);
+                    Traits.Add(combined_traits[random]);
                 }
                 else
                 {
@@ -332,25 +332,25 @@ public class Character
     /// <param name="name"></param>
     public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name) // Разветвление добавить (конструктор)
     {
-        this.name = name;
+        this.Name = name;
 
         List<Trait> combined_traits = new List<Trait> { };
 
-        combined_traits.AddRange(mama.traits);
-        combined_traits.AddRange(papa.traits);
+        combined_traits.AddRange(mama.Traits);
+        combined_traits.AddRange(papa.Traits);
 
         combined_traits = SortListByAff(combined_traits);
 
         for (int i = 0; i < combined_traits.Count / 2; i++)
         {
-            if (traits_count != traits.Count)
+            if (traits_count != Traits.Count)
             {
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
+                if (Traits.Count == 0 || CheckTabl(GlobalData.TraitsList.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
-                    traits.Add(combined_traits[i]);
+                    Traits.Add(combined_traits[i]);
                 }
                 else
                 {
@@ -360,13 +360,13 @@ public class Character
             }
         }
 
-        for (int i = traits.Count(); i < traits_count; i++)
+        for (int i = Traits.Count(); i < traits_count; i++)
         {
-            var random = new Random().Next(GlobalData.traits_list.Count);
+            var random = new Random().Next(GlobalData.TraitsList.Count);
 
             if (CheckTabl(random))
             {
-                traits.Add(GlobalData.traits_list[random]);
+                Traits.Add(GlobalData.TraitsList[random]);
             }
             else
             {
@@ -383,17 +383,17 @@ public class Character
     /// <param name="name"></param>
     public void CreateByTwoParentsLogic(Character mama, Character papa, string name)
     {
-        if (mama.traits == null || papa.traits == null)
+        if (mama.Traits == null || papa.Traits == null)
         {
             Console.WriteLine("У Мамы и/или Папы нет черт");
         }
         else
         {
-            this.name = name;
+            this.Name = name;
 
             List<Trait> combined_traits = new List<Trait> { };
-            combined_traits.AddRange(mama.traits);
-            combined_traits.AddRange(papa.traits);
+            combined_traits.AddRange(mama.Traits);
+            combined_traits.AddRange(papa.Traits);
 
             combined_traits = SortListByAff(combined_traits);
 
@@ -404,9 +404,9 @@ public class Character
                 Random rand = new Random();
                 double random = Math.Round(rand.NextSingle(), 3);
 
-                if (traits.Count == 0 || CheckTabl(GlobalData.traits_list.IndexOf(combined_traits[i])) && random <= 0.85d)
+                if (Traits.Count == 0 || CheckTabl(GlobalData.TraitsList.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
-                    traits.Add(combined_traits[i]);
+                    Traits.Add(combined_traits[i]);
                 }
                 else
                 {
@@ -428,26 +428,26 @@ public class Character
     /// <param name="traits_count"></param>
     public void CreateByInputTrait(string trait_name, int traits_count)
     {
-        if (max_possible_traits < traits_count)
+        if (_MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByInputTrait");
         }
-        if (!GlobalData.traits_list.Any(trait => trait.title == trait_name))
+        if (!GlobalData.TraitsList.Any(trait => trait.Title == trait_name))
         {
             Console.WriteLine("Данная черта не найдена в базе данных для CreateByInputTrait");
         }
         else
         {
             Trait trait = CheckTraitInList(trait_name);
-            traits.Add(trait);
+            Traits.Add(trait);
 
             for (int i = 1; i < traits_count; i++)
             {
-                var random = new Random().Next(GlobalData.traits_list.Count);
+                var random = new Random().Next(GlobalData.TraitsList.Count);
 
-                if (traits.Count == 0 || CheckTabl(random))
+                if (Traits.Count == 0 || CheckTabl(random))
                 {
-                    traits.Add(GlobalData.traits_list[random]);
+                    Traits.Add(GlobalData.TraitsList[random]);
                 }
                 else
                 {
@@ -464,30 +464,30 @@ public class Character
     /// <param name="traits_count"></param>
     public void CreateByInputTraits(List<string> traits_names, int traits_count)
     {
-        if (max_possible_traits < traits_count)
+        if (_MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByInputTrait");
         }
         foreach (string name in traits_names)
         {
-            if (!GlobalData.traits_list.Any(trait => trait.title == name))
+            if (!GlobalData.TraitsList.Any(trait => trait.Title == name))
             {
                 Console.WriteLine("Черта {0} не найдена в базе данных для CreateByInputTraits", name);
             }
             else
             {
                 Trait trait = CheckTraitInList(name);
-                traits.Add(trait);
+                Traits.Add(trait);
             }
         }
 
         for (int i = 1; i < traits_count; i++)
         {
-            var random = new Random().Next(GlobalData.traits_list.Count);
+            var random = new Random().Next(GlobalData.TraitsList.Count);
 
-            if (traits.Count == 0 || CheckTabl(random))
+            if (Traits.Count == 0 || CheckTabl(random))
             {
-                traits.Add(GlobalData.traits_list[random]);
+                Traits.Add(GlobalData.TraitsList[random]);
             }
             else
             {
@@ -506,10 +506,10 @@ public class Character
     /// </summary>
     public void WriteAllTraits()
     {
-        Console.Write($"{name} имеет такие черты: ");
-        foreach (var trait in traits)
+        Console.Write($"{Name} имеет такие черты: ");
+        foreach (var trait in Traits)
         {
-            Console.Write($"{trait.title} ");
+            Console.Write($"{trait.Title} ");
         }
     }
 
@@ -518,12 +518,12 @@ public class Character
     /// </summary>
     public void WriteAllTraitsWithAff()
     {
-        Console.Write($"{name} имеет такие черты: ");
+        Console.Write($"{Name} имеет такие черты: ");
         Console.WriteLine("\n");
 
-        foreach (var trait in traits)
+        foreach (var trait in Traits)
         {
-            Console.Write($"{trait.title} {trait.affection} ");
+            Console.Write($"{trait.Title} {trait.Affection} ");
             Console.WriteLine("\n");
         }
     }
@@ -533,29 +533,29 @@ public class Character
     /// </summary>
     public void WriteAllTraitsWithAffDesc()
     {
-        Console.Write($"{name} имеет такие черты: ");
+        Console.Write($"{Name} имеет такие черты: ");
 
-        foreach (var trait in traits)
+        foreach (var trait in Traits)
         {
-            if (trait.affection <= 0.20)
+            if (trait.Affection <= 0.20)
             {
-                Console.Write($"a bit {trait.title} ");
+                Console.Write($"a bit {trait.Title} ");
             }
-            else if (trait.affection <= 0.4)
+            else if (trait.Affection <= 0.4)
             {
-                Console.Write($"slightly {trait.title} ");
+                Console.Write($"slightly {trait.Title} ");
             }
-            else if (trait.affection <= 0.6)
+            else if (trait.Affection <= 0.6)
             {
-                Console.Write($"quite {trait.title} ");
+                Console.Write($"quite {trait.Title} ");
             }
-            else if (trait.affection <= 0.8)
+            else if (trait.Affection <= 0.8)
             {
-                Console.Write($"extremely {trait.title} ");
+                Console.Write($"extremely {trait.Title} ");
             }
-            else if (trait.affection <= 1)
+            else if (trait.Affection <= 1)
             {
-                Console.Write($"absolutely {trait.title} ");
+                Console.Write($"absolutely {trait.Title} ");
             }
         }
     }
@@ -566,8 +566,8 @@ public class Character
     public void WriteDesc()
     {
         CreateDesc();
-        Console.Write($"Персонажа {name} можно описать так. ");
-        Console.Write(description);
+        Console.Write($"Персонажа {Name} можно описать так. ");
+        Console.Write(Description);
     }
 
     #endregion
@@ -576,20 +576,20 @@ public class Character
 
     public Character(string name)
     {
-        this.name = name;
-        this.surname = "";
-        this.id = GlobalData.charactersCreated;
+        this.Name = name;
+        this.Surname = "";
+        this.id = GlobalData.CharactersCreated;
 
-        GlobalData.charactersCreated++;
+        GlobalData.CharactersCreated++;
     }
 
     public Character(string name, string surname)
     {
-        this.name = name;
-        this.surname = surname;
-        this.id = GlobalData.charactersCreated;
+        this.Name = name;
+        this.Surname = surname;
+        this.id = GlobalData.CharactersCreated;
 
-        GlobalData.charactersCreated++;
+        GlobalData.CharactersCreated++;
     }
 
     #endregion
@@ -604,10 +604,10 @@ public class Character
     /// <returns></returns>
     public bool CheckTablAnchor(int id, int anchor)
     {
-        foreach (Trait a in traits)
+        foreach (Trait a in Traits)
         {
 
-            if (GlobalData.tabl[GlobalData.traits_list.IndexOf(a), id] == 0 || GlobalData.tabl[GlobalData.traits_list.IndexOf(a), id] != anchor)
+            if (GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), id] == 0 || GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), id] != anchor)
             {
                 /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
                 return false;
@@ -631,7 +631,7 @@ public class Character
     {
         int cnt = 0;
 
-        for (int i = 0; i < GlobalData.traits_list.Count; i++)
+        for (int i = 0; i < GlobalData.TraitsList.Count; i++)
         {
             if (GlobalData.tabl[id, i] == anchor)
             {
@@ -641,7 +641,7 @@ public class Character
 
         if (cnt < traits_count)
         {
-            Console.WriteLine("Черты были очищены, потому что черта {0} имеет cnt {1}", GlobalData.traits_list[id].title, cnt);
+            Console.WriteLine("Черты были очищены, потому что черта {0} имеет cnt {1}", GlobalData.TraitsList[id].Title, cnt);
             return false;
         }
 
@@ -658,7 +658,7 @@ public class Character
     [Obsolete("CreateByAnchorLogic is deprecated, please use CreateByAnchorLogic instead."/*, true*/)]
     public void CreateByAnchorLogic(int traits_count, int anchor)
     {
-        if (max_possible_traits < traits_count)
+        if (_MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных");
         }
@@ -666,11 +666,11 @@ public class Character
         {
             for (int iv = 0; iv < traits_count; iv++)
             {
-                var random = new Random().Next(GlobalData.traits_list.Count);
+                var random = new Random().Next(GlobalData.TraitsList.Count);
 
                 if (CheckAnchorPossibility(anchor, traits_count, random) && CheckTablAnchor(random, anchor))
                 {
-                    traits.Add(GlobalData.traits_list[random]);
+                    Traits.Add(GlobalData.TraitsList[random]);
                 }
                 else
                 {
