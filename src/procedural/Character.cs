@@ -25,6 +25,7 @@ public class Character
 
     public Dictionary<int, double> relations = new Dictionary<int, double>();
     public List<Trait> traits = new List<Trait>();
+    public List<Trait> phobias = new List<Trait>();
     /*public List<Item> items = new List<Item>();*/
     /*public List<Event> events = new List<Event>;*/
     // TODO: Фобии
@@ -575,20 +576,20 @@ public class Character
 
     public Character(string name)
     {
-        GlobalData.charactersCreated++;
-
         this.name = name;
         this.surname = "";
         this.id = GlobalData.charactersCreated;
+
+        GlobalData.charactersCreated++;
     }
 
     public Character(string name, string surname)
     {
-        GlobalData.charactersCreated++;
-
         this.name = name;
         this.surname = surname;
         this.id = GlobalData.charactersCreated;
+
+        GlobalData.charactersCreated++;
     }
 
     #endregion
