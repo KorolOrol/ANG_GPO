@@ -72,13 +72,31 @@ namespace AIGenerator
 			TextAIGenerator = textAIGenerator;
 		}
 
+		private IPart Merge(IPart preparedPart, IPart aiPart)
+		{
+            if (!preparedPart.IsEmpty())
+            {
+                if (AIPriority)
+                {
+                    aiPart.Merge(preparedPart);
+					return aiPart;
+                }
+                else
+                {
+                    preparedPart.Merge(aiPart);
+                    return preparedPart;
+                }
+            }
+			return aiPart;
+        }
+
 		/// <summary>
 		/// Получение подсказок для генерации
 		/// </summary>
 		/// <param name="task">Необходимый элемент истории</param>
 		/// <param name="plot">История</param>
 		/// <returns>Список подсказок</returns>
-		private List<string> GetPromptForResponse(Type type, Plot plot, object part = null)
+		private List<string> GetPromptForResponse(Type type, Plot plot, IPart part)
 		{
 			List<string> prompts = new List<string>
 			{
@@ -154,7 +172,7 @@ namespace AIGenerator
 			{
 				prompts.Add(SystemPrompt["EventEmpty"]);
 			}
-			if (part != null)
+			if (!part.IsEmpty())
 			{
 				switch (part)
 				{
@@ -191,42 +209,41 @@ namespace AIGenerator
 		/// <summary>
 		/// Генерация элемента истории
 		/// </summary>
-		/// <typeparam name="T">Тип элемента истории</typeparam>
 		/// <param name="plot">История</param>
 		/// <param name="preparedPart">Подготовленный элемент истории</param>
 		/// <returns>Сгенерированный элемент истории</returns>
 		/// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
-		public async Task<T> GenerateAsync<T>(Plot plot, T preparedPart)
+		public async Task<IPart> GenerateAsync(Plot plot, IPart preparedPart)
 		{
-			List<string> prompts = GetPromptForResponse(typeof(T), plot, preparedPart);
+			List<string> prompts = GetPromptForResponse(preparedPart.GetType(), plot, preparedPart);
 			string response = await TextAIGenerator.GenerateTextAsync(prompts);
 			try
 			{
-                object aiPart = JsonConvert.DeserializeObject(response, Classes[typeof(T)]);
-				T part;
+                object aiPart = JsonConvert.DeserializeObject(response, Classes[preparedPart.GetType()]);
+				IPart part;
 				switch (aiPart)
 				{
 					case AICharacter c:
 						{
-                            part = (T)c.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)c.ToBase(plot));
                             plot.Characters.Add(part as Character);
 							return part;
                         }
 					case AILocation l:
 						{
-                            part = (T)l.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)l.ToBase(plot));
                             plot.Locations.Add(part as Location);
                             return part;
                         }
 					case AIItem i:
 						{
-                            part = (T)i.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)i.ToBase(plot));
                             plot.Items.Add(part as Item);
 							return part;
                         }
 					case AIEvent e:
 						{
-                            part = (T)e.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)e.ToBase(plot));
                             plot.Events.Add(part as Event);
                             return part;
                         }
@@ -341,9 +358,9 @@ namespace AIGenerator
 		/// <returns>Сгенерированный элемент истории</returns>
 		/// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
 		public async Task<IPart> GenerateChainAsync(Plot plot, 
-											 IPart preparedPart, 
-											 Queue<(IPart, IPart, int)> generationQueue = null, 
-											 int recursion = 3)
+													IPart preparedPart, 
+													Queue<(IPart, IPart, int)> generationQueue = null, 
+													int recursion = 3)
 		{
 			bool isRoot = generationQueue == null;
 			if (isRoot) generationQueue = new();
@@ -357,25 +374,25 @@ namespace AIGenerator
                 {
                     case AICharacter c:
                         {
-                            part = (IPart)c.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)c.ToBase(plot));
                             plot.Characters.Add(part as Character);
 							break;
                         }
                     case AILocation l:
                         {
-                            part = (IPart)l.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)l.ToBase(plot));
                             plot.Locations.Add(part as Location);
 							break;
                         }
                     case AIItem i:
                         {
-                            part = (IPart)i.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)i.ToBase(plot));
                             plot.Items.Add(part as Item);
                             break;
                         }
                     case AIEvent e:
                         {
-                            part = (IPart)e.ToBase(plot);
+                            part = Merge(preparedPart, (IPart)e.ToBase(plot));
                             plot.Events.Add(part as Event);
                             break;
                         }
@@ -384,18 +401,6 @@ namespace AIGenerator
 							part = default;
 							break;
 						}
-                }
-                if (preparedPart != null)
-                {
-                    if (AIPriority)
-                    {
-                        part.Merge(preparedPart);
-                    }
-                    else
-                    {
-                        preparedPart.Merge(part);
-                        part = preparedPart;
-                    }
                 }
                 if (recursion > 0)
 				{
@@ -416,7 +421,7 @@ namespace AIGenerator
 											Value = (aiPart as AICharacter).Relations[c]
 										}
 									}
-                                }, (IPart)part, recursion - 1));
+                                }, part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Location)) {
@@ -429,7 +434,7 @@ namespace AIGenerator
 									{
 										part as Character
 									}
-								}, (IPart)part, recursion - 1));
+								}, part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Item))
@@ -440,7 +445,7 @@ namespace AIGenerator
 								{
 									Name = i,
 									Host = part as Character
-								}, (IPart)part, recursion - 1));
+								}, part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Event))
@@ -452,9 +457,9 @@ namespace AIGenerator
 									Name = e,
 									Characters = new List<Character>
 									{
-										part as Character
+                                        part as Character
 									}
-								}, (IPart)part, recursion - 1));
+								}, part, recursion - 1));
 							}
 						}	
 					}
@@ -465,45 +470,10 @@ namespace AIGenerator
                     newPart = await GenerateChainAsync(plot, newPart, generationQueue, rec);
 					// Можно сделать universal binder в binder
 					// Интерфейс для базовых классов
-                    if (parent is Character c)
-					{
-						if (newPart is Character)
-							Binder.Bind(parent as Character, newPart as Character, 
-								(newPart as AICharacter).Relations[c.Name]);
-						else if (newPart is Location)
-							Binder.Bind(parent as Character, newPart as Location);
-						else if (newPart is Item)
-							Binder.Bind(parent as Character, newPart as Item);
-						else if (newPart is Event)
-							Binder.Bind(parent as Character, newPart as Event);
-                    }
-					else if (parent is Location l)
-					{
-						if (newPart is Character)
-                            Binder.Bind(parent as Location, newPart as Character);
-                        else if (newPart is Item)
-                            Binder.Bind(parent as Location, newPart as Item);
-                        else if (newPart is Event)
-                            Binder.Bind(parent as Location, newPart as Event);
-                    }
-                    else if (parent is Item i)
-					{
-                        if (newPart is Character)
-                            Binder.Bind(parent as Item, newPart as Character);
-                        else if (newPart is Location)
-                            Binder.Bind(parent as Item, newPart as Location);
-                        else if (newPart is Event)
-                            Binder.Bind(parent as Item, newPart as Event);
-                    }
-                    else if (parent is Event e)
-					{
-                        if (newPart is Character)
-                            Binder.Bind(parent as Event, newPart as Character);
-                        else if (newPart is Location)
-                            Binder.Bind(parent as Event, newPart as Location);
-                        else if (newPart is Item)
-                            Binder.Bind(parent as Event, newPart as Item);
-                    }
+					double relation = newPart is Character && parent is Character c ? 
+                        (newPart as Character).Relations
+						.FirstOrDefault(r => r.Character == parent, new()).Value : 0;
+					Binder.Bind(parent, newPart, relation);
                 }
 				return part;
 			}

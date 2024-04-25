@@ -39,49 +39,49 @@ while (true)
     {
         case "11":
             {
-                Character character = await gen.GenerateCharacterAsync(plot);
+                Character character = (Character)await gen.GenerateAsync(plot, new Character());
                 Console.WriteLine(character.FullInfo());
                 break;
             }
         case "12":
             {
-                Location location = await gen.GenerateLocationAsync(plot);
+                Location location = (Location)await gen.GenerateAsync(plot, new Location());
                 Console.WriteLine(location.FullInfo());
                 break;
             }
         case "13":
             {
-                Item item = await gen.GenerateItemAsync(plot);
+                Item item = (Item)await gen.GenerateAsync(plot, new Item());
                 Console.WriteLine(item.FullInfo());
                 break;
             }
         case "14":
             {
-                Event ev = await gen.GenerateEventAsync(plot);
+                Event ev = (Event)await gen.GenerateAsync(plot, new Event());
                 Console.WriteLine(ev.FullInfo());
                 break;
             }
         case "21":
             {
-                Character character = await gen.GenerateCharacterChainAsync(plot);
+                Character character = (Character)await gen.GenerateChainAsync(plot, new Character());
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "22":
             {
-                Location location = await gen.GenerateLocationChainAsync(plot);
+                Location location = (Location)await gen.GenerateChainAsync(plot, new Location());
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "23":
             {
-                Item item = await gen.GenerateItemChainAsync(plot);
+                Item item = (Item)await gen.GenerateChainAsync(plot, new Item());
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "24":
             {
-                Event @event = await gen.GenerateEventChainAsync(plot);
+                Event @event = (Event)await gen.GenerateChainAsync(plot, new Event());
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
@@ -90,9 +90,12 @@ while (true)
                 Character preparedCharacter = new Character();
                 preparedCharacter.Name = Console.ReadLine();
                 preparedCharacter.Description = Console.ReadLine();
-                preparedCharacter.Locations.Add(
-                    plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine()));
-                Character character = await gen.GenerateCharacterChainAsync(plot, preparedCharacter);
+                Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                if (foundLocation != null)
+                {
+                    preparedCharacter.Locations.Add(foundLocation);
+                }
+                Character character = (Character)await gen.GenerateChainAsync(plot, preparedCharacter);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
@@ -101,9 +104,12 @@ while (true)
                 Location preparedLocation = new Location();
                 preparedLocation.Name = Console.ReadLine();
                 preparedLocation.Description = Console.ReadLine();
-                preparedLocation.Characters.Add(
-                    plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine()));
-                Location location = await gen.GenerateLocationChainAsync(plot, preparedLocation);
+                Character foundCharacter = plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine());
+                if (foundCharacter != null)
+                {
+                    preparedLocation.Characters.Add(foundCharacter);
+                }
+                Location location = (Location)await gen.GenerateChainAsync(plot, preparedLocation);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
@@ -114,7 +120,7 @@ while (true)
                 preparedItem.Description = Console.ReadLine();
                 preparedItem.Location = 
                     plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
-                Item item = await gen.GenerateItemChainAsync(plot, preparedItem);
+                Item item = (Item)await gen.GenerateChainAsync(plot, preparedItem);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
@@ -123,9 +129,12 @@ while (true)
                 Event preparedEvent = new Event();
                 preparedEvent.Name = Console.ReadLine();
                 preparedEvent.Description = Console.ReadLine();
-                preparedEvent.Locations.Add(
-                    plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine()));
-                Event ev = await gen.GenerateEventChainAsync(plot, preparedEvent);
+                Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                if (foundLocation != null)
+                {
+                    preparedEvent.Locations.Add(foundLocation);
+                }
+                Event ev = (Event)await gen.GenerateChainAsync(plot, preparedEvent);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
