@@ -354,20 +354,27 @@ public class GlobalData
 
     public static List<Trait> PhobiasList = new List<Trait>
     {
-        new Trait("Акрофобия", new List<string> // Acrophobia
-        {
-            ""
-        }),
+        new Trait("Аквафобия", "Боится водных пространств и глубины."), // Aquaphobia
 
-        new Trait("Арахнофобия", new List<string> // Arachnophobia
-        {
-            ""
-        }),
+        new Trait("Акрофобия", "Боится высоты."), // Acrophobia 
 
-        new Trait("Клаустрофобия", new List<string> // Claustrophobia
-        {
-            ""
-        }),
+        new Trait("Арахнофобия", "Боится пауков."), // Arachnophobia
+
+        new Trait("Аутофобия", "Боится одиночества."), // Autophobia
+
+        new Trait("Верминофобия", "Боится микробов."), // Mysophobia / Verminophobia
+
+        new Trait("Клаустрофобия", "Боится замкнутых помещений."), // Claustrophobia
+
+        new Trait("Коулрофобия", "Боится клоунов."), // Coulrophobia
+
+        new Trait("Никтофобия", "Боится темноты."), // Nyctophobia
+
+        new Trait("Социофобия", "Боится взаимодействий с людьми."), // Sociophobia
+
+        new Trait("Танатофобия", "Боится собственной смерти."), // Thanatophobia
+
+        new Trait("Трипофобия", "Боится скопления отверстий."), // Trypophobia
     };
 
     public static int CharactersCreated = 0;

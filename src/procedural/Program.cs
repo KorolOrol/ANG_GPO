@@ -8,7 +8,7 @@ Tom.create_full_random(5);
 Tom.write_all_traits();*/
 
 Character Bob = new Character("Bob");
-Bob.CreateByLogicRandom(5);
+Bob.CreateByLogicRandomTraits(5);
 Bob.WriteAllTraits();
 
 /*Console.WriteLine("\n");
@@ -30,7 +30,8 @@ Kid.CreateByTwoParentsLogicRandom(8, Ivanna, Tony, "ШиШи");
 Kid.WriteAllTraitsWithAff();*/
 
 Character Pain = new Character("Пэйн");
-Pain.CreateByLogicRandom(8);
+Pain.CreateByLogicRandomTraits(8);
+Pain.CreateByChaoticRandomPhobias(2);
 Pain.WriteAllTraits();
 
 Console.WriteLine("\n");

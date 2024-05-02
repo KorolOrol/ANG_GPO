@@ -22,6 +22,7 @@ public class Character
     public string ?Description;
     public string ?Location;
     private const int _MaxPossibleTraits = 10;
+    private const int _MaxPossiblePhobias = 3;
 
     public Dictionary<int, double> Relations = new Dictionary<int, double>();
     public List<Trait> Traits = new List<Trait>();
@@ -118,6 +119,20 @@ public class Character
                 Description += desc;
             }
         }
+
+        foreach (var phobia in Phobias)
+        {
+            if (phobia.Description != "")
+            {
+                string desc = phobia.Description + " ";
+                Description += desc;
+            }
+        }
+
+        if (Description != null)
+        {
+            Description = Description.Remove(Description.Length - 1, 1);
+        }
     }
 
     /// <summary>
@@ -138,13 +153,13 @@ public class Character
 
     #endregion
 
-    #region [Create Character from Zero]  // TODO: Add more ways to generation
+    #region [Create Character Traits from Zero]  // TODO: Add more ways to generation
 
     /// <summary>
     /// Генерация черт персонажа через обычный рандом
     /// </summary>
     /// <param name="traits_count"></param>
-    public void CreateByChaoticRandom(int traits_count)
+    public void CreateByChaoticRandomTraits(int traits_count)
     {
         if (_MaxPossibleTraits < traits_count)
         {
@@ -165,7 +180,7 @@ public class Character
     /// Генерация черт персонажа с помощью логики. Все черты совместимы друг с другом
     /// </summary>
     /// <param name="traits_count"></param>
-    public void CreateByLogicRandom(int traits_count)
+    public void CreateByLogicRandomTraits(int traits_count)
     {
         if (_MaxPossibleTraits < traits_count)
         {
@@ -191,7 +206,7 @@ public class Character
 
     #endregion
 
-    #region [Create Character from Parents]
+    #region [Create Character Traits from Parents]
 
     /// <summary>
     /// Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы. Дополнительные черты при необходимости генерятся по логике
@@ -200,7 +215,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsHalfRandom(int traits_count, Character mama, Character papa, string name)
+    public void CreateByTwoParentsHalfRandomTraits(int traits_count, Character mama, Character papa, string name)
     {
         if (_MaxPossibleTraits < traits_count)
         {
@@ -212,7 +227,7 @@ public class Character
         }
         else if (traits_count == (mama.Traits.Count + papa.Traits.Count) / 2)
         {
-            CreateByTwoParentsHalf(mama, papa, name);
+            CreateByTwoParentsHalfTraits(mama, papa, name);
         }
 
         else if (traits_count > (mama.Traits.Count + papa.Traits.Count) / 2)
@@ -291,7 +306,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsHalf(Character mama, Character papa, string name)
+    public void CreateByTwoParentsHalfTraits(Character mama, Character papa, string name)
     {
         if (mama.Traits == null || papa.Traits == null)
         {
@@ -330,7 +345,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsLogicRandom(int traits_count, Character mama, Character papa, string name) // Разветвление добавить (конструктор)
+    public void CreateByTwoParentsLogicRandomTraits(int traits_count, Character mama, Character papa, string name) // Разветвление добавить (конструктор)
     {
         this.Name = name;
 
@@ -381,7 +396,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsLogic(Character mama, Character papa, string name)
+    public void CreateByTwoParentsLogicTraits(Character mama, Character papa, string name)
     {
         if (mama.Traits == null || papa.Traits == null)
         {
@@ -419,7 +434,7 @@ public class Character
 
     #endregion
 
-    #region [Create Character from Input traits]
+    #region [Create Character Traits from Input traits]
 
     /// <summary>
     /// Генерация черт персонажа с помощью одной введённой черты. Использует логику
@@ -499,6 +514,31 @@ public class Character
 
     #endregion
 
+    #region [Create Character Phobias from Zero]
+
+    /// <summary>
+    /// Генерация фобий персонажа через обычный рандом
+    /// </summary>
+    /// <param name="phobias_count"></param>
+    public void CreateByChaoticRandomPhobias(int phobias_count)
+    {
+        if (_MaxPossiblePhobias < phobias_count)
+        {
+            Console.WriteLine("Недостаточно фобий в базе данных для CreateByChaoticRandomPhobias");
+        }
+        else
+        {
+            for (int i = 0; i < phobias_count; i++)
+            {
+                var random = new Random().Next(GlobalData.PhobiasList.Count);
+                Phobias.Add(GlobalData.PhobiasList[random]);
+                GlobalData.PhobiasList.Remove(GlobalData.PhobiasList[random]);
+            }
+        }
+    }
+
+    #endregion
+
     #region [Output]
 
     /// <summary>
@@ -539,24 +579,51 @@ public class Character
         {
             if (trait.Affection <= 0.20)
             {
-                Console.Write($"a bit {trait.Title} ");
+                Console.Write($"чуток {trait.Title} ");
             }
             else if (trait.Affection <= 0.4)
             {
-                Console.Write($"slightly {trait.Title} ");
+                Console.Write($"слегка {trait.Title} ");
             }
             else if (trait.Affection <= 0.6)
             {
-                Console.Write($"quite {trait.Title} ");
+                Console.Write($"довольно {trait.Title} ");
             }
             else if (trait.Affection <= 0.8)
             {
-                Console.Write($"extremely {trait.Title} ");
+                Console.Write($"максимально {trait.Title} ");
             }
             else if (trait.Affection <= 1)
             {
-                Console.Write($"absolutely {trait.Title} ");
+                Console.Write($"чрезвычайно {trait.Title} ");
             }
+        }
+    }
+
+    /// <summary>
+    /// Выводит все фобии персонажа
+    /// </summary>
+    public void WriteAllPhobias()
+    {
+        Console.Write($"{Name} имеет такие фобии: ");
+        foreach (var phobia in Phobias)
+        {
+            Console.Write($"{phobia.Title} ");
+        }
+    }
+
+    /// <summary>
+    /// Выводит все фобии персонажа с параметром их влияния 
+    /// </summary>
+    public void WriteAllPhobiasWithAff()
+    {
+        Console.Write($"{Name} имеет такие фобии: ");
+        Console.WriteLine("\n");
+
+        foreach (var phobia in Phobias)
+        {
+            Console.Write($"{phobia.Title} {phobia.Affection} ");
+            Console.WriteLine("\n");
         }
     }
 
