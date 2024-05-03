@@ -72,25 +72,22 @@ namespace BaseClasses.Model
                     Traits.Add(trait);
                 }
             }
-            foreach (var relation in character.Relations.ToList())
+            foreach (var relation in character.Relations)
             {
-                if (Relations.FirstOrDefault(r => r.Character == relation.Character) == null)
-                {
-                    Binder.Bind(this, relation.Character, relation.Value);
-                    Binder.Unbind(relation.Character, character);
-                }
+                Binder.Bind(this, relation.Character, relation.Value);
+                Binder.Unbind(relation.Character, character);
             }
-            foreach (var location in character.Locations.ToList())
+            foreach (var location in character.Locations)
             {
                 Binder.Bind(this, location);
                 Binder.Unbind(character, location);
             }
-            foreach (var item in character.Items.ToList())
+            foreach (var item in character.Items)
             {
                 Binder.Bind(this, item);
                 Binder.Unbind(character, item);
             }
-            foreach (var @event in character.Events.ToList())
+            foreach (var @event in character.Events)
             {
                 Binder.Bind(this, @event);
                 Binder.Unbind(character, @event);
