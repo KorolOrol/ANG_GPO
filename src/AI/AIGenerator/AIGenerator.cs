@@ -410,56 +410,49 @@ namespace AIGenerator
 						{
 							foreach (string c in list)
 							{
-								generationQueue.Enqueue((new Character()
+								Character newCharacter = new Character()
 								{
-									Name = c,
-									Relations = new List<Relation>
-									{
-										new Relation()
-										{
-											Character = part as Character,
-											Value = (aiPart as AICharacter).Relations[c]
-										}
-									}
-                                }, part, recursion - 1));
+									Name = c
+								};
+								Binder.Bind(part, newCharacter, aiPart is AICharacter ? 
+									(aiPart as AICharacter).Relations[c] :
+									0);
+                                generationQueue.Enqueue((newCharacter, part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Location)) {
 							foreach (string l in list)
 							{
-								generationQueue.Enqueue((new Location()
-								{
-									Name = l,
-									Characters = new List<Character>
-									{
-										part as Character
-									}
-								}, part, recursion - 1));
+								Location newLocation = new Location()
+                                {
+                                    Name = l
+                                };
+								Binder.Bind(part, newLocation);
+                                generationQueue.Enqueue((newLocation, part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Item))
 						{
 							foreach (string i in list)
 							{
-								generationQueue.Enqueue((new Item()
-								{
-									Name = i,
-									Host = part as Character
-								}, part, recursion - 1));
+								Item newItem = new Item()
+                                {
+                                    Name = i
+                                };
+								Binder.Bind(part, newItem);
+                                generationQueue.Enqueue((newItem, part, recursion - 1));
 							}
 						}
 						else if (type == typeof(Event))
 						{
 							foreach (string e in list)
 							{
-								generationQueue.Enqueue((new Event()
-								{
-									Name = e,
-									Characters = new List<Character>
-									{
-                                        part as Character
-									}
-								}, part, recursion - 1));
+								Event newEvent = new Event()
+                                {
+                                    Name = e
+                                };
+								Binder.Bind(part, newEvent);
+                                generationQueue.Enqueue((newEvent, part, recursion - 1));
 							}
 						}	
 					}
@@ -470,6 +463,8 @@ namespace AIGenerator
                     newPart = await GenerateChainAsync(plot, newPart, generationQueue, rec);
 					// Можно сделать universal binder в binder
 					// Интерфейс для базовых классов
+
+					// По идее все уже связано
 					double relation = newPart is Character && parent is Character c ? 
                         (newPart as Character).Relations
 						.FirstOrDefault(r => r.Character == parent, new()).Value : 0;
