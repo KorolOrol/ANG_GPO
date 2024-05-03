@@ -70,10 +70,7 @@ namespace BaseClasses.Model
                 Binder.Bind(this, ev);
                 Binder.Unbind(location, ev);
             }
-            if (Time == -1)
-            {
-                Time = location.Time;
-            }
+            Time = Math.Max(Time, location.Time);
         }
 
         /// <summary>

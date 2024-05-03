@@ -70,6 +70,7 @@ namespace BaseClasses.Model
                 Binder.Bind(this, item);
                 Binder.Unbind(@event, item);
             }
+            Time = Math.Max(Time, @event.Time);
         }
 
         /// <summary>

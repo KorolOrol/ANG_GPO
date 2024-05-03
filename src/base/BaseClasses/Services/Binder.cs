@@ -205,11 +205,11 @@ namespace BaseClasses.Services
             {
                 character.Items.Add(item);
             }
-            if (item.Host != null)
+            if (item.Host != character)
             {
-                item.Host.Items.Remove(item);
+                Unbind(item.Host, item);
+                item.Host = character;
             }
-            item.Host = character;
         }
 
         /// <summary>
@@ -310,11 +310,11 @@ namespace BaseClasses.Services
             {
                 location.Items.Add(item);
             }
-            if (item.Location != null)
+            if (item.Location != location)
             {
-                item.Location.Items.Remove(item);
+                Unbind(item.Location, item);
+                item.Location = location;
             }
-            item.Location = location;
         }
 
         /// <summary>

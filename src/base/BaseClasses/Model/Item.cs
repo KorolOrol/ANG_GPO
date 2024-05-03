@@ -64,6 +64,7 @@ namespace BaseClasses.Model
                 Binder.Bind(this, ev);
                 Binder.Unbind(item, ev);
             }
+            Time = Math.Max(Time, item.Time);
         }
 
         /// <summary>
