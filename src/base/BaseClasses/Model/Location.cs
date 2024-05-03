@@ -55,17 +55,17 @@ namespace BaseClasses.Model
             {
                 Description = location.Description;
             }
-            foreach (var character in location.Characters)
+            foreach (var character in location.Characters.ToList())
             {
                 Binder.Bind(this, character);
                 Binder.Unbind(location, character);
             }
-            foreach (var item in location.Items)
+            foreach (var item in location.Items.ToList())
             {
                 Binder.Bind(this, item);
                 Binder.Unbind(location, item);
             }
-            foreach (var ev in location.Events)
+            foreach (var ev in location.Events.ToList())
             {
                 Binder.Bind(this, ev);
                 Binder.Unbind(location, ev);

@@ -59,7 +59,7 @@ namespace BaseClasses.Model
             Binder.Unbind(item, item.Host);
             Binder.Bind(this, item.Location);
             Binder.Unbind(item, item.Location);
-            foreach (var ev in item.Events)
+            foreach (var ev in item.Events.ToList())
             {
                 Binder.Bind(this, ev);
                 Binder.Unbind(item, ev);
