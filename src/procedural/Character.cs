@@ -78,11 +78,11 @@ public class Character
         {
             if (GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), i] == 0)
             {
-                Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
+                // Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
                 return false;
             }
 
-            Console.WriteLine("Черта {0} совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
+            // Console.WriteLine("Черта {0} совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
         }
 
         Console.WriteLine("");
@@ -139,7 +139,7 @@ public class Character
     /// Добавляет в словарь отношений значение, зависящее от черт оппонента
     /// </summary>
     /// <param name="a"></param>
-    public void GetRelations(Character opponent) // TODO: Доделать
+    public void GetRelations(Character opponent)
     {
         if (opponent == null)
         {
@@ -147,7 +147,24 @@ public class Character
         }
         else
         {
-            this.Relations.Add(opponent.id, 0.5);
+            double finalRelation = 0;
+
+            foreach (Trait a in Traits)
+            {
+                double tempRelation = 0;
+
+                foreach (Trait b in opponent.Traits)
+                {
+                    tempRelation += GlobalData.relations_tabl[GlobalData.TraitsList.IndexOf(a), GlobalData.TraitsList.IndexOf(b)] * 50 * b.Affection;
+                }
+
+                tempRelation /= opponent.Traits.Count;
+                finalRelation += tempRelation * a.Affection;
+            }
+
+            finalRelation /= Traits.Count;
+
+            Relations.Add(opponent.id, Math.Round(finalRelation, 3));
         }
     }
 
