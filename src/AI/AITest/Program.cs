@@ -6,10 +6,8 @@ using BaseClasses.Services;
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
 string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
 AIGen Ngen = new AIGen(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://lk.neuroapi.host"));
-Ngen.AIPriority = false;
-Ngen.TextAIGenerator.Model = "gpt-3.5-turbo-0125";
-AIGen Vgen = new AIGen(promptPath, new VisionCraftGenerator());
-Vgen.TextAIGenerator.Model = "Mixtral-8x7B-Instruct-v0.1";
+Ngen.AIPriority = true;
+Ngen.TextAIGenerator.Model = "gpt-4-turbo-preview";
 AIGen Ogen = new AIGen(promptPath);
 
 AIGen gen = Ngen;
