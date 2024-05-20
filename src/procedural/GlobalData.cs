@@ -422,5 +422,5 @@ public class GlobalData
         new Trait("Трипофобия", "Боится скопления отверстий."), // Trypophobia
     };
 
-    public static int CharactersCreated = 0;
+    public static int PrCharactersCreated = 0;
 }

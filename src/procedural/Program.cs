@@ -3,34 +3,34 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 
-/*Character Tom = new Character("Tom");
+/*PrCharacter Tom = new PrCharacter("Tom");
 Tom.create_full_random(5);
 Tom.write_all_traits();*/
 
-Character Bob = new Character("Bob");
+PrCharacter Bob = new PrCharacter("Bob");
 Bob.CreateByLogicRandomTraits(2);
 Bob.WriteAllTraits();
 
 /*Console.WriteLine("\n");
 
-Character Tony = new Character("Тони");
+PrCharacter Tony = new PrCharacter("Тони");
 Tony.CreateByLogicRandom(4);
 Tony.WriteAllTraitsWithAff();
 
 Console.WriteLine("\n");
 
-Character Ivanna = new Character("Иванна");
+PrCharacter Ivanna = new PrCharacter("Иванна");
 Ivanna.CreateByLogicRandom(4);
 Ivanna.WriteAllTraitsWithAff();
 
 Console.WriteLine("\n");
 
-Character Kid = new Character();
+PrCharacter Kid = new PrCharacter();
 Kid.CreateByTwoParentsLogicRandom(8, Ivanna, Tony, "ШиШи");
 Kid.WriteAllTraitsWithAff();*/
 
-Character Pain = new Character("Пэйн");
-Pain.CreateByLogicRandomTraits(2);
+PrCharacter Pain = new PrCharacter("Пэйн");
+Pain.CreateByLogicRandomTraits(6);
 Pain.CreateByChaoticRandomPhobias(1);
 Pain.WriteAllTraits();
 

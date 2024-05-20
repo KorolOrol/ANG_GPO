@@ -4,14 +4,14 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
 
-public class Character
+public class PrCharacter
 {
 
     /// <summary>
     /// Три Слэша - Всему Голова
     /// </summary>
 
-    #region [Character characteristics]
+    #region [PrCharacter characteristics]
 
     public int id;
 
@@ -139,7 +139,7 @@ public class Character
     /// Добавляет в словарь отношений значение, зависящее от черт оппонента
     /// </summary>
     /// <param name="a"></param>
-    public void GetRelations(Character opponent)
+    public void GetRelations(PrCharacter opponent)
     {
         if (opponent == null)
         {
@@ -170,7 +170,7 @@ public class Character
 
     #endregion
 
-    #region [Create Character Traits from Zero]  // TODO: Add more ways to generation
+    #region [Create PrCharacter Traits from Zero]  // TODO: Add more ways to generation
 
     /// <summary>
     /// Генерация черт персонажа через обычный рандом
@@ -223,7 +223,7 @@ public class Character
 
     #endregion
 
-    #region [Create Character Traits from Parents]
+    #region [Create PrCharacter Traits from Parents]
 
     /// <summary>
     /// Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы. Дополнительные черты при необходимости генерятся по логике
@@ -232,7 +232,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsHalfRandomTraits(int traits_count, Character mama, Character papa, string name)
+    public void CreateByTwoParentsHalfRandomTraits(int traits_count, PrCharacter mama, PrCharacter papa, string name)
     {
         if (_MaxPossibleTraits < traits_count)
         {
@@ -323,7 +323,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsHalfTraits(Character mama, Character papa, string name)
+    public void CreateByTwoParentsHalfTraits(PrCharacter mama, PrCharacter papa, string name)
     {
         if (mama.Traits == null || papa.Traits == null)
         {
@@ -362,7 +362,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsLogicRandomTraits(int traits_count, Character mama, Character papa, string name) // Разветвление добавить (конструктор)
+    public void CreateByTwoParentsLogicRandomTraits(int traits_count, PrCharacter mama, PrCharacter papa, string name) // Разветвление добавить (конструктор)
     {
         this.Name = name;
 
@@ -413,7 +413,7 @@ public class Character
     /// <param name="mama"></param>
     /// <param name="papa"></param>
     /// <param name="name"></param>
-    public void CreateByTwoParentsLogicTraits(Character mama, Character papa, string name)
+    public void CreateByTwoParentsLogicTraits(PrCharacter mama, PrCharacter papa, string name)
     {
         if (mama.Traits == null || papa.Traits == null)
         {
@@ -451,7 +451,7 @@ public class Character
 
     #endregion
 
-    #region [Create Character Traits from Input traits]
+    #region [Create PrCharacter Traits from Input traits]
 
     /// <summary>
     /// Генерация черт персонажа с помощью одной введённой черты. Использует логику
@@ -531,7 +531,7 @@ public class Character
 
     #endregion
 
-    #region [Create Character Phobias from Zero]
+    #region [Create PrCharacter Phobias from Zero]
 
     /// <summary>
     /// Генерация фобий персонажа через обычный рандом
@@ -658,22 +658,22 @@ public class Character
 
     #region [Construstors] // TODO: DO
 
-    public Character(string name)
+    public PrCharacter(string name)
     {
         this.Name = name;
         this.Surname = "";
-        this.id = GlobalData.CharactersCreated;
+        this.id = GlobalData.PrCharactersCreated;
 
-        GlobalData.CharactersCreated++;
+        GlobalData.PrCharactersCreated++;
     }
 
-    public Character(string name, string surname)
+    public PrCharacter(string name, string surname)
     {
         this.Name = name;
         this.Surname = surname;
-        this.id = GlobalData.CharactersCreated;
+        this.id = GlobalData.PrCharactersCreated;
 
-        GlobalData.CharactersCreated++;
+        GlobalData.PrCharactersCreated++;
     }
 
     #endregion
