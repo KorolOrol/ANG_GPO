@@ -19,7 +19,7 @@ namespace AIGenerator
 		/// <summary>
 		/// Системные подсказки
 		/// </summary>
-		public Dictionary<string, string> SystemPrompt { get; set; }
+		public Dictionary<string, string> SystemPrompt { get; set; } = new();
 
 		/// <summary>
 		/// Настройки сериализации
@@ -30,6 +30,9 @@ namespace AIGenerator
 			DefaultValueHandling = DefaultValueHandling.Ignore
         };
 
+		/// <summary>
+		/// Приоретет ИИ над заготовленным материалом
+		/// </summary>
 		public bool AIPriority { get; set; } = false;
 
 		private static readonly Dictionary<Type, Type> Classes = new Dictionary<Type, Type>
@@ -46,8 +49,8 @@ namespace AIGenerator
 		/// <param name="path">Путь к файлу с подсказками</param>
 		public void LoadSystemPrompt(string path)
 		{
-			SystemPrompt = 
-				JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
+            SystemPrompt =
+                JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(path));
 		}
 
 		/// <summary>
@@ -60,18 +63,23 @@ namespace AIGenerator
 			TextAIGenerator = new OpenAIGenerator();
 		}
 
-		/// <summary>
-		/// Конструктор с пользовательским ИИ
-		/// </summary>
-		/// <param name="promptPath">Путь к файлу с подсказками</param>
-		/// <param name="apiKey">Переменная среды с ключом API</param>
-		/// <param name="endpoint">Переменная среды с конечной точкой</param>
-		public AIGenerator(string promptPath, ITextAIGenerator textAIGenerator)
+        /// <summary>
+        /// Конструктор с пользовательским ИИ
+        /// </summary>
+        /// <param name="promptPath">Путь к файлу с подсказками</param>
+        /// <param name="textAIGenerator">Генератор текста</param>
+        public AIGenerator(string promptPath, ITextAIGenerator textAIGenerator)
 		{
 			LoadSystemPrompt(promptPath);
 			TextAIGenerator = textAIGenerator;
 		}
 
+		/// <summary>
+		/// Объединение двух компонентов истории в один
+		/// </summary>
+		/// <param name="preparedPart">Заготовленный компонент</param>
+		/// <param name="aiPart">Сгенерированный компонент</param>
+		/// <returns>Объединенный компонент</returns>
 		private IPart Merge(IPart preparedPart, IPart aiPart)
 		{
             if (!preparedPart.IsEmpty())
@@ -90,13 +98,14 @@ namespace AIGenerator
 			return aiPart;
         }
 
-		/// <summary>
-		/// Получение подсказок для генерации
-		/// </summary>
-		/// <param name="task">Необходимый элемент истории</param>
-		/// <param name="plot">История</param>
-		/// <returns>Список подсказок</returns>
-		private List<string> GetPromptForResponse(Type type, Plot plot, IPart part)
+        /// <summary>
+        /// Получение подсказок для генерации
+        /// </summary>
+        /// <param name="type">Тип необходимого элемента истории</param>
+        /// <param name="plot">История</param>
+        /// <param name="part">Подготовленный элемент истории</param>
+        /// <returns>Список подсказок</returns>
+        private List<string> GetPromptForResponse(Type type, Plot plot, IPart part)
 		{
 			List<string> prompts = new List<string>
 			{

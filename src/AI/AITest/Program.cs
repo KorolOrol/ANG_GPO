@@ -3,12 +3,25 @@ using AIGenerator.TextGenerator;
 using AIGen = AIGenerator.AIGenerator;
 using BaseClasses.Services;
 
+/*
+OpenAIGenerator text = new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host");
+text.Model = "gpt-3.5-turbo-0125";
+List<string> list = new List<string>() {"Привет"};
+Console.WriteLine(await text.GenerateTextAsync(list));
+*/
+
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
 string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
-AIGen Ngen = new AIGen(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://lk.neuroapi.host"));
+AIGen Ngen = new AIGen(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host"));
 Ngen.AIPriority = true;
-Ngen.TextAIGenerator.Model = "gpt-4-turbo-preview";
+Ngen.TextAIGenerator.Model = "gpt-3.5-turbo-0125";
 AIGen Ogen = new AIGen(promptPath);
+
+AIGen test = new AIGen(promptPath);
+test.AIPriority = true;
+test.TextAIGenerator.Endpoint = "https://api.pawan.krd";
+test.TextAIGenerator.ApiKey = "pk-nAilQDefiAxSVuxkqSJvHVIwasFMAhEuORJrfzwAGshgPlhm";
+test.TextAIGenerator.Model = "gpt-3.5-unfiltered";
 
 AIGen gen = Ngen;
 

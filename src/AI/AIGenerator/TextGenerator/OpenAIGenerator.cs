@@ -123,6 +123,8 @@ namespace AIGenerator.TextGenerator
             }
             else
             {
+                await Task.Delay(5000);
+                return await GenerateTextAsync(messages);
                 if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     await Task.Delay(5000);

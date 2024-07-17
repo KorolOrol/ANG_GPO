@@ -3,10 +3,23 @@ using BaseClasses.Services;
 
 namespace AIGenerator
 {
+    /// <summary>
+    /// Компонент истории, полученный от ИИ
+    /// </summary>
     public interface IAIClass
     {
+        /// <summary>
+        /// Преобразование в стандартный класс истории
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Объект с типом стандартного класса</returns>
         public object ToBase(Plot plot);
 
+        /// <summary>
+        /// Списки новых частей истории
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Словарь (тип - список новых частей)</returns>
         public Dictionary<Type, List<string>> NewParts(Plot plot);
     }
 
@@ -105,6 +118,11 @@ namespace AIGenerator
             return character;
         }
 
+        /// <summary>
+        /// Списки новых частей истории
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Словарь (тип - список новых частей)</returns>
         public Dictionary<Type, List<string>> NewParts(Plot plot)
         {
             return new Dictionary<Type, List<string>>
@@ -283,6 +301,11 @@ namespace AIGenerator
             return location;
         }
 
+        /// <summary>
+        /// Списки новых частей истории
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Словарь (тип - список новых частей)</returns>
         public Dictionary<Type, List<string>> NewParts(Plot plot)
         {
             return new Dictionary<Type, List<string>>()
@@ -434,6 +457,11 @@ namespace AIGenerator
             return item;
         }
 
+        /// <summary>
+        /// Списки новых частей истории
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Словарь (тип - список новых частей)</returns>
         public Dictionary<Type, List<string>> NewParts(Plot plot)
         {
             return new Dictionary<Type, List<string>>()
@@ -589,6 +617,11 @@ namespace AIGenerator
             return @event;
         }
 
+        /// <summary>
+        /// Списки новых частей истории
+        /// </summary>
+        /// <param name="plot">История</param>
+        /// <returns>Словарь (тип - список новых частей)</returns>
         public Dictionary<Type, List<string>> NewParts(Plot plot)
         {
             return new Dictionary<Type, List<string>>()
