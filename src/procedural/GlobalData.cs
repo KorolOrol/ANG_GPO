@@ -422,5 +422,13 @@ public class GlobalData
         new Trait("Трипофобия", "Боится скопления отверстий."), // Trypophobia
     };
 
+    public static void getKinship(PrCharacter kto, PrCharacter komu) // TO DO: Poumney napisat!
+    {
+        if (kto.Father == komu.id || kto.Gender == true)
+        {
+            Console.WriteLine("{0} является сыном {1}", kto.Name, komu.Name);
+        }
+    }
+
     public static int PrCharactersCreated = 0;
 }

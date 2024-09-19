@@ -14,22 +14,26 @@ public class PrCharacter
     #region [PrCharacter characteristics]
 
     public int id;
-
+    
     public string Name;
     public string Surname;
-    public int    Age;
-    public string ?Gender;
+    public int    ?Age;
+    public bool ?Gender; // 0 - F, 1 - M
     public string ?Description;
     public string ?Location;
+
     private const int _MaxPossibleTraits = 10;
     private const int _MaxPossiblePhobias = 3;
+
+    public int ?Mother;
+    public int ?Father;
 
     public Dictionary<int, double> Relations = new Dictionary<int, double>();
     public List<Trait> Traits = new List<Trait>();
     public List<Trait> Phobias = new List<Trait>();
+
     /*public List<Item> Items = new List<Item>();*/
     /*public List<Event> Events = new List<Event>;*/
-    // TODO: Фобии
 
     #endregion
 
@@ -249,7 +253,13 @@ public class PrCharacter
 
         else if (traits_count > (mama.Traits.Count + papa.Traits.Count) / 2)
         {
+
+            Random rand = new Random();
+
             this.Name = name;
+            this.Surname = papa.Surname;
+
+            this.Gender = rand.NextDouble() >= 0.5;
 
             List<Trait> combined_traits = new List<Trait> { };
             combined_traits.AddRange(mama.Traits);
@@ -271,11 +281,11 @@ public class PrCharacter
                 }
             }
 
-            for (int i = GlobalData.TraitsList.Count(); i < traits_count; i++)
+            for (int i = Traits.Count(); i < traits_count; i++)
             {
                 var random = new Random().Next(GlobalData.TraitsList.Count);
 
-                if (Traits.Count == 0 || CheckTabl(random))
+                if (CheckTabl(random))
                 {
                     Traits.Add(GlobalData.TraitsList[random]);
                 }
@@ -315,6 +325,9 @@ public class PrCharacter
                 Traits.RemoveAt(i);
             }
         }
+
+        Mother = mama.id;
+        Father = papa.id;
     }
 
     /// <summary>
@@ -352,6 +365,9 @@ public class PrCharacter
                     i--;
                 }
             }
+
+            Mother = mama.id;
+            Father = papa.id;
         }
     }
 
@@ -405,6 +421,9 @@ public class PrCharacter
                 i--;
             }
         }
+
+        Mother = mama.id;
+        Father = papa.id;
     }
 
     /// <summary>
@@ -447,6 +466,9 @@ public class PrCharacter
                 }
             }
         }
+
+        Mother = mama.id;
+        Father = papa.id;
     }
 
     #endregion
@@ -658,6 +680,12 @@ public class PrCharacter
 
     #region [Construstors] // TODO: DO
 
+    public PrCharacter()
+    {
+        this.id = GlobalData.PrCharactersCreated;
+        GlobalData.PrCharactersCreated++;
+    }
+
     public PrCharacter(string name)
     {
         this.Name = name;
@@ -667,10 +695,12 @@ public class PrCharacter
         GlobalData.PrCharactersCreated++;
     }
 
-    public PrCharacter(string name, string surname)
+    public PrCharacter(string name, string surname, int age, bool gender)
     {
         this.Name = name;
         this.Surname = surname;
+        this.Age = age;
+        this.Gender = gender;
         this.id = GlobalData.PrCharactersCreated;
 
         GlobalData.PrCharactersCreated++;
