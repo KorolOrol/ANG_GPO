@@ -3,22 +3,21 @@
 namespace BaseClasses.Interface
 {
     /// <summary>
-    /// Интерфейс генератора цепочки частей истории
+    /// Интерфейс генератора цепочки элементов истории
     /// </summary>
     public interface IChainGenerator
     {
         /// <summary>
-        /// Генерация цепочки частей истории
+        /// Генерация цепочки элементов истории
         /// </summary>
-        /// <typeparam name="T">Тип компонента</typeparam>
         /// <param name="plot">История</param>
-        /// <param name="preparedPart">Подготовленная часть</param>
+        /// <param name="preparedElement">Подготовленный элемент</param>
         /// <param name="generationQueue">Очередь генерации</param>
         /// <param name="recursion">Глубина рекурсии</param>
-        /// <returns>Сгенерированная цепочка частей</returns>
-        public Task<IPart> GenerateChainAsync(Plot plot,
-                                              IPart preparedPart,
-                                              Queue<(IPart, IPart, int)> generationQueue = null,
+        /// <returns>Сгенерированная цепочка элементов</returns>
+        public Task<IElement> GenerateChainAsync(Plot plot,
+                                              IElement preparedElement,
+                                              Queue<(IElement, IElement, int)> generationQueue = null,
                                               int recursion = 3);
     }
 }
