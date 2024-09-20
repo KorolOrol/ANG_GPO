@@ -30,13 +30,7 @@ namespace BaseClasses.Interface
         /// <summary>
         /// Время создания элемента
         /// </summary>
-        public int Time { get; }
-
-        /// <summary>
-        /// Объединение двух элементов
-        /// </summary>
-        /// <param name="element">Элемент для объединения</param>
-        public void Merge(IElement element);
+        public int Time { get; set; }
 
         /// <summary>
         /// Полная информация об элементе

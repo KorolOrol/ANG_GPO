@@ -40,7 +40,7 @@ namespace BaseClasses.Services
                     switch (element2.Type)
                     {
                         case ElemType.Character:
-                            BindCharLoc(element2, element1);
+                            BindLocChar(element1, element2);
                             break;
                         case ElemType.Item:
                             BindLocItem(element1, element2);
@@ -81,6 +81,76 @@ namespace BaseClasses.Services
             }
         }
 
+        /// <summary>
+        /// Разъединение двух частей истории
+        /// </summary>
+        /// <param name="element1">Первая часть истории</param>
+        /// <param name="element2">Вторая часть истории</param>
+        public static void Unbind(IElement element1, IElement element2) 
+        { 
+            switch (element1.Type)
+            {
+                case ElemType.Character:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindCharacters(element1, element2);
+                            break;
+                        case ElemType.Location:
+                            UnbindCharLoc(element1, element2);
+                            break;
+                        case ElemType.Item:
+                            UnbindCharItem(element1, element2);
+                            break;
+                        case ElemType.Event:
+                            UnbindCharEvent(element1, element2);
+                            break;
+                    }
+                    break;
+                case ElemType.Location:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindLocChar(element1, element2);
+                            break;
+                        case ElemType.Item:
+                            UnbindLocItem(element1, element2);
+                            break;
+                        case ElemType.Event:
+                            UnbindLocEvent(element1, element2);
+                            break;
+                    }
+                    break;
+                case ElemType.Item:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindItemChar(element1, element2);
+                            break;
+                        case ElemType.Location:
+                            UnbindItemLoc(element1, element2);
+                            break;
+                        case ElemType.Event:
+                            UnbindItemEvent(element1, element2);
+                            break;
+                    }
+                    break;
+                case ElemType.Event:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindEventChar(element1, element2);
+                            break;
+                        case ElemType.Location:
+                            UnbindEventLoc(element1, element2);
+                            break;
+                        case ElemType.Item:
+                            UnbindEventItem(element1, element2);
+                            break;
+                    }
+                    break;
+            }
+        }
 
         /// <summary>
         /// Связывание двух персонажей

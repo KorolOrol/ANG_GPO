@@ -15,7 +15,7 @@ namespace BaseClasses.Model
         private readonly ElemType _type;
 
         /// <summary>
-        /// Конструктор элемента
+        /// Тип элемента
         /// </summary>
         public ElemType Type { get { return _type; } }
 
@@ -37,32 +37,7 @@ namespace BaseClasses.Model
         /// <summary>
         /// Время создания элемента
         /// </summary>
-        public int Time { get; private set; } = 0;
-
-        /// <summary>
-        /// Объединение двух элементов
-        /// </summary>
-        /// <param name="element">Элемент для объединения</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public void Merge(IElement element)
-        {
-            if (element is null) throw new ArgumentNullException("Элемент не может быть null.");
-            if (element.Type != Type) throw new ArgumentException("Неверный тип элемента.");
-            if (Name == "")
-            {
-                Name = element.Name;
-            }
-            if (Description == "")
-            {
-                Description = element.Description;
-            }
-            foreach (KeyValuePair<string, object> kvp in element.Params)
-            {
-                Binder.Rebind(this, element, kvp.Key, kvp.Value);
-            }
-            Time = Math.Max(Time, element.Time);
-        }
+        public int Time { get; set; } = -1;
 
         /// <inheritdoc/>
         public override string ToString()
