@@ -38,6 +38,14 @@ namespace BaseClasses.Model
         /// </summary>
         public int Time { get; set; }
 
+        /// <summary>
+        /// Конструктор элемента
+        /// </summary>
+        /// <param name="type">Тип элемента</param>
+        /// <param name="name">Название элемента</param>
+        /// <param name="description">Описание элемента</param>
+        /// <param name="params">Параметры элемента</param>
+        /// <param name="time">Время создания элемента</param>
         public Element(ElemType type, string name = "", string description = "",
                        Dictionary<string, object> @params = null, int time = -1)
         {
