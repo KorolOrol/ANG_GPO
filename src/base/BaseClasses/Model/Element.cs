@@ -21,22 +21,32 @@ namespace BaseClasses.Model
         /// <summary>
         /// Название элемента
         /// </summary>
-        public string Name { get; set; } = "";
+        public string Name { get; set; }
 
         /// <summary>
         /// Описание элемента
         /// </summary>
-        public string Description { get; set; } = "";
+        public string Description { get; set; }
 
         /// <summary>
         /// Параметры элемента
         /// </summary>
-        public Dictionary<string, object> Params { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Params { get; set; }
 
         /// <summary>
         /// Время создания элемента
         /// </summary>
-        public int Time { get; set; } = -1;
+        public int Time { get; set; }
+
+        public Element(ElemType type, string name = "", string description = "",
+                       Dictionary<string, object> @params = null, int time = -1)
+        {
+            _type = type;
+            Name = name;
+            Description = description;
+            Params = @params ?? new Dictionary<string, object>();
+            Time = time;
+        }
 
         /// <inheritdoc/>
         public override string ToString()
