@@ -5,7 +5,7 @@ using BaseClasses.Enum;
 namespace BaseClasses.Services
 {
     /// <summary>
-    /// Сервис для слияния историй
+    /// Сервис для связывания элементов истории
     /// </summary>
     public static class Binder
     {

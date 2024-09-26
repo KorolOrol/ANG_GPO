@@ -1,9 +1,11 @@
 ﻿using BaseClasses.Interface;
 using BaseClasses.Model;
-using System.Xml.Linq;
 
 namespace BaseClasses.Services
 {
+    /// <summary>
+    /// Сервис объединения элементов
+    /// </summary>
     public static class Merger
     {
         /// <summary>
