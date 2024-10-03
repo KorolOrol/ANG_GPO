@@ -1,4 +1,6 @@
-﻿namespace BaseClasses.Model
+﻿using BaseClasses.Interface;
+
+namespace BaseClasses.Model
 {
     /// <summary>
     /// Отношение персонажа с другим персонажем
@@ -8,7 +10,7 @@
         /// <summary>
         /// Персонаж
         /// </summary>
-        public Character Character { get; set; }
+        public IElement Character { get; set; }
 
         /// <summary>
         /// Значение отношения

@@ -8,11 +8,11 @@ namespace BaseClasses.Interface
     public interface IGenerator
     {
         /// <summary>
-        /// Генерация компонента истории
+        /// Генерация элемента истории
         /// </summary>
         /// <param name="plot">История</param>
-        /// <param name="preparedPart">Подготовленная часть</param>
-        /// <returns>Сгенерированный компонент</returns>
-        public Task<IPart> GenerateAsync(Plot plot, IPart preparedPart);
+        /// <param name="preparedElement">Подготовленный элемент</param>
+        /// <returns>Сгенерированный элемент</returns>
+        public Task<IElement> GenerateAsync(Plot plot, IElement preparedElement);
     }
 }
