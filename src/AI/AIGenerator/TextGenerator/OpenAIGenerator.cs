@@ -2,7 +2,6 @@
 using OpenAI.Managers;
 using OpenAI.ObjectModels;
 using OpenAI.ObjectModels.RequestModels;
-using OpenAI.ObjectModels.ResponseModels;
 using System.Text.RegularExpressions;
 
 namespace AIGenerator.TextGenerator
@@ -10,7 +9,7 @@ namespace AIGenerator.TextGenerator
     /// <summary>
     /// Класс для генерации текста с помощью OpenAI API
     /// </summary>
-    public class OpenAIGenerator : ITextAIGenerator
+    public class OpenAIGenerator : ITextAiGenerator
     {
         /// <summary>
         /// Ключ API для OpenAI
@@ -97,6 +96,8 @@ namespace AIGenerator.TextGenerator
             set => _model = value;
         }
 
+        public bool TrimEnd { get; set; }
+
         /// <summary>
         /// Генерация текста
         /// </summary>
@@ -112,8 +113,10 @@ namespace AIGenerator.TextGenerator
             });
             if (completion.Successful)
             {
-                string trimmedResult = Regex.Match(completion.Choices.First().Message.Content, 
-                                                   @"\{.*\}", RegexOptions.Singleline).Value;
+                string trimmedResult = completion.Choices.First().Message.Content;
+                if (TrimEnd) trimmedResult = TrimRepatingEnd(trimmedResult);
+                trimmedResult = Regex.Match(trimmedResult, 
+                                            @"\{.*\}", RegexOptions.Singleline).Value;
                 if (trimmedResult == "")
                 {
                     throw new Exception("Failed to generate text: " + 
@@ -124,7 +127,6 @@ namespace AIGenerator.TextGenerator
             else
             {
                 await Task.Delay(5000);
-                return await GenerateTextAsync(messages);
                 if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     await Task.Delay(5000);
@@ -140,6 +142,7 @@ namespace AIGenerator.TextGenerator
         public OpenAIGenerator()
         {
             GetApiKeyFromEnvironment("OpenAIAPIKey");
+            TrimEnd = false;
         }
 
         /// <summary>
@@ -151,6 +154,20 @@ namespace AIGenerator.TextGenerator
         {
             GetApiKeyFromEnvironment(keyEnvVar);
             Endpoint = endpoint;
+            TrimEnd = true;
+        }
+
+        private string TrimRepatingEnd(string input)
+        {
+            for (int i = (int)Math.Floor((double)input.Length / 2); i > 0 ; i--)
+            {
+                if (input.Substring(input.Length - i, i) == 
+                    input.Substring(input.Length - 2 * i, i))
+                {
+                    return input.Substring(0, input.Length - i);
+                }
+            }
+            return input;
         }
     }
 }

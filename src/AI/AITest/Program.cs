@@ -1,7 +1,9 @@
 ﻿using BaseClasses.Model;
-using AIGenerator.TextGenerator;
-using AIGen = AIGenerator.AIGenerator;
+using BaseClasses.Enum;
 using BaseClasses.Services;
+using AIGenerator;
+using AIGenerator.TextGenerator;
+using Newtonsoft.Json;
 
 /*
 OpenAIGenerator text = new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host");
@@ -10,20 +12,34 @@ List<string> list = new List<string>() {"Привет"};
 Console.WriteLine(await text.GenerateTextAsync(list));
 */
 
+/*
+JsonSerializerSettings settings = new JsonSerializerSettings
+{
+    NullValueHandling = NullValueHandling.Ignore,
+    DefaultValueHandling = DefaultValueHandling.Ignore
+};
+
+Element c = new Element(ElemType.Character, "Вася", "Вася Пупкин");
+Element c2 = new Element(ElemType.Character, "Петя", "");
+Element l = new Element(ElemType.Location, "Дом", "Дом Васи");
+Element i = new Element(ElemType.Item, "Колбаса");
+Element e = new Element(ElemType.Event, "Праздник");
+Binder.Bind(c, c2, 10);
+Binder.Bind(c, l);
+Binder.Bind(c, i);
+Binder.Bind(c, e);
+
+Console.WriteLine(JsonConvert.SerializeObject(new AiElement(c), settings));
+*/
+
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
 string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
-AIGen Ngen = new AIGen(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host"));
+LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host"));
 Ngen.AIPriority = true;
-Ngen.TextAIGenerator.Model = "gpt-3.5-turbo-0125";
-AIGen Ogen = new AIGen(promptPath);
+Ngen.TextAiGenerator.Model = "gpt-3.5-turbo-0125";
+LlmAiGenerator Ogen = new(promptPath);
 
-AIGen test = new AIGen(promptPath);
-test.AIPriority = true;
-test.TextAIGenerator.Endpoint = "https://api.pawan.krd";
-test.TextAIGenerator.ApiKey = "pk-nAilQDefiAxSVuxkqSJvHVIwasFMAhEuORJrfzwAGshgPlhm";
-test.TextAIGenerator.Model = "gpt-3.5-unfiltered";
-
-AIGen gen = Ngen;
+LlmAiGenerator gen = Ngen;
 
 Plot plot = new Plot();
 
@@ -51,102 +67,117 @@ while (true)
     {
         case "11":
             {
-                Character character = (Character)await gen.GenerateAsync(plot, new Character());
+                Element character = 
+                    (Element)await gen.GenerateAsync(plot, new Element(ElemType.Character));
                 Console.WriteLine(character.FullInfo());
                 break;
             }
         case "12":
             {
-                Location location = (Location)await gen.GenerateAsync(plot, new Location());
+                Element location = 
+                    (Element)await gen.GenerateAsync(plot, new Element(ElemType.Location));
                 Console.WriteLine(location.FullInfo());
                 break;
             }
         case "13":
             {
-                Item item = (Item)await gen.GenerateAsync(plot, new Item());
+                Element item = 
+                    (Element)await gen.GenerateAsync(plot, new Element(ElemType.Item));
                 Console.WriteLine(item.FullInfo());
                 break;
             }
         case "14":
             {
-                Event ev = (Event)await gen.GenerateAsync(plot, new Event());
+                Element ev = 
+                    (Element)await gen.GenerateAsync(plot, new Element(ElemType.Event));
                 Console.WriteLine(ev.FullInfo());
                 break;
             }
         case "21":
             {
-                Character character = (Character)await gen.GenerateChainAsync(plot, new Character());
+                Element character = 
+                    (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Character));
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "22":
             {
-                Location location = (Location)await gen.GenerateChainAsync(plot, new Location());
+                Element location = 
+                    (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Location));
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "23":
             {
-                Item item = (Item)await gen.GenerateChainAsync(plot, new Item());
+                Element item = 
+                    (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Item));
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "24":
             {
-                Event @event = (Event)await gen.GenerateChainAsync(plot, new Event());
+                Element @event = 
+                    (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Event));
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "31":
             {
-                Character preparedCharacter = new Character();
+                Element preparedCharacter = new Element(ElemType.Character);
                 preparedCharacter.Name = Console.ReadLine();
                 preparedCharacter.Description = Console.ReadLine();
-                Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                Element foundLocation = 
+                    (Element)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
                 if (foundLocation != null)
                 {
-                    preparedCharacter.Locations.Add(foundLocation);
+                    Binder.Bind(preparedCharacter, foundLocation);
                 }
-                Character character = (Character)await gen.GenerateChainAsync(plot, preparedCharacter);
+                Element character = (Element)await gen.GenerateChainAsync(plot, preparedCharacter);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "32":
             {
-                Location preparedLocation = new Location();
+                Element preparedLocation = new Element(ElemType.Location);
                 preparedLocation.Name = Console.ReadLine();
                 preparedLocation.Description = Console.ReadLine();
-                Character foundCharacter = plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine());
+                Element foundCharacter = 
+                    (Element)plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine());
                 if (foundCharacter != null)
                 {
-                    preparedLocation.Characters.Add(foundCharacter);
+                    Binder.Bind(preparedLocation, foundCharacter);
                 }
-                Location location = (Location)await gen.GenerateChainAsync(plot, preparedLocation);
+                Element location = (Element)await gen.GenerateChainAsync(plot, preparedLocation);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "33":
             {
-                Item preparedItem = new Item();
+                Element preparedItem = new Element(ElemType.Item);
                 preparedItem.Name = Console.ReadLine();
                 preparedItem.Description = Console.ReadLine();
-                preparedItem.Location = 
-                    plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
-                Item item = (Item)await gen.GenerateChainAsync(plot, preparedItem);
+                Element foundLocation = 
+                    (Element)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                if (foundLocation != null)
+                {
+                    Binder.Bind(preparedItem, foundLocation);
+                }
+                Element item = (Element)await gen.GenerateChainAsync(plot, preparedItem);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }
         case "34":
             {
-                Event preparedEvent = new Event();
+                Element preparedEvent = new Element(ElemType.Event);
                 preparedEvent.Name = Console.ReadLine();
                 preparedEvent.Description = Console.ReadLine();
-                Location foundLocation = plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                Element foundLocation = 
+                    (Element)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
                 if (foundLocation != null)
                 {
-                    preparedEvent.Locations.Add(foundLocation);
+                    Binder.Bind(preparedEvent, foundLocation);
                 }
-                Event ev = (Event)await gen.GenerateChainAsync(plot, preparedEvent);
+                Element ev = (Element)await gen.GenerateChainAsync(plot, preparedEvent);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }

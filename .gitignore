@@ -397,3 +397,5 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /src/AI/AITest/SavingPath
+/src/base/Test/Test.csproj
+/src/base/Test

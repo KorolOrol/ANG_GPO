@@ -309,7 +309,7 @@ namespace BaseClasses.Services
             if (location.Params.ContainsKey("Characters") &&
                 ((List<IElement>)location.Params["Characters"]).Contains(character))
             {
-                ((List<IElement>)location.Params["Locations"]).Remove(character);
+                ((List<IElement>)location.Params["Characters"]).Remove(character);
             }
         }
 
@@ -343,7 +343,7 @@ namespace BaseClasses.Services
             }
 
             if (!item.Params.ContainsKey("Host"))
-                {
+            {
                 item.Params.Add("Host", character);
             }
             else
@@ -571,11 +571,11 @@ namespace BaseClasses.Services
             if (!@event.Params.ContainsKey("Locations"))
             {
                 locs = new List<IElement>();
-                @event.Params.Add("Characters", locs);
+                @event.Params.Add("Locations", locs);
             }
             else
             {
-                locs = (List<IElement>)@event.Params["Characters"];
+                locs = (List<IElement>)@event.Params["Locations"];
             }
 
             if (!events.Contains(@event))
