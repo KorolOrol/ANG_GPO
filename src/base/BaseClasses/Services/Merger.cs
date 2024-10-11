@@ -37,7 +37,7 @@ namespace BaseClasses.Services
                 {
                     case List<IElement> elements:
                         {
-                            foreach (IElement element in elements)
+                            foreach (IElement element in elements.ToList())
                             {
                                 Binder.Bind(baseElement, element);
                                 Binder.Unbind(mergedElement, element);

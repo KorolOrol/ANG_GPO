@@ -1,5 +1,6 @@
 ﻿using BaseClasses.Enum;
 using BaseClasses.Interface;
+using System.Collections;
 
 namespace BaseClasses.Model
 {
@@ -70,7 +71,8 @@ namespace BaseClasses.Model
         {
             return $"{Type}: {Name}\n" +
                    $"Description: {Description}\n" +
-                   $"{string.Join("\n", Params.Select(kvp => $"{kvp.Key}: {kvp.Value}"))}\n" +
+                   $"{string.Join("\n", Params.Select(kvp => 
+                   $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
                    $"Creation time: {Time}";
         }
 
@@ -87,7 +89,25 @@ namespace BaseClasses.Model
                        if (kvp.Value is string str) return str == "";
                        return false;
                    })
-                   ) && Time == 0;
+                   ) && Time == -1;
+        }
+
+        /// <summary>
+        /// Получение строки значения параметра
+        /// </summary>
+        /// <param name="value">Значение параметра</param>
+        /// <returns>Строка значения параметра</returns>
+        private string GetValueString(object value)
+        {
+            if (value is IEnumerable enumerable)
+            {
+                return $"[{string.Join(", ", 
+                    enumerable.Cast<object>().Select(item => item.ToString()))}]";
+            }
+            else
+            {
+                return value.ToString();
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BaseClasses.Interface;
 using BaseClasses.Model;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace BaseClasses.Services
 {
@@ -12,13 +13,13 @@ namespace BaseClasses.Services
         /// <summary>
         /// Настройки сериализации
         /// </summary>
-        public static JsonSerializerSettings Settings { get; } = new JsonSerializerSettings
+        public static JsonSerializerOptions Options { get; } = new JsonSerializerOptions
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            Formatting = Formatting.Indented,
-            TypeNameHandling = TypeNameHandling.Auto,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
+            WriteIndented = true,
+            IncludeFields = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            ReadCommentHandling = JsonCommentHandling.Skip
         };
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace BaseClasses.Services
         /// <param name="path">Путь к файлу</param>
         public static void Serialize(Plot plot, string path)
         {
-            var json = JsonConvert.SerializeObject(plot, Settings);
+            var json = JsonSerializer.Serialize(plot, Options);
             File.WriteAllText(path, json);
         }
 
@@ -39,7 +40,7 @@ namespace BaseClasses.Services
         /// <param name="path">Путь к файлу</param>
         public static void Serialize(IElement element, string path)
         {
-            var json = JsonConvert.SerializeObject(element, Settings);
+            var json = JsonSerializer.Serialize(element, Options);
             File.WriteAllText(path, json);
         }
 
@@ -52,7 +53,7 @@ namespace BaseClasses.Services
         public static T Deserialize<T>(string path)
         {
             var json = File.ReadAllText(path);
-            return JsonConvert.DeserializeObject<T>(json, Settings);
+            return JsonSerializer.Deserialize<T>(json, Options);
         }
 
         /// <summary>

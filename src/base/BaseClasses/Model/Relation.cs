@@ -16,5 +16,10 @@ namespace BaseClasses.Model
         /// Значение отношения
         /// </summary>
         public double Value { get; set; }
+
+        public override string ToString()
+        {
+            return $"{{{Character.Name}, {Value}}}";
+        }
     }
 }
