@@ -158,7 +158,7 @@ namespace BaseClasses.Services
         /// <param name="character1">Первый персонаж</param>
         /// <param name="character2">Второй персонаж</param>
         /// <param name="relations">Отношения между персонажами</param>
-        public static void BindCharacters(IElement character1, IElement character2, double relations)
+        private static void BindCharacters(IElement character1, IElement character2, double relations)
         {
             if (character1 == null || character2 == null || character1 == character2 || relations == 0 ||
                 character1.Type != ElemType.Character || character2.Type != ElemType.Character)
@@ -212,7 +212,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character1">Первый персонаж</param>
         /// <param name="character2">Второй персонаж</param>
-        public static void UnbindCharacters(IElement character1, IElement character2)
+        private static void UnbindCharacters(IElement character1, IElement character2)
         {
             if (character1 == null || character2 == null || character1 == character2 ||
                 character1.Type != ElemType.Character || character2.Type != ElemType.Character)
@@ -246,7 +246,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="location">Локация</param>
-        public static void BindCharLoc(IElement character, IElement location)
+        private static void BindCharLoc(IElement character, IElement location)
         {
             if (character == null || location == null || 
                 character.Type != ElemType.Character || location.Type != ElemType.Location)
@@ -292,7 +292,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="location">Локация</param>
-        public static void UnbindCharLoc(IElement character, IElement location)
+        private static void UnbindCharLoc(IElement character, IElement location)
         {
             if (character == null || location == null ||
                 character.Type != ElemType.Character || location.Type != ElemType.Location)
@@ -318,7 +318,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="item">Предмет</param>
-        public static void BindCharItem(IElement character, IElement item)
+        private static void BindCharItem(IElement character, IElement item)
         {
             if (character == null || item == null ||
                 character.Type != ElemType.Character || item.Type != ElemType.Item)
@@ -361,7 +361,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="item">Предмет</param>
-        public static void UnbindCharItem(IElement character, IElement item)
+        private static void UnbindCharItem(IElement character, IElement item)
         {
             if (character == null || item == null ||
                 character.Type != ElemType.Character || item.Type != ElemType.Item)
@@ -387,7 +387,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="event">Событие</param>
-        public static void BindCharEvent(IElement character, IElement @event)
+        private static void BindCharEvent(IElement character, IElement @event)
         {
             if (character == null || @event == null ||
                 character.Type != ElemType.Character || @event.Type != ElemType.Event)
@@ -433,7 +433,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="event">Событие</param>
-        public static void UnbindCharEvent(IElement character, IElement @event)
+        private static void UnbindCharEvent(IElement character, IElement @event)
         {
             if (character == null || @event == null ||
                 character.Type != ElemType.Character || @event.Type != ElemType.Event)
@@ -459,7 +459,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="character">Персонаж</param>
-        public static void BindLocChar(IElement location, IElement character)
+        private static void BindLocChar(IElement location, IElement character)
         {
             BindCharLoc(character, location);
         }
@@ -469,7 +469,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="character">Персонаж</param>
-        public static void UnbindLocChar(IElement location, IElement character)
+        private static void UnbindLocChar(IElement location, IElement character)
         {
             UnbindCharLoc(character, location);
         }
@@ -479,7 +479,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="item">Предмет</param>
-        public static void BindLocItem(IElement location, IElement item)
+        private static void BindLocItem(IElement location, IElement item)
         {
             if (location == null || item == null ||
                 location.Type != ElemType.Location || item.Type != ElemType.Item)
@@ -522,7 +522,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="item">Предмет</param>
-        public static void UnbindLocItem(IElement location, IElement item)
+        private static void UnbindLocItem(IElement location, IElement item)
         {
             if (location == null || item == null ||
                 location.Type != ElemType.Location || item.Type != ElemType.Item)
@@ -548,7 +548,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="event">Событие</param>
-        public static void BindLocEvent(IElement location, IElement @event)
+        private static void BindLocEvent(IElement location, IElement @event)
         {
             if (location == null || @event == null ||
                 location.Type != ElemType.Location || @event.Type != ElemType.Event)
@@ -594,7 +594,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="event">Событие</param>
-        public static void UnbindLocEvent(IElement location, IElement @event)
+        private static void UnbindLocEvent(IElement location, IElement @event)
         {
             if (location == null || @event == null ||
                 location.Type != ElemType.Location || @event.Type != ElemType.Event)
@@ -620,7 +620,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="character">Персонаж</param>
-        public static void BindItemChar(IElement item, IElement character)
+        private static void BindItemChar(IElement item, IElement character)
         {
             BindCharItem(character, item);
         }
@@ -630,7 +630,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="character">Персонаж</param>
-        public static void UnbindItemChar(IElement item, IElement character)
+        private static void UnbindItemChar(IElement item, IElement character)
         {
             UnbindCharItem(character, item);
         }
@@ -640,7 +640,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="location">Локация</param>
-        public static void BindItemLoc(IElement item, IElement location)
+        private static void BindItemLoc(IElement item, IElement location)
         {
             BindLocItem(location, item);
         }
@@ -650,7 +650,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="location">Локация</param>
-        public static void UnbindItemLoc(IElement item, IElement location)
+        private static void UnbindItemLoc(IElement item, IElement location)
         {
             UnbindLocItem(location, item);
         }
@@ -660,7 +660,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="event">Событие</param>
-        public static void BindItemEvent(IElement item, IElement @event)
+        private static void BindItemEvent(IElement item, IElement @event)
         {
             if (item == null || @event == null ||
                 item.Type != ElemType.Item || @event.Type != ElemType.Event)
@@ -706,7 +706,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="event">Событие</param>
-        public static void UnbindItemEvent(IElement item, IElement @event)
+        private static void UnbindItemEvent(IElement item, IElement @event)
         {
             if (item == null || @event == null ||
                 item.Type != ElemType.Item || @event.Type != ElemType.Event)
@@ -732,7 +732,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event"></param>
         /// <param name="character"></param>
-        public static void BindEventChar(IElement @event, IElement character)
+        private static void BindEventChar(IElement @event, IElement character)
         {
             BindCharEvent(character, @event);
         }
@@ -742,7 +742,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="character">Персонаж</param>
-        public static void UnbindEventChar(IElement @event, IElement character)
+        private static void UnbindEventChar(IElement @event, IElement character)
         {
             UnbindCharEvent(character, @event);
         }
@@ -752,7 +752,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="location">Локация</param>
-        public static void BindEventLoc(IElement @event, IElement location)
+        private static void BindEventLoc(IElement @event, IElement location)
         {
             BindLocEvent(location, @event);
         }
@@ -762,7 +762,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="location">Локация</param>
-        public static void UnbindEventLoc(IElement @event, IElement location)
+        private static void UnbindEventLoc(IElement @event, IElement location)
         {
             UnbindLocEvent(location, @event);
         }
@@ -772,7 +772,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="item">Предмет</param>
-        public static void BindEventItem(IElement @event, IElement item)
+        private static void BindEventItem(IElement @event, IElement item)
         {
             BindItemEvent(item, @event);
         }
@@ -782,7 +782,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="item">Предмет</param>
-        public static void UnbindEventItem(IElement @event, IElement item)
+        private static void UnbindEventItem(IElement @event, IElement item)
         {
             UnbindItemEvent(item, @event);
         }

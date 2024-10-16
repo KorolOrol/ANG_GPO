@@ -71,8 +71,9 @@ namespace BaseClasses.Model
         {
             return $"{Type}: {Name}\n" +
                    $"Description: {Description}\n" +
-                   $"{string.Join("\n", Params.Select(kvp => $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
-                   $"Creation time: {Time}\n";
+                   $"{string.Join("\n", Params.Select(kvp => 
+                   $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
+                   $"Creation time: {Time}";
         }
 
         /// <summary>
@@ -100,7 +101,8 @@ namespace BaseClasses.Model
         {
             if (value is IEnumerable enumerable)
             {
-                return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString()))}]";
+                return $"[{string.Join(", ", 
+                    enumerable.Cast<object>().Select(item => item.ToString()))}]";
             }
             else
             {
