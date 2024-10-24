@@ -1,10 +1,13 @@
 ﻿using BaseClasses.Enum;
+using BaseClasses.Model;
+using System.Text.Json.Serialization;
 
 namespace BaseClasses.Interface
 {
     /// <summary>
     /// Интерфейс элемента истории
     /// </summary>
+    [JsonDerivedType(typeof(Element), typeDiscriminator: "Element")]
     public interface IElement
     {
         /// <summary>
