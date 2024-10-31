@@ -1,17 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.Xml.Linq;
+using System.Text.Json;
 
-/*PrCharacter Tom = new PrCharacter("Tom");
-Tom.create_full_random(5);
-Tom.write_all_traits();*/
+string choice;
+var options = new JsonSerializerOptions { WriteIndented = true };
 
-/*PrCharacter Bob = new PrCharacter("Bob");
-Bob.CreateByLogicRandomTraits(2);
-Bob.WriteAllTraits();*/
+PrCharacter Tony = new PrCharacter("Тони", "Сальвоне", 25, true);
+Tony.CreateByLogicRandomTraits(4);
 
-Console.WriteLine("\n");
+while (true)
+{
+    Console.WriteLine("Выберите:");
+    Console.WriteLine("1 - генерация персонажа, 2 - настройка генерации персонажа, 3 - редактор персонажа, 4 - экспорт персонажа, 0 - выход");
+    choice = Console.ReadLine();
+
+    switch (choice)
+    {
+        case "0":
+            return 0;
+
+        case "1":
+            Console.WriteLine("Выберите генерацию:");
+            Console.WriteLine("1 - С нуля, 2 - С помощью родителей, 3 - С введённых черт, 4 - С шума");
+            string gen_choice = Console.ReadLine();
+            break;
+
+        case "2":
+            Console.WriteLine("2");
+            break;
+
+        case "3":
+            {
+                if (GlobalData.Characters.Count != 0)
+                {
+                    Console.WriteLine("Выберите персонажа по его ID");
+                    int id_in = Convert.ToInt32(choice);
+                    Console.WriteLine(GlobalData.Characters[id_in]);
+                }
+                else
+                {
+                    Console.WriteLine("\nERR: Нет сгенерированных персонажей.\n");
+                }
+                break;
+            }
+
+        case "4":
+            {
+                if (GlobalData.Characters.Count != 0)
+                {
+                    Console.WriteLine("Выберите персонажа по его ID");
+                    int id_in = Convert.ToInt32(Console.ReadLine());
+
+                    string fileName = "TEST.json";
+                    string jsonString = JsonSerializer.Serialize(GlobalData.Characters[id_in], options);
+                    File.WriteAllText(fileName, jsonString);
+
+                    Console.WriteLine(jsonString);
+
+                }
+                else
+                {
+                    Console.WriteLine("\nERR: Нет сгенерированных персонажей.\n");
+                }
+                break;
+            }
+
+        default:
+            Console.WriteLine("\nERR: Неправильный запрос.\n");
+            break;
+    }
+}
+
+/*Console.WriteLine("\n");
 
 PrCharacter Tony = new PrCharacter("Тони", "Сальвоне", 25, true);
 Tony.CreateByLogicRandomTraits(4);
@@ -35,20 +98,4 @@ Kid.GetRelations(Ivanna);
 string json = JsonConvert.SerializeObject(Kid, Formatting.Indented);
 Console.WriteLine(json);
 
-GlobalData.getKinship(Kid, Tony);
-
-/*PrCharacter Pain = new PrCharacter("Пэйн");
-Pain.CreateByLogicRandomTraits(6);
-Pain.CreateByChaoticRandomPhobias(1);
-Pain.WriteAllTraits();
-
-Console.WriteLine("\n");
-
-Pain.WriteDesc();
-
-Console.WriteLine("\n");
-
-Pain.GetRelations(Bob);
-
-string json = JsonConvert.SerializeObject(Pain, Formatting.Indented);
-Console.WriteLine(json);*/
+GlobalData.getKinship(Kid, Tony);*/

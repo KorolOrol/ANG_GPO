@@ -15,12 +15,12 @@ public class PrCharacter
 
     public int id;
     
-    public string Name;
-    public string Surname;
-    public int    ?Age;
-    public bool ?Gender; // 0 - F, 1 - M
-    public string ?Description;
-    public string ?Location;
+    public string? Name;
+    public string? Surname;
+    public int?    Age;
+    public bool?   Gender; // 0 - F, 1 - M
+    public string? Description;
+    public string? Location;
 
     private const int _MaxPossibleTraits = 10;
     private const int _MaxPossiblePhobias = 3;
@@ -683,7 +683,9 @@ public class PrCharacter
     public PrCharacter()
     {
         this.id = GlobalData.PrCharactersCreated;
+
         GlobalData.PrCharactersCreated++;
+        GlobalData.Characters.Add(this);
     }
 
     public PrCharacter(string name)
@@ -693,6 +695,7 @@ public class PrCharacter
         this.id = GlobalData.PrCharactersCreated;
 
         GlobalData.PrCharactersCreated++;
+        GlobalData.Characters.Add(this);
     }
 
     public PrCharacter(string name, string surname, int age, bool gender)
@@ -704,6 +707,7 @@ public class PrCharacter
         this.id = GlobalData.PrCharactersCreated;
 
         GlobalData.PrCharactersCreated++;
+        GlobalData.Characters.Add(this);
     }
 
     #endregion
