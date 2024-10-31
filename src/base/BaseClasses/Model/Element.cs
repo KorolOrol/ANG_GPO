@@ -32,7 +32,7 @@ namespace BaseClasses.Model
         /// <summary>
         /// Параметры элемента
         /// </summary>
-        public Dictionary<string, object> Params { get; set; }
+        public Dictionary<string, object> Params { get; set; } = new();
 
         /// <summary>
         /// Время создания элемента
@@ -73,7 +73,7 @@ namespace BaseClasses.Model
                    $"Description: {Description}\n" +
                    $"{string.Join("\n", Params.Select(kvp => 
                    $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
-                   $"Creation time: {Time}";
+                   $"Creation time: {Time}\n";
         }
 
         /// <summary>

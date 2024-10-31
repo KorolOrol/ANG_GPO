@@ -1,11 +1,13 @@
 ﻿using BaseClasses.Interface;
 using BaseClasses.Enum;
+using System.Text.Json.Serialization;
 
 namespace BaseClasses.Model
 {
     /// <summary>
     /// История
     /// </summary>
+    [JsonDerivedType(typeof(Plot), typeDiscriminator: "Plot")]
     public class Plot
     {
         /// <summary>
@@ -22,21 +24,25 @@ namespace BaseClasses.Model
         /// <summary>
         /// Персонажи
         /// </summary>
+        [JsonIgnore]
         public List<IElement> Characters => Elements.FindAll(e => e.Type == ElemType.Character);
 
         /// <summary>
         /// Локации
         /// </summary>
+        [JsonIgnore]
         public List<IElement> Locations => Elements.FindAll(e => e.Type == ElemType.Location);
 
         /// <summary>
         /// Предметы
         /// </summary>
+        [JsonIgnore]
         public List<IElement> Items => Elements.FindAll(e => e.Type == ElemType.Item);
 
         /// <summary>
         /// События
         /// </summary>
+        [JsonIgnore]
         public List<IElement> Events => Elements.FindAll(e => e.Type == ElemType.Event);
 
         /// <summary>
