@@ -3,18 +3,26 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Xml.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
+using System.Drawing;
 
 string choice;
-var options = new JsonSerializerOptions { WriteIndented = true };
+
+Console.BackgroundColor = ConsoleColor.DarkGray;
+Console.WindowWidth = 150;
 
 PrCharacter Tony = new PrCharacter("Тони", "Сальвоне", 25, true);
 Tony.CreateByLogicRandomTraits(4);
 
+PrCharacter Pain = new PrCharacter("Пейн", "Фуфил", 25, true);
+Pain.CreateByLogicRandomTraits(4);
+
+Tony.GetRelations(Pain);
+
 while (true)
 {
-    Console.WriteLine("Выберите:");
-    Console.WriteLine("1 - генерация персонажа, 2 - настройка генерации персонажа, 3 - редактор персонажа, 4 - экспорт персонажа, 0 - выход");
+    Console.WriteLine("\nВыберите:");
+    Console.Write("1 - генерация персонажа, 2 - прочесть персонажа, 3 - настройка генерации персонажа, 4 - редактор персонажа, 5 - экспорт персонажа, 0 - выход: ");
     choice = Console.ReadLine();
 
     switch (choice)
@@ -23,21 +31,75 @@ while (true)
             return 0;
 
         case "1":
-            Console.WriteLine("Выберите генерацию:");
-            Console.WriteLine("1 - С нуля, 2 - С помощью родителей, 3 - С введённых черт, 4 - С шума");
-            string gen_choice = Console.ReadLine();
-            break;
+            {
+                Console.WriteLine("Выберите генерацию:");
+                Console.Write("1 - С нуля, 2 - С помощью родителей, 3 - С введённых черт, 4 - С шума: ");
+                string gen_choice = Console.ReadLine();
+
+                switch (gen_choice)
+                {
+                    case "1":
+                        {
+                            break;
+                        }
+
+                    case "2":
+                        {
+                            break;
+                        }
+
+                    case "3":
+                        {
+                            break;
+                        }
+
+                    case "4":
+                        {
+                            Console.WriteLine("WIP");
+                            break;
+                        }
+
+                    default:
+                        Console.WriteLine("\nERR: Неправильный запрос.\n");
+                        break;
+                }
+                break;
+            }
 
         case "2":
-            Console.WriteLine("2");
-            break;
-
-        case "3":
             {
                 if (GlobalData.Characters.Count != 0)
                 {
-                    Console.WriteLine("Выберите персонажа по его ID");
-                    int id_in = Convert.ToInt32(choice);
+                    Console.Write("Выберите персонажа по его ID: ");
+                    int id_in = Convert.ToInt32(Console.ReadLine());
+                    try
+                    {
+                        GlobalData.Characters[id_in].Write();
+                    }
+                    catch
+                    {
+                        Console.WriteLine("Нет персонажа с таким ID!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\nERR: Нет сгенерированных персонажей.\n");
+                }
+
+                break;
+            }
+
+        case "3":
+            {
+                break;
+            }
+
+        case "4":
+            {
+                if (GlobalData.Characters.Count != 0)
+                {
+                    Console.Write("Выберите персонажа по его ID: ");
+                    int id_in = Convert.ToInt32(Console.ReadLine());
                     Console.WriteLine(GlobalData.Characters[id_in]);
                 }
                 else
@@ -47,15 +109,15 @@ while (true)
                 break;
             }
 
-        case "4":
+        case "5":
             {
                 if (GlobalData.Characters.Count != 0)
                 {
-                    Console.WriteLine("Выберите персонажа по его ID");
+                    Console.Write("Выберите персонажа по его ID: ");
                     int id_in = Convert.ToInt32(Console.ReadLine());
 
                     string fileName = "TEST.json";
-                    string jsonString = JsonSerializer.Serialize(GlobalData.Characters[id_in], options);
+                    var jsonString = JsonConvert.SerializeObject(GlobalData.Characters[id_in]);
                     File.WriteAllText(fileName, jsonString);
 
                     Console.WriteLine(jsonString);

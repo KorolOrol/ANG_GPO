@@ -427,18 +427,18 @@ public class GlobalData
     {
         if (subject.Gender == true)
         {
-            if ((subject.Father == komu.id) || (subject.Mother == komu.id))
+            if ((subject.FatherID == komu.ID) || (subject.MotherID  == komu.ID))
             {
                 Console.WriteLine("{0} является сыном {1}", subject.Name, komu.Name);
             }
-            else if (subject.Father == komu.id)
+            else if (subject.FatherID == komu.ID)
             {
 
             }
         }
         else
         {
-            if ((subject.Father == komu.id) || (subject.Mother == komu.id))
+            if ((subject.FatherID == komu.ID) || (subject.MotherID  == komu.ID))
             {
                 Console.WriteLine("{0} является дочерью {1}", subject.Name, komu.Name);
             }

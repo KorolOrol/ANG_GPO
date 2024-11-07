@@ -13,7 +13,7 @@ public class PrCharacter
 
     #region [PrCharacter characteristics]
 
-    public int id;
+    public int ID;
     
     public string? Name;
     public string? Surname;
@@ -25,8 +25,8 @@ public class PrCharacter
     private const int _MaxPossibleTraits = 10;
     private const int _MaxPossiblePhobias = 3;
 
-    public int ?Mother;
-    public int ?Father;
+    public int ?MotherID;
+    public int ?FatherID;
 
     public Dictionary<int, double> Relations = new Dictionary<int, double>();
     public List<Trait> Traits = new List<Trait>();
@@ -168,7 +168,7 @@ public class PrCharacter
 
             finalRelation /= Traits.Count;
 
-            Relations.Add(opponent.id, Math.Round(finalRelation, 3));
+            Relations.Add(opponent.ID, Math.Round(finalRelation, 3));
         }
     }
 
@@ -326,8 +326,8 @@ public class PrCharacter
             }
         }
 
-        Mother = mama.id;
-        Father = papa.id;
+        MotherID = mama.ID;
+        FatherID = papa.ID;
     }
 
     /// <summary>
@@ -366,8 +366,8 @@ public class PrCharacter
                 }
             }
 
-            Mother = mama.id;
-            Father = papa.id;
+            MotherID = mama.ID;
+            FatherID = papa.ID;
         }
     }
 
@@ -422,8 +422,8 @@ public class PrCharacter
             }
         }
 
-        Mother = mama.id;
-        Father = papa.id;
+        MotherID = mama.ID;
+        FatherID = papa.ID;
     }
 
     /// <summary>
@@ -467,8 +467,8 @@ public class PrCharacter
             }
         }
 
-        Mother = mama.id;
-        Father = papa.id;
+        MotherID = mama.ID;
+        FatherID = papa.ID;
     }
 
     #endregion
@@ -579,17 +579,37 @@ public class PrCharacter
     #endregion
 
     #region [Output]
+    
+    /// <summary>
+    /// Выводит всю информацию о персонаже
+    /// </summary>
+    public void Write()
+    {
+        Console.WriteLine($"ID: {ID}");
+
+        Console.WriteLine($"Имя: {Name}");
+        Console.WriteLine($"Фамилия: {Surname}");
+        Console.WriteLine($"Возраст: {Age}");
+        Console.WriteLine($"Пол: {Gender}");
+        Console.WriteLine($"Описание: {Description}");
+        Console.WriteLine($"Локация: {Location}");
+
+        Console.Write($"Отношения: "); this.WriteRelations();
+        Console.Write($"Черты характера: "); this.WriteAllTraits();
+        Console.Write($"Фобии: "); this.WriteAllPhobias();
+
+    }
 
     /// <summary>
     /// Выводит все черты персонажа
     /// </summary>
     public void WriteAllTraits()
     {
-        Console.Write($"{Name} имеет такие черты: ");
         foreach (var trait in Traits)
         {
             Console.Write($"{trait.Title} ");
         }
+        Console.WriteLine();
     }
 
     /// <summary>
@@ -644,11 +664,11 @@ public class PrCharacter
     /// </summary>
     public void WriteAllPhobias()
     {
-        Console.Write($"{Name} имеет такие фобии: ");
         foreach (var phobia in Phobias)
         {
             Console.Write($"{phobia.Title} ");
         }
+        Console.WriteLine();
     }
 
     /// <summary>
@@ -666,14 +686,13 @@ public class PrCharacter
         }
     }
 
-    /// <summary>
-    /// Выводит описание персонажа
-    /// </summary>
-    public void WriteDesc()
+    public void WriteRelations()
     {
-        CreateDesc();
-        Console.Write($"Персонажа {Name} можно описать так. ");
-        Console.Write(Description);
+        foreach (var relation in Relations)
+        {
+            Console.Write($"{relation}");
+        }
+        Console.WriteLine();
     }
 
     #endregion
@@ -682,7 +701,7 @@ public class PrCharacter
 
     public PrCharacter()
     {
-        this.id = GlobalData.PrCharactersCreated;
+        this.ID = GlobalData.PrCharactersCreated;
 
         GlobalData.PrCharactersCreated++;
         GlobalData.Characters.Add(this);
@@ -692,7 +711,7 @@ public class PrCharacter
     {
         this.Name = name;
         this.Surname = "";
-        this.id = GlobalData.PrCharactersCreated;
+        this.ID = GlobalData.PrCharactersCreated;
 
         GlobalData.PrCharactersCreated++;
         GlobalData.Characters.Add(this);
@@ -704,7 +723,7 @@ public class PrCharacter
         this.Surname = surname;
         this.Age = age;
         this.Gender = gender;
-        this.id = GlobalData.PrCharactersCreated;
+        this.ID = GlobalData.PrCharactersCreated;
 
         GlobalData.PrCharactersCreated++;
         GlobalData.Characters.Add(this);
