@@ -28,7 +28,7 @@ namespace AIGenerator
         /// </summary>
         public JsonSerializerOptions settings = new JsonSerializerOptions
         {
-            /*DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,*/
+            ReferenceHandler = ReferenceHandler.IgnoreCycles,
             Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             IgnoreReadOnlyProperties = true
         };
@@ -243,7 +243,6 @@ namespace AIGenerator
                         parent.Type == ElemType.Character ?
                         ((List<Relation>)newElement.Params["Relations"])
                         .FirstOrDefault(r => r.Character == parent, new()).Value : 0;
-                    //Binder.Bind(parent, newElement, relation);
                 }
                 return element;
             }

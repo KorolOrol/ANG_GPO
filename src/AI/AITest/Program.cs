@@ -3,7 +3,6 @@ using BaseClasses.Enum;
 using BaseClasses.Services;
 using AIGenerator;
 using AIGenerator.TextGenerator;
-using Newtonsoft.Json;
 
 /*
 OpenAIGenerator text = new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host");
@@ -34,10 +33,17 @@ Console.WriteLine(JsonConvert.SerializeObject(new AiElement(c), settings));
 
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
 string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
-LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host"));
+LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host/v1/"));
 Ngen.AIPriority = true;
-Ngen.TextAiGenerator.Model = "gpt-3.5-turbo-0125";
+Ngen.TextAiGenerator.Model = "gpt-4o-mini";
 LlmAiGenerator Ogen = new(promptPath);
+
+/*
+LlmAiGenerator server = new(promptPath);
+server.TextAiGenerator.Endpoint = "http://192.168.1.178:1234/v1/";
+server.TextAiGenerator.Model = "gemma-2-27b-it";
+server.AIPriority = true;
+*/
 
 LlmAiGenerator gen = Ngen;
 
@@ -96,7 +102,7 @@ while (true)
         case "21":
             {
                 Element character = 
-                    (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Character));
+                    (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Character), recursion: 2);
                 Console.WriteLine(plot.FullInfo());
                 break;
             }

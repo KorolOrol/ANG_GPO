@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Betalgo.OpenAI" Version="8.7.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OpenAI" Version="2.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>

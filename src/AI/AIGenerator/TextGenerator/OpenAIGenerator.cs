@@ -1,7 +1,7 @@
 ﻿using OpenAI;
-using OpenAI.Managers;
-using OpenAI.ObjectModels;
-using OpenAI.ObjectModels.RequestModels;
+using OpenAI.Chat;
+using System.ClientModel;
+using System.ClientModel.Primitives;
 using System.Text.RegularExpressions;
 
 namespace AIGenerator.TextGenerator
@@ -24,12 +24,12 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Клиент OpenAI
         /// </summary>
-        private OpenAIService _client;
+        private ChatClient _client;
 
         /// <summary>
         /// Модель для генерации текста
         /// </summary>
-        private string _model = Models.Gpt_3_5_Turbo_1106;
+        private string _model = "gpt-3.5-turbo-1106";
 
         /// <summary>
         /// Ключ API для OpenAI
@@ -40,11 +40,12 @@ namespace AIGenerator.TextGenerator
             set
             {
                 _apiKey = value;
-                Client = new OpenAIService(new OpenAiOptions()
-                {
-                    ApiKey = value,
-                    BaseDomain = Endpoint
-                });
+                Client = new ChatClient(Model, new ApiKeyCredential(ApiKey),
+                    new OpenAIClientOptions
+                    {
+                        Endpoint = new Uri(Endpoint),
+                        NetworkTimeout = TimeSpan.FromMinutes(30)
+                    });
             }
         }
 
@@ -57,11 +58,12 @@ namespace AIGenerator.TextGenerator
             set
             {
                 _endpoint = value;
-                Client = new OpenAIService(new OpenAiOptions()
-                {
-                    ApiKey = ApiKey,
-                    BaseDomain = value
-                });
+                Client = new ChatClient(Model, new ApiKeyCredential(ApiKey),
+                    new OpenAIClientOptions
+                    {
+                        Endpoint = new Uri(Endpoint),
+                        NetworkTimeout = TimeSpan.FromMinutes(30)
+                    });
             }
         }
 
@@ -81,7 +83,7 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Клиент OpenAI
         /// </summary>
-        private OpenAIService Client
+        public ChatClient Client
         {
             get => _client;
             set => _client = value;
@@ -93,7 +95,16 @@ namespace AIGenerator.TextGenerator
         public string Model
         {
             get => _model;
-            set => _model = value;
+            set 
+            {
+                _model = value;
+                Client = new ChatClient(Model, new ApiKeyCredential(ApiKey),
+                    new OpenAIClientOptions
+                    {
+                        Endpoint = new Uri(Endpoint),
+                        NetworkTimeout = TimeSpan.FromMinutes(30)
+                    });
+            }
         }
 
         public bool TrimEnd { get; set; }
@@ -106,33 +117,33 @@ namespace AIGenerator.TextGenerator
         /// <exception cref="Exception">Ошибка генерации текста</exception>
         public async Task<string> GenerateTextAsync(List<string> messages)
         {
-            var completion = await Client.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest()
+            var completion = await Client.CompleteChatAsync(messages.Select(
+                message => ChatMessage.CreateUserMessage(message)));
+            if (completion.Value.FinishReason == ChatFinishReason.Stop)
             {
-                Messages = messages.Select(message => ChatMessage.FromSystem(message)).ToList(),
-                Model = Model
-            });
-            if (completion.Successful)
-            {
-                string trimmedResult = completion.Choices.First().Message.Content;
+                string trimmedResult = completion.Value.Content.First().Text;
                 if (TrimEnd) trimmedResult = TrimRepatingEnd(trimmedResult);
                 trimmedResult = Regex.Match(trimmedResult, 
                                             @"\{.*\}", RegexOptions.Singleline).Value;
+                trimmedResult = trimmedResult.Replace("\n\n", "");
                 if (trimmedResult == "")
                 {
                     throw new Exception("Failed to generate text: " + 
-                        completion.Choices.First().Message.Content);
+                        completion.Value.Content.First().Text);
                 }
                 return trimmedResult;
             }
             else
             {
+                /*
                 await Task.Delay(5000);
                 if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
                 {
                     await Task.Delay(5000);
                     return await GenerateTextAsync(messages);
                 }
-                throw new Exception("Failed to generate text: " + completion.Error.Message);
+                */
+                throw new Exception("Failed to generate text: " + completion.Value.FinishReason);
             }
         }
 
