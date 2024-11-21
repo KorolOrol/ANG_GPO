@@ -3,6 +3,9 @@ using System.ComponentModel;
 
 public class GlobalData
 {
+    public const int _MaxPossibleTraits = 10;
+    public const int _MaxPossiblePhobias = 3;
+
     public static int[,] tabl = new int[,]
     {
         {0, 0, 3, 2, 3, 2, 2, 2, 3, 1, 2, 1, 1, 3, 2, 2, 0, 3, 3, 1, 2, 3, 1, 1, 1, 3, 3, 2, 1, 2, 1, 2, 0, 3, 1, 1, 3, 3, 1, 1, 2},
