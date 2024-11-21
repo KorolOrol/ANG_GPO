@@ -15,18 +15,18 @@ namespace BaseClasses.Services
         /// <param name="mergedElement">Объединяемый элемент</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public static void Merge(IElement baseElement, IElement mergedElement)
+        public static void Merge(IElement baseElement, IElement mergedElement, bool basePriority = true)
         {
             if (baseElement is null || mergedElement is null)
                 throw new ArgumentNullException("Элемент не может быть null.");
             if (baseElement.Type != mergedElement.Type)
                 throw new ArgumentException("Неверный тип элемента.");
 
-            if (baseElement.Name == "")
+            if (baseElement.Name == "" || !basePriority)
             {
                 baseElement.Name = mergedElement.Name;
             }
-            if (baseElement.Description == "")
+            if (baseElement.Description == "" || !basePriority)
             {
                 baseElement.Description = mergedElement.Description;
             }
@@ -90,7 +90,7 @@ namespace BaseClasses.Services
                 }
             }
             
-            mergedElement.Time = Math.Max(baseElement.Time, mergedElement.Time);
+            baseElement.Time = Math.Max(baseElement.Time, mergedElement.Time);
         }
     }
 }
