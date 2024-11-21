@@ -1,6 +1,7 @@
 ﻿using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Enum;
+using Microsoft.VisualBasic;
 
 namespace BaseClasses.Services
 {
@@ -188,18 +189,20 @@ namespace BaseClasses.Services
                 relations2 = (List<Relation>)character2.Params["Relations"];
             }
 
-            if (relations1.FirstOrDefault(rel => rel.Character == character2) != null)
+            var rel1 = relations1.FirstOrDefault(rel => rel.Character == character2);
+            if (rel1 != null)
             {
-                relations1.FirstOrDefault(rel => rel.Character == character2).Value = relations;
+                rel1.Value = relations;
             }
             else
             {
                 relations1.Add(new Relation { Character = character2, Value = relations });
             }
 
-            if (relations2.FirstOrDefault(rel => rel.Character == character1) != null)
+            var rel2 = relations2.FirstOrDefault(rel => rel.Character == character1);
+            if (rel2 != null)
             {
-                relations2.FirstOrDefault(rel => rel.Character == character1).Value = relations;
+                rel2.Value = relations;
             }
             else
             {
