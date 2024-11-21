@@ -31,8 +31,8 @@ Binder.Bind(c, e);
 Console.WriteLine(JsonConvert.SerializeObject(new AiElement(c), settings));
 */
 
-string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\repos\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
+string promptPath = "/home/korolorol/src/ANG_GPO/src/AI/AIGenerator/SystemPromptExample.json";
+string savingPath = "/home/korolorol/src/ANG_GPO/src/AI/AITest/SavingPath/";
 LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host/v1/"));
 Ngen.AIPriority = true;
 Ngen.TextAiGenerator.Model = "gpt-4o-mini";

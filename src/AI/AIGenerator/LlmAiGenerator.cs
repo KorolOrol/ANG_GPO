@@ -34,7 +34,7 @@ namespace AIGenerator
         };
 
         /// <summary>
-        /// Приоретет ИИ над заготовленным материалом
+        /// Приоритет ИИ над заготовленным материалом
         /// </summary>
         public bool AIPriority { get; set; } = false;
 
@@ -204,8 +204,8 @@ namespace AIGenerator
             Queue<(IElement, IElement, int)> generationQueue = null,
             int recursion = 3)
         {
-            bool isRoot = (generationQueue == null);
-            if (isRoot) generationQueue = new();
+            bool isRoot = generationQueue == null;
+            if (generationQueue == null) generationQueue = new();
             List<string> prompts = GetPromptForResponse(plot, preparedElement);
             string response = await TextAiGenerator.GenerateTextAsync(prompts);
             try
@@ -239,10 +239,6 @@ namespace AIGenerator
                 {
                     var (newElement, parent, rec) = generationQueue.Dequeue();
                     newElement = await GenerateChainAsync(plot, newElement, generationQueue, rec);
-                    double relation = newElement.Type == ElemType.Character &&
-                        parent.Type == ElemType.Character ?
-                        ((List<Relation>)newElement.Params["Relations"])
-                        .FirstOrDefault(r => r.Character == parent, new()).Value : 0;
                 }
                 return element;
             }

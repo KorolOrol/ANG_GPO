@@ -1,7 +1,6 @@
 ﻿using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
-using System.ClientModel.Primitives;
 using System.Text.RegularExpressions;
 
 namespace AIGenerator.TextGenerator
@@ -73,7 +72,7 @@ namespace AIGenerator.TextGenerator
         /// <param name="envVar">Имя переменной окружения</param>
         public void GetApiKeyFromEnvironment(string envVarName)
         {
-            string envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            string envVar = Environment.GetEnvironmentVariable(envVarName);
             if (envVar != null)
             {
                 ApiKey = envVar;
@@ -122,7 +121,7 @@ namespace AIGenerator.TextGenerator
             if (completion.Value.FinishReason == ChatFinishReason.Stop)
             {
                 string trimmedResult = completion.Value.Content.First().Text;
-                if (TrimEnd) trimmedResult = TrimRepatingEnd(trimmedResult);
+                if (TrimEnd) trimmedResult = TrimRepeatingEnd(trimmedResult);
                 trimmedResult = Regex.Match(trimmedResult, 
                                             @"\{.*\}", RegexOptions.Singleline).Value;
                 trimmedResult = trimmedResult.Replace("\n\n", "");
@@ -168,7 +167,7 @@ namespace AIGenerator.TextGenerator
             TrimEnd = true;
         }
 
-        private string TrimRepatingEnd(string input)
+        private string TrimRepeatingEnd(string input)
         {
             for (int i = (int)Math.Floor((double)input.Length / 2); i > 0 ; i--)
             {
