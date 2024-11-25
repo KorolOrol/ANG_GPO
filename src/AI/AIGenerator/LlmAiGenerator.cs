@@ -45,7 +45,7 @@ namespace AIGenerator
         public void LoadSystemPrompt(string path)
         {
             SystemPrompt =
-                JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path));
+                JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path))!;
         }
 
         /// <summary>
@@ -77,20 +77,8 @@ namespace AIGenerator
         /// <returns>Объединенный компонент</returns>
         private IElement Merge(IElement preparedElement, IElement aiElement)
         {
-            if (!preparedElement.IsEmpty())
-            {
-                if (AIPriority)
-                {
-                    Merger.Merge(aiElement, preparedElement);
-                    return aiElement;
-                }
-                else
-                {
-                    Merger.Merge(preparedElement, aiElement);
-                    return preparedElement;
-                }
-            }
-            return aiElement;
+            Merger.Merge(preparedElement, aiElement, !AIPriority);
+            return preparedElement;
         }
 
         /// <summary>
@@ -178,7 +166,7 @@ namespace AIGenerator
             try
             {
                 AiElement aiElement =
-                    JsonSerializer.Deserialize<AiElement>(response);
+                    JsonSerializer.Deserialize<AiElement>(response)!;
                 aiElement.ParamsJsonToSystem();
                 IElement element = Merge(preparedElement, aiElement.Element(plot));
                 plot.Add(element);
@@ -201,7 +189,7 @@ namespace AIGenerator
         /// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
         public async Task<IElement> GenerateChainAsync(Plot plot,
             IElement preparedElement,
-            Queue<(IElement, IElement, int)> generationQueue = null,
+            Queue<(IElement, IElement, int)>? generationQueue = null,
             int recursion = 3)
         {
             bool isRoot = generationQueue == null;
@@ -211,7 +199,7 @@ namespace AIGenerator
             try
             {
                 AiElement aiElement =
-                    JsonSerializer.Deserialize<AiElement>(response);
+                    JsonSerializer.Deserialize<AiElement>(response)!;
                 aiElement.ParamsJsonToSystem();
                 IElement element = Merge(preparedElement, aiElement.Element(plot));
                 plot.Add(element);
@@ -229,9 +217,18 @@ namespace AIGenerator
                                 relation = 
                                     ((Dictionary<string, double>)aiElement.Params["Relations"])[e];
                             }
-                            Element newElement = new Element(type, e);
-                            Binder.Bind(element, newElement, relation);
-                            generationQueue.Enqueue((newElement, element, recursion - 1));
+                            IElement? queuedElement = 
+                                generationQueue.FirstOrDefault(q => q.Item1.Name == e).Item1;
+                            if (queuedElement != null)
+                            {
+                                Binder.Bind(queuedElement, element, relation);
+                            }
+                            else 
+                            {
+                                Element newElement = new Element(type, e);
+                                Binder.Bind(element, newElement, relation);
+                                generationQueue.Enqueue((newElement, element, recursion - 1));
+                            }
                         }
                     }
                 }

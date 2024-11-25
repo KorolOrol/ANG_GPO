@@ -24,29 +24,43 @@ namespace AIGenerator
             {
                 switch (kvp.Value)
                 {
-                    case List<IElement> elements:
+                    case List<object> list:
                         {
-                            List<string> list = new List<string>();
-                            foreach (IElement el in elements)
+                            switch (list.First())
                             {
-                                list.Add(el.Name);
+                                case IElement:
+                                    {
+                                        List<string> strList = new List<string>();
+                                        foreach (IElement e in list)
+                                        {
+                                            strList.Add(e.Name);
+                                        }
+                                        Params.Add(kvp.Key, strList);
+                                    }
+                                    break;
+                                case Relation:
+                                    {
+                                        Dictionary<string, double> dict = 
+                                            new Dictionary<string, double>();
+                                        foreach (Relation r in list)
+                                        {
+                                            dict.Add(r.Character.Name, r.Value);
+                                        }
+                                        Params.Add(kvp.Key, dict);
+                                    }
+                                    break;
+                                case string:
+                                    {
+                                        Params.Add(kvp.Key, list);
+                                    }
+                                    break;
                             }
-                            Params.Add(kvp.Key, list);
+
                         }
                         break;
                     case IElement el:
                         {
                             Params.Add(kvp.Key, el.Name);
-                        }
-                        break;
-                    case List<Relation> relationships:
-                        {
-                            Dictionary<string, double> dict = new Dictionary<string, double>();
-                            foreach (Relation relation in relationships)
-                            {
-                                dict.Add(relation.Character.Name, relation.Value);
-                            }
-                            Params.Add(kvp.Key, dict);
                         }
                         break;
                     default:
@@ -75,8 +89,8 @@ namespace AIGenerator
                             foreach (KeyValuePair<string, double> rel in 
                                 (Dictionary<string, double>)kvp.Value)
                             {
-                                IElement foundCharacter = plot.Characters.FirstOrDefault(
-                                    c => c.Name == rel.Key);
+                                IElement? foundCharacter = 
+                                    plot.Characters.FirstOrDefault(c => c.Name == rel.Key);
                                 if (foundCharacter != null)
                                 {
                                     Binder.Bind(element, foundCharacter, rel.Value);
@@ -91,7 +105,7 @@ namespace AIGenerator
                         {
                             foreach (string name in (List<string>)kvp.Value)
                             {
-                                IElement foundElement = plot.Elements.FirstOrDefault(e => e.Name == name);
+                                IElement? foundElement = plot.Elements.FirstOrDefault(e => e.Name == name);
                                 if (foundElement != null)
                                 {
                                     Binder.Bind(element, foundElement);
@@ -103,8 +117,8 @@ namespace AIGenerator
                     case "Location":
                         {
                             if (element.Type != ElemType.Item) break;
-                            IElement foundElement = plot.Elements.FirstOrDefault(
-                                element => element.Name == kvp.Value);
+                            IElement? foundElement = plot.Elements.FirstOrDefault(
+                                element => element.Name == kvp.Value.ToString());
                             if (foundElement != null)
                             {
                                 Binder.Bind(element, foundElement);

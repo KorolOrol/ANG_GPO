@@ -36,6 +36,7 @@ string savingPath = "/home/korolorol/src/ANG_GPO/src/AI/AITest/SavingPath/";
 LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host/v1/"));
 Ngen.AIPriority = true;
 Ngen.TextAiGenerator.Model = "gpt-4o-mini";
+((OpenAIGenerator)Ngen.TextAiGenerator).TrimEnd = false;
 LlmAiGenerator Ogen = new(promptPath);
 
 /*
@@ -68,8 +69,8 @@ while (true)
     Console.WriteLine("03: Загрузить из файла");
     Console.WriteLine("04: Напечатать в файл");
     Console.WriteLine("0: Выход");
-    string choise = Console.ReadLine();
-    switch (choise)
+    string choice = Console.ReadLine()!;
+    switch (choice)
     {
         case "11":
             {
@@ -130,10 +131,10 @@ while (true)
         case "31":
             {
                 Element preparedCharacter = new Element(ElemType.Character);
-                preparedCharacter.Name = Console.ReadLine();
-                preparedCharacter.Description = Console.ReadLine();
-                Element foundLocation = 
-                    (Element)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                preparedCharacter.Name = Console.ReadLine()!;
+                preparedCharacter.Description = Console.ReadLine()!;
+                Element? foundLocation = 
+                    (Element?)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
                 if (foundLocation != null)
                 {
                     Binder.Bind(preparedCharacter, foundLocation);
@@ -145,10 +146,10 @@ while (true)
         case "32":
             {
                 Element preparedLocation = new Element(ElemType.Location);
-                preparedLocation.Name = Console.ReadLine();
-                preparedLocation.Description = Console.ReadLine();
-                Element foundCharacter = 
-                    (Element)plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine());
+                preparedLocation.Name = Console.ReadLine()!;
+                preparedLocation.Description = Console.ReadLine()!;
+                Element? foundCharacter = 
+                    (Element?)plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine());
                 if (foundCharacter != null)
                 {
                     Binder.Bind(preparedLocation, foundCharacter);
@@ -160,10 +161,10 @@ while (true)
         case "33":
             {
                 Element preparedItem = new Element(ElemType.Item);
-                preparedItem.Name = Console.ReadLine();
-                preparedItem.Description = Console.ReadLine();
-                Element foundLocation = 
-                    (Element)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                preparedItem.Name = Console.ReadLine()!;
+                preparedItem.Description = Console.ReadLine()!;
+                Element? foundLocation = 
+                    (Element?)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
                 if (foundLocation != null)
                 {
                     Binder.Bind(preparedItem, foundLocation);
@@ -175,10 +176,10 @@ while (true)
         case "34":
             {
                 Element preparedEvent = new Element(ElemType.Event);
-                preparedEvent.Name = Console.ReadLine();
-                preparedEvent.Description = Console.ReadLine();
-                Element foundLocation = 
-                    (Element)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                preparedEvent.Name = Console.ReadLine()!;
+                preparedEvent.Description = Console.ReadLine()!;
+                Element? foundLocation = 
+                    (Element?)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
                 if (foundLocation != null)
                 {
                     Binder.Bind(preparedEvent, foundLocation);
@@ -192,19 +193,19 @@ while (true)
             break;
         case "02":
             {
-                string name = Console.ReadLine();
+                string name = Console.ReadLine()!;
                 Serializer.Serialize(plot, savingPath + name + ".txt");
                 break;
             }
         case "03":
             {
-                string name = Console.ReadLine();
+                string name = Console.ReadLine()!;
                 plot = Serializer.Deserialize<Plot>(savingPath + name + ".txt");
                 break;
             }
         case "04":
             {
-                string name = Console.ReadLine();
+                string name = Console.ReadLine()!;
                 Serializer.Print(plot, savingPath + name + ".txt");
                 break;
             }
