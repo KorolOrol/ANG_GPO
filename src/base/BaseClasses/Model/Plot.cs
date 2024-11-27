@@ -19,7 +19,12 @@ namespace BaseClasses.Model
         /// Добавление элемента в историю
         /// </summary>
         /// <param name="element">Элемент</param>
-        public void Add(IElement element) { Elements.Add(element); }
+        public void Add(IElement element) 
+        {
+            if (Elements.Contains(element)) return;
+            if (element.Time == -1) element.Time = Time++;
+            Elements.Add(element); 
+        }
 
         /// <summary>
         /// Персонажи
