@@ -77,7 +77,6 @@ namespace AIGenerator
             Element element = new Element((ElemType)Enum.Parse(typeof(ElemType), Type), 
                                           Name, Description);
             var par = element.Params;
-            element.Time = plot.Time++;
             foreach (KeyValuePair<string, object> kvp in Params)
             {
                 switch (kvp.Key)
