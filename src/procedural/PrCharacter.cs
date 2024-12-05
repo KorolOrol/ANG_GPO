@@ -66,7 +66,7 @@ public class PrCharacter
     {
         foreach (var trait in Traits)
         {
-            Console.Write($"{trait.Title} ");
+            Console.Write($"{trait.Title} ({trait.Affection}) ");
         }
         Console.WriteLine();
     }

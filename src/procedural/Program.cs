@@ -18,9 +18,10 @@ Console.WindowWidth = 150;
 PrGenerator.CreateByLogicRandomTraits(Tony, 4);
 
 PrCharacter Pain = new PrCharacter("Пейн", "Фуфил", 25, true);
-Pain.CreateByLogicRandomTraits(4);
+PrGenerator.CreateByLogicRandomTraits(Pain, 4);
 
-Tony.GetRelations(Pain);*/
+PrCharacter Kid = new PrCharacter();
+PrGenerator.CreateByTwoParentsHalfRandomTraits(Kid, 3, Tony, Pain, "Кид");*/
 
 bool? checkGender(string input_gender)
 {
