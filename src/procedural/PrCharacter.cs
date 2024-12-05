@@ -188,7 +188,7 @@ public class PrCharacter
         GlobalData.Characters.Add(this);
     }*/
 
-    public PrCharacter(string name, string surname = "", int age = 0, bool gender = false)
+    public PrCharacter(string name, string surname = "", int age = 0, bool? gender = null)
     {
         this.ID = GlobalData.PrCharactersCreated;
         this.Name = name;
@@ -201,7 +201,7 @@ public class PrCharacter
         {
             this.Age = age;
         }
-        if (gender != false)
+        if (gender != null)
         {
             this.Gender = gender;
         }
@@ -212,91 +212,4 @@ public class PrCharacter
 
     #endregion
 
-    #region [Deprecated methods]
-
-    /// <summary>
-    /// Проверяет черту по всем якорям.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="anchor"></param>
-    /// <returns></returns>
-    public bool CheckTablAnchor(int id, int anchor)
-    {
-        foreach (Trait a in Traits)
-        {
-
-            if (GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), id] == 0 || GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), id] != anchor)
-            {
-                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
-                return false;
-            }
-
-            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
-        }
-
-        /*Console.WriteLine("");*/
-        return true;
-    }
-
-    /// <summary>
-    /// Проверяет возможность создания персонажа с введённым якорем.
-    /// </summary>
-    /// <param name="anchor"></param>
-    /// <param name="traits_count"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    public bool CheckAnchorPossibility(int anchor, int traits_count, int id)
-    {
-        int cnt = 0;
-
-        for (int i = 0; i < GlobalData.TraitsList.Count; i++)
-        {
-            if (GlobalData.tabl[id, i] == anchor)
-            {
-                cnt++;
-            }
-        }
-
-        if (cnt < traits_count)
-        {
-            Console.WriteLine("Черты были очищены, потому что черта {0} имеет cnt {1}", GlobalData.TraitsList[id].Title, cnt);
-            return false;
-        }
-
-        Console.WriteLine("");
-        return true;
-    }
-
-
-    /// <summary>
-    /// Создание персонажа через "якорь". Якорь - число от 0 до 3. Чем якорь больше, тем персонаж будет интереснее (сомнительнее)
-    /// </summary>
-    /// <param name="traits_count"></param>
-    /// <param name="anchor"></param>
-    [Obsolete("CreateByAnchorLogic is deprecated, please use CreateByAnchorLogic instead."/*, true*/)]
-    public void CreateByAnchorLogic(int traits_count, int anchor)
-    {
-        if (_MaxPossibleTraits < traits_count)
-        {
-            Console.WriteLine("Недостаточно черт в базе данных");
-        }
-        else
-        {
-            for (int iv = 0; iv < traits_count; iv++)
-            {
-                var random = new Random().Next(GlobalData.TraitsList.Count);
-
-                if (CheckAnchorPossibility(anchor, traits_count, random) && CheckTablAnchor(random, anchor))
-                {
-                    Traits.Add(GlobalData.TraitsList[random]);
-                }
-                else
-                {
-                    iv--;
-                }
-            }
-        }
-    }
-
-    #endregion
 }

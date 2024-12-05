@@ -8,17 +8,35 @@ using System.Drawing;
 using System.Runtime.CompilerServices;
 
 string choice;
+bool isGeneratingTraits = true;
+bool isGeneratingPhobias = true;
 
 Console.BackgroundColor = ConsoleColor.DarkGray;
 Console.WindowWidth = 150;
 
 /*PrCharacter Tony = new PrCharacter("Тони", "Сальвоне", 25, true);
-Tony.CreateByLogicRandomTraits(4);
+PrGenerator.CreateByLogicRandomTraits(Tony, 4);
 
 PrCharacter Pain = new PrCharacter("Пейн", "Фуфил", 25, true);
 Pain.CreateByLogicRandomTraits(4);
 
 Tony.GetRelations(Pain);*/
+
+bool? checkGender(string input_gender)
+{
+    List<string> Males = new List<string> {"Male", "M", "Мужчина", "М", "1", "True"};
+    List<string> Females = new List<string> { "Female", "F", "Женщина", "Ж", "0", "False" };
+
+    if (Males.Contains(input_gender))
+    {
+        return true;
+    }
+    else if (Females.Contains(input_gender))
+    {
+        return false;
+    }
+    return null;
+}
 
 while (true)
 {
@@ -43,7 +61,7 @@ while (true)
 
                 switch (gen_choice)
                 {
-                    case "1":
+                    case "1": // 1 - С нуля
                         {
                             Console.WriteLine("Выберите вид генерации с нуля:");
                             Console.Write("1 - Хаотический (черты характеры могут быть несовместимы), 2 - Логический (черты характера будут совместимы друг с другом): ");
@@ -62,7 +80,7 @@ while (true)
                                         string temp_name = "";
                                         string temp_surname = "";
                                         int temp_age = 0;
-                                        bool temp_gender = false;
+                                        bool? temp_gender = false;
 
                                         if (character.Length > 4)
                                         {
@@ -73,7 +91,7 @@ while (true)
                                             temp_name = character[0];
                                             temp_surname = character[1];
                                             temp_age = Convert.ToInt32(character[2]);
-                                            temp_gender = Convert.ToBoolean(character[3]);
+                                            temp_gender = checkGender(character[3]);
                                         }
                                         else if (character.Length == 3) // TO DO: Более умная проверка, что данные введены те. А не, например, 0 0 Макс 
                                         {
@@ -96,15 +114,59 @@ while (true)
                                         }
 
                                         PrCharacter prCharacter = new PrCharacter(temp_name, temp_surname, temp_age, temp_gender);
-                                        // PrGenerator.CreateByChaoticRandomTraits(prCharacter, 5);
+                                        PrGenerator.CreateByChaoticRandomTraits(prCharacter, 5);
+                                        PrGenerator.CreateByChaoticRandomPhobias(prCharacter, 1);
+                                        PrGenerator.CreateDesc(prCharacter);
 
                                         break;
                                     }
+
                                 case "2":
                                     {
                                         Console.WriteLine("Введите Имя {Фамилия} {Возраст} {Пол}. {} - необязательный параметр");
-                                        string character = Console.ReadLine();
-                                        // CreateByLogicRandomTraits
+                                        Console.WriteLine("Возраст - число | Пол - false/true (женский/мужской)");
+                                        string[] character = Console.ReadLine().Split();
+
+                                        string temp_name = "";
+                                        string temp_surname = "";
+                                        int temp_age = 0;
+                                        bool? temp_gender = false;
+
+                                        if (character.Length > 4)
+                                        {
+                                            Console.WriteLine("\nERR: Слишком много параметров.\n");
+                                        }
+                                        else if (character.Length == 4)
+                                        {
+                                            temp_name = character[0];
+                                            temp_surname = character[1];
+                                            temp_age = Convert.ToInt32(character[2]);
+                                            temp_gender = checkGender(character[3]);
+                                        }
+                                        else if (character.Length == 3) // TO DO: Более умная проверка, что данные введены те. А не, например, 0 0 Макс 
+                                        {
+                                            temp_name = character[0];
+                                            temp_surname = character[1];
+                                            temp_age = Convert.ToInt32(character[2]);
+                                        }
+                                        else if (character.Length == 2)
+                                        {
+                                            temp_name = character[0];
+                                            temp_surname = character[1];
+                                        }
+                                        else if (character.Length == 1)
+                                        {
+                                            temp_name = character[0];
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("\nERR: Неправильный запрос.\n");
+                                        }
+
+                                        PrCharacter prCharacter = new PrCharacter(temp_name, temp_surname, temp_age, temp_gender);
+                                        PrGenerator.CreateByLogicRandomTraits(prCharacter, 5);
+                                        PrGenerator.CreateByChaoticRandomPhobias(prCharacter, 1);
+                                        PrGenerator.CreateDesc(prCharacter);
                                         break;
                                     }
 
@@ -120,17 +182,17 @@ while (true)
                             break;
                         }
 
-                    case "2":
+                    case "2": // 2 - С помощью родителей
                         {
                             break;
                         }
 
-                    case "3":
+                    case "3": // 3 - С введённых черт
                         {
                             break;
                         }
 
-                    case "4":
+                    case "4": // 4 - С шума
                         {
                             Console.WriteLine("WIP");
                             break;
@@ -150,7 +212,8 @@ while (true)
             {
                 if (GlobalData.Characters.Count != 0)
                 {
-                    Console.Write("Выберите персонажа по его ID: ");
+                    GlobalData.printAllPrCharacters();
+                    Console.Write("\nВыберите персонажа по его ID: ");
                     int id_in = Convert.ToInt32(Console.ReadLine());
                     try
                     {
@@ -196,7 +259,7 @@ while (true)
                     Console.Write("Выберите персонажа по его ID: ");
                     int id_in = Convert.ToInt32(Console.ReadLine());
 
-                    string fileName = "TEST.json";
+                    string fileName = $"{GlobalData.Characters[id_in].ID} _ {GlobalData.Characters[id_in].Name}.json";
                     var jsonString = JsonConvert.SerializeObject(GlobalData.Characters[id_in]);
                     File.WriteAllText(fileName, jsonString);
 

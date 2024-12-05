@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 
 public class GlobalData
 {
@@ -456,6 +457,14 @@ public class GlobalData
             PrCharacter parent = 
             return parent;
         }*/
+
+    public static void printAllPrCharacters()
+    {
+        foreach (var PrCharacter in Characters)
+        {
+            Console.WriteLine($"{PrCharacter.ID} {PrCharacter.Name}");
+        }
+    }
 
     public static int PrCharactersCreated = 0;
 
