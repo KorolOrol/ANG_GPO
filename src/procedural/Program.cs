@@ -23,22 +23,6 @@ PrGenerator.CreateByLogicRandomTraits(Pain, 4);
 PrCharacter Kid = new PrCharacter();
 PrGenerator.CreateByTwoParentsHalfRandomTraits(Kid, 3, Tony, Pain, "Кид");*/
 
-bool? checkGender(string input_gender)
-{
-    List<string> Males = new List<string> {"Male", "M", "Мужчина", "М", "1", "True"};
-    List<string> Females = new List<string> { "Female", "F", "Женщина", "Ж", "0", "False" };
-
-    if (Males.Contains(input_gender))
-    {
-        return true;
-    }
-    else if (Females.Contains(input_gender))
-    {
-        return false;
-    }
-    return null;
-}
-
 while (true)
 {
     Console.WriteLine("\nВыберите:");
@@ -92,7 +76,7 @@ while (true)
                                             temp_name = character[0];
                                             temp_surname = character[1];
                                             temp_age = Convert.ToInt32(character[2]);
-                                            temp_gender = checkGender(character[3]);
+                                            temp_gender = GlobalData.checkGender(character[3]);
                                         }
                                         else if (character.Length == 3) // TO DO: Более умная проверка, что данные введены те. А не, например, 0 0 Макс 
                                         {
@@ -142,7 +126,7 @@ while (true)
                                             temp_name = character[0];
                                             temp_surname = character[1];
                                             temp_age = Convert.ToInt32(character[2]);
-                                            temp_gender = checkGender(character[3]);
+                                            temp_gender = GlobalData.checkGender(character[3]);
                                         }
                                         else if (character.Length == 3) // TO DO: Более умная проверка, что данные введены те. А не, например, 0 0 Макс 
                                         {

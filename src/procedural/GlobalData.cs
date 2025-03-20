@@ -466,6 +466,22 @@ public class GlobalData
         }
     }
 
+    public static bool? checkGender(string input_gender)
+    {
+        List<string> Males = new List<string> { "Male", "M", "Мужчина", "М", "1", "True" };
+        List<string> Females = new List<string> { "Female", "F", "Женщина", "Ж", "0", "False" };
+
+        if (Males.Contains(input_gender))
+        {
+            return true;
+        }
+        else if (Females.Contains(input_gender))
+        {
+            return false;
+        }
+        return null;
+    }
+
     public static int PrCharactersCreated = 0;
 
     public static List<PrCharacter> Characters = new List<PrCharacter>();
