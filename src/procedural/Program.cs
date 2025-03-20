@@ -169,6 +169,61 @@ while (true)
 
                     case "2": // 2 - С помощью родителей
                         {
+                            Console.WriteLine("Выберите вид генерации:");
+                            Console.Write("1 - Хаотический (черты характеры могут быть несовместимы), 2 - Логический (черты характера будут совместимы друг с другом): ");
+                            string first_choice = Console.ReadLine();
+
+                            Console.WriteLine();
+
+                            switch (first_choice)
+                            {
+                                case "1":
+                                    Console.WriteLine("Выберите вид генерации:");
+                                    Console.Write("1 - С дополнительной генерацией черт, 2 - Половина от Мамы и Папы: ");
+                                    string second_choice = Console.ReadLine();
+
+                                    Console.WriteLine();
+
+                                    switch (second_choice)
+                                    {
+                                        case "1":
+                                            break;
+
+                                        case "2":
+                                            Console.Write("\nВведите ID Мамы: ");
+                                            int mom_id = Convert.ToInt32(Console.ReadLine());
+
+                                            Console.Write("\nВведите ID Папы: ");
+                                            int dad_id = Convert.ToInt32(Console.ReadLine());
+
+                                            PrCharacter temp_mama;
+                                            PrCharacter temp_papa;
+
+                                            try
+                                            {
+                                                temp_mama = GlobalData.Characters[mom_id];
+                                                temp_papa = GlobalData.Characters[dad_id];
+
+
+                                                PrCharacter prCharacter = new PrCharacter();
+                                                PrGenerator.CreateByTwoParentsHalfRandomTraits(prCharacter, 3, temp_mama, temp_papa, "Новенький");
+                                                PrGenerator.CreateByChaoticRandomPhobias(prCharacter, 1);
+                                                PrGenerator.CreateDesc(prCharacter);
+
+                                            }
+                                            catch
+                                            {
+                                                Console.WriteLine("Нет персонажа с таким ID!");
+                                                //CreateByTwoParentsHalfTraits();
+                                            }
+
+                                            break;
+                                    }
+                                    break;
+
+                                case "2":
+                                    break;
+                            }
                             break;
                         }
 

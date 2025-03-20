@@ -172,7 +172,12 @@ public class PrGenerator
         }
         else
         {
+            Random rand = new Random();
+
             character.Name = name;
+            character.Surname = papa.Surname;
+
+            character.Gender = rand.NextDouble() >= 0.5;
 
             List<Trait> combined_traits = new List<Trait> { };
             combined_traits.AddRange(mama.Traits);
