@@ -238,5 +238,25 @@ namespace BaseClasses.Tests.Services
             Assert.Contains("Value1", (List<string>)baseElement.Params["Param1"]);
             Assert.Contains("Value2", (List<string>)baseElement.Params["Param1"]);
         }
+
+        /// <summary>
+        /// Объединение элементов с одним элементом в параметрах
+        /// Ожидание: Привязка элемента к базовому элементу
+        /// </summary>
+        [Fact]
+        public void Merge_WithElementInParams_BindsElementToBaseElement()
+        {
+            // Arrange
+            Element baseElement = new Element(ElemType.Item, "Name", "Description");
+            Element mergedElement = new Element(ElemType.Item, "Name2", "Description2");
+            Element host = new Element(ElemType.Character, "Host", "Host description");
+            Binder.Bind(mergedElement, host);
+            // Act
+            Merger.Merge(baseElement, mergedElement);
+            // Assert
+            Assert.Equal("Name", baseElement.Name);
+            Assert.Equal("Description", baseElement.Description);
+            Assert.Equal(host, (Element)baseElement.Params["Host"]);
+        }
     }
 }
