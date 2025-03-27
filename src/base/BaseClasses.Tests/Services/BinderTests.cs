@@ -940,5 +940,265 @@ namespace BaseClasses.Tests.Services
                 Assert.Empty((List<IElement>)@event.Params["Characters"]);
             }
         }
+
+        /// <summary>
+        /// Тесты для класса Binder. Связывание и разрыв связей предметов и локаций.
+        /// </summary>
+        public class BinderItemLocTests
+        {
+            /// <summary>
+            /// Связывание предмета и локации.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_ItemAndLocation_SuccessfulBinding()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item);
+                var location = new Element(ElemType.Location);
+                // Act
+                Binder.Bind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(item.Params["Location"] is IElement);
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.NotNull((IElement)item.Params["Location"]);
+                Assert.Single((List<IElement>)location.Params["Items"]);
+                Assert.Equal(location, (IElement)item.Params["Location"]);
+                Assert.Equal(item, ((List<IElement>)location.Params["Items"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание предмета и локации с ненулевым значением отношения.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_ItemAndLocationWithNonZeroRelation_SuccessfulBinding()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item);
+                var location = new Element(ElemType.Location);
+                // Act
+                Binder.Bind(item, location, 1);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(item.Params["Location"] is IElement);
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.NotNull((IElement)item.Params["Location"]);
+                Assert.Single((List<IElement>)location.Params["Items"]);
+                Assert.Equal(location, (IElement)item.Params["Location"]);
+                Assert.Equal(item, ((List<IElement>)location.Params["Items"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание предмета и локации, когда предмет уже содержит локацию.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_ItemWithLocation_SuccessfulBinding()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location);
+                var item = new Element(ElemType.Item, @params: new Dictionary<string, object> { 
+                    { "Location", location } });
+                // Act
+                Binder.Bind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(item.Params["Location"] is IElement);
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.NotNull((IElement)item.Params["Location"]);
+                Assert.Single((List<IElement>)location.Params["Items"]);
+                Assert.Equal(location, (IElement)item.Params["Location"]);
+                Assert.Equal(item, ((List<IElement>)location.Params["Items"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание предмета и локации, когда локация уже содержит предмет.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_LocationWithItem_SuccessfulBinding()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item);
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Items", new List<IElement> { item } } });
+                // Act
+                Binder.Bind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(item.Params["Location"] is IElement);
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.NotNull((IElement)item.Params["Location"]);
+                Assert.Single((List<IElement>)location.Params["Items"]);
+                Assert.Equal(location, (IElement)item.Params["Location"]);
+                Assert.Equal(item, ((List<IElement>)location.Params["Items"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание предмета и локации, которые уже связаны.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Bind_BoundItemAndLocation_NoChanges()
+            {
+                // Arrange
+                Bind_ItemAndLocation_SuccessfulBinding();
+                var item = new Element(ElemType.Item);
+                var location = new Element(ElemType.Location);
+                Binder.Bind(item, location);
+                // Act
+                Binder.Bind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(item.Params["Location"] is IElement);
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.NotNull((IElement)item.Params["Location"]);
+                Assert.Single((List<IElement>)location.Params["Items"]);
+                Assert.Equal(location, (IElement)item.Params["Location"]);
+                Assert.Equal(item, ((List<IElement>)location.Params["Items"])[0]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между предметом и локацией.
+            /// Ожидание: успешное разрывание связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_ItemAndLocation_SuccessfulUnbinding()
+            {
+                // Arrange
+                Bind_ItemAndLocation_SuccessfulBinding();
+                var item = new Element(ElemType.Item);
+                var location = new Element(ElemType.Location);
+                Binder.Bind(item, location);
+                // Act
+                Binder.Unbind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.Null((IElement)item.Params["Location"]);
+                Assert.Empty((List<IElement>)location.Params["Items"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между предметом и локацией, когда предмет не содержит локации.
+            /// Ожидание: разрыв существующей связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_ItemWithoutLocation_SuccessfulUnbinding()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item, @params: new Dictionary<string, object> {
+                    { "Location", null } });
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Items", new List<IElement>() } });
+                // Act
+                Binder.Unbind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.Null((IElement)item.Params["Location"]);
+                Assert.Empty((List<IElement>)location.Params["Items"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между предметом и локацией, когда локация не содержит предмета.
+            /// Ожидание: разрыв существующей связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_LocationWithoutItem_SuccessfulUnbinding()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Items", new List<IElement>() } });
+                var item = new Element(ElemType.Item, @params: new Dictionary<string, object> {
+                    { "Location", location } });
+                // Act
+                Binder.Unbind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.Null((IElement)item.Params["Location"]);
+                Assert.Empty((List<IElement>)location.Params["Items"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между предметом и локацией, когда предмет и локация не связаны.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_UnboundItemAndLocation_NoChanges()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item);
+                var location = new Element(ElemType.Location);
+                // Act
+                Binder.Unbind(item, location);
+                // Assert
+                Assert.False(item.Params.ContainsKey("Location"));
+                Assert.False(location.Params.ContainsKey("Items"));
+            }
+
+            /// <summary>
+            /// Разрыв связи между предметом и локацией, которые имеют пустые параметры для хранения связей.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_EmptyItemAndLocation_NoChanges()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item, @params: new Dictionary<string, object> {
+                    { "Location", null } });
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Items", new List<IElement>() } });
+                // Act
+                Binder.Unbind(item, location);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location.Params.ContainsKey("Items"));
+                Assert.True(location.Params["Items"] is List<IElement>);
+                Assert.Null((IElement)item.Params["Location"]);
+                Assert.Empty((List<IElement>)location.Params["Items"]);
+            }
+
+            /// <summary>
+            /// Переприязка предмета к другой локации.
+            /// Ожидание: разрыв существующей связи и успешное связывание с новой локацией.
+            /// </summary>
+            [Fact]
+            public void Rebind_ItemToAnotherLocation_SuccessfulRebinding()
+            {
+                // Arrange
+                Bind_ItemAndLocation_SuccessfulBinding();
+                Unbind_ItemAndLocation_SuccessfulUnbinding();
+                var location1 = new Element(ElemType.Location);
+                var location2 = new Element(ElemType.Location);
+                var item = new Element(ElemType.Item);
+                Binder.Bind(item, location1);
+                // Act
+                Binder.Bind(item, location2);
+                // Assert
+                Assert.True(item.Params.ContainsKey("Location"));
+                Assert.True(location1.Params.ContainsKey("Items"));
+                Assert.True(location2.Params.ContainsKey("Items"));
+                Assert.True(item.Params["Location"] is IElement);
+                Assert.True(location1.Params["Items"] is List<IElement>);
+                Assert.True(location2.Params["Items"] is List<IElement>);
+                Assert.NotNull((IElement)item.Params["Location"]);
+                Assert.Empty((List<IElement>)location1.Params["Items"]);
+                Assert.Single((List<IElement>)location2.Params["Items"]);
+                Assert.Equal(location2, (IElement)item.Params["Location"]);
+                Assert.Equal(item, ((List<IElement>)location2.Params["Items"])[0]);
+            }
+        }
     }
 }
