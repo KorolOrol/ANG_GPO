@@ -706,5 +706,239 @@ namespace BaseClasses.Tests.Services
                 Assert.Empty((List<IElement>)location.Params["Characters"]);
             }
         }
+
+        /// <summary>
+        /// Тесты для класса Binder. Связывание и разрыв связей персонажей и событий.
+        /// </summary>
+        public class BinderCharEventTests
+        {
+            /// <summary>
+            /// Связывание персонажа и события.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_CharacterAndEvent_SuccessfulBinding()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character);
+                var @event = new Element(ElemType.Event);
+                // Act
+                Binder.Bind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Single((List<IElement>)character.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Characters"]);
+                Assert.Equal(@event, ((List<IElement>)character.Params["Events"])[0]);
+                Assert.Equal(character, ((List<IElement>)@event.Params["Characters"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание персонажа и события с ненулевым значением отношения.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_CharacterAndEventWithNonZeroRelation_SuccessfulBinding()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character);
+                var @event = new Element(ElemType.Event);
+                // Act
+                Binder.Bind(character, @event, 1);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Single((List<IElement>)character.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Characters"]);
+                Assert.Equal(@event, ((List<IElement>)character.Params["Events"])[0]);
+                Assert.Equal(character, ((List<IElement>)@event.Params["Characters"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание персонажа и события, когда персонаж уже содержит событие.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_CharacterWithEvent_SuccessfulBinding()
+            {
+                // Arrange
+                var @event = new Element(ElemType.Event);
+                var character = new Element(ElemType.Character, @params:
+                    new Dictionary<string, object> { { "Events", new List<IElement> { @event } } });
+                // Act
+                Binder.Bind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Single((List<IElement>)character.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Characters"]);
+                Assert.Equal(@event, ((List<IElement>)character.Params["Events"])[0]);
+                Assert.Equal(character, ((List<IElement>)@event.Params["Characters"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание персонажа и события, когда событие уже содержит персонажа.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_EventWithCharacter_SuccessfulBinding()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character);
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Characters", new List<IElement> { character } } });
+                // Act
+                Binder.Bind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Single((List<IElement>)character.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Characters"]);
+                Assert.Equal(@event, ((List<IElement>)character.Params["Events"])[0]);
+                Assert.Equal(character, ((List<IElement>)@event.Params["Characters"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание персонажа и события, которые уже связаны.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Bind_BoundCharacterAndEvent_NoChanges()
+            {
+                // Arrange
+                Bind_CharacterAndEvent_SuccessfulBinding();
+                var character = new Element(ElemType.Character);
+                var @event = new Element(ElemType.Event);
+                Binder.Bind(character, @event);
+                // Act
+                Binder.Bind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Single((List<IElement>)character.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Characters"]);
+                Assert.Equal(@event, ((List<IElement>)character.Params["Events"])[0]);
+                Assert.Equal(character, ((List<IElement>)@event.Params["Characters"])[0]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между персонажем и событием.
+            /// Ожидание: успешное разрывание связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_CharacterAndEvent_SuccessfulUnbinding()
+            {
+                // Arrange
+                Bind_CharacterAndEvent_SuccessfulBinding();
+                var character = new Element(ElemType.Character);
+                var @event = new Element(ElemType.Event);
+                Binder.Bind(character, @event);
+                // Act
+                Binder.Unbind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Empty((List<IElement>)character.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Characters"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между персонажем и событием, когда персонаж не содержит события.
+            /// Ожидание: разрыв существующей связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_CharacterWithoutEvent_SuccessfulUnbinding()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement>() } });
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Characters", new List<IElement> { character } } });
+                // Act
+                Binder.Unbind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Empty((List<IElement>)character.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Characters"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между персонажем и событием, когда событие не содержит персонажа.
+            /// Ожидание: разрыв существующей связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_EventWithoutCharacter_SuccessfulUnbinding()
+            {
+                // Arrange
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Characters", new List<IElement>() } });
+                var character = new Element(ElemType.Character, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement> { @event } } });
+                // Act
+                Binder.Unbind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Empty((List<IElement>)character.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Characters"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между персонажем и событием, когда персонаж и событие не связаны.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_UnboundCharacterAndEvent_NoChanges()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character);
+                var @event = new Element(ElemType.Event);
+                // Act
+                Binder.Unbind(character, @event);
+                // Assert
+                Assert.False(character.Params.ContainsKey("Events"));
+                Assert.False(@event.Params.ContainsKey("Characters"));
+            }
+
+            /// <summary>
+            /// Разрыв связи между персонажем и событием, которые имеют пустые параметры для хранения связей.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_EmptyCharacterAndEvent_NoChanges()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement>() } });
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Characters", new List<IElement>() } });
+                // Act
+                Binder.Unbind(character, @event);
+                // Assert
+                Assert.True(character.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Characters"));
+                Assert.True(character.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Characters"] is List<IElement>);
+                Assert.Empty((List<IElement>)character.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Characters"]);
+            }
+        }
     }
 }
