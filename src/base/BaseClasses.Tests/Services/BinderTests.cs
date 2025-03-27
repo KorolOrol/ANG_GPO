@@ -1434,5 +1434,231 @@ namespace BaseClasses.Tests.Services
                 Assert.Empty((List<IElement>)@event.Params["Items"]);
             }
         }
+
+        /// <summary>
+        /// Тесты для класса Binder. Связывание и разрыв связей локаций и событий.
+        /// </summary>
+        public class BinderLocEventTests
+        {
+            /// <summary>
+            /// Связывание локации и события.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_LocationAndEvent_SuccessfulBinding()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location);
+                var @event = new Element(ElemType.Event);
+                // Act
+                Binder.Bind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.True(location.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Locations"] is List<IElement>);
+                Assert.Single((List<IElement>)location.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Locations"]);
+                Assert.Equal(@event, ((List<IElement>)location.Params["Events"])[0]);
+                Assert.Equal(location, ((List<IElement>)@event.Params["Locations"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание локации и события с ненулевым значением отношения.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_LocationAndEventWithNonZeroRelation_SuccessfulBinding()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location);
+                var @event = new Element(ElemType.Event);
+                // Act
+                Binder.Bind(location, @event, 1);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.True(location.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Locations"] is List<IElement>);
+                Assert.Single((List<IElement>)location.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Locations"]);
+                Assert.Equal(@event, ((List<IElement>)location.Params["Events"])[0]);
+                Assert.Equal(location, ((List<IElement>)@event.Params["Locations"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание локации и события, когда локация уже содержит событие.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_LocationWithEvent_SuccessfulBinding()
+            {
+                // Arrange
+                var @event = new Element(ElemType.Event);
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement> { @event } } });
+                // Act
+                Binder.Bind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.True(location.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Locations"] is List<IElement>);
+                Assert.Single((List<IElement>)location.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Locations"]);
+                Assert.Equal(@event, ((List<IElement>)location.Params["Events"])[0]);
+                Assert.Equal(location, ((List<IElement>)@event.Params["Locations"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание локации и события, когда событие уже содержит локацию.
+            /// Ожидание: успешное связывание.
+            /// </summary>
+            [Fact]
+            public void Bind_EventWithLocation_SuccessfulBinding()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location);
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Locations", new List<IElement> { location } } });
+                // Act
+                Binder.Bind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.True(location.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Locations"] is List<IElement>);
+                Assert.Single((List<IElement>)location.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Locations"]);
+                Assert.Equal(@event, ((List<IElement>)location.Params["Events"])[0]);
+                Assert.Equal(location, ((List<IElement>)@event.Params["Locations"])[0]);
+            }
+
+            /// <summary>
+            /// Связывание локации и события, которые уже связаны.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Bind_BoundLocationAndEvent_NoChanges()
+            {
+                // Arrange
+                Bind_LocationAndEvent_SuccessfulBinding();
+                var location = new Element(ElemType.Location);
+                var @event = new Element(ElemType.Event);
+                Binder.Bind(location, @event);
+                // Act
+                Binder.Bind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.True(location.Params["Events"] is List<IElement>);
+                Assert.True(@event.Params["Locations"] is List<IElement>);
+                Assert.Single((List<IElement>)location.Params["Events"]);
+                Assert.Single((List<IElement>)@event.Params["Locations"]);
+                Assert.Equal(@event, ((List<IElement>)location.Params["Events"])[0]);
+                Assert.Equal(location, ((List<IElement>)@event.Params["Locations"])[0]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между локацией и событием.
+            /// Ожидание: успешное разрывание связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_LocationAndEvent_SuccessfulUnbinding()
+            {
+                // Arrange
+                Bind_LocationAndEvent_SuccessfulBinding();
+                var location = new Element(ElemType.Location);
+                var @event = new Element(ElemType.Event);
+                Binder.Bind(location, @event);
+                // Act
+                Binder.Unbind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.Empty((List<IElement>)location.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Locations"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между локацией и событием, когда локация не содержит события.
+            /// Ожидание: разрыв существующей связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_LocationWithoutEvent_SuccessfulUnbinding()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement>() } });
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Locations", new List<IElement> { location } } });
+                // Act
+                Binder.Unbind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.Empty((List<IElement>)location.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Locations"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между локацией и событием, когда событие не содержит локацию.
+            /// Ожидание: разрыв существующей связи.
+            /// </summary>
+            [Fact]
+            public void Unbind_EventWithoutLocation_SuccessfulUnbinding()
+            {
+                // Arrange
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Locations", new List<IElement>() } });
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement> { @event } } });
+                // Act
+                Binder.Unbind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.Empty((List<IElement>)location.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Locations"]);
+            }
+
+            /// <summary>
+            /// Разрыв связи между локацией и событием, когда локация и событие не связаны.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_UnboundLocationAndEvent_NoChanges()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location);
+                var @event = new Element(ElemType.Event);
+                // Act
+                Binder.Unbind(location, @event);
+                // Assert
+                Assert.False(location.Params.ContainsKey("Events"));
+                Assert.False(@event.Params.ContainsKey("Locations"));
+            }
+
+            /// <summary>
+            /// Разрыв связи между локацией и событием, которые имеют пустые параметры для хранения связей.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_EmptyLocationAndEvent_NoChanges()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location, @params: new Dictionary<string, object> {
+                    { "Events", new List<IElement>() } });
+                var @event = new Element(ElemType.Event, @params: new Dictionary<string, object> {
+                    { "Locations", new List<IElement>() } });
+                // Act
+                Binder.Unbind(location, @event);
+                // Assert
+                Assert.True(location.Params.ContainsKey("Events"));
+                Assert.True(@event.Params.ContainsKey("Locations"));
+                Assert.Empty((List<IElement>)location.Params["Events"]);
+                Assert.Empty((List<IElement>)@event.Params["Locations"]);
+            }
+        }
     }
 }
