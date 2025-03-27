@@ -5,6 +5,9 @@ using BaseClasses.Interface;
 
 namespace BaseClasses.Tests.Services
 {
+    /// <summary>
+    /// Тесты для класса Merger
+    /// </summary>
     public class MergerTests
     {
         /// <summary>
