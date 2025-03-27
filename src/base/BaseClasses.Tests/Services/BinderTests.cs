@@ -1660,5 +1660,113 @@ namespace BaseClasses.Tests.Services
                 Assert.Empty((List<IElement>)@event.Params["Locations"]);
             }
         }
+
+        /// <summary>
+        /// Тесты для класса Binder. Связывание и разрыв связей у пар элементов, которые не могут быть связаны.
+        /// </summary>
+        public class BinderInvalidTests
+        {
+            /// <summary>
+            /// Связывание двух предметов.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Bind_TwoItems_NoChanges()
+            {
+                // Arrange
+                var item1 = new Element(ElemType.Item);
+                var item2 = new Element(ElemType.Item);
+                // Act
+                Binder.Bind(item1, item2);
+                // Assert
+                Assert.Empty(item1.Params);
+                Assert.Empty(item2.Params);
+            }
+
+            /// <summary>
+            /// Разрыв связи между двумя предметами.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_TwoItems_NoChanges()
+            {
+                // Arrange
+                var item1 = new Element(ElemType.Item);
+                var item2 = new Element(ElemType.Item);
+                // Act
+                Binder.Unbind(item1, item2);
+                // Assert
+                Assert.Empty(item1.Params);
+                Assert.Empty(item2.Params);
+            }
+
+            /// <summary>
+            /// Связывание двух локаций.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Bind_TwoLocations_NoChanges()
+            {
+                // Arrange
+                var location1 = new Element(ElemType.Location);
+                var location2 = new Element(ElemType.Location);
+                // Act
+                Binder.Bind(location1, location2);
+                // Assert
+                Assert.Empty(location1.Params);
+                Assert.Empty(location2.Params);
+            }
+
+            /// <summary>
+            /// Разрыв связи между двумя локациями.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_TwoLocations_NoChanges()
+            {
+                // Arrange
+                var location1 = new Element(ElemType.Location);
+                var location2 = new Element(ElemType.Location);
+                // Act
+                Binder.Unbind(location1, location2);
+                // Assert
+                Assert.Empty(location1.Params);
+                Assert.Empty(location2.Params);
+            }
+
+            /// <summary>
+            /// Связывание двух событий.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Bind_TwoEvents_NoChanges()
+            {
+                // Arrange
+                var @event1 = new Element(ElemType.Event);
+                var @event2 = new Element(ElemType.Event);
+                // Act
+                Binder.Bind(@event1, @event2);
+                // Assert
+                Assert.Empty(@event1.Params);
+                Assert.Empty(@event2.Params);
+            }
+
+            /// <summary>
+            /// Разрыв связи между двумя событиями.
+            /// Ожидание: никаких изменений.
+            /// </summary>
+            [Fact]
+            public void Unbind_TwoEvents_NoChanges()
+            {
+                // Arrange
+                var @event1 = new Element(ElemType.Event);
+                var @event2 = new Element(ElemType.Event);
+                // Act
+                Binder.Unbind(@event1, @event2);
+                // Assert
+                Assert.Empty(@event1.Params);
+                Assert.Empty(@event2.Params);
+            }
+        }
     }
 }
