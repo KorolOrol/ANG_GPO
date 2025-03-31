@@ -171,6 +171,10 @@ namespace BaseClasses.Services
                     }
                     break;
                 case JsonValueKind.String:
+                    if (DateTime.TryParse(json.GetString(), out DateTime date))
+                    {
+                        return date;
+                    }
                     return json.GetString();
                 case JsonValueKind.Number:
                     return json.GetDouble();
