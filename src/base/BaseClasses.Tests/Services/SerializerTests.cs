@@ -1,7 +1,8 @@
-﻿using BaseClasses.Interface;
-using BaseClasses.Model;
+﻿using BaseClasses.Model;
 using BaseClasses.Enum;
 using BaseClasses.Services;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BaseClasses.Tests.Services
 {
@@ -237,6 +238,269 @@ namespace BaseClasses.Tests.Services
                 Assert.Equal(@event.Params, actual.Params);
                 Assert.Equal(@event.Time, actual.Time);
                 File.Delete("EventWithoutBonds.txt");
+            }
+        }
+
+        /// <summary>
+        /// Тесты для класса Serializer. Сохранение и загрузка элементов истории со связями.
+        /// </summary>
+        public class SerializerElementsWithBondsTests
+        {
+            private bool CompareElements(Element element1, Element element2, List<Element> refHandler = null)
+            {
+                if (refHandler == null) refHandler = new List<Element>();
+                if (element1.Type != element2.Type) return false;
+                if (element1.Name != element2.Name) return false;
+                if (element1.Description != element2.Description) return false;
+                if (element1.Time != element2.Time) return false;
+                if (element1.Params.Count != element2.Params.Count) return false;
+                foreach (var key in element1.Params.Keys)
+                {
+                    if (!element2.Params.ContainsKey(key)) return false;
+                    if (element1.Params[key] is IEnumerable)
+                    {
+                        if (element2.Params[key] is not IEnumerable) return false;
+                        var list1 = (IEnumerable)element1.Params[key];
+                        var list2 = (IEnumerable)element2.Params[key];
+                        var enumerator1 = list1.GetEnumerator();
+                        while (enumerator1.MoveNext())
+                        {
+                            var current1 = enumerator1.Current;
+                            if (current1 is Element element)
+                            {
+                                if (refHandler.Contains(element)) continue;
+                                refHandler.Add(element);
+                                var found = false;
+                                foreach (var item in list2)
+                                {
+                                    if (item is Element foundElement &&
+                                        CompareElements(element, foundElement, refHandler))
+                                    {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (!found) return false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!element1.Params[key].Equals(element2.Params[key])) return false;
+                    }
+                }
+                return true;
+            }
+
+            private bool CompareRelations(Relation relation1, Relation relation2)
+            {
+                if (relation1.Value != relation2.Value) return false;
+                return CompareElements((Element)relation1.Character, (Element)relation2.Character);
+            }
+
+            private bool Compare<T>(T element1, T element2)
+            {
+                if (element1 is IEnumerable enum1 && element2 is IEnumerable enum2)
+                {
+                    var enumerator1 = enum1.GetEnumerator();
+                    while (enumerator1.MoveNext())
+                    {
+                        bool found = false;
+                        var enumerator2 = enum2.GetEnumerator();
+                        while (enumerator2.MoveNext())
+                        {
+                            if (Compare(enumerator1.Current, enumerator2.Current))
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) return false;
+                    }
+                    return true;
+                }
+                if (element1 is Element e1 && element2 is Element e2)
+                {
+                    return CompareElements(e1, e2);
+                }
+                else if (element1 is Relation r1 && element2 is Relation r2)
+                {
+                    return CompareRelations(r1, r2);
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Сохранение персонажа со связями с другими элементами.
+            /// Ожидание: файл с верными данными персонажа.
+            /// </summary>
+            [Fact]
+            public void Serialize_CharacterWithBonds_CorrectFile()
+            {
+                // Arrange
+                var character = new Element(ElemType.Character, "Name1", "Description1");
+                var character2 = new Element(ElemType.Character, "Name2", "Description2");
+                var item = new Element(ElemType.Item, "Name3", "Description3");
+                var location = new Element(ElemType.Location, "Name4", "Description4");
+                var @event = new Element(ElemType.Event, "Name5", "Description5");
+                Binder.Bind(character, character2, 10);
+                Binder.Bind(character, item);
+                Binder.Bind(character, location);
+                Binder.Bind(character, @event);
+                // Act
+                Serializer.Serialize(character, "CharacterWithBonds.txt");
+                // Assert
+                var actual = File.ReadAllText("CharacterWithBonds.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""$type"": ""Element"",
+  ""Type"": 0,
+  ""Name"": ""Name1"",
+  ""Description"": ""Description1"",
+  ""Params"": {
+    ""$id"": ""2"",
+    ""Relations"": {
+      ""$id"": ""3"",
+      ""$values"": [
+        {
+          ""$id"": ""4"",
+          ""$type"": ""Relation"",
+          ""Character"": {
+            ""$id"": ""5"",
+            ""$type"": ""Element"",
+            ""Type"": 0,
+            ""Name"": ""Name2"",
+            ""Description"": ""Description2"",
+            ""Params"": {
+              ""$id"": ""6"",
+              ""Relations"": {
+                ""$id"": ""7"",
+                ""$values"": [
+                  {
+                    ""$id"": ""8"",
+                    ""$type"": ""Relation"",
+                    ""Character"": {
+                      ""$ref"": ""1""
+                    },
+                    ""Value"": 10
+                  }
+                ]
+              }
+            },
+            ""Time"": -1
+          },
+          ""Value"": 10
+        }
+      ]
+    },
+    ""Items"": {
+      ""$id"": ""9"",
+      ""$values"": [
+        {
+          ""$id"": ""10"",
+          ""$type"": ""Element"",
+          ""Type"": 1,
+          ""Name"": ""Name3"",
+          ""Description"": ""Description3"",
+          ""Params"": {
+            ""$id"": ""11"",
+            ""Host"": {
+              ""$ref"": ""1""
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    },
+    ""Locations"": {
+      ""$id"": ""12"",
+      ""$values"": [
+        {
+          ""$id"": ""13"",
+          ""$type"": ""Element"",
+          ""Type"": 2,
+          ""Name"": ""Name4"",
+          ""Description"": ""Description4"",
+          ""Params"": {
+            ""$id"": ""14"",
+            ""Characters"": {
+              ""$id"": ""15"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    },
+    ""Events"": {
+      ""$id"": ""16"",
+      ""$values"": [
+        {
+          ""$id"": ""17"",
+          ""$type"": ""Element"",
+          ""Type"": 3,
+          ""Name"": ""Name5"",
+          ""Description"": ""Description5"",
+          ""Params"": {
+            ""$id"": ""18"",
+            ""Characters"": {
+              ""$id"": ""19"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    }
+  },
+  ""Time"": -1
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("CharacterWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Десериализация персонажа со связями с другими элементами.
+            /// Ожидание: объект персонажа с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_CharacterWithBonds_CorrectObject()
+            {
+                // Arrange
+                Serialize_CharacterWithBonds_CorrectFile();
+                var character = new Element(ElemType.Character, "Name1", "Description1");
+                var character2 = new Element(ElemType.Character, "Name2", "Description2");
+                var item = new Element(ElemType.Item, "Name3", "Description3");
+                var location = new Element(ElemType.Location, "Name4", "Description4");
+                var @event = new Element(ElemType.Event, "Name5", "Description5");
+                Binder.Bind(character, character2, 10);
+                Binder.Bind(character, item);
+                Binder.Bind(character, location);
+                Binder.Bind(character, @event);
+                Serializer.Serialize(character, "CharacterWithBonds.txt");
+                // Act
+                var actual = Serializer.Deserialize<Element>("CharacterWithBonds.txt");
+                // Assert
+                Assert.Equal(character.Type, actual.Type);
+                Assert.Equal(character.Name, actual.Name);
+                Assert.Equal(character.Description, actual.Description);
+                Assert.Equal(character.Params.Count, actual.Params.Count);
+                foreach (var key in character.Params.Keys)
+                {
+                    Assert.True(actual.Params.ContainsKey(key));
+                    Assert.Equal(character.Params[key], actual.Params[key], Compare);
+
+                }
+                Assert.Equal(character.Time, actual.Time);
+                File.Delete("CharacterWithBonds.txt");
             }
         }
     }

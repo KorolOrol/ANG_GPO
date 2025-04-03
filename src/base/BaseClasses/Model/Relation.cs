@@ -7,12 +7,12 @@ namespace BaseClasses.Model
     /// Отношение персонажа с другим персонажем
     /// </summary>
     [JsonDerivedType(typeof(Relation), typeDiscriminator: "Relation")]
-    public class Relation
+    public class Relation : IEquatable<Relation>
     {
         /// <summary>
         /// Персонаж
         /// </summary>
-        public IElement Character { get; set; }
+        public required IElement Character { get; set; }
 
         /// <summary>
         /// Значение отношения
@@ -22,6 +22,16 @@ namespace BaseClasses.Model
         public override string ToString()
         {
             return $"{{{Character.Name}, {Value}}}";
+        }
+
+        public bool Equals(Relation? other)
+        {
+            return true;
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+            return Character.Equals(other.Character) &&
+                Value == other.Value;
         }
     }
 }
