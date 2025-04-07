@@ -112,10 +112,8 @@ namespace BaseClasses.Model
 
         public bool Equals(Element? other)
         {
-            return true;
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
-            if (GetType() != other.GetType()) return false;
             return Type == other.Type &&
                    Name == other.Name &&
                    Description == other.Description &&

@@ -286,7 +286,9 @@ namespace BaseClasses.Tests.Services
                     }
                     else
                     {
-                        if (!element1.Params[key].Equals(element2.Params[key])) return false;
+                        if (!CompareElements((Element)element1.Params[key], 
+                                             (Element)element2.Params[key], 
+                                             refHandler)) return false;
                     }
                 }
                 return true;
@@ -501,6 +503,135 @@ namespace BaseClasses.Tests.Services
                 }
                 Assert.Equal(character.Time, actual.Time);
                 File.Delete("CharacterWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Сохранение предмета со связями с другими элементами.
+            /// Ожидание: файл с верными данными предмета.
+            /// </summary>
+            [Fact]
+            public void Serialize_ItemWithBonds_CorrectFile()
+            {
+                // Arrange
+                var item = new Element(ElemType.Item, "Name1", "Description1");
+                var character = new Element(ElemType.Character, "Name2", "Description2");
+                var location = new Element(ElemType.Location, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                Binder.Bind(item, character);
+                Binder.Bind(item, location);
+                Binder.Bind(item, @event);
+                // Act
+                Serializer.Serialize(item, "ItemWithBonds.txt");
+                // Assert
+                var actual = File.ReadAllText("ItemWithBonds.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""$type"": ""Element"",
+  ""Type"": 1,
+  ""Name"": ""Name1"",
+  ""Description"": ""Description1"",
+  ""Params"": {
+    ""$id"": ""2"",
+    ""Host"": {
+      ""$id"": ""3"",
+      ""$type"": ""Element"",
+      ""Type"": 0,
+      ""Name"": ""Name2"",
+      ""Description"": ""Description2"",
+      ""Params"": {
+        ""$id"": ""4"",
+        ""Items"": {
+          ""$id"": ""5"",
+          ""$values"": [
+            {
+              ""$ref"": ""1""
+            }
+          ]
+        }
+      },
+      ""Time"": -1
+    },
+    ""Location"": {
+      ""$id"": ""6"",
+      ""$type"": ""Element"",
+      ""Type"": 2,
+      ""Name"": ""Name3"",
+      ""Description"": ""Description3"",
+      ""Params"": {
+        ""$id"": ""7"",
+        ""Items"": {
+          ""$id"": ""8"",
+          ""$values"": [
+            {
+              ""$ref"": ""1""
+            }
+          ]
+        }
+      },
+      ""Time"": -1
+    },
+    ""Events"": {
+      ""$id"": ""9"",
+      ""$values"": [
+        {
+          ""$id"": ""10"",
+          ""$type"": ""Element"",
+          ""Type"": 3,
+          ""Name"": ""Name4"",
+          ""Description"": ""Description4"",
+          ""Params"": {
+            ""$id"": ""11"",
+            ""Items"": {
+              ""$id"": ""12"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    }
+  },
+  ""Time"": -1
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("ItemWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Десериализация предмета со связями с другими элементами.
+            /// Ожидание: объект предмета с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_ItemWithBonds_CorrectObject()
+            {
+                // Arrange
+                Serialize_ItemWithBonds_CorrectFile();
+                var item = new Element(ElemType.Item, "Name1", "Description1");
+                var character = new Element(ElemType.Character, "Name2", "Description2");
+                var location = new Element(ElemType.Location, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                Binder.Bind(item, character);
+                Binder.Bind(item, location);
+                Binder.Bind(item, @event);
+                Serializer.Serialize(item, "ItemWithBonds.txt");
+                // Act
+                var actual = Serializer.Deserialize<Element>("ItemWithBonds.txt");
+                // Assert
+                Assert.Equal(item.Type, actual.Type);
+                Assert.Equal(item.Name, actual.Name);
+                Assert.Equal(item.Description, actual.Description);
+                Assert.Equal(item.Params.Count, actual.Params.Count);
+                foreach (var key in item.Params.Keys)
+                {
+                    Assert.True(actual.Params.ContainsKey(key));
+                    Assert.Equal(item.Params[key], actual.Params[key], Compare);
+                }
+                Assert.Equal(item.Time, actual.Time);
+                File.Delete("ItemWithBonds.txt");
             }
         }
     }
