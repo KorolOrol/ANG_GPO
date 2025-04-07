@@ -11,26 +11,17 @@ List<string> list = new List<string>() {"Привет"};
 Console.WriteLine(await text.GenerateTextAsync(list));
 */
 
-/*
-JsonSerializerSettings settings = new JsonSerializerSettings
-{
-    NullValueHandling = NullValueHandling.Ignore,
-    DefaultValueHandling = DefaultValueHandling.Ignore
-};
-
 Element c = new Element(ElemType.Character, "Вася", "Вася Пупкин");
 Element c2 = new Element(ElemType.Character, "Петя", "");
-Element l = new Element(ElemType.Location, "Дом", "Дом Васи");
-Element i = new Element(ElemType.Item, "Колбаса");
-Element e = new Element(ElemType.Event, "Праздник");
+Element c3 = new Element(ElemType.Character, "Коля", "");
+Element c4 = new Element(ElemType.Character, "Саша", "");
 Binder.Bind(c, c2, 10);
-Binder.Bind(c, l);
-Binder.Bind(c, i);
-Binder.Bind(c, e);
+Binder.Bind(c, c3, 20);
+Binder.Bind(c, c4, 30);
 
-Console.WriteLine(JsonConvert.SerializeObject(new AiElement(c), settings));
-*/
+Serializer.Serialize(c, "relTest.txt");
 
+/*
 string promptPath = "/home/korolorol/src/ANG_GPO/src/AI/AIGenerator/SystemPromptExample.json";
 string savingPath = "/home/korolorol/src/ANG_GPO/src/AI/AITest/SavingPath/";
 LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host/v1/"));
@@ -38,6 +29,7 @@ Ngen.AIPriority = true;
 Ngen.TextAiGenerator.Model = "gpt-4o-mini";
 ((OpenAIGenerator)Ngen.TextAiGenerator).TrimEnd = false;
 LlmAiGenerator Ogen = new(promptPath);
+*/
 
 /*
 LlmAiGenerator server = new(promptPath);
@@ -46,6 +38,7 @@ server.TextAiGenerator.Model = "gemma-2-27b-it";
 server.AIPriority = true;
 */
 
+/*
 LlmAiGenerator gen = Ngen;
 
 Plot plot = new Plot();
@@ -213,3 +206,4 @@ while (true)
             return;
     }
 }
+*/
