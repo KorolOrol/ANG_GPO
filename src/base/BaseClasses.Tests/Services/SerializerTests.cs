@@ -32,7 +32,6 @@ namespace BaseClasses.Tests.Services
                 var actual = File.ReadAllText("CharacterWithoutBonds.txt");
                 var expected = @"{
   ""$id"": ""1"",
-  ""$type"": ""Element"",
   ""Type"": 0,
   ""Name"": ""Name"",
   ""Description"": ""Description"",
@@ -91,7 +90,6 @@ namespace BaseClasses.Tests.Services
                 var actual = File.ReadAllText("ItemWithoutBonds.txt");
                 var expected = @"{
   ""$id"": ""1"",
-  ""$type"": ""Element"",
   ""Type"": 1,
   ""Name"": ""Name"",
   ""Description"": ""Description"",
@@ -144,7 +142,6 @@ namespace BaseClasses.Tests.Services
                 var actual = File.ReadAllText("LocationWithoutBonds.txt");
                 var expected = @"{
   ""$id"": ""1"",
-  ""$type"": ""Element"",
   ""Type"": 2,
   ""Name"": ""Name"",
   ""Description"": ""Description"",
@@ -203,7 +200,6 @@ namespace BaseClasses.Tests.Services
                 var actual = File.ReadAllText("EventWithoutBonds.txt");
                 var expected = @"{
   ""$id"": ""1"",
-  ""$type"": ""Element"",
   ""Type"": 3,
   ""Name"": ""Name"",
   ""Description"": ""Description"",
@@ -355,7 +351,6 @@ namespace BaseClasses.Tests.Services
                 var actual = File.ReadAllText("CharacterWithBonds.txt");
                 var expected = @"{
   ""$id"": ""1"",
-  ""$type"": ""Element"",
   ""Type"": 0,
   ""Name"": ""Name1"",
   ""Description"": ""Description1"",
@@ -366,10 +361,8 @@ namespace BaseClasses.Tests.Services
       ""$values"": [
         {
           ""$id"": ""4"",
-          ""$type"": ""Relation"",
           ""Character"": {
             ""$id"": ""5"",
-            ""$type"": ""Element"",
             ""Type"": 0,
             ""Name"": ""Name2"",
             ""Description"": ""Description2"",
@@ -380,7 +373,6 @@ namespace BaseClasses.Tests.Services
                 ""$values"": [
                   {
                     ""$id"": ""8"",
-                    ""$type"": ""Relation"",
                     ""Character"": {
                       ""$ref"": ""1""
                     },
@@ -400,7 +392,6 @@ namespace BaseClasses.Tests.Services
       ""$values"": [
         {
           ""$id"": ""10"",
-          ""$type"": ""Element"",
           ""Type"": 1,
           ""Name"": ""Name3"",
           ""Description"": ""Description3"",
@@ -419,7 +410,6 @@ namespace BaseClasses.Tests.Services
       ""$values"": [
         {
           ""$id"": ""13"",
-          ""$type"": ""Element"",
           ""Type"": 2,
           ""Name"": ""Name4"",
           ""Description"": ""Description4"",
@@ -443,7 +433,6 @@ namespace BaseClasses.Tests.Services
       ""$values"": [
         {
           ""$id"": ""17"",
-          ""$type"": ""Element"",
           ""Type"": 3,
           ""Name"": ""Name5"",
           ""Description"": ""Description5"",
@@ -526,7 +515,6 @@ namespace BaseClasses.Tests.Services
                 var actual = File.ReadAllText("ItemWithBonds.txt");
                 var expected = @"{
   ""$id"": ""1"",
-  ""$type"": ""Element"",
   ""Type"": 1,
   ""Name"": ""Name1"",
   ""Description"": ""Description1"",
@@ -534,7 +522,6 @@ namespace BaseClasses.Tests.Services
     ""$id"": ""2"",
     ""Host"": {
       ""$id"": ""3"",
-      ""$type"": ""Element"",
       ""Type"": 0,
       ""Name"": ""Name2"",
       ""Description"": ""Description2"",
@@ -553,7 +540,6 @@ namespace BaseClasses.Tests.Services
     },
     ""Location"": {
       ""$id"": ""6"",
-      ""$type"": ""Element"",
       ""Type"": 2,
       ""Name"": ""Name3"",
       ""Description"": ""Description3"",
@@ -575,7 +561,6 @@ namespace BaseClasses.Tests.Services
       ""$values"": [
         {
           ""$id"": ""10"",
-          ""$type"": ""Element"",
           ""Type"": 3,
           ""Name"": ""Name4"",
           ""Description"": ""Description4"",
@@ -632,6 +617,271 @@ namespace BaseClasses.Tests.Services
                 }
                 Assert.Equal(item.Time, actual.Time);
                 File.Delete("ItemWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Сохранение локации со связями с другими элементами.
+            /// Ожидание: файл с верными данными локации.
+            /// </summary>
+            [Fact]
+            public void Serialize_LocationWithBonds_CorrectFile()
+            {
+                // Arrange
+                var location = new Element(ElemType.Location, "Name1", "Description1");
+                var character = new Element(ElemType.Character, "Name2", "Description2");
+                var item = new Element(ElemType.Item, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                Binder.Bind(location, character);
+                Binder.Bind(location, item);
+                Binder.Bind(location, @event);
+                // Act
+                Serializer.Serialize(location, "LocationWithBonds.txt");
+                // Assert
+                var actual = File.ReadAllText("LocationWithBonds.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""Type"": 2,
+  ""Name"": ""Name1"",
+  ""Description"": ""Description1"",
+  ""Params"": {
+    ""$id"": ""2"",
+    ""Characters"": {
+      ""$id"": ""3"",
+      ""$values"": [
+        {
+          ""$id"": ""4"",
+          ""Type"": 0,
+          ""Name"": ""Name2"",
+          ""Description"": ""Description2"",
+          ""Params"": {
+            ""$id"": ""5"",
+            ""Locations"": {
+              ""$id"": ""6"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    },
+    ""Items"": {
+      ""$id"": ""7"",
+      ""$values"": [
+        {
+          ""$id"": ""8"",
+          ""Type"": 1,
+          ""Name"": ""Name3"",
+          ""Description"": ""Description3"",
+          ""Params"": {
+            ""$id"": ""9"",
+            ""Location"": {
+              ""$ref"": ""1""
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    },
+    ""Events"": {
+      ""$id"": ""10"",
+      ""$values"": [
+        {
+          ""$id"": ""11"",
+          ""Type"": 3,
+          ""Name"": ""Name4"",
+          ""Description"": ""Description4"",
+          ""Params"": {
+            ""$id"": ""12"",
+            ""Locations"": {
+              ""$id"": ""13"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    }
+  },
+  ""Time"": -1
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("LocationWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Десериализация локации со связями с другими элементами.
+            /// Ожидание: объект локации с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_LocationWithBonds_CorrectObject()
+            {
+                // Arrange
+                Serialize_LocationWithBonds_CorrectFile();
+                var location = new Element(ElemType.Location, "Name1", "Description1");
+                var character = new Element(ElemType.Character, "Name2", "Description2");
+                var item = new Element(ElemType.Item, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                Binder.Bind(location, character);
+                Binder.Bind(location, item);
+                Binder.Bind(location, @event);
+                Serializer.Serialize(location, "LocationWithBonds.txt");
+                // Act
+                var actual = Serializer.Deserialize<Element>("LocationWithBonds.txt");
+                // Assert
+                Assert.Equal(location.Type, actual.Type);
+                Assert.Equal(location.Name, actual.Name);
+                Assert.Equal(location.Description, actual.Description);
+                Assert.Equal(location.Params.Count, actual.Params.Count);
+                foreach (var key in location.Params.Keys)
+                {
+                    Assert.True(actual.Params.ContainsKey(key));
+                    Assert.Equal(location.Params[key], actual.Params[key], Compare);
+                }
+                Assert.Equal(location.Time, actual.Time);
+                File.Delete("LocationWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Сохранение события со связями с другими элементами.
+            /// Ожидание: файл с верными данными события.
+            /// </summary>
+            [Fact]
+            public void Serialize_EventWithBonds_CorrectFile()
+            {
+                // Arrange
+                var @event = new Element(ElemType.Event, "Name1", "Description1");
+                var character = new Element(ElemType.Character, "Name2", "Description2");
+                var item = new Element(ElemType.Item, "Name3", "Description3");
+                var location = new Element(ElemType.Location, "Name4", "Description4");
+                Binder.Bind(@event, character);
+                Binder.Bind(@event, item);
+                Binder.Bind(@event, location);
+                // Act
+                Serializer.Serialize(@event, "EventWithBonds.txt");
+                // Assert
+                var actual = File.ReadAllText("EventWithBonds.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""Type"": 3,
+  ""Name"": ""Name1"",
+  ""Description"": ""Description1"",
+  ""Params"": {
+    ""$id"": ""2"",
+    ""Characters"": {
+      ""$id"": ""3"",
+      ""$values"": [
+        {
+          ""$id"": ""4"",
+          ""Type"": 0,
+          ""Name"": ""Name2"",
+          ""Description"": ""Description2"",
+          ""Params"": {
+            ""$id"": ""5"",
+            ""Events"": {
+              ""$id"": ""6"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    },
+    ""Items"": {
+      ""$id"": ""7"",
+      ""$values"": [
+        {
+          ""$id"": ""8"",
+          ""Type"": 1,
+          ""Name"": ""Name3"",
+          ""Description"": ""Description3"",
+          ""Params"": {
+            ""$id"": ""9"",
+            ""Events"": {
+              ""$id"": ""10"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    },
+    ""Locations"": {
+      ""$id"": ""11"",
+      ""$values"": [
+        {
+          ""$id"": ""12"",
+          ""Type"": 2,
+          ""Name"": ""Name4"",
+          ""Description"": ""Description4"",
+          ""Params"": {
+            ""$id"": ""13"",
+            ""Events"": {
+              ""$id"": ""14"",
+              ""$values"": [
+                {
+                  ""$ref"": ""1""
+                }
+              ]
+            }
+          },
+          ""Time"": -1
+        }
+      ]
+    }
+  },
+  ""Time"": -1
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("EventWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Десериализация события со связями с другими элементами.
+            /// Ожидание: объект события с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_EventWithBonds_CorrectObject()
+            {
+                // Arrange
+                Serialize_EventWithBonds_CorrectFile();
+                var @event = new Element(ElemType.Event, "Name1", "Description1");
+                var character = new Element(ElemType.Character, "Name2", "Description2");
+                var item = new Element(ElemType.Item, "Name3", "Description3");
+                var location = new Element(ElemType.Location, "Name4", "Description4");
+                Binder.Bind(@event, character);
+                Binder.Bind(@event, item);
+                Binder.Bind(@event, location);
+                Serializer.Serialize(@event, "EventWithBonds.txt");
+                // Act
+                var actual = Serializer.Deserialize<Element>("EventWithBonds.txt");
+                // Assert
+                Assert.Equal(@event.Type, actual.Type);
+                Assert.Equal(@event.Name, actual.Name);
+                Assert.Equal(@event.Description, actual.Description);
+                Assert.Equal(@event.Params.Count, actual.Params.Count);
+                foreach (var key in @event.Params.Keys)
+                {
+                    Assert.True(actual.Params.ContainsKey(key));
+                    Assert.Equal(@event.Params[key], actual.Params[key], Compare);
+                }
+                Assert.Equal(@event.Time, actual.Time);
+                File.Delete("EventWithBonds.txt");
             }
         }
     }

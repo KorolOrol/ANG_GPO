@@ -6,7 +6,6 @@ namespace BaseClasses.Model
     /// <summary>
     /// Отношение персонажа с другим персонажем
     /// </summary>
-    [JsonDerivedType(typeof(Relation), typeDiscriminator: "Relation")]
     public class Relation : IEquatable<Relation>
     {
         /// <summary>
@@ -26,7 +25,6 @@ namespace BaseClasses.Model
 
         public bool Equals(Relation? other)
         {
-            return true;
             if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             if (GetType() != other.GetType()) return false;

@@ -7,7 +7,6 @@ namespace BaseClasses.Interface
     /// <summary>
     /// Интерфейс элемента истории
     /// </summary>
-    [JsonDerivedType(typeof(Element), typeDiscriminator: "Element")]
     public interface IElement
     {
         /// <summary>

@@ -63,13 +63,12 @@ namespace BaseClasses.Services
             var json = File.ReadAllText(path);
             var document = JsonDocument.Parse(json);
             var rootElement = document.RootElement;
-            if (typeof(T) == typeof(Plot) && rootElement.GetProperty("$type").GetString() == "Plot")
+            if (typeof(T) == typeof(Plot) && MatchesProperties(typeof(Plot), rootElement))
             {
                 Plot plot = ReadPlot(rootElement);
                 return (T)Convert.ChangeType(plot, typeof(T));
             }
-            else if (typeof(T) == typeof(Element) && 
-                rootElement.GetProperty("$type").GetString() == "Element")
+            else if (typeof(T) == typeof(Element) && MatchesProperties(typeof(Element), rootElement))
             {
                 IElement element = ReadElement(rootElement);
                 return (T)Convert.ChangeType(element, typeof(T));
@@ -156,20 +155,20 @@ namespace BaseClasses.Services
                     {
                         return ReferenceResolver.ResolveReference(@ref.GetString());
                     }
-                    else if (json.TryGetProperty("$type", out JsonElement type))
+                    else
                     {
-                        if (type.GetString() == "Relation")
+                        if (MatchesProperties(typeof(Element), json))
+                        {
+                            return ReadElement(json);
+                        }
+                        else if (MatchesProperties(typeof(Relation), json))
                         {
                             Relation rel = new() 
                             {
-                                Character = (Element)ReadValue(json.GetProperty("Character")),
-                                Value = json.GetProperty("Value").GetDouble() 
+                                Character = ReadValue(json.GetProperty("Character")) as IElement,
+                                Value = json.GetProperty("Value").GetDouble()
                             };
                             return rel;
-                        }
-                        else if (type.GetString() == "Element")
-                        {
-                            return ReadElement(json);
                         }
                     }
                     break;
@@ -236,6 +235,24 @@ namespace BaseClasses.Services
                 return typedList;
             }
             return obj;
+        }
+
+        /// <summary>
+        /// Проверка на соответствие свойств.
+        /// </summary>
+        /// <param name="type">Тип.</param>
+        /// <param name="json">Json элемент.</param>
+        /// <returns>True, если свойства совпадают, иначе False.</returns>
+        private static bool MatchesProperties(Type type, JsonElement json)
+        {
+            foreach (var property in type.GetProperties())
+            {
+                if (!json.TryGetProperty(property.Name, out _))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
