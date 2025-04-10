@@ -11,6 +11,92 @@ namespace BaseClasses.Tests.Services
     /// </summary>
     public class SerializerTests
     {
+        private static bool CompareElements(Element element1, Element element2, List<Element> refHandler = null)
+        {
+            if (refHandler == null) refHandler = new List<Element>();
+            if (element1.Type != element2.Type) return false;
+            if (element1.Name != element2.Name) return false;
+            if (element1.Description != element2.Description) return false;
+            if (element1.Time != element2.Time) return false;
+            if (element1.Params.Count != element2.Params.Count) return false;
+            foreach (var key in element1.Params.Keys)
+            {
+                if (!element2.Params.ContainsKey(key)) return false;
+                if (element1.Params[key] is IEnumerable)
+                {
+                    if (element2.Params[key] is not IEnumerable) return false;
+                    var list1 = (IEnumerable)element1.Params[key];
+                    var list2 = (IEnumerable)element2.Params[key];
+                    var enumerator1 = list1.GetEnumerator();
+                    while (enumerator1.MoveNext())
+                    {
+                        var current1 = enumerator1.Current;
+                        if (current1 is Element element)
+                        {
+                            if (refHandler.Contains(element)) continue;
+                            refHandler.Add(element);
+                            var found = false;
+                            foreach (var item in list2)
+                            {
+                                if (item is Element foundElement &&
+                                    CompareElements(element, foundElement, refHandler))
+                                {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) return false;
+                        }
+                    }
+                }
+                else
+                {
+                    if (!CompareElements((Element)element1.Params[key],
+                                         (Element)element2.Params[key],
+                                         refHandler)) return false;
+                }
+            }
+            return true;
+        }
+
+        private static bool CompareRelations(Relation relation1, Relation relation2)
+        {
+            if (relation1.Value != relation2.Value) return false;
+            return CompareElements((Element)relation1.Character, (Element)relation2.Character);
+        }
+
+        private static bool Compare<T>(T element1, T element2)
+        {
+            if (element1 is IEnumerable enum1 && element2 is IEnumerable enum2)
+            {
+                var enumerator1 = enum1.GetEnumerator();
+                while (enumerator1.MoveNext())
+                {
+                    bool found = false;
+                    var enumerator2 = enum2.GetEnumerator();
+                    while (enumerator2.MoveNext())
+                    {
+                        if (Compare(enumerator1.Current, enumerator2.Current))
+                        {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) return false;
+                }
+                return true;
+            }
+            if (element1 is Element e1 && element2 is Element e2)
+            {
+                return CompareElements(e1, e2);
+            }
+            else if (element1 is Relation r1 && element2 is Relation r2)
+            {
+                return CompareRelations(r1, r2);
+            }
+            return false;
+        }
+
         /// <summary>
         /// Тесты для класса Serializer. Сохранение и загрузка элементов истории без связей.
         /// </summary>
@@ -242,92 +328,6 @@ namespace BaseClasses.Tests.Services
         /// </summary>
         public class SerializerElementsWithBondsTests
         {
-            private bool CompareElements(Element element1, Element element2, List<Element> refHandler = null)
-            {
-                if (refHandler == null) refHandler = new List<Element>();
-                if (element1.Type != element2.Type) return false;
-                if (element1.Name != element2.Name) return false;
-                if (element1.Description != element2.Description) return false;
-                if (element1.Time != element2.Time) return false;
-                if (element1.Params.Count != element2.Params.Count) return false;
-                foreach (var key in element1.Params.Keys)
-                {
-                    if (!element2.Params.ContainsKey(key)) return false;
-                    if (element1.Params[key] is IEnumerable)
-                    {
-                        if (element2.Params[key] is not IEnumerable) return false;
-                        var list1 = (IEnumerable)element1.Params[key];
-                        var list2 = (IEnumerable)element2.Params[key];
-                        var enumerator1 = list1.GetEnumerator();
-                        while (enumerator1.MoveNext())
-                        {
-                            var current1 = enumerator1.Current;
-                            if (current1 is Element element)
-                            {
-                                if (refHandler.Contains(element)) continue;
-                                refHandler.Add(element);
-                                var found = false;
-                                foreach (var item in list2)
-                                {
-                                    if (item is Element foundElement &&
-                                        CompareElements(element, foundElement, refHandler))
-                                    {
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                                if (!found) return false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (!CompareElements((Element)element1.Params[key], 
-                                             (Element)element2.Params[key], 
-                                             refHandler)) return false;
-                    }
-                }
-                return true;
-            }
-
-            private bool CompareRelations(Relation relation1, Relation relation2)
-            {
-                if (relation1.Value != relation2.Value) return false;
-                return CompareElements((Element)relation1.Character, (Element)relation2.Character);
-            }
-
-            private bool Compare<T>(T element1, T element2)
-            {
-                if (element1 is IEnumerable enum1 && element2 is IEnumerable enum2)
-                {
-                    var enumerator1 = enum1.GetEnumerator();
-                    while (enumerator1.MoveNext())
-                    {
-                        bool found = false;
-                        var enumerator2 = enum2.GetEnumerator();
-                        while (enumerator2.MoveNext())
-                        {
-                            if (Compare(enumerator1.Current, enumerator2.Current))
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) return false;
-                    }
-                    return true;
-                }
-                if (element1 is Element e1 && element2 is Element e2)
-                {
-                    return CompareElements(e1, e2);
-                }
-                else if (element1 is Relation r1 && element2 is Relation r2)
-                {
-                    return CompareRelations(r1, r2);
-                }
-                return false;
-            }
-
             /// <summary>
             /// Сохранение персонажа со связями с другими элементами.
             /// Ожидание: файл с верными данными персонажа.
@@ -882,6 +882,382 @@ namespace BaseClasses.Tests.Services
                 }
                 Assert.Equal(@event.Time, actual.Time);
                 File.Delete("EventWithBonds.txt");
+            }
+        }
+
+        /// <summary>
+        /// Тесты для класса Serializer. Сохранение и загрузка сюжета.
+        /// </summary>
+        public class SerializerPlotTests
+        {
+            /// <summary>
+            /// Сохранение пустого сюжета.
+            /// Ожидание: файл с верными данными сюжета.
+            /// </summary>
+            [Fact]
+            public void Serialize_EmptyPlot_CorrectFile()
+            {
+                // Arrange
+                var plot = new Plot();
+                // Act
+                Serializer.Serialize(plot, "EmptyPlot.txt");
+                // Assert
+                var actual = File.ReadAllText("EmptyPlot.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""Elements"": {
+    ""$id"": ""2"",
+    ""$values"": []
+  },
+  ""Time"": 0
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("EmptyPlot.txt");
+            }
+
+            /// <summary>
+            /// Десериализация пустого сюжета.
+            /// Ожидание: объект сюжета с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_EmptyPlot_CorrectObject()
+            {
+                // Arrange
+                Serialize_EmptyPlot_CorrectFile();
+                var plot = new Plot();
+                Serializer.Serialize(plot, "EmptyPlot.txt");
+                // Act
+                var actual = Serializer.Deserialize<Plot>("EmptyPlot.txt");
+                // Assert
+                Assert.Equal(plot.Elements.Count, actual.Elements.Count);
+                Assert.Equal(plot.Time, actual.Time);
+                File.Delete("EmptyPlot.txt");
+            }
+
+            /// <summary>
+            /// Сохранение сюжета с элементами без связей.
+            /// Ожидание: файл с верными данными сюжета.
+            /// </summary>
+            [Fact]
+            public void Serialize_PlotWithSingleElements_CorrectFile()
+            {
+                // Arrange
+                var plot = new Plot();
+                var character = new Element(ElemType.Character, "Name1", "Description1");
+                var item = new Element(ElemType.Item, "Name2", "Description2");
+                var location = new Element(ElemType.Location, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                plot.Add(character);
+                plot.Add(item);
+                plot.Add(location);
+                plot.Add(@event);
+                // Act
+                Serializer.Serialize(plot, "PlotWithSingleElements.txt");
+                // Assert
+                var actual = File.ReadAllText("PlotWithSingleElements.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""Elements"": {
+    ""$id"": ""2"",
+    ""$values"": [
+      {
+        ""$id"": ""3"",
+        ""Type"": 0,
+        ""Name"": ""Name1"",
+        ""Description"": ""Description1"",
+        ""Params"": {
+          ""$id"": ""4""
+        },
+        ""Time"": 0
+      },
+      {
+        ""$id"": ""5"",
+        ""Type"": 1,
+        ""Name"": ""Name2"",
+        ""Description"": ""Description2"",
+        ""Params"": {
+          ""$id"": ""6""
+        },
+        ""Time"": 1
+      },
+      {
+        ""$id"": ""7"",
+        ""Type"": 2,
+        ""Name"": ""Name3"",
+        ""Description"": ""Description3"",
+        ""Params"": {
+          ""$id"": ""8""
+        },
+        ""Time"": 2
+      },
+      {
+        ""$id"": ""9"",
+        ""Type"": 3,
+        ""Name"": ""Name4"",
+        ""Description"": ""Description4"",
+        ""Params"": {
+          ""$id"": ""10""
+        },
+        ""Time"": 3
+      }
+    ]
+  },
+  ""Time"": 4
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("PlotWithSingleElements.txt");
+            }
+
+            /// <summary>
+            /// Десериализация сюжета с элементами без связей.
+            /// Ожидание: объект сюжета с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_PlotWithSingleElements_CorrectObject()
+            {
+                // Arrange
+                Serialize_PlotWithSingleElements_CorrectFile();
+                var plot = new Plot();
+                var character = new Element(ElemType.Character, "Name1", "Description1");
+                var item = new Element(ElemType.Item, "Name2", "Description2");
+                var location = new Element(ElemType.Location, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                plot.Add(character);
+                plot.Add(item);
+                plot.Add(location);
+                plot.Add(@event);
+                Serializer.Serialize(plot, "PlotWithSingleElements.txt");
+                // Act
+                var actual = Serializer.Deserialize<Plot>("PlotWithSingleElements.txt");
+                // Assert
+                Assert.Equal(plot.Elements.Count, actual.Elements.Count);
+                Assert.Equal(plot.Time, actual.Time);
+                for (int i = 0; i < plot.Elements.Count; i++)
+                {
+                    Assert.Equal(plot.Elements[i].Type, actual.Elements[i].Type);
+                    Assert.Equal(plot.Elements[i].Name, actual.Elements[i].Name);
+                    Assert.Equal(plot.Elements[i].Description, actual.Elements[i].Description);
+                    Assert.Equal(plot.Elements[i].Params.Count, actual.Elements[i].Params.Count);
+                    foreach (var key in plot.Elements[i].Params.Keys)
+                    {
+                        Assert.True(actual.Elements[i].Params.ContainsKey(key));
+                        Assert.Equal(plot.Elements[i].Params[key], actual.Elements[i].Params[key], Compare);
+                    }
+                    Assert.Equal(plot.Elements[i].Time, actual.Elements[i].Time);
+                }
+                File.Delete("PlotWithSingleElements.txt");
+            }
+
+            /// <summary>
+            /// Сохранение сюжета с элементами со связями.
+            /// Ожидание: файл с верными данными сюжета.
+            /// </summary>
+            [Fact]
+            public void Serialize_PlotWithElementsWithBonds_CorrectFile()
+            {
+                // Arrange
+                var plot = new Plot();
+                var character = new Element(ElemType.Character, "Name1", "Description1");
+                var item = new Element(ElemType.Item, "Name2", "Description2");
+                var location = new Element(ElemType.Location, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                Binder.Bind(character, item);
+                Binder.Bind(character, location);
+                Binder.Bind(character, @event);
+                Binder.Bind(item, location);
+                Binder.Bind(item, @event);
+                Binder.Bind(location, @event);
+                plot.Add(character);
+                plot.Add(item);
+                plot.Add(location);
+                plot.Add(@event);
+                // Act
+                Serializer.Serialize(plot, "PlotWithElementsWithBonds.txt");
+                // Assert
+                var actual = File.ReadAllText("PlotWithElementsWithBonds.txt");
+                var expected = @"{
+  ""$id"": ""1"",
+  ""Elements"": {
+    ""$id"": ""2"",
+    ""$values"": [
+      {
+        ""$id"": ""3"",
+        ""Type"": 0,
+        ""Name"": ""Name1"",
+        ""Description"": ""Description1"",
+        ""Params"": {
+          ""$id"": ""4"",
+          ""Items"": {
+            ""$id"": ""5"",
+            ""$values"": [
+              {
+                ""$id"": ""6"",
+                ""Type"": 1,
+                ""Name"": ""Name2"",
+                ""Description"": ""Description2"",
+                ""Params"": {
+                  ""$id"": ""7"",
+                  ""Host"": {
+                    ""$ref"": ""3""
+                  },
+                  ""Location"": {
+                    ""$id"": ""8"",
+                    ""Type"": 2,
+                    ""Name"": ""Name3"",
+                    ""Description"": ""Description3"",
+                    ""Params"": {
+                      ""$id"": ""9"",
+                      ""Characters"": {
+                        ""$id"": ""10"",
+                        ""$values"": [
+                          {
+                            ""$ref"": ""3""
+                          }
+                        ]
+                      },
+                      ""Items"": {
+                        ""$id"": ""11"",
+                        ""$values"": [
+                          {
+                            ""$ref"": ""6""
+                          }
+                        ]
+                      },
+                      ""Events"": {
+                        ""$id"": ""12"",
+                        ""$values"": [
+                          {
+                            ""$id"": ""13"",
+                            ""Type"": 3,
+                            ""Name"": ""Name4"",
+                            ""Description"": ""Description4"",
+                            ""Params"": {
+                              ""$id"": ""14"",
+                              ""Characters"": {
+                                ""$id"": ""15"",
+                                ""$values"": [
+                                  {
+                                    ""$ref"": ""3""
+                                  }
+                                ]
+                              },
+                              ""Items"": {
+                                ""$id"": ""16"",
+                                ""$values"": [
+                                  {
+                                    ""$ref"": ""6""
+                                  }
+                                ]
+                              },
+                              ""Locations"": {
+                                ""$id"": ""17"",
+                                ""$values"": [
+                                  {
+                                    ""$ref"": ""8""
+                                  }
+                                ]
+                              }
+                            },
+                            ""Time"": 3
+                          }
+                        ]
+                      }
+                    },
+                    ""Time"": 2
+                  },
+                  ""Events"": {
+                    ""$id"": ""18"",
+                    ""$values"": [
+                      {
+                        ""$ref"": ""13""
+                      }
+                    ]
+                  }
+                },
+                ""Time"": 1
+              }
+            ]
+          },
+          ""Locations"": {
+            ""$id"": ""19"",
+            ""$values"": [
+              {
+                ""$ref"": ""8""
+              }
+            ]
+          },
+          ""Events"": {
+            ""$id"": ""20"",
+            ""$values"": [
+              {
+                ""$ref"": ""13""
+              }
+            ]
+          }
+        },
+        ""Time"": 0
+      },
+      {
+        ""$ref"": ""6""
+      },
+      {
+        ""$ref"": ""8""
+      },
+      {
+        ""$ref"": ""13""
+      }
+    ]
+  },
+  ""Time"": 4
+}";
+                Assert.Equal(expected, actual);
+                File.Delete("PlotWithElementsWithBonds.txt");
+            }
+
+            /// <summary>
+            /// Десериализация сюжета с элементами со связями.
+            /// Ожидание: объект сюжета с верными данными.
+            /// </summary>
+            [Fact]
+            public void Deserialize_PlotWithElementsWithBonds_CorrectObject()
+            {
+                // Arrange
+                Serialize_PlotWithElementsWithBonds_CorrectFile();
+                var plot = new Plot();
+                var character = new Element(ElemType.Character, "Name1", "Description1");
+                var item = new Element(ElemType.Item, "Name2", "Description2");
+                var location = new Element(ElemType.Location, "Name3", "Description3");
+                var @event = new Element(ElemType.Event, "Name4", "Description4");
+                Binder.Bind(character, item);
+                Binder.Bind(character, location);
+                Binder.Bind(character, @event);
+                Binder.Bind(item, location);
+                Binder.Bind(item, @event);
+                Binder.Bind(location, @event);
+                plot.Add(character);
+                plot.Add(item);
+                plot.Add(location);
+                plot.Add(@event);
+                Serializer.Serialize(plot, "PlotWithElementsWithBonds.txt");
+                // Act
+                var actual = Serializer.Deserialize<Plot>("PlotWithElementsWithBonds.txt");
+                // Assert
+                Assert.Equal(plot.Elements.Count, actual.Elements.Count);
+                Assert.Equal(plot.Time, actual.Time);
+                for (int i = 0; i < plot.Elements.Count; i++)
+                {
+                    Assert.Equal(plot.Elements[i].Type, actual.Elements[i].Type);
+                    Assert.Equal(plot.Elements[i].Name, actual.Elements[i].Name);
+                    Assert.Equal(plot.Elements[i].Description, actual.Elements[i].Description);
+                    Assert.Equal(plot.Elements[i].Params.Count, actual.Elements[i].Params.Count);
+                    foreach (var key in plot.Elements[i].Params.Keys)
+                    {
+                        Assert.True(actual.Elements[i].Params.ContainsKey(key));
+                        Assert.Equal(plot.Elements[i].Params[key], actual.Elements[i].Params[key], Compare);
+                    }
+                    Assert.Equal(plot.Elements[i].Time, actual.Elements[i].Time);
+                }
+                File.Delete("PlotWithElementsWithBonds.txt");
             }
         }
     }

@@ -245,7 +245,8 @@ namespace BaseClasses.Services
         /// <returns>True, если свойства совпадают, иначе False.</returns>
         private static bool MatchesProperties(Type type, JsonElement json)
         {
-            foreach (var property in type.GetProperties())
+            foreach (var property in type.GetProperties()
+                .Where(p => !p.IsDefined(typeof(JsonIgnoreAttribute), true)))
             {
                 if (!json.TryGetProperty(property.Name, out _))
                 {

@@ -7,7 +7,6 @@ namespace BaseClasses.Model
     /// <summary>
     /// История
     /// </summary>
-    [JsonDerivedType(typeof(Plot), typeDiscriminator: "Plot")]
     public class Plot
     {
         /// <summary>
