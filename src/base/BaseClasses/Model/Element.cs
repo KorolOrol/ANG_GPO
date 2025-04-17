@@ -7,7 +7,7 @@ namespace BaseClasses.Model
     /// <summary>
     /// Элемент истории
     /// </summary>
-    public class Element : IElement
+    public class Element : IElement, IEquatable<Element>
     {
         /// <summary>
         /// Тип элемента
@@ -108,6 +108,16 @@ namespace BaseClasses.Model
             {
                 return value.ToString();
             }
+        }
+
+        public bool Equals(Element? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Type == other.Type &&
+                   Name == other.Name &&
+                   Description == other.Description &&
+                   Time == other.Time;
         }
     }
 }

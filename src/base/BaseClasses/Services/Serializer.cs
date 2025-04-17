@@ -5,16 +5,17 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
+using System.Collections;
 
 namespace BaseClasses.Services
 {
     /// <summary>
-    /// Сериализатор
+    /// Сериализатор. 
     /// </summary>
     public static class Serializer
     {
         /// <summary>
-        /// Настройки сериализации
+        /// Настройки сериализации. 
         /// </summary>
         public static JsonSerializerOptions Options { get; } = new JsonSerializerOptions
         {
@@ -24,15 +25,15 @@ namespace BaseClasses.Services
         };
 
         /// <summary>
-        /// Разрешитель ссылок
+        /// Разрешитель ссылок. 
         /// </summary>
         private static ReferenceResolver ReferenceResolver { get; set; }
 
         /// <summary>
-        /// Сериализация истории
+        /// Сериализация истории. 
         /// </summary>
-        /// <param name="plot">История</param>
-        /// <param name="path">Путь к файлу</param>
+        /// <param name="plot">История.</param>
+        /// <param name="path">Путь к файлу.</param>
         public static void Serialize(Plot plot, string path)
         {
             var json = JsonSerializer.Serialize(plot, Options);
@@ -40,10 +41,10 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Сериализация элемента истории
+        /// Сериализация элемента истории. 
         /// </summary>
-        /// <param name="character">Элемент</param>
-        /// <param name="path">Путь к файлу</param>
+        /// <param name="character">Элемент.</param>
+        /// <param name="path">Путь к файлу.</param>
         public static void Serialize(IElement element, string path)
         {
             var json = JsonSerializer.Serialize(element, Options);
@@ -51,26 +52,25 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Десериализация
+        /// Десериализация. 
         /// </summary>
-        /// <typeparam name="T">Тип объекта</typeparam>
-        /// <param name="path">Путь к файлу</param>
-        /// <returns>Объект</returns>
+        /// <typeparam name="T">Тип объекта.</typeparam>
+        /// <param name="path">Путь к файлу.</param>
+        /// <returns>Объект.</returns>
         public static T Deserialize<T>(string path)
         {
             ReferenceResolver = new ElementsReferenceResolver();
             var json = File.ReadAllText(path);
             var document = JsonDocument.Parse(json);
             var rootElement = document.RootElement;
-            if (typeof(T) == typeof(Plot) && rootElement.GetProperty("$type").GetString() == "Plot")
+            if (typeof(T) == typeof(Plot) && MatchesProperties(typeof(Plot), rootElement))
             {
                 Plot plot = ReadPlot(rootElement);
                 return (T)Convert.ChangeType(plot, typeof(T));
             }
-            else if (typeof(T) == typeof(Element) && 
-                rootElement.GetProperty("$type").GetString() == "Element")
+            else if (typeof(T) == typeof(Element) && MatchesProperties(typeof(Element), rootElement))
             {
-                Element element = ReadElement(rootElement);
+                IElement element = ReadElement(rootElement);
                 return (T)Convert.ChangeType(element, typeof(T));
             }
             else
@@ -80,10 +80,10 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Чтение истории
+        /// Чтение истории. 
         /// </summary>
-        /// <param name="json">Json элемент</param>
-        /// <returns>История</returns>
+        /// <param name="json">Json элемент.</param>
+        /// <returns>История.</returns>
         private static Plot ReadPlot(JsonElement json)
         {
             var elementsProperty = json.GetProperty("Elements");
@@ -101,11 +101,11 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Чтение элемента
+        /// Чтение элемента. 
         /// </summary>
-        /// <param name="json">Json элемент</param>
-        /// <returns>Элемент</returns>
-        private static Element ReadElement(JsonElement json)
+        /// <param name="json">Json элемент. </param>
+        /// <returns>Элемент. </returns>
+        private static IElement ReadElement(JsonElement json)
         {
             var typeProperty = json.GetProperty("Type");
             var nameProperty = json.GetProperty("Name");
@@ -131,11 +131,11 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Чтение значения
+        /// Чтение значения. 
         /// </summary>
-        /// <param name="json">Json элемент</param>
-        /// <returns>Значение</returns>
-        /// <exception cref="JsonException">Исключение, если тип не определен</exception>
+        /// <param name="json">Json элемент.</param>
+        /// <returns>Значение.</returns>
+        /// <exception cref="JsonException">Исключение, если тип не определен.</exception>
         private static object ReadValue(JsonElement json)
         {
             
@@ -149,28 +149,34 @@ namespace BaseClasses.Services
                         {
                             values.Add(ReadValue(elem));
                         }
-                        return values;
+                        return ConvertList(values);
                     }
                     else if (json.TryGetProperty("$ref", out JsonElement @ref))
                     {
                         return ReferenceResolver.ResolveReference(@ref.GetString());
                     }
-                    else if (json.TryGetProperty("$type", out JsonElement type))
+                    else
                     {
-                        if (type.GetString() == "Relation")
-                        {
-                            Relation rel = new();
-                            rel.Character = (Element)ReadValue(json.GetProperty("Character"));
-                            rel.Value = json.GetProperty("Value").GetDouble();
-                            return rel;
-                        }
-                        else if (type.GetString() == "Element")
+                        if (MatchesProperties(typeof(Element), json))
                         {
                             return ReadElement(json);
+                        }
+                        else if (MatchesProperties(typeof(Relation), json))
+                        {
+                            Relation rel = new() 
+                            {
+                                Character = ReadValue(json.GetProperty("Character")) as IElement,
+                                Value = json.GetProperty("Value").GetDouble()
+                            };
+                            return rel;
                         }
                     }
                     break;
                 case JsonValueKind.String:
+                    if (DateTime.TryParse(json.GetString(), out DateTime date))
+                    {
+                        return date;
+                    }
                     return json.GetString();
                 case JsonValueKind.Number:
                     return json.GetDouble();
@@ -181,10 +187,10 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Печать информации об истории
+        /// Печать информации об истории. 
         /// </summary>
-        /// <param name="plot">История</param>
-        /// <param name="path">Путь к файлу</param>
+        /// <param name="plot">История.</param>
+        /// <param name="path">Путь к файлу.</param>
         public static void Print(Plot plot, string path)
         {
             string data = plot.FullInfo();
@@ -192,14 +198,62 @@ namespace BaseClasses.Services
         }
 
         /// <summary>
-        /// Печать информации об элементе истории
+        /// Печать информации об элементе истории. 
         /// </summary>
-        /// <param name="element">Элемент</param>
-        /// <param name="path">Путь к файлу</param>
+        /// <param name="element">Элемент.</param>
+        /// <param name="path">Путь к файлу.</param>
         public static void Print(IElement element, string path)
         {
             string data = element.FullInfo();
             File.WriteAllText(path, data);
+        }
+
+        /// <summary>
+        /// Конвертация списка в типизированный список. 
+        /// </summary>
+        /// <param name="obj">Конвертируемый объект.</param>
+        /// <returns>Типизированный список или оригинальный объект, если это не список.</returns>
+        private static object ConvertList(object obj)
+        {
+            if (obj is IList list && list.Count > 0)
+            {
+                Type elementType = list[0].GetType();
+                Type listType;
+                if (elementType == typeof(Element))
+                {
+                    listType = typeof(List<>).MakeGenericType(typeof(IElement));
+                }
+                else
+                {
+                    listType = typeof(List<>).MakeGenericType(elementType);
+                }
+                IList typedList = (IList)Activator.CreateInstance(listType);
+                foreach (var item in list)
+                {
+                    typedList.Add(item);
+                }
+                return typedList;
+            }
+            return obj;
+        }
+
+        /// <summary>
+        /// Проверка на соответствие свойств.
+        /// </summary>
+        /// <param name="type">Тип.</param>
+        /// <param name="json">Json элемент.</param>
+        /// <returns>True, если свойства совпадают, иначе False.</returns>
+        private static bool MatchesProperties(Type type, JsonElement json)
+        {
+            foreach (var property in type.GetProperties()
+                .Where(p => !p.IsDefined(typeof(JsonIgnoreAttribute), true)))
+            {
+                if (!json.TryGetProperty(property.Name, out _))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
