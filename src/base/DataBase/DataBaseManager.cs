@@ -2,6 +2,11 @@
 using BaseClasses.Interface;
 using SliccDB.Core;
 using SliccDB;
+using BaseClasses.Enum;
+using SliccDB.Fluent;
+using System.Runtime.InteropServices;
+using SliccDB.Exceptions;
+using static DataBase.DataBaseManager;
 
 
 namespace DataBase
@@ -9,24 +14,29 @@ namespace DataBase
     public class DataBaseManager
     {
         #region Classes for db mapping
-        private class Character
+        internal class Сharacter
         {
-
+            internal string Name {  get; set; }
+            internal string Description { get; set; } = "";
+            internal string Traits { get; set; } = "";
         }
 
-        private class Item
+        internal class Item
         {
-
+            internal string Name { get; set; }
+            internal string Description { get; set; } = "";
         }
 
-        private class Event
+        internal class Event
         {
-
+            internal string Name { get; set; }
+            internal string Description { get; set; } = "";
         }
 
-        public class Location
+        internal class Location
         {
-
+            internal string Name { get; set; }
+            internal string Description { get; set; } = "";
         }
         #endregion
 
@@ -39,14 +49,10 @@ namespace DataBase
         #region Constructor
         DataBaseManager(string filepath)
         {
-            if (filepath == null)
-            {
-                filepath = Path.Combine(
+            filepath ??= Path.Combine(
                     Environment.GetFolderPath(
                         Environment.SpecialFolder.Personal),
                     "AGN");
-
-            }
             Connection = new DatabaseConnection(filepath);
         }
         #endregion
@@ -56,7 +62,43 @@ namespace DataBase
         #region Create
         public bool Create(IElement element)
         {
-            throw new NotImplementedException();
+            if (Connection.Nodes().Properties("Name".Value(element.Description)).First() is var node && node != null)
+            {
+                FillNodeFields(element, node);
+                return true;
+            }
+
+            switch (element.Type)
+            {
+                case ElemType.Character:
+                {
+                    Connection.CreateNode(new Сharacter() {
+                        Name = element.Name,
+                        Description = element.Description, 
+                        Traits = (string)element.Params["Traits"]
+                    });
+                    break;
+                }
+                case ElemType.Item:
+                {
+                    Connection.CreateNode(new Item() { Name = element.Name, Description = element.Description });
+                    break;
+                }
+                case ElemType.Event:
+                {
+                    Connection.CreateNode(new Event() { Name = element.Name, Description = element.Description });
+                    break;
+                }
+                case ElemType.Location:
+                {
+                    Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description });
+                    break;
+                }
+            }
+
+            var createdNode = Connection.Nodes().Properties("Description".Value(element.Description)).First();
+            CreateRelations(element, createdNode);
+            return true;
         }
 
         public bool Create(List<IElement> elements) 
@@ -100,6 +142,71 @@ namespace DataBase
             throw new NotImplementedException();
         }
         #endregion
+
+        #endregion
+
+        #region Private methods
+
+        private bool CreateRelations(IElement element, Node centralNode)
+        {
+            foreach (var param in element.Params.Keys)
+            {
+                foreach (string name in (List<string>)element.Params[param])
+                {
+                    try
+                    {
+                        switch (param)
+                        {
+                            case "Location":
+                                {
+                                    Connection.CreateNode(new Location() { Name = name });
+                                    break;
+                                }
+                            case "Events":
+                                {
+                                    Connection.CreateNode(new Event() { Name = name });
+                                    break;
+                                }
+                            case "Items":
+                                {
+                                    Connection.CreateNode(new Item() { Name = name });
+                                    break;
+                                }
+                            case "Relations":
+                                {
+                                    Connection.CreateNode(new Сharacter() { Name = name });
+                                    break;
+                                }
+                            case "Characters":
+                                {
+                                    Connection.CreateNode(new Сharacter() { Name = name })
+                                }
+                            default:
+                                continue;
+                        }
+                    }
+                    catch (SliccDbException) { }
+                }
+            }
+        }
+
+        private bool FillNodeFields(IElement element, Node node)
+        {
+            try
+            {
+                node.Properties["Description"] = element.Description;
+                if (element.Type == ElemType.Character)
+                {
+                    node.Properties["Traits"] = (string)element.Params["Traits"];
+                }
+                Connection.Update(node);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         #endregion
     }
