@@ -39,6 +39,30 @@ namespace AIGenerator
         public bool AIPriority { get; set; } = false;
 
         /// <summary>
+        /// Использовать структурированный вывод
+        /// </summary>
+        private bool _useStructuredOutput = true;
+
+        /// <summary>
+        /// Использовать структурированный вывод
+        /// </summary>
+        public bool UseStructuredOutput
+        {
+            get
+            {
+                return _useStructuredOutput;
+            }
+            set
+            {
+                _useStructuredOutput = value;
+                if (TextAiGenerator is ISupportStructuredOutput supportStructuredOutput)
+                {
+                    supportStructuredOutput.UseStructuredOutput = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// Загрузка системных подсказок
         /// </summary>
         /// <param name="path">Путь к файлу с подсказками</param>
@@ -90,11 +114,13 @@ namespace AIGenerator
         /// <returns>Список подсказок</returns>
         private List<string> GetPromptForResponse(Plot plot, IElement element)
         {
-            List<string> prompts = new List<string>
-                {
-                    SystemPrompt["Setting"],
-                    SystemPrompt[$"{element.Type}Start"]
-                };
+            List<string> prompts = new();
+            if (UseStructuredOutput)
+            {
+                prompts.Add(SystemPrompt[$"{element.Type}StructuredOutput"]);
+            }
+            prompts.Add(SystemPrompt["Setting"]);
+            prompts.Add(SystemPrompt[$"{element.Type}Start"]);
             if (plot.Characters.Count != 0)
             {
                 foreach (var character in plot.Characters)

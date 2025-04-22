@@ -11,6 +11,7 @@ List<string> list = new List<string>() {"Привет"};
 Console.WriteLine(await text.GenerateTextAsync(list));
 */
 
+/*
 Element c = new Element(ElemType.Character, "Вася", "Вася Пупкин");
 Element c2 = new Element(ElemType.Character, "Петя", "");
 Element c3 = new Element(ElemType.Character, "Коля", "");
@@ -20,10 +21,9 @@ Binder.Bind(c, c3, 20);
 Binder.Bind(c, c4, 30);
 
 Serializer.Serialize(c, "relTest.txt");
+*/
 
 /*
-string promptPath = "/home/korolorol/src/ANG_GPO/src/AI/AIGenerator/SystemPromptExample.json";
-string savingPath = "/home/korolorol/src/ANG_GPO/src/AI/AITest/SavingPath/";
 LlmAiGenerator Ngen = new(promptPath, new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host/v1/"));
 Ngen.AIPriority = true;
 Ngen.TextAiGenerator.Model = "gpt-4o-mini";
@@ -31,15 +31,16 @@ Ngen.TextAiGenerator.Model = "gpt-4o-mini";
 LlmAiGenerator Ogen = new(promptPath);
 */
 
-/*
+string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
+string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
 LlmAiGenerator server = new(promptPath);
-server.TextAiGenerator.Endpoint = "http://192.168.1.178:1234/v1/";
-server.TextAiGenerator.Model = "gemma-2-27b-it";
+server.TextAiGenerator.Endpoint = "http://127.0.0.1:1234/v1/";
+server.TextAiGenerator.Model = "saiga_nemo_12b_gguf";
 server.AIPriority = true;
-*/
+server.UseStructuredOutput = true;
 
-/*
-LlmAiGenerator gen = Ngen;
+
+LlmAiGenerator gen = server;
 
 Plot plot = new Plot();
 
@@ -206,4 +207,3 @@ while (true)
             return;
     }
 }
-*/

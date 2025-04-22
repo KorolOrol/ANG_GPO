@@ -8,7 +8,7 @@ namespace AIGenerator.TextGenerator
     /// <summary>
     /// Класс для генерации текста с помощью OpenAI API
     /// </summary>
-    public class OpenAIGenerator : ITextAiGenerator
+    public class OpenAIGenerator : ITextAiGenerator, ISupportStructuredOutput
     {
         /// <summary>
         /// Ключ API для OpenAI
@@ -67,6 +67,11 @@ namespace AIGenerator.TextGenerator
         }
 
         /// <summary>
+        /// Использовать структурированный вывод
+        /// </summary>
+        public bool UseStructuredOutput { get; set; } = true;
+
+        /// <summary>
         /// Получить ключ API из переменной окружения
         /// </summary>
         /// <param name="envVar">Имя переменной окружения</param>
@@ -106,22 +111,33 @@ namespace AIGenerator.TextGenerator
             }
         }
 
-        public bool TrimEnd { get; set; }
-
         /// <summary>
         /// Генерация текста
         /// </summary>
-        /// <param name="messages">Список сообщений</param>
+        /// <param name="messages">Список сообщений. 
+        /// Если UseStructuredOutput - true, то первое сообщение используется 
+        /// для структурированного вывода.</param>
         /// <returns>Сгенерированный текст</returns>
         /// <exception cref="Exception">Ошибка генерации текста</exception>
         public async Task<string> GenerateTextAsync(List<string> messages)
         {
+            ChatCompletionOptions options = new();
+            if (UseStructuredOutput)
+            {
+                options = new ChatCompletionOptions()
+                {
+                    ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                        jsonSchemaFormatName: "AiElement",
+                        jsonSchema: BinaryData.FromString(messages.First()),
+                        jsonSchemaIsStrict: true)
+                };
+                messages.RemoveAt(0);
+            }
             var completion = await Client.CompleteChatAsync(messages.Select(
-                message => ChatMessage.CreateUserMessage(message)));
+                message => ChatMessage.CreateUserMessage(message)), options);
             if (completion.Value.FinishReason == ChatFinishReason.Stop)
             {
                 string trimmedResult = completion.Value.Content.First().Text;
-                if (TrimEnd) trimmedResult = TrimRepeatingEnd(trimmedResult);
                 trimmedResult = Regex.Match(trimmedResult, 
                                             @"\{.*\}", RegexOptions.Singleline).Value;
                 trimmedResult = trimmedResult.Replace("\n\n", "");
@@ -134,14 +150,6 @@ namespace AIGenerator.TextGenerator
             }
             else
             {
-                /*
-                await Task.Delay(5000);
-                if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                {
-                    await Task.Delay(5000);
-                    return await GenerateTextAsync(messages);
-                }
-                */
                 throw new Exception("Failed to generate text: " + completion.Value.FinishReason);
             }
         }
@@ -152,7 +160,6 @@ namespace AIGenerator.TextGenerator
         public OpenAIGenerator()
         {
             GetApiKeyFromEnvironment("OpenAIAPIKey");
-            TrimEnd = false;
         }
 
         /// <summary>
@@ -164,20 +171,6 @@ namespace AIGenerator.TextGenerator
         {
             GetApiKeyFromEnvironment(keyEnvVar);
             Endpoint = endpoint;
-            TrimEnd = true;
-        }
-
-        private string TrimRepeatingEnd(string input)
-        {
-            for (int i = (int)Math.Floor((double)input.Length / 2); i > 0 ; i--)
-            {
-                if (input.Substring(input.Length - i, i) == 
-                    input.Substring(input.Length - 2 * i, i))
-                {
-                    return input.Substring(0, input.Length - i);
-                }
-            }
-            return input;
         }
     }
 }
