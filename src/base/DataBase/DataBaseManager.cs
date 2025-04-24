@@ -1,22 +1,20 @@
 ﻿using SliccDB.Serialization;
 using BaseClasses.Interface;
 using SliccDB.Core;
-using SliccDB;
 using BaseClasses.Enum;
 using SliccDB.Fluent;
-using System.Runtime.InteropServices;
 using SliccDB.Exceptions;
-using static DataBase.DataBaseManager;
+using BaseClasses.Model;
 
 
 namespace DataBase
 {
     public class DataBaseManager
     {
-        #region Classes for db mapping
+        #region MapEnteties
         internal class Сharacter
         {
-            internal string Name {  get; set; }
+            internal string Name { get; set; }
             internal string Description { get; set; } = "";
             internal string Traits { get; set; } = "";
         }
@@ -38,10 +36,11 @@ namespace DataBase
             internal string Name { get; set; }
             internal string Description { get; set; } = "";
         }
+
         #endregion
 
         #region Fields
-        
+
         private readonly DatabaseConnection Connection;
 
         #endregion
@@ -62,60 +61,71 @@ namespace DataBase
         #region Create
         public bool Create(IElement element)
         {
-            if (Connection.Nodes().Properties("Name".Value(element.Description)).First() is var node && node != null)
+            if (Connection.Nodes().Properties("Name".Value(element.Name)).First() is var node && node != null)
             {
                 FillNodeFields(element, node);
                 return true;
             }
-
-            switch (element.Type)
+            else
             {
-                case ElemType.Character:
+                switch (element.Type)
                 {
-                    Connection.CreateNode(new Сharacter() {
-                        Name = element.Name,
-                        Description = element.Description, 
-                        Traits = (string)element.Params["Traits"]
-                    });
-                    break;
-                }
-                case ElemType.Item:
-                {
-                    Connection.CreateNode(new Item() { Name = element.Name, Description = element.Description });
-                    break;
-                }
-                case ElemType.Event:
-                {
-                    Connection.CreateNode(new Event() { Name = element.Name, Description = element.Description });
-                    break;
-                }
-                case ElemType.Location:
-                {
-                    Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description });
-                    break;
+                    case ElemType.Character:
+                    {
+                        Connection.CreateNode(new Сharacter()
+                        {
+                            Name = RemoveTag(element.Name),
+                            Description = element.Description,
+                            Traits = (string)element.Params["Traits"]
+                        });
+                        break;
+                    }
+                    case ElemType.Item:
+                    {
+                        Connection.CreateNode(new Item() { Name = RemoveTag(element.Name), Description = element.Description });
+                        break;
+                    }
+                    case ElemType.Event:
+                    {
+                        Connection.CreateNode(new Event() { Name = RemoveTag(element.Name), Description = element.Description });
+                        break;
+                    }
+                    case ElemType.Location:
+                    {
+                        Connection.CreateNode(new Location() { Name = RemoveTag(element.Name), Description = element.Description });
+                        break;
+                    }
                 }
             }
-
-            var createdNode = Connection.Nodes().Properties("Description".Value(element.Description)).First();
+            var createdNode = Connection.Nodes().Properties("Name".Value(RemoveTag(element.Name))).First();
             CreateRelations(element, createdNode);
             return true;
         }
 
         public bool Create(List<IElement> elements) 
-        { 
-            throw new NotImplementedException(); 
+        {
+            foreach (var element in elements)
+            {
+                if (!Create(element))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         #endregion
             
         #region Read
-        public bool Read(IElement element)
+        public IElement Read(string elementName)
         {
             throw new NotImplementedException();
-        }
 
-        public bool Read(List<IElement> elements)
-        {
-            throw new NotImplementedException();
+            Node element = Connection.Nodes().Properties("Name".Value(elementName)).First();
+            ElemType type = Enum.Parse<ElemType>(element.Labels.First());
+
+            var relations = Connection.Relations.Where(x => x.SourceHash == element.Hash).ToList();
+
+            
         }
         #endregion
         
@@ -153,41 +163,51 @@ namespace DataBase
             {
                 foreach (string name in (List<string>)element.Params[param])
                 {
+                    var clearName = RemoveTag(name);
+                    Node newNode;
                     try
                     {
                         switch (param)
                         {
-                            case "Location":
-                                {
-                                    Connection.CreateNode(new Location() { Name = name });
-                                    break;
-                                }
-                            case "Events":
-                                {
-                                    Connection.CreateNode(new Event() { Name = name });
-                                    break;
-                                }
-                            case "Items":
-                                {
-                                    Connection.CreateNode(new Item() { Name = name });
-                                    break;
-                                }
-                            case "Relations":
-                                {
-                                    Connection.CreateNode(new Сharacter() { Name = name });
-                                    break;
-                                }
-                            case "Characters":
-                                {
-                                    Connection.CreateNode(new Сharacter() { Name = name })
-                                }
-                            default:
-                                continue;
+                        case "Locations":
+                            {
+                                newNode = Connection.CreateNode(new Event() { Name = clearName });
+                                break;
+                            }
+                        case "Events":
+                            {
+                                newNode = Connection.CreateNode(new Event() { Name = clearName });
+                                break;
+                            }
+                        case "Items":
+                            {
+                                newNode = Connection.CreateNode(new Item() { Name = clearName });
+                                break;
+                            }
+                        case "Host":
+                            {
+                                newNode = Connection.CreateNode(new Item() { Name = clearName });
+                                break;
+                            }
+                        case "Relations":
+                            {
+                                newNode = Connection.CreateNode(new Сharacter() { Name = clearName });
+                                break;
+                            }
+                        case "Characters":
+                            {
+                                newNode = Connection.CreateNode(new Сharacter() { Name = clearName });
+                                break;
+                            }
+                        default: { continue; }
                         }
+
+                        Connection.CreateRelation(param.Remove(param.Length - 2), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
                     }
-                    catch (SliccDbException) { }
+                    catch (SliccDbException) { return false; }
                 }
             }
+            return true;
         }
 
         private bool FillNodeFields(IElement element, Node node)
@@ -206,6 +226,11 @@ namespace DataBase
             {
                 return false;
             }
+        }
+
+        private static string RemoveTag(string param)
+        {
+            return param.Remove(param.IndexOf(": "));
         }
 
         #endregion

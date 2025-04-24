@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseClasses", "BaseClasses.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBase", "..\DataBase\DataBase.csproj", "{EF187345-D1BC-4E4B-B68B-F3052F1FD1BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SliccDB", "..\SliccDB\SliccDB.csproj", "{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{EF187345-D1BC-4E4B-B68B-F3052F1FD1BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF187345-D1BC-4E4B-B68B-F3052F1FD1BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF187345-D1BC-4E4B-B68B-F3052F1FD1BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
