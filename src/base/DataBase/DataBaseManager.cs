@@ -1,10 +1,10 @@
-﻿using SliccDB.Serialization;
+﻿using BaseClasses.Enum;
 using BaseClasses.Interface;
-using SliccDB.Core;
-using BaseClasses.Enum;
-using SliccDB.Fluent;
-using SliccDB.Exceptions;
 using BaseClasses.Model;
+using SliccDB.Core;
+using SliccDB.Exceptions;
+using SliccDB.Fluent;
+using SliccDB.Serialization;
 
 
 namespace DataBase
@@ -74,7 +74,7 @@ namespace DataBase
                     {
                         Connection.CreateNode(new Сharacter()
                         {
-                            Name = RemoveTag(element.Name),
+                            Name = element.Name,
                             Description = element.Description,
                             Traits = (string)element.Params["Traits"]
                         });
@@ -82,22 +82,22 @@ namespace DataBase
                     }
                     case ElemType.Item:
                     {
-                        Connection.CreateNode(new Item() { Name = RemoveTag(element.Name), Description = element.Description });
+                        Connection.CreateNode(new Item() { Name = element.Name, Description = element.Description });
                         break;
                     }
                     case ElemType.Event:
                     {
-                        Connection.CreateNode(new Event() { Name = RemoveTag(element.Name), Description = element.Description });
+                        Connection.CreateNode(new Event() { Name = element.Name, Description = element.Description });
                         break;
                     }
                     case ElemType.Location:
                     {
-                        Connection.CreateNode(new Location() { Name = RemoveTag(element.Name), Description = element.Description });
+                        Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description });
                         break;
                     }
                 }
             }
-            var createdNode = Connection.Nodes().Properties("Name".Value(RemoveTag(element.Name))).First();
+            var createdNode = Connection.Nodes().Properties("Name".Value(element.Name)).First();
             CreateRelations(element, createdNode);
             return true;
         }
@@ -116,16 +116,52 @@ namespace DataBase
         #endregion
             
         #region Read
+
         public IElement Read(string elementName)
         {
-            throw new NotImplementedException();
+            var elementNode = Connection.Nodes().Properties("Name".Value(elementName)).First();
+            Element element = new(Enum.Parse<ElemType>(elementNode.Labels.First()), elementName, elementNode.Properties["Description"]);
 
-            Node element = Connection.Nodes().Properties("Name".Value(elementName)).First();
-            ElemType type = Enum.Parse<ElemType>(element.Labels.First());
+            foreach (var prop in elementNode.Properties.Keys)
+            {
+                if (prop == "Description" || prop == "Name") { continue; }
+                
+                var values = elementNode.Properties[prop]
+                        .Trim('[', ']').Split(',')
+                        .Select(s => s.Trim()).ToList();
 
-            var relations = Connection.Relations.Where(x => x.SourceHash == element.Hash).ToList();
+                if (values.Count == 1)
+                {
+                    element.Params.Add(prop, values[0]);
+                }
+                else
+                {
+                    element.Params.Add(prop, values);
+                }
+            }
 
-            
+            var relations = Connection.Relations.Where(x => x.SourceHash == elementNode.Hash).ToList();
+
+            foreach (var rel in relations)
+            {
+                var relatedNode = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
+                if (relatedNode != null)
+                {
+                    var param = relatedNode.Labels.First();
+
+                    if (!element.Params.TryGetValue(param, out object? value))
+                    {
+                        value = new List<string>();
+                        element.Params.Add(param, value);
+                    }
+
+                    if (value is List<string> paramValues)
+                    {
+                        paramValues.Add(relatedNode.Properties["Name"]);
+                    }
+                }
+            }
+            return element;
         }
         #endregion
         
@@ -163,7 +199,7 @@ namespace DataBase
             {
                 foreach (string name in (List<string>)element.Params[param])
                 {
-                    var clearName = RemoveTag(name);
+                    var clearName = name;
                     Node newNode;
                     try
                     {
@@ -171,7 +207,7 @@ namespace DataBase
                         {
                         case "Locations":
                             {
-                                newNode = Connection.CreateNode(new Event() { Name = clearName });
+                                newNode = Connection.CreateNode(new Location() { Name = clearName });
                                 break;
                             }
                         case "Events":
@@ -186,7 +222,7 @@ namespace DataBase
                             }
                         case "Host":
                             {
-                                newNode = Connection.CreateNode(new Item() { Name = clearName });
+                                newNode = Connection.CreateNode(new Сharacter() { Name = clearName });
                                 break;
                             }
                         case "Relations":
@@ -202,7 +238,17 @@ namespace DataBase
                         default: { continue; }
                         }
 
-                        Connection.CreateRelation(param.Remove(param.Length - 2), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
+                        if (param != "Relations")
+                        {
+                            Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
+                            Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
+
+                        }
+                        else
+                        {
+                            //TODO
+                        }
+
                     }
                     catch (SliccDbException) { return false; }
                 }
@@ -226,11 +272,6 @@ namespace DataBase
             {
                 return false;
             }
-        }
-
-        private static string RemoveTag(string param)
-        {
-            return param.Remove(param.IndexOf(": "));
         }
 
         #endregion
