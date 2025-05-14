@@ -5,6 +5,7 @@ using SliccDB.Core;
 using SliccDB.Exceptions;
 using SliccDB.Fluent;
 using SliccDB.Serialization;
+using System.Reflection.Metadata.Ecma335;
 
 
 namespace DataBase
@@ -41,11 +42,19 @@ namespace DataBase
 
         #region Fields
 
+        /// <summary>
+        /// Подключение к базе данных.
+        /// </summary>
         private readonly DatabaseConnection Connection;
 
         #endregion
 
         #region Constructor
+
+        /// <summary>
+        /// Конструктор класса.
+        /// </summary>
+        /// <param name="filepath">Путь к файлу базы данных. Расширение файла </param>
         DataBaseManager(string filepath)
         {
             filepath ??= Path.Combine(
@@ -64,7 +73,6 @@ namespace DataBase
             if (Connection.Nodes().Properties("Name".Value(element.Name)).First() is var node && node != null)
             {
                 FillNodeFields(element, node);
-                return true;
             }
             else
             {
@@ -77,7 +85,7 @@ namespace DataBase
                             Name = element.Name,
                             Description = element.Description,
                             Traits = (string)element.Params["Traits"]
-                        });
+                        },"Character");
                         break;
                     }
                     case ElemType.Item:
@@ -166,27 +174,42 @@ namespace DataBase
         #endregion
         
         #region Update
-        public bool Update(IElement element)
+        public void UpdateDescription(IElement element)
         {
-            throw new NotImplementedException();
+            if (element == null) throw new ArgumentNullException();
+
+            var node = Connection.Nodes().Properties("Name".Value(element.Name)).First();
+
+            if (node == null) { Create(element); }
+            else
+            {
+                node.Properties["Description"] = element.Description;
+            }
+
+            Connection.Update(node);
         }
 
-        public bool Update(List<IElement> elements)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
         
         #region Delete
-        public bool Delete(IElement element)
+
+        /// <summary>
+        /// Delete the node of <see cref="IElement"/>.
+        /// </summary>
+        /// <param name="element">Element to delete.</param>
+        /// <exception cref="DBException">Erorr on deletation.</exception>
+        public void Delete(IElement element)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Connection.Delete(Connection.Nodes().Properties("Name".Value(element.Name)).First());
+            }
+            catch (SliccDbException ex)
+            {
+                throw new DBException("Error on deletion:" + ex.Message);
+            }
         }
 
-        public bool Delete(List<IElement> elements)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
 
         #endregion
@@ -197,9 +220,8 @@ namespace DataBase
         {
             foreach (var param in element.Params.Keys)
             {
-                foreach (string name in (List<string>)element.Params[param])
+                foreach (var obj in (List<object>)element.Params[param])
                 {
-                    var clearName = name;
                     Node newNode;
                     try
                     {
@@ -207,32 +229,27 @@ namespace DataBase
                         {
                         case "Locations":
                             {
-                                newNode = Connection.CreateNode(new Location() { Name = clearName });
+                                newNode = Connection.CreateNode(new Location() { Name = (string)obj });
                                 break;
                             }
                         case "Events":
                             {
-                                newNode = Connection.CreateNode(new Event() { Name = clearName });
+                                newNode = Connection.CreateNode(new Event() { Name = (string)obj });
                                 break;
                             }
                         case "Items":
                             {
-                                newNode = Connection.CreateNode(new Item() { Name = clearName });
+                                newNode = Connection.CreateNode(new Item() { Name = (string)obj });
                                 break;
                             }
                         case "Host":
                             {
-                                newNode = Connection.CreateNode(new Сharacter() { Name = clearName });
-                                break;
-                            }
-                        case "Relations":
-                            {
-                                newNode = Connection.CreateNode(new Сharacter() { Name = clearName });
+                                newNode = Connection.CreateNode(new Сharacter() { Name = (string)obj });
                                 break;
                             }
                         case "Characters":
                             {
-                                newNode = Connection.CreateNode(new Сharacter() { Name = clearName });
+                                newNode = Connection.CreateNode(new Сharacter() { Name = (string)obj });
                                 break;
                             }
                         default: { continue; }
@@ -242,13 +259,18 @@ namespace DataBase
                         {
                             Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
                             Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
-
                         }
                         else
                         {
-                            //TODO
-                        }
+                            if (obj is BaseClasses.Model.Relation rel && rel != null)
+                            {
+                                var relationProps = new Dictionary<string, string>();
+                                relationProps.Add("Relation", rel.Value.ToString());
+                                newNode = Connection.CreateNode(new Сharacter() { Name = (string)obj });
 
+                                Connection.CreateRelation(param[..^1], sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
+                            }
+                        }
                     }
                     catch (SliccDbException) { return false; }
                 }
