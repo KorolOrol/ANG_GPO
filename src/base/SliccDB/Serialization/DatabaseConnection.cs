@@ -468,7 +468,7 @@ namespace SliccDB.Serialization
             {
                 CreateSchema(label,
                     value.GetType().GetProperties().Select(prop => new Property()
-                        { FullTypeName = prop.PropertyType.FullName, Name = prop.Name }).ToList());
+                    { FullTypeName = prop.PropertyType.FullName, Name = prop.Name }).ToList());
             }
             else
             {

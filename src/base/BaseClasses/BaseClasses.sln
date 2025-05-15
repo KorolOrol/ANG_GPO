@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBase", "..\DataBase\Dat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SliccDB", "..\SliccDB\SliccDB.csproj", "{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "..\ConsoleApp1\ConsoleApp1.csproj", "{64829A02-149C-4D03-966E-17727C0EBB06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{64829A02-149C-4D03-966E-17727C0EBB06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64829A02-149C-4D03-966E-17727C0EBB06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64829A02-149C-4D03-966E-17727C0EBB06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64829A02-149C-4D03-966E-17727C0EBB06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
