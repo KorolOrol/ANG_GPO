@@ -26,18 +26,11 @@ plot.Add(event2);
 Serializer.Serialize(plot, "test.txt");
 DataBase.DataBaseManager dataBaseManager = new(null);
 dataBaseManager.StorePlot(plot);
-/*
 var newplot = dataBaseManager.ReadPlot();
 
-var read = dataBaseManager.Read("Name1");
-var newplot2 = new Plot();
-newplot2.Add(read);
-*/
+List<Plot> plots = new() { plot, newplot };
 
-var updatedElem = dataBaseManager.Read("Name1");
-updatedElem.Description = "Decscription updated";
-
-dataBaseManager.AddOrUpdateParams(updatedElem, ["Description"]);
-
-var updatedElem2 = dataBaseManager.Read("Name1");
-Console.WriteLine();
+foreach (Plot plo in plots)
+{
+    Console.WriteLine("\n\n" + plo.FullInfo());
+}
