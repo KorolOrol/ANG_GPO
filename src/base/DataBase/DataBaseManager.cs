@@ -94,7 +94,7 @@ namespace DataBase
             Node createdNode = null;
             if (Connection.Nodes().Properties("Name".Value(element.Name)).FirstOrDefault() is var node && node != null)
             {
-                AddOrUpdateParams(element, element.Params.Keys);
+                Update(element);
                 createdNode = node;
             }
             else
@@ -127,8 +127,8 @@ namespace DataBase
                     }
                     default: { break;}
                 }
+            Update(element);
             }
-            AddOrUpdateParams(element, element.Params.Keys);
 
             CreateRelations(element, createdNode);
             return true;
@@ -142,8 +142,8 @@ namespace DataBase
         /// Read node.
         /// </summary>
         /// <param name="elementName">Name of element to read.</param>
-        /// <returns>IElement inctance.</returns>
-        public IElement Read(string elementName)
+        /// <returns>Element inctance.</returns>
+        public Element Read(string elementName)
         {
             // Fill params of element from node data.
             static void FillParams(Node node, Element element)
@@ -210,36 +210,18 @@ namespace DataBase
         #region Update
 
         /// <summary>
-        /// Update Description of IElement node.
-        /// </summary>
-        /// <param name="element">IElement to update.</param>
-        /// <exception cref="ArgumentNullException">IElement is null.</exception>
-        public void UpdateDescription(IElement element)
-        {
-            ArgumentNullException.ThrowIfNull(element);
-
-            var node = Connection.Nodes().Properties("Name".Value(element.Name)).First();
-
-            if (node == null) { Create(element); }
-            else
-            {
-                node.Properties["Description"] = element.Description;
-            }
-
-            Connection.Update(node);
-        }
-
-        /// <summary>
         /// Add or update properties of <see cref="IElement"/> node.
         /// </summary>
         /// <param name="element"><see cref="IElement"/> to update.</param>
         /// <param name="paramsName">Params to update in IElement node</param>
-        public void AddOrUpdateParams(IElement element, IEnumerable<string> paramsName)
+        public void Update(IElement element)
         {
             ArgumentNullException.ThrowIfNull(element);
 
+            var @params = element.Params.Keys.Concat(["Description", "Name"]);
+
             var node = Connection.Nodes().Properties("Name".Value(element.Name)).First();
-            foreach (var param in paramsName)
+            foreach (var param in @params.Concat(["Description", "Name"]))
             {
                 if (_exceptedProperties.Contains(param)) 
                 {
@@ -346,6 +328,19 @@ namespace DataBase
                         if (Connection.Nodes().Properties("Name".Value(obj.Name)).FirstOrDefault() is var node && node != null)
                         {
                             newNode = node;
+                            try
+                            {
+                                Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
+                            }
+                            catch (RelationExistsException)
+                            { }
+
+                            try
+                            {
+                                Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
+                            }
+                            catch (RelationExistsException)
+                            { }
                         }
                         else
                         {

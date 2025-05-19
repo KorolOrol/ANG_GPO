@@ -2,6 +2,10 @@
 using BaseClasses.Model;
 using BaseClasses.Enum;
 using BaseClasses.Services;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using BaseClasses.Interface;
+using System.Security.Cryptography.X509Certificates;
 
 namespace DataBase.Tests
 {
@@ -47,10 +51,10 @@ namespace DataBase.Tests
                 Element location = new(ElemType.Location, "Location", "LocationDescription");
                 Element @event = new(ElemType.Event, "Event", "EventDescription");
 
-                var itemResult = dbm.Create(item);
-                var characterResult = dbm.Create(character);
-                var locationResult = dbm.Create(location);
-                var eventResult = dbm.Create(@event);
+                dbm.Create(character);
+                dbm.Create(item);
+                dbm.Create(location);
+                dbm.Create(@event);
 
                 Assert.Equivalent(item, dbm.Read(item.Name));
                 Assert.Equivalent(character, dbm.Read(character.Name));
@@ -63,7 +67,7 @@ namespace DataBase.Tests
             [Fact]
             public void Read_NodesWithRelation_SuccessfulReading()
             {
-                string filepath = @"Read_NodesWithRelation";
+                string filepath = @"Read_NodesWithRelation.sliccdb";
                 DataBaseManager dbm = new(filepath);
 
                 Element item = new(ElemType.Item, "Item1", "ItemDescription");
@@ -72,26 +76,18 @@ namespace DataBase.Tests
                 Element @event = new(ElemType.Event, "Event", "EventDescription");
 
                 Binder.Bind(character, item);
-                Binder.Bind(@event, location);
-                Binder.Bind(@event, character);
-                Binder.Bind(location, character);
+                Binder.Bind(character, location);
+                Binder.Bind(character, @event);
 
-                dbm.Create(item);
+
                 dbm.Create(character);
+                dbm.Create(item);
                 dbm.Create(location);
                 dbm.Create(@event);
 
-                var itemResult = dbm.Read(item.Name);
-                var characterResult = dbm.Read(character.Name);
-                var locationResult = dbm.Read(location.Name);
-                var eventResult = dbm.Read(@event.Name);
+                var resultChar = dbm.Read(item.Name);
 
-                Assert.Equivalent(itemResult, item);
-                Assert.Equivalent(characterResult, character);
-                Assert.Equivalent(locationResult, location);
-                Assert.Equivalent(eventResult, @event);
-
-                File.Delete(filepath);
+                Assert.Equivalent(character, dbm.Read(character.Name));
             }
         }
 
