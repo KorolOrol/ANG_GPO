@@ -9,71 +9,78 @@ var plot = new Plot();
 
 // Персонажи  
 var alchemist = new Element(ElemType.Character, "Эдгар Вердан",
-    "Алхимик, когда-то служивший королю, но изгнанный за попытку создать эликсир бессмертия. Теперь скрывается, продолжая свои опыты.");
+    "Бывший придворный алхимик, изгнанный за опасные эксперименты. Теперь скрывается в Забытой башне, пытаясь искупить вину.");
 
 var thief = new Element(ElemType.Character, "Лира Теней",
-    "Воровка с таинственным прошлым. Украла древний свиток у ведьмы, не подозревая, что он может пробудить древнее зло.");
+    "Молодая воровка, случайно укравшая древний свиток у ведьмы. Теперь за ней охотятся тени.");
 
 var knight = new Element(ElemType.Character, "Сэр Галлант",
-    "Рыцарь, некогда спасший королевство от демона. Теперь подозревает, что тьма возвращается, и ищет алхимика, чтобы предотвратить катастрофу.");
+    "Легендарный рыцарь, победивший демона в прошлом. Чувствует, что тьма возвращается, и ищет способ остановить её.");
 
 var witch = new Element(ElemType.Character, "Моргана Лестар",
-    "Ведьма, заключившая договор с демоном. Преследует Лиру, чтобы вернуть свиток, необходимый для ритуала освобождения своего господина.");
+    "Тёмная ведьма, служащая Повелителю Тьмы. Пытается заполучить свиток, чтобы завершить ритуал пробуждения.");
 
 // Предметы  
 var cursedAmulet = new Element(ElemType.Item, "Проклятый амулет",
-    "Создан алхимиком в попытке обмануть смерть. Дарует силу, но превращает владельца в монстра.");
+    "Артефакт, созданный алхимиком. Дарует силу, но медленно превращает носителя в монстра.");
 
-var ancientScroll = new Element(ElemType.Item, "Древний свиток пробуждения",
-    "Содержит заклинание, способное разорвать печати, сдерживающие Повелителя Тьмы.");
+var ancientScroll = new Element(ElemType.Item, "Свиток пробуждения",
+    "Древний манускрипт, содержащий заклинание, способное разорвать печати, сдерживающие демона.");
 
 var phantomBlade = new Element(ElemType.Item, "Клинок призрачного рыцаря",
-    "Меч, способный ранить даже демонов. Последний артефакт ордена Света, переданный Сэру Галланту.");
+    "Меч, способный убивать нежить и демонов. Последняя надежда Сэра Галланта.");
 
-var elixirOfLife = new Element(ElemType.Item, "Эликсир вечной жизни",
-    "Незавершенное творение Эдгара. Дарует бессмертие, но взамен забирает воспоминания и эмоции.");
+var elixirOfLife = new Element(ElemType.Item, "Эликсир вечности",
+    "Незавершённое зелье Эдгара. Дарует бессмертие, но стирает личность.");
 
 // Места  
-var forgottenTower = new Element(ElemType.Location, "Забытая башня алхимиков",
-    "Здесь Эдгар проводит свои эксперименты. Говорят, в подвалах башни скрыты ужасные создания.");
+var forgottenTower = new Element(ElemType.Location, "Забытая башня",
+    "Здесь алхимик проводит свои опыты. В подземельях башни скрыты ужасные создания.");
 
-var blackMarket = new Element(ElemType.Location, "Теневой базар",
-    "Место, где Лира продает украденные артефакты. Сюда же ведьма направила своих прислужников.");
+var blackMarket = new Element(ElemType.Location, "Чёрный рынок",
+    "Место, где Лира пытается продать свиток. Здесь же орудуют агенты ведьмы.");
 
 var cursedForest = new Element(ElemType.Location, "Лес проклятых душ",
-    "Обитель Морганы. Те, кто заходит слишком глубоко, становятся частью леса... навсегда.");
+    "Обитель Морганы. Те, кто заходит слишком далеко, становятся частью леса.");
 
-var royalCastle = new Element(ElemType.Location, "Королевский замок Луменис",
-    "Когда-то здесь правил мудрый король, но теперь тени сгущаются над троном.");
+var royalCastle = new Element(ElemType.Location, "Королевский замок",
+    "Когда-то здесь правил справедливый король. Теперь тени сгущаются над троном.");
 
 // События  
 var eclipseRitual = new Element(ElemType.Event, "Ритуал кровавого затмения",
-    "Раз в век демон может вернуться в мир, если ритуал будет совершен в час полного затмения.");
+    "Во время затмения ведьма попытается пробудить демона, используя свиток.");
 
-var greatHeist = new Element(ElemType.Event, "Кража королевской реликвии",
-    "Лира украла свиток из хранилища, не зная, что за этим последует.");
+var greatHeist = new Element(ElemType.Event, "Кража свитка",
+    "Лира украла свиток у Морганы, не зная его истинной ценности.");
 
-var demonAwakening = new Element(ElemType.Event, "Пробуждение Повелителя Тьмы",
-    "Если свиток будет прочитан в Забытой башне во время затмения, демон вырвется на свободу.");
+var demonAwakening = new Element(ElemType.Event, "Пробуждение демона",
+    "Если ритуал завершится, королевство погрузится в вечную тьму.");
 
 var knightTournament = new Element(ElemType.Event, "Последний турнир",
-    "Сэр Галлант должен победить, чтобы получить доступ к королевской библиотеке и найти способ остановить ведьму.");
+    "Сэр Галлант участвует в турнире, чтобы получить доступ к королевским архивам.");
 
-// Связи между персонажами  
-Binder.Bind(alchemist, knight);
-Binder.Bind(thief, witch);
-Binder.Bind(knight, witch);
-Binder.Bind(alchemist, witch);
+// Связи (персонажи ↔ персонажи)  
+Binder.Bind(alchemist, knight, -50);
+Binder.Bind(alchemist, witch, -50);
+Binder.Bind(thief, witch, 0);
+Binder.Bind(knight, witch, -100);
 
-// Связи с предметами  
-Binder.Bind(alchemist, elixirOfLife);
+// Связи (персонажи ↔ предметы)  
+Binder.Bind(alchemist, cursedAmulet);
 Binder.Bind(thief, ancientScroll);
 Binder.Bind(knight, phantomBlade);
-Binder.Bind(witch, cursedAmulet);
+Binder.Bind(witch, elixirOfLife);
 
-// Связи с событиями  
-Binder.Bind(eclipseRitual, demonAwakening);
-Binder.Bind(greatHeist, demonAwakening);
+// Связи (персонажи ↔ места)  
+Binder.Bind(alchemist, forgottenTower);
+Binder.Bind(thief, blackMarket);
+Binder.Bind(witch, cursedForest);
+Binder.Bind(knight, royalCastle);
+
+// Связи (события ↔ персонажи/предметы/места)  
+Binder.Bind(eclipseRitual, witch);
+Binder.Bind(greatHeist, thief);
+Binder.Bind(demonAwakening, ancientScroll);
 Binder.Bind(knightTournament, royalCastle);
 
 // Добавляем всё в сюжет  
@@ -95,6 +102,6 @@ plot.Add(demonAwakening);
 plot.Add(knightTournament);
 
 
-Serializer.Serialize(plot, "test.txt");
-DataBase.DataBaseManager dataBaseManager = new(@"C:\Users\slend\Documents\Monke\GPO\src\base\ConsoleApp1\bin\Debug\net9.0\test.sliccdb");
+Serializer.Serialize(plot, "test.json");
+DataBase.DataBaseManager dataBaseManager = new(@"C:\Users\Egor\Documents\Monke\Tusur\AGN\src\base\ConsoleApp1\bin\Debug\net9.0\test2.sliccdb");
 dataBaseManager.StorePlot(plot);

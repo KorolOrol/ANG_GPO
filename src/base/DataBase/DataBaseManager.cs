@@ -44,7 +44,7 @@ namespace DataBase
 
         #region Fields
 
-        private readonly string[] _exceptedProperties = ["Locations", "Location", "Events", "Characters", "Host", "Items", "Relation"];
+        private readonly string[] _exceptedProperties = ["Locations", "Location", "Events", "Characters", "Host", "Items", "Relations"];
         /// <summary>
         /// Подключение к базе данных.
         /// </summary>
@@ -258,11 +258,11 @@ namespace DataBase
                 {
                     if (!node.Properties.ContainsKey(param))
                     {
-                        node.Properties.Add(param, (string)element.Params[param]);
+                        node.Properties.Add(param, element.Params[param].ToString());
                     }
                     else
                     {
-                        node.Properties[param] = (string)element.Params[param];
+                        node.Properties[param] = element.Params[param].ToString();
                     }
                 }
             }
@@ -386,37 +386,21 @@ namespace DataBase
                                     }
                                 default: { continue; }
                             }
-                            if (param != "Relations")
-                            {
-                                try
-                                {
-                                    Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
-                                }
-                                catch (RelationExistsException)
-                                { }
-
-                                try
-                                {
-                                    Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
-                                }
-                                catch (RelationExistsException)
-                                { }
-
-                            }
-                            else
-                            {
-                                if (obj is BaseClasses.Model.Relation rel && rel != null)
-                                {
-                                    var relationProps = new Dictionary<string, string>
-                                    {
-                                        { "Relation", rel.Value.ToString() }
-                                    };
-                                    newNode = Connection.CreateNode(new Character() { Name = obj.Name });
-
-                                    Connection.CreateRelation(param[..^1], sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
-                                }
-                            }
                         }
+
+                        try
+                        {
+                            Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
+                        }
+                        catch (RelationExistsException)
+                        { }
+
+                        try
+                        {
+                            Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
+                        }
+                        catch (RelationExistsException)
+                        { }
                     }
                 }
                 else if (element.Params[param] is IElement obj)
@@ -442,6 +426,7 @@ namespace DataBase
                             default: { continue; }
                         }
                     }
+
                     try
                     {
                         Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
@@ -455,6 +440,30 @@ namespace DataBase
                     }
                     catch (RelationExistsException)
                     { }
+                }
+                else if (element.Params[param] is IEnumerable<BaseClasses.Model.Relation> rels && rels != null)
+                {
+                    foreach (var rel in rels)
+                    {
+                        var relationProps = new Dictionary<string, string>
+                                    {
+                                        { "Relation", rel.Value.ToString() }
+                                    };
+
+                        if (Connection.Nodes().Properties("Name".Value(rel.Character.Name)).FirstOrDefault() is var node && node != null)
+                        {
+                            newNode = node;
+                        }
+                        else
+                        {
+                           newNode = Connection.CreateNode(new Character() { Name = rel.Character.Name });
+                        }
+                        try
+                        {
+                            Connection.CreateRelation(param[..^1], sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
+                        }
+                        catch (RelationExistsException) { }
+                    }
                 }
             }      
         }
