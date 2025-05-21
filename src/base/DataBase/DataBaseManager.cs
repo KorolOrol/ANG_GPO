@@ -145,27 +145,7 @@ namespace DataBase
         /// <returns>Element inctance.</returns>
         public Element Read(string elementName)
         {
-            // Fill params of element from node data.
-            static void FillParams(Node node, Element element)
-            {
-                foreach (var prop in node.Properties.Keys)
-                {
-                    if (prop == "Description" || prop == "Name") { continue; }
-
-                    var values = node.Properties[prop]
-                            .Trim('[', ']').Split(',')
-                            .Select(s => s.Trim()).ToList();
-
-                    if (values.Count == 1)
-                    {
-                        element.Params.Add(prop, values[0]);
-                    }
-                    else
-                    {
-                        element.Params.Add(prop, values);
-                    }
-                }
-            }
+            
 
             var elementNode = Connection.Nodes().Properties("Name".Value(elementName)).First();
             Element element = new(Enum.Parse<ElemType>(elementNode.Labels.First()), elementName, elementNode.Properties["Description"]);
@@ -192,6 +172,32 @@ namespace DataBase
         }
 
         /// <summary>
+        /// Fill params of element from node data.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="element"></param>
+        private static void FillParams(Node node, Element element)
+        {
+            foreach (var prop in node.Properties.Keys)
+            {
+                if (prop == "Description" || prop == "Name") { continue; }
+        
+                var values = node.Properties[prop]
+                        .Trim('[', ']').Split(',')
+                        .Select(s => s.Trim()).ToList();
+        
+                if (values.Count == 1)
+                {
+                    element.Params.Add(prop, values[0]);
+                }
+                else
+                {
+                    element.Params.Add(prop, values);
+                }
+            }
+        }
+
+        /// <summary>
         /// Read whole plot.
         /// </summary>
         /// <returns>Filled <see cref="Plot"/> instance.</returns>
@@ -200,8 +206,26 @@ namespace DataBase
             Plot plot = new();
             foreach (var node in Connection.Nodes)
             {
-                plot.Add(Read(node.Properties["Name"]));
+                Element elem = new(Enum.Parse<ElemType>(node.Labels.First()));
+                elem.Name = node.Properties["Name"];
+                elem.Description = node.Properties["Description"];
+                FillParams(node, elem);
+                plot.Elements.Add(elem);
             }
+
+            foreach (var rel in Connection.Relations)
+            {
+                if (rel.RelationName == "Relation")
+                {
+                    var node1 = Connection.Nodes.Where(x => x.Hash == rel.SourceHash).First();
+                    var node2 = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
+                    Binder.Bind(
+                        plot.Elements.Where(x => x.Name == node1.Properties["Name"]).First(),
+                        plot.Elements.Where(x => x.Name == node1.Properties["Name"]).First()
+                        );
+                }
+            }
+
             return plot;
         }
 
@@ -314,10 +338,7 @@ namespace DataBase
         /// </summary>
         public void DeletePlot()
         {
-            foreach (var node in Connection.Nodes)
-            {
-                Delete(node.Properties["Name"]);
-            }
+            Connection.Entities().Clear();
         }
 
         #endregion
