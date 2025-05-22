@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BaseClasses.Interface;
 using System.Security.Cryptography.X509Certificates;
+using System.Linq.Expressions;
 
 namespace DataBase.Tests
 {
@@ -40,6 +41,25 @@ namespace DataBase.Tests
 
         public class ManagerReadTests
         {
+            public static void AssertPlot(Plot expected, Plot result)
+            {
+                foreach (var plot in new List<Plot> { expected, result }) {
+                    foreach (var elem in plot.Elements)
+                    {
+                        var sortedDict = new SortedDictionary<string, object>(elem.Params);
+                        elem.Params.Clear();
+
+                        foreach (var key in sortedDict.Keys)
+                        {
+                            elem.Params[key] = sortedDict[key];
+                        }
+                    }
+                    plot.Elements = plot.Elements.OrderBy(x => x.Name).ToList();
+                }
+                var exp = expected.FullInfo()+ "\n\n" + result.FullInfo();
+                Assert.Equivalent(expected.FullInfo(), result.FullInfo());
+            }
+
             [Fact]
             public void Read_NodesWithoutRelation_SuccessfulReading()
             {
@@ -78,7 +98,11 @@ namespace DataBase.Tests
                 Binder.Bind(character, item);
                 Binder.Bind(character, location);
                 Binder.Bind(character, @event);
-                Binder.Bind(location, item);
+
+                Binder.Bind(item, location);
+                Binder.Bind(item, @event);
+
+                Binder.Bind(location, @event);
 
                 Plot plot = new();
                 plot.Add(item);
@@ -88,9 +112,7 @@ namespace DataBase.Tests
 
                 dbm.StorePlot(plot);
 
-                var resultPlot = dbm.ReadPlot();
-
-                Assert.Equal(JsonSerializer.Serialize(plot, Serializer.Options), JsonSerializer.Serialize(resultPlot, Serializer.Options));
+                AssertPlot(plot, dbm.ReadPlot());
 
                 File.Delete(filepath);
             }

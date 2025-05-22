@@ -19,24 +19,36 @@ namespace DataBase
         public class Character
         {
             public string Name { get; set; }
+
+            public int Time { get; set; } = -1;
+
             public string Description { get; set; } = "Description";
         }
 
         public class Item
         {
             public string Name { get; set; }
+
+            public int Time { get; set; } = -1;
+
             public string Description { get; set; } = "Description";
         }
 
         public class Event
         {
             public string Name { get; set; }
+
+            public int Time { get; set; } = -1;
+
             public string Description { get; set; } = "Description";
         }
 
         public class Location
         {
             public string Name { get; set; }
+
+            public int Time { get; set; } = -1;
+
             public string Description { get; set; } = "Description";
         }
 
@@ -107,22 +119,23 @@ namespace DataBase
                         {
                             Name = element.Name,
                             Description = element.Description,
+                            Time = element.Time
                         });
                         break;
                     }
                     case ElemType.Item:
                     {
-                        createdNode = Connection.CreateNode(new Item() { Name = element.Name, Description = element.Description });
+                        createdNode = Connection.CreateNode(new Item() { Name = element.Name, Description = element.Description, Time = element.Time });
                         break;
                     }
                     case ElemType.Event:
                     {
-                        createdNode = Connection.CreateNode(new Event() { Name = element.Name, Description = element.Description });
+                        createdNode = Connection.CreateNode(new Event() { Name = element.Name, Description = element.Description, Time = element.Time });
                         break;
                     }
                     case ElemType.Location:
                     {
-                        createdNode =Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description });
+                        createdNode = Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description, Time = element.Time });
                         break;
                     }
                     default: { break;}
@@ -145,10 +158,13 @@ namespace DataBase
         /// <returns>IElement inctance.</returns>
         public IElement Read(string elementName)
         {
-            
-
             var elementNode = Connection.Nodes().Properties("Name".Value(elementName)).First();
-            Element element = new(Enum.Parse<ElemType>(elementNode.Labels.First()), elementName, elementNode.Properties["Description"]);
+            Element element = new(
+                Enum.Parse<ElemType>(elementNode.Labels.First()),
+                elementName, 
+                elementNode.Properties["Description"],
+                time: Convert.ToInt32(elementNode.Properties["Time"]));
+
             FillParams(elementNode, element);
 
             var relations = Connection.Relations.Where(x => x.SourceHash == elementNode.Hash).ToList();
@@ -161,7 +177,8 @@ namespace DataBase
                     Element relatedElement = new(
                         Enum.Parse<ElemType>(relatedNode.Labels.First()), 
                         relatedNode.Properties["Name"],
-                        relatedNode.Properties["Description"]);
+                        relatedNode.Properties["Description"],
+                        time: Convert.ToInt32(relatedNode.Properties["Time"]));
 
                     FillParams(relatedNode, relatedElement);
                     Binder.Bind(element, relatedElement);
@@ -176,11 +193,11 @@ namespace DataBase
         /// </summary>
         /// <param name="node"></param>
         /// <param name="element"></param>
-        private static void FillParams(Node node, Element element)
+        private static void FillParams(Node node, IElement element)
         {
             foreach (var prop in node.Properties.Keys)
             {
-                if (prop == "Description" || prop == "Name") { continue; }
+                if (prop == "Description" || prop == "Name" || prop == "Time") { continue; }
         
                 var values = node.Properties[prop]
                         .Trim('[', ']').Split(',')
@@ -206,22 +223,34 @@ namespace DataBase
             Plot plot = new();
             foreach (var node in Connection.Nodes)
             {
-                Element elem = new(Enum.Parse<ElemType>(node.Labels.First()));
-                elem.Name = node.Properties["Name"];
-                elem.Description = node.Properties["Description"];
+                Element elem = new(Enum.Parse<ElemType>(node.Labels.First()))
+                {
+                    Name = node.Properties["Name"],
+                    Description = node.Properties["Description"],
+                    Time = Convert.ToInt32(node.Properties["Time"])
+                };
                 FillParams(node, elem);
                 plot.Add(elem);
             }
 
             foreach (var rel in Connection.Relations)
             {
+                var node1 = Connection.Nodes.Where(x => x.Hash == rel.SourceHash).First();
+                var node2 = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
+
                 if (rel.RelationName != "Relation")
                 {
-                    var node1 = Connection.Nodes.Where(x => x.Hash == rel.SourceHash).First();
-                    var node2 = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
                     Binder.Bind(
                         plot.Elements.Where(x => x.Name == node1.Properties["Name"]).First(),
                         plot.Elements.Where(x => x.Name == node2.Properties["Name"]).First()
+                        );
+                }
+                else
+                {
+                    Binder.Bind(
+                        plot.Elements.Where(x => x.Name == node1.Properties["Name"]).First(),
+                        plot.Elements.Where(x => x.Name == node2.Properties["Name"]).First(),
+                        Convert.ToDouble(rel.Properties["Relation"])
                         );
                 }
             }
@@ -241,10 +270,10 @@ namespace DataBase
         {
             ArgumentNullException.ThrowIfNull(element);
 
-            var @params = element.Params.Keys.Concat(["Description", "Name"]);
+            var @params = element.Params.Keys.Concat(["Description", "Time"]);
 
             var node = Connection.Nodes().Properties("Name".Value(element.Name)).First();
-            foreach (var param in @params.Concat(["Description", "Name"]))
+            foreach (var param in @params)
             {
                 if (_exceptedProperties.Contains(param)) 
                 {
@@ -255,9 +284,9 @@ namespace DataBase
                 {
                     node.Properties[param] = element.Description;
                 }
-                else if (param == "Name")
+                else if (param == "Time")
                 {
-                    node.Properties[param] = element.Name;
+                    node.Properties[param] = element.Time.ToString();
                 }
                 else
                 {
@@ -271,6 +300,17 @@ namespace DataBase
                     }
                 }
             }
+
+            Connection.Update(node);
+            CreateRelations(element, node);
+        }
+
+        public void Update(IElement element, string previousName)
+        {
+            ArgumentNullException.ThrowIfNull(element);
+
+            var node = Connection.Nodes().Properties("Name".Value(previousName)).First();
+            node.Properties["Name"] = element.Name;
             Connection.Update(node);
         }
 
@@ -327,7 +367,34 @@ namespace DataBase
         #endregion
 
         #region Private methods
-        
+
+        private void CreateRelations(Node node1, Node node2, Dictionary<string, string> additionalParams = null)
+        {
+            ArgumentNullException.ThrowIfNull(node1);
+            ArgumentNullException.ThrowIfNull(node2);
+
+            if (Connection.Nodes.Contains(node1) && Connection.Nodes.Contains(node2))
+            {
+                try
+                {
+                    Connection.CreateRelation(node1.Labels.First(), sn => sn.First(x => x.Hash == node2.Hash), tn => tn.First(x => x.Hash == node1.Hash), additionalParams);
+                }
+                catch (RelationExistsException)
+                { }
+
+                try
+                {
+                    Connection.CreateRelation(node2.Labels.First(), sn => sn.First(x => x.Hash == node1.Hash), tn => tn.First(x => x.Hash == node2.Hash), additionalParams);
+                }
+                catch (RelationExistsException)
+                { }
+            }
+            else
+            {
+                throw new ArgumentException("Node is not in database.");
+            }
+        }
+
         /// <summary>
         /// Creates all relations of node with nodes, that has only Name.
         /// </summary>
@@ -347,69 +414,57 @@ namespace DataBase
                     {
                         if (Connection.Nodes().Properties("Name".Value(obj.Name)).FirstOrDefault() is var node && node != null)
                         {
-                            newNode = node;
-                            try
+                            if (Connection.Relations.Where(x => x.SourceHash ==  centralNode.Hash && x.TargetHash == node.Hash).Any())
                             {
-                                Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
+                                continue;
                             }
-                            catch (RelationExistsException)
-                            { }
-
-                            try
+                            else
                             {
-                                Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
+                                newNode = node;
                             }
-                            catch (RelationExistsException)
-                            { }
                         }
                         else
                         {
                             switch (param)
                             {
                                 case "Locations":
-                                    {
-                                        newNode = Connection.CreateNode(new Location() { Name = obj.Name });
-                                        break;
-                                    }
+                                {
+                                    newNode = Connection.CreateNode(new Location() { Name = obj.Name });
+                                    break;
+                                }
                                 case "Events":
-                                    {
-                                        newNode = Connection.CreateNode(new Event() { Name = obj.Name });
-                                        break;
-                                    }
+                                {
+                                    newNode = Connection.CreateNode(new Event() { Name = obj.Name });
+                                    break;
+                                }
                                 case "Items":
-                                    {
-                                        newNode = Connection.CreateNode(new Item() { Name = obj.Name });
-                                        break;
-                                    }
+                                {
+                                    newNode = Connection.CreateNode(new Item() { Name = obj.Name });
+                                    break;
+                                }
                                 case "Characters":
-                                    {
-                                        newNode = Connection.CreateNode(new Character() { Name = obj.Name });
-                                        break;
-                                    }
+                                {
+                                    newNode = Connection.CreateNode(new Character() { Name = obj.Name });
+                                    break;
+                                }
                                 default: { continue; }
                             }
                         }
-
-                        try
-                        {
-                            Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
-                        }
-                        catch (RelationExistsException)
-                        { }
-
-                        try
-                        {
-                            Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
-                        }
-                        catch (RelationExistsException)
-                        { }
+                        CreateRelations(centralNode, newNode);
                     }
                 }
                 else if (element.Params[param] is IElement obj)
                 {
                     if (Connection.Nodes().Properties("Name".Value(obj.Name)).FirstOrDefault() is var node && node != null)
                     {
-                        newNode = node;
+                        if (Connection.Relations.Where(x => x.SourceHash == centralNode.Hash && x.TargetHash == node.Hash).Any())
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            newNode = node;
+                        }
                     }
                     else
                     {
@@ -428,20 +483,7 @@ namespace DataBase
                             default: { continue; }
                         }
                     }
-
-                    try
-                    {
-                        Connection.CreateRelation(newNode.Labels.First(), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash));
-                    }
-                    catch (RelationExistsException)
-                    { }
-
-                    try
-                    {
-                        Connection.CreateRelation(centralNode.Labels.First(), sn => sn.First(x => x.Hash == newNode.Hash), tn => tn.First(x => x.Hash == centralNode.Hash));
-                    }
-                    catch (RelationExistsException)
-                    { }
+                    CreateRelations(centralNode, newNode);
                 }
                 else if (element.Params[param] is IEnumerable<BaseClasses.Model.Relation> rels && rels != null)
                 {
@@ -460,12 +502,14 @@ namespace DataBase
                         {
                            newNode = Connection.CreateNode(new Character() { Name = rel.Character.Name });
                         }
+
                         try
                         {
                             Connection.CreateRelation(param[..^1], sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
                         }
                         catch (RelationExistsException) { }
                     }
+                    continue;
                 }
             }      
         }
