@@ -70,7 +70,7 @@ namespace DataBase.Tests
                 string filepath = @"Read_NodesWithRelation.sliccdb";
                 DataBaseManager dbm = new(filepath);
 
-                Element item = new(ElemType.Item, "Item1", "ItemDescription");
+                Element item = new(ElemType.Item, "Item", "ItemDescription");
                 Element character = new(ElemType.Character, "Character", "CharacterDescription");
                 Element location = new(ElemType.Location, "Location", "LocationDescription");
                 Element @event = new(ElemType.Event, "Event", "EventDescription");
@@ -78,16 +78,21 @@ namespace DataBase.Tests
                 Binder.Bind(character, item);
                 Binder.Bind(character, location);
                 Binder.Bind(character, @event);
+                Binder.Bind(location, item);
 
+                Plot plot = new();
+                plot.Add(item);
+                plot.Add(character);
+                plot.Add(location);
+                plot.Add(@event);
 
-                dbm.Create(character);
-                dbm.Create(item);
-                dbm.Create(location);
-                dbm.Create(@event);
+                dbm.StorePlot(plot);
 
-                var resultChar = dbm.Read(item.Name);
+                var resultPlot = dbm.ReadPlot();
 
-                Assert.Equivalent(character, dbm.Read(character.Name));
+                Assert.Equal(JsonSerializer.Serialize(plot, Serializer.Options), JsonSerializer.Serialize(resultPlot, Serializer.Options));
+
+                File.Delete(filepath);
             }
         }
 
