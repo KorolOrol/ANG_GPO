@@ -51,9 +51,14 @@ namespace BaseClasses.Tests.Services
                 }
                 else
                 {
-                    if (!CompareElements((Element)element1.Params[key],
-                                         (Element)element2.Params[key],
-                                         refHandler)) return false;
+                    if (element1.Params[key] is Element elem1 && element2.Params[key] is Element elem2)
+                    {
+                        if (!CompareElements(elem1, elem2, refHandler)) return false;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             return true;
