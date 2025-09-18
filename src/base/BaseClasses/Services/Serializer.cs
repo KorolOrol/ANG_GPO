@@ -70,12 +70,16 @@ namespace BaseClasses.Services
             }
             else if (typeof(T) == typeof(Element) && MatchesProperties(typeof(Element), rootElement))
             {
-                Element element = ReadElement(rootElement);
+                Element element = ReadElement(rootElement) as Element;
                 return (T)Convert.ChangeType(element, typeof(T));
             }
             else
             {
-                throw new ArgumentException("Invalid type");
+                throw new ArgumentException($"Invalid type. Expected: Plot or Element, Received: {typeof(T).Name}. " 
+                    + $"JSON root properties: [{
+                        string.Join(", ", rootElement
+                              .EnumerateObject()
+                              .Select(p => p.Name))}]");
             }
         }
 
