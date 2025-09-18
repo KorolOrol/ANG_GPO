@@ -24,7 +24,7 @@ namespace BaseClasses.Services
             if (mergedElement is null)
                 throw new ArgumentNullException(nameof(mergedElement), "Элемент не может быть null.");
             if (baseElement.Type != mergedElement.Type)
-                throw new ArgumentException("Неверный тип элемента.");
+                throw new ArgumentException("Неверный тип элемента.", nameof(mergedElement));
 
             if (baseElement.Name == "" || !basePriority)
             {
