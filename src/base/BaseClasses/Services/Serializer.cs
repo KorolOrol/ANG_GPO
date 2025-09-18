@@ -183,7 +183,7 @@ namespace BaseClasses.Services
                 case JsonValueKind.Null:
                     return null;
             }
-            throw new JsonException(json.GetString());
+            throw new JsonException($"Could not determine or deserialize type from JSON value. ValueKind: {json.ValueKind}, Value: {json.ToString()}");
         }
 
         /// <summary>
