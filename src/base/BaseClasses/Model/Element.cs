@@ -104,10 +104,11 @@ namespace BaseClasses.Model
                 return $"[{string.Join(", ", 
                     enumerable.Cast<object>().Select(item => item.ToString()))}]";
             }
-            else
+            if (value is null)
             {
-                return value.ToString();
+                return "null";
             }
+            return value.ToString();
         }
 
         public bool Equals(Element? other)
