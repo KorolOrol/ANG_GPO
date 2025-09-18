@@ -25,11 +25,6 @@ namespace BaseClasses.Services
         };
 
         /// <summary>
-        /// Разрешитель ссылок. 
-        /// </summary>
-        private static ReferenceResolver ReferenceResolver { get; set; }
-
-        /// <summary>
         /// Сериализация истории. 
         /// </summary>
         /// <param name="plot">История.</param>
@@ -59,18 +54,18 @@ namespace BaseClasses.Services
         /// <returns>Объект.</returns>
         public static T Deserialize<T>(string path)
         {
-            ReferenceResolver = new ElementsReferenceResolver();
+            var resolver = new ElementsReferenceResolver();
             var json = File.ReadAllText(path);
             var document = JsonDocument.Parse(json);
             var rootElement = document.RootElement;
             if (typeof(T) == typeof(Plot) && MatchesProperties(typeof(Plot), rootElement))
             {
-                Plot plot = ReadPlot(rootElement);
+                Plot plot = ReadPlot(rootElement, resolver);
                 return (T)Convert.ChangeType(plot, typeof(T));
             }
             else if (typeof(T) == typeof(Element) && MatchesProperties(typeof(Element), rootElement))
             {
-                Element element = ReadElement(rootElement) as Element;
+                Element element = ReadElement(rootElement, resolver) as Element;
                 return (T)Convert.ChangeType(element, typeof(T));
             }
             else
@@ -87,8 +82,9 @@ namespace BaseClasses.Services
         /// Чтение истории. 
         /// </summary>
         /// <param name="json">Json элемент.</param>
+        /// <param name="resolver">Разрешитель ссылок.</param>
         /// <returns>История.</returns>
-        private static Plot ReadPlot(JsonElement json)
+        private static Plot ReadPlot(JsonElement json, ReferenceResolver resolver)
         {
             var elementsProperty = json.GetProperty("Elements");
             var timeProperty = json.GetProperty("Time");
@@ -98,7 +94,7 @@ namespace BaseClasses.Services
 
             foreach (var element in elementsProperty.GetProperty("$values").EnumerateArray())
             {
-                 var value = ReadValue(element);
+                 var value = ReadValue(element, resolver);
                  if (value is Element el)
                  {
                      plot.Add(el);
@@ -116,8 +112,9 @@ namespace BaseClasses.Services
         /// Чтение элемента. 
         /// </summary>
         /// <param name="json">Json элемент. </param>
+        /// <param name="resolver">Разрешитель ссылок.</param>
         /// <returns>Элемент. </returns>
-        private static IElement ReadElement(JsonElement json)
+        private static IElement ReadElement(JsonElement json, ReferenceResolver resolver)
         {
             var typeProperty = json.GetProperty("Type");
             var nameProperty = json.GetProperty("Name");
@@ -130,13 +127,13 @@ namespace BaseClasses.Services
             plotElement.Description = descriptionProperty.GetString();
             plotElement.Time = timeProperty.GetInt32();
 
-            ReferenceResolver.AddReference(id.GetString(), plotElement);
+            resolver.AddReference(id.GetString(), plotElement);
 
             var @params = plotElement.Params;
             foreach (var param in json.GetProperty("Params").EnumerateObject())
             {
                 if (param.Name == "$id") continue;
-                @params.Add(param.Name, ReadValue(param.Value));
+                @params.Add(param.Name, ReadValue(param.Value, resolver));
             }
 
             return plotElement;
@@ -146,11 +143,12 @@ namespace BaseClasses.Services
         /// Чтение значения. 
         /// </summary>
         /// <param name="json">Json элемент.</param>
+        /// <param name="resolver">Разрешитель ссылок.</param>
         /// <returns>Значение.</returns>
         /// <exception cref="JsonException">Исключение, если тип не определен.</exception>
-        private static object ReadValue(JsonElement json)
+        private static object ReadValue(JsonElement json, ReferenceResolver resolver)
         {
-            
+
             switch (json.ValueKind)
             {
                 case JsonValueKind.Object:
@@ -159,25 +157,25 @@ namespace BaseClasses.Services
                         List<object> values = new List<object>();
                         foreach (var elem in arrayJson.EnumerateArray())
                         {
-                            values.Add(ReadValue(elem));
+                            values.Add(ReadValue(elem, resolver));
                         }
                         return ConvertList(values);
                     }
                     else if (json.TryGetProperty("$ref", out JsonElement @ref))
                     {
-                        return ReferenceResolver.ResolveReference(@ref.GetString());
+                        return resolver.ResolveReference(@ref.GetString());
                     }
                     else
                     {
                         if (MatchesProperties(typeof(Element), json))
                         {
-                            return ReadElement(json);
+                            return ReadElement(json, resolver);
                         }
                         else if (MatchesProperties(typeof(Relation), json))
                         {
-                            Relation rel = new() 
+                            Relation rel = new()
                             {
-                                Character = ReadValue(json.GetProperty("Character")) as IElement,
+                                Character = ReadValue(json.GetProperty("Character"), resolver) as IElement,
                                 Value = json.GetProperty("Value").GetDouble()
                             };
                             return rel;
