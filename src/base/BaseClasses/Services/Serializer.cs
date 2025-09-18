@@ -75,8 +75,8 @@ namespace BaseClasses.Services
             }
             else
             {
-                throw new ArgumentException($"Invalid type. Expected: Plot or Element, Received: {typeof(T).Name}. " 
-                    + $"JSON root properties: [{
+                throw new ArgumentException($"Deserialization failed: The JSON structure does not match the expected format for the requested type ({typeof(T).Name}). " 
+                    + $"Expected a structure matching 'Plot' or 'Element'. JSON root properties: [{ 
                         string.Join(", ", rootElement
                               .EnumerateObject()
                               .Select(p => p.Name))}]");
