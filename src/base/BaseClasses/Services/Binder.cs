@@ -357,7 +357,7 @@ namespace BaseClasses.Services
                     var prevHost = item.Params["Host"] as IElement;
                     if (prevHost != null)
                     {
-                        UnbindCharItem((IElement)item.Params["Host"], item);
+                        UnbindCharItem(prevHost, item);
                     }
                     item.Params["Host"] = character;
                 }
