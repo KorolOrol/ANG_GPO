@@ -70,7 +70,7 @@ namespace BaseClasses.Services
             }
             else if (typeof(T) == typeof(Element) && MatchesProperties(typeof(Element), rootElement))
             {
-                IElement element = ReadElement(rootElement);
+                Element element = ReadElement(rootElement);
                 return (T)Convert.ChangeType(element, typeof(T));
             }
             else
