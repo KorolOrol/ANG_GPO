@@ -38,7 +38,7 @@ namespace BaseClasses.Services
         /// <summary>
         /// Сериализация элемента истории. 
         /// </summary>
-        /// <param name="character">Элемент.</param>
+        /// <param name="element">Элемент.</param>
         /// <param name="path">Путь к файлу.</param>
         public static void Serialize(IElement element, string path)
         {
