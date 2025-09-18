@@ -154,10 +154,9 @@ namespace BaseClasses.Services
         /// <summary>
         /// Вспомогательный метод для проверки валидности связывания элементов
         /// </summary>
-        private static bool IsValidBinding(IElement element1, ElemType type1, IElement element2, ElemType type2)
+        private static bool IsValidBinding(IElement element1, IElement element2)
         {
-            return element1 != null && element2 != null && element1 != element2 &&
-                   element1.Type == type1 && element2.Type == type2;
+            return element1 != null && element2 != null && element1 != element2;
         }
 
         /// <summary>
@@ -168,7 +167,7 @@ namespace BaseClasses.Services
         /// <param name="relations">Отношения между персонажами</param>
         private static void BindCharacters(IElement character1, IElement character2, double relations)
         {
-            if (!IsValidBinding(character1, ElemType.Character, character2, ElemType.Character) || relations == 0)
+            if (!IsValidBinding(character1, character2) || relations == 0)
             {
                 return;
             }
@@ -223,7 +222,7 @@ namespace BaseClasses.Services
         /// <param name="character2">Второй персонаж</param>
         private static void UnbindCharacters(IElement character1, IElement character2)
         {
-            if (!IsValidBinding(character1, ElemType.Character, character2, ElemType.Character))
+            if (!IsValidBinding(character1, character2))
             {
                 return;
             }
@@ -256,7 +255,7 @@ namespace BaseClasses.Services
         /// <param name="location">Локация</param>
         private static void BindCharLoc(IElement character, IElement location)
         {
-            if (!IsValidBinding(character, ElemType.Character, location, ElemType.Location))
+            if (!IsValidBinding(character, location))
             {
                 return;
             }
@@ -301,7 +300,7 @@ namespace BaseClasses.Services
         /// <param name="location">Локация</param>
         private static void UnbindCharLoc(IElement character, IElement location)
         {
-            if (!IsValidBinding(character, ElemType.Character, location, ElemType.Location))
+            if (!IsValidBinding(character, location))
             {
                 return;
             }
@@ -326,7 +325,7 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         private static void BindCharItem(IElement character, IElement item)
         {
-            if (!IsValidBinding(character, ElemType.Character, item, ElemType.Item))
+            if (!IsValidBinding(character, item))
             {
                 return;
             }
@@ -372,7 +371,7 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         private static void UnbindCharItem(IElement character, IElement item)
         {
-            if (!IsValidBinding(character, ElemType.Character, item, ElemType.Item))
+            if (!IsValidBinding(character, item))
             {
                 return;
             }
@@ -397,7 +396,7 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         private static void BindCharEvent(IElement character, IElement @event)
         {
-            if (!IsValidBinding(character, ElemType.Character, @event, ElemType.Event))
+            if (!IsValidBinding(character, @event))
             {
                 return;
             }
@@ -442,7 +441,7 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         private static void UnbindCharEvent(IElement character, IElement @event)
         {
-            if (!IsValidBinding(character, ElemType.Character, @event, ElemType.Event))
+            if (!IsValidBinding(character, @event))
             {
                 return;
             }
@@ -487,7 +486,7 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         private static void BindLocItem(IElement location, IElement item)
         {
-            if (!IsValidBinding(location, ElemType.Location, item, ElemType.Item))
+            if (!IsValidBinding(location, item))
             {
                 return;
             }
@@ -533,7 +532,7 @@ namespace BaseClasses.Services
         /// <param name="item">Предмет</param>
         private static void UnbindLocItem(IElement location, IElement item)
         {
-            if (!IsValidBinding(location, ElemType.Location, item, ElemType.Item))
+            if (!IsValidBinding(location, item))
             {
                 return;
             }
@@ -558,7 +557,7 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         private static void BindLocEvent(IElement location, IElement @event)
         {
-            if (!IsValidBinding(location, ElemType.Location, @event, ElemType.Event))
+            if (!IsValidBinding(location, @event))
             {
                 return;
             }
@@ -603,7 +602,7 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         private static void UnbindLocEvent(IElement location, IElement @event)
         {
-            if (!IsValidBinding(location, ElemType.Location, @event, ElemType.Event))
+            if (!IsValidBinding(location, @event))
             {
                 return;
             }
@@ -668,7 +667,7 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         private static void BindItemEvent(IElement item, IElement @event)
         {
-            if (!IsValidBinding(item, ElemType.Item, @event, ElemType.Event))
+            if (!IsValidBinding(item, @event))
             {
                 return;
             }
@@ -713,7 +712,7 @@ namespace BaseClasses.Services
         /// <param name="event">Событие</param>
         private static void UnbindItemEvent(IElement item, IElement @event)
         {
-            if (!IsValidBinding(item, ElemType.Item, @event, ElemType.Event))
+            if (!IsValidBinding(item, @event))
             {
                 return;
             }
