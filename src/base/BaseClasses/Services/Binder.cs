@@ -512,7 +512,11 @@ namespace BaseClasses.Services
             {
                 if ((IElement)item.Params["Location"] != location)
                 {
-                    UnbindLocItem((IElement)item.Params["Location"], item);
+                    var prevLocation = item.Params["Location"] as IElement;
+                    if (prevLocation != null)
+                    {
+                        UnbindLocItem(prevLocation, item);
+                    }
                     item.Params["Location"] = location;
                 }
             }
