@@ -19,8 +19,10 @@ namespace BaseClasses.Services
         /// <exception cref="ArgumentException"></exception>
         public static void Merge(IElement baseElement, IElement mergedElement, bool basePriority = true)
         {
-            if (baseElement is null || mergedElement is null)
-                throw new ArgumentNullException("Элемент не может быть null.");
+            if (baseElement is null)
+                throw new ArgumentNullException(nameof(baseElement), "Элемент не может быть null.");
+            if (mergedElement is null)
+                throw new ArgumentNullException(nameof(mergedElement), "Элемент не может быть null.");
             if (baseElement.Type != mergedElement.Type)
                 throw new ArgumentException("Неверный тип элемента.");
 
