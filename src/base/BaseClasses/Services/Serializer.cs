@@ -94,7 +94,15 @@ namespace BaseClasses.Services
 
             foreach (var element in elementsProperty.GetProperty("$values").EnumerateArray())
             {
-                 plot.Add((Element)ReadValue(element));
+                 var value = ReadValue(element);
+                 if (value is Element el)
+                 {
+                     plot.Add(el);
+                 }
+                 else
+                 {
+                     throw new InvalidCastException("ReadValue did not return an Element as expected.");
+                 }
             }
 
             return plot;
