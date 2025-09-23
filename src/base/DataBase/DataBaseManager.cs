@@ -1,12 +1,12 @@
 ﻿using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
+using BaseClasses.Services;
 using SliccDB.Core;
 using SliccDB.Exceptions;
 using SliccDB.Fluent;
 using SliccDB.Serialization;
-using BaseClasses.Services;
-using System.Xml.Linq;
+
 
 
 namespace DataBase
@@ -138,8 +138,8 @@ namespace DataBase
                         createdNode = Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description, Time = element.Time });
                         break;
                     }
-                    default: { break;}
                 }
+
             Update(element);
             }
 
@@ -148,17 +148,27 @@ namespace DataBase
         }
 
         #endregion
-            
+
         #region Read
 
         /// <summary>
         /// Read node.
         /// </summary>
         /// <param name="elementName">Name of element to read.</param>
+        /// <param name="related">Is any relations needed</param>
         /// <returns>IElement inctance.</returns>
-        public IElement Read(string elementName)
+        /// <exception cref="Exception"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public IElement Read(string elementName, bool related = true)
         {
+            if (Connection.Nodes.Count == 0)
+            {
+                throw new Exception("DB is empty.");
+            }
             var elementNode = Connection.Nodes().Properties("Name".Value(elementName)).First();
+
+            if (elementNode is null) throw new ArgumentException("Element has not found.");
+
             Element element = new(
                 Enum.Parse<ElemType>(elementNode.Labels.First()),
                 elementName, 
@@ -167,25 +177,60 @@ namespace DataBase
 
             FillParams(elementNode, element);
 
-            var relations = Connection.Relations.Where(x => x.SourceHash == elementNode.Hash).ToList();
-
-            foreach (var rel in relations)
+            if (related)
             {
-                var relatedNode = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
-                if (relatedNode != null)
-                {
-                    Element relatedElement = new(
-                        Enum.Parse<ElemType>(relatedNode.Labels.First()), 
-                        relatedNode.Properties["Name"],
-                        relatedNode.Properties["Description"],
-                        time: Convert.ToInt32(relatedNode.Properties["Time"]));
+                var relations = Connection.Relations.Where(x => x.SourceHash == elementNode.Hash).ToList();
 
-                    FillParams(relatedNode, relatedElement);
-                    Binder.Bind(element, relatedElement);
+                foreach (var rel in relations)
+                {
+                    var relatedNode = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
+                    if (relatedNode != null)
+                    {
+                        Element relatedElement = new(
+                            Enum.Parse<ElemType>(relatedNode.Labels.First()),
+                            relatedNode.Properties["Name"],
+                            relatedNode.Properties["Description"],
+                            time: Convert.ToInt32(relatedNode.Properties["Time"]));
+
+                        FillParams(relatedNode, relatedElement);
+
+                        if (rel.RelationName == "Relation")
+                        {
+                            Binder.Bind(element, relatedElement, Convert.ToDouble(rel.Properties["Relation"]));
+                        }
+                        else
+                        {
+                            Binder.Bind(element, relatedElement);
+                        }
+                    }
                 }
             }
 
             return element;
+        }
+
+        /// <summary>
+        /// Returns a List of elements, sorted by type without relations
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public List<IElement> ReadElementsByType(ElemType type)
+        {
+            var nodes = GetNodesByLabel(type.ToString());
+
+            List<IElement> elementList = new();
+
+            foreach (var node in nodes)
+            {
+                elementList.Add(Read(node.Properties["Name"]));
+            }
+
+            return elementList;
+        }
+
+        private IEnumerable<Node> GetNodesByLabel(string label)
+        {
+            return Connection.Nodes().Where(x => x.Labels.Contains(label));
         }
 
         /// <summary>
@@ -290,13 +335,23 @@ namespace DataBase
                 }
                 else
                 {
-                    if (!node.Properties.ContainsKey(param))
+                    string paramValue;
+                    if (element.Params[param] is IEnumerable<object> p)
                     {
-                        node.Properties.Add(param, element.Params[param].ToString());
+                        paramValue = string.Join(", ", p);
                     }
                     else
                     {
-                        node.Properties[param] = element.Params[param].ToString();
+                        paramValue = element.Params[param].ToString();
+                    }
+
+                    if (!node.Properties.ContainsKey(param))
+                    {
+                        node.Properties.Add(param, paramValue);
+                    }
+                    else
+                    {
+                        node.Properties[param] = paramValue;
                     }
                 }
             }
