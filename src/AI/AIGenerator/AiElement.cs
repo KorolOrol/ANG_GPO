@@ -26,6 +26,7 @@ namespace AIGenerator
                 {
                     case List<object> list:
                         {
+                            if (list.Count == 0) break;
                             switch (list.First())
                             {
                                 case IElement:

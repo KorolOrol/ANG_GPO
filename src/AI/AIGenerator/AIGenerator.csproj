@@ -17,4 +17,8 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\base\BaseClasses\BaseClasses.csproj" />
+  </ItemGroup>
+
 </Project>
