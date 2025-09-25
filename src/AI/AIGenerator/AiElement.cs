@@ -251,25 +251,28 @@ namespace AIGenerator
         {
             foreach (var kvp in Params)
             {
-                switch (((JsonElement)kvp.Value).ValueKind)
+                if (kvp.Value is JsonElement jsonElement)
                 {
-                    case JsonValueKind.Array:
-                        {
-                            Params[kvp.Key] =
-                                ((JsonElement)kvp.Value).Deserialize<List<string>>() ?? new();
-                        }
-                        break;
-                    case JsonValueKind.Object:
-                        {
-                            Params[kvp.Key] =
-                                ((JsonElement)kvp.Value).Deserialize<Dictionary<string, double>>() ?? new();
-                        }
-                        break;
-                    case JsonValueKind.String:
-                        {
-                            Params[kvp.Key] = ((JsonElement)kvp.Value).GetString() ?? "";
-                        }
-                        break;
+                    switch (jsonElement.ValueKind)
+                    {
+                        case JsonValueKind.Array:
+                            {
+                                Params[kvp.Key] =
+                                    jsonElement.Deserialize<List<string>>() ?? new();
+                            }
+                            break;
+                        case JsonValueKind.Object:
+                            {
+                                Params[kvp.Key] =
+                                    jsonElement.Deserialize<Dictionary<string, double>>() ?? new();
+                            }
+                            break;
+                        case JsonValueKind.String:
+                            {
+                                Params[kvp.Key] = jsonElement.GetString() ?? "";
+                            }
+                            break;
+                    }
                 }
             }
         }
