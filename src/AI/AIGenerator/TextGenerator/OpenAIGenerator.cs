@@ -77,7 +77,19 @@ namespace AIGenerator.TextGenerator
         /// <param name="envVar">Имя переменной окружения</param>
         public void GetApiKeyFromEnvironment(string envVarName)
         {
-            string envVar = Environment.GetEnvironmentVariable(envVarName);
+            string envVar;
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                envVar = Environment.GetEnvironmentVariable(envVarName);
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            }
+            else
+            {
+                envVar = null;
+            }
             if (envVar != null)
             {
                 ApiKey = envVar;
