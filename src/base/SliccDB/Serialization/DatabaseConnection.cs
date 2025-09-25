@@ -346,7 +346,7 @@ namespace SliccDB.Serialization
             var targetNodeObject = targetNode.Invoke(Database.Nodes);
             if (sourceNodeObject is null || targetNodeObject is null)
             {
-
+                throw new ArgumentNullException("Source or target node not found when creating relation.");
             }
             bool exists = Relations.AsParallel().ToList().Exists(x =>
                 x.TargetHash == targetNodeObject.Hash && x.SourceHash == sourceNodeObject.Hash);
