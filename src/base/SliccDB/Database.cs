@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using MessagePack;
 using SliccDB.Core;
-using MessagePack;
 
 namespace SliccDB
 {
