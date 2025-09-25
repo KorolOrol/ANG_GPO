@@ -232,32 +232,6 @@ namespace DataBase
         }
 
         /// <summary>
-        /// Fill params of element from node data.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <param name="element"></param>
-        private static void FillParams(Node node, IElement element)
-        {
-            foreach (var prop in node.Properties.Keys)
-            {
-                if (prop == "Description" || prop == "Name" || prop == "Time") { continue; }
-        
-                var values = node.Properties[prop]
-                        .Trim('[', ']').Split(',')
-                        .Select(s => s.Trim()).ToList();
-        
-                if (values.Count == 1)
-                {
-                    element.Params.Add(prop, values[0]);
-                }
-                else
-                {
-                    element.Params.Add(prop, values);
-                }
-            }
-        }
-
-        /// <summary>
         /// Read whole plot.
         /// </summary>
         /// <returns>Filled <see cref="Plot"/> instance.</returns>
@@ -574,6 +548,32 @@ namespace DataBase
                     continue;
                 }
             }      
+        }
+
+        /// <summary>
+        /// Fill params of element from node data.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="element"></param>
+        private static void FillParams(Node node, IElement element)
+        {
+            foreach (var prop in node.Properties.Keys)
+            {
+                if (prop == "Description" || prop == "Name" || prop == "Time") { continue; }
+
+                var values = node.Properties[prop]
+                        .Trim('[', ']').Split(',')
+                        .Select(s => s.Trim()).ToList();
+
+                if (values.Count == 1)
+                {
+                    element.Params.Add(prop, values[0]);
+                }
+                else
+                {
+                    element.Params.Add(prop, values);
+                }
+            }
         }
 
         /// <summary>
