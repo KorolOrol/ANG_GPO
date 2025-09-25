@@ -111,6 +111,12 @@ namespace AIGenerator.TextGenerator
             }
         }
 
+        public List<Func<string, string>> ResultFilters { get; set; } = new()
+        {
+            (result) => Regex.Match(result, @"\{.*\}", RegexOptions.Singleline).Value,
+            (result) => result.Replace("\n\n", "")
+        };
+
         /// <summary>
         /// Генерация текста
         /// </summary>
@@ -138,9 +144,10 @@ namespace AIGenerator.TextGenerator
             if (completion.Value.FinishReason == ChatFinishReason.Stop)
             {
                 string trimmedResult = completion.Value.Content.First().Text;
-                trimmedResult = Regex.Match(trimmedResult, 
-                                            @"\{.*\}", RegexOptions.Singleline).Value;
-                trimmedResult = trimmedResult.Replace("\n\n", "");
+                foreach (var filter in ResultFilters)
+                {
+                    trimmedResult = filter(trimmedResult);
+                }
                 if (trimmedResult == "")
                 {
                     throw new Exception("Failed to generate text: " + 
