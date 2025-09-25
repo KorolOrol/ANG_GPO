@@ -6,15 +6,40 @@ using System.Text.Json;
 
 namespace AIGenerator
 {
+    /// <summary>
+    /// Класс для представления элемента сюжета в формате, удобном для AI
+    /// </summary>
     public class AiElement
     {
+        /// <summary>
+        /// Тип элемента (Character, Item, Location, Event)
+        /// </summary>
         public string Type { get; set; } = "";
+        
+        /// <summary>
+        /// Имя элемента
+        /// </summary>
         public string Name { get; set; } = "";
+        
+        /// <summary>
+        /// Описание элемента
+        /// </summary>
         public string Description { get; set; } = "";
+        
+        /// <summary>
+        /// Параметры элемента
+        /// </summary>
         public Dictionary<string, object> Params { get; set; } = new Dictionary<string, object>();
 
+        /// <summary>
+        /// Конструктор по умолчанию
+        /// </summary>
         public AiElement() { }
 
+        /// <summary>
+        /// Конструктор, принимающий IElement и преобразующий его в AiElement
+        /// </summary>
+        /// <param name="element">Элемент сюжета</param>
         public AiElement(IElement element)
         {
             Type = element.Type.ToString();
@@ -73,6 +98,11 @@ namespace AIGenerator
             }
         }
 
+        /// <summary>
+        /// Преобразование AiElement обратно в IElement с учетом существующих элементов сюжета
+        /// </summary>
+        /// <param name="plot">Сюжет, в который добавляется элемент</param>
+        /// <returns>Созданный элемент сюжета</returns>
         public IElement Element(Plot plot)
         {
             Element element = new Element((ElemType)Enum.Parse(typeof(ElemType), Type), 
@@ -135,6 +165,9 @@ namespace AIGenerator
             return element;
         }
         
+        /// <summary>
+        /// Словарь для определения типа элемента по имени параметра
+        /// </summary>
         private readonly static Dictionary<string, ElemType> _elementTypes = new()
         {
             { "Relations", ElemType.Character },
@@ -146,6 +179,12 @@ namespace AIGenerator
             { "Events", ElemType.Event }
         };
 
+        /// <summary>
+        /// Определение новых элементов, которые необходимо создать в сюжете
+        /// на основе параметров AiElement, если они отсутствуют в текущем сюжете
+        /// </summary>
+        /// <param name="plot">Сюжет, в который добавляются элементы</param>
+        /// <returns>Словарь новых элементов по типам</returns>
         public Dictionary<ElemType, List<string>> NewElements(Plot plot)
         {
             Dictionary<ElemType, List<string>> newEl = new Dictionary<ElemType, List<string>>
@@ -204,7 +243,10 @@ namespace AIGenerator
             }
             return newEl;
         }
-
+        
+        /// <summary>
+        /// Преобразование параметров из JSON-элементов обратно в соответствующие типы
+        /// </summary>
         public void ParamsJsonToSystem()
         {
             foreach (var kvp in Params)
