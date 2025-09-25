@@ -326,7 +326,7 @@ namespace DataBase.Tests
             [Fact]
             public void Update_NodeWithoutParams_SuccesfullUpdating()
             {
-                string filepath = @"Update_NodeWithotParams";
+                string filepath = @"Update_NodeWithoutParams.txt";
                 DataBaseManager dbm = new(filepath);
                 Element char1 = new(ElemType.Character, "Name before", "Description before", time: 10);
                 dbm.Create(char1);
@@ -355,7 +355,7 @@ namespace DataBase.Tests
             [Fact]
             public void Update_NodeWithParams_SuccesfullUpdating()
             {
-                string filepath = "ReadNodesWithParams.txt";
+                string filepath = "Update_NodesWithParams.txt";
                 DataBaseManager dbm = new(filepath);
 
                 Element item = new(ElemType.Item, "Item", "ItemDescription", new() { { "Height", "100" } });
