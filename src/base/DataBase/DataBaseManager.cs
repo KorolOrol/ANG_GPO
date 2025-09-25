@@ -388,7 +388,7 @@ namespace DataBase
         /// </summary>
         public void DeletePlot()
         {
-            Connection.Entities().Clear();
+            Connection.ClearDatabase();
         }
 
         #endregion
