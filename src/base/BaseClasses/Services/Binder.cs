@@ -1,94 +1,163 @@
 ﻿using BaseClasses.Interface;
 using BaseClasses.Model;
-
+using BaseClasses.Enum;
 namespace BaseClasses.Services
 {
     /// <summary>
-    /// Сервис для слияния историй
+    /// Сервис для связывания элементов истории
     /// </summary>
     public static class Binder
     {
         /// <summary>
         /// Связывание двух частей истории
         /// </summary>
-        /// <param name="part1">Первая часть истории</param>
-        /// <param name="part2">Вторая часть истории</param>
+        /// <param name="element1">Первая часть истории</param>
+        /// <param name="element2">Вторая часть истории</param>
         /// <param name="param">Параметр отношений (если связываются два персонажа)</param>
-        public static void Bind(IPart part1, IPart part2, double param = 0) 
+        public static void Bind(IElement element1, IElement element2, double param = 0) 
         { 
-            switch (part1)
+            switch (element1.Type)
             {
-                case Character character1:
-                    switch (part2)
+                case ElemType.Character:
+                    switch (element2.Type)
                     {
-                        case Character character2:
-                            Bind(character1, character2, param);
+                        case ElemType.Character:
+                            BindCharacters(element1, element2, param);
                             break;
-                        case Location location:
-                            Bind(character1, location);
+                        case ElemType.Location:
+                            BindCharLoc(element1, element2);
                             break;
-                        case Item item:
-                            Bind(character1, item);
+                        case ElemType.Item:
+                            BindCharItem(element1, element2);
                             break;
-                        case Event @event:
-                            Bind(character1, @event);
+                        case ElemType.Event:
+                            BindCharEvent(element1, element2);
                             break;
                     }
                     break;
-                case Location location1:
-                    switch (part2)
+                case ElemType.Location:
+                    switch (element2.Type)
                     {
-                        case Character character:
-                            Bind(location1, character);
+                        case ElemType.Character:
+                            BindLocChar(element1, element2);
                             break;
-                        case Location location2:
-                            Bind(location1, location2);
+                        case ElemType.Item:
+                            BindLocItem(element1, element2);
                             break;
-                        case Item item:
-                            Bind(location1, item);
-                            break;
-                        case Event @event:
-                            Bind(location1, @event);
+                        case ElemType.Event:
+                            BindLocEvent(element1, element2);
                             break;
                     }
                     break;
-                case Item item1:
-                    switch (part2)
+                case ElemType.Item:
+                    switch (element2.Type)
                     {
-                        case Character character:
-                            Bind(item1, character);
+                        case ElemType.Character:
+                            BindItemChar(element1, element2);
                             break;
-                        case Location location:
-                            Bind(item1, location);
+                        case ElemType.Location:
+                            BindItemLoc(element1, element2);
                             break;
-                        case Item item2:
-                            Bind(item1, item2);
-                            break;
-                        case Event @event:
-                            Bind(item1, @event);
+                        case ElemType.Event:
+                            BindItemEvent(element1, element2);
                             break;
                     }
                     break;
-                case Event @event1:
-                    switch (part2)
+                case ElemType.Event:
+                    switch (element2.Type)
                     {
-                        case Character character:
-                            Bind(@event1, character);
+                        case ElemType.Character:
+                            BindEventChar(element1, element2);
                             break;
-                        case Location location:
-                            Bind(@event1, location);
+                        case ElemType.Location:
+                            BindEventLoc(element1, element2);
                             break;
-                        case Item item:
-                            Bind(@event1, item);
-                            break;
-                        case Event @event2:
-                            Bind(@event1, @event2);
+                        case ElemType.Item:
+                            BindEventItem(element1, element2);
                             break;
                     }
                     break;
             }
         }
 
+        /// <summary>
+        /// Разъединение двух частей истории
+        /// </summary>
+        /// <param name="element1">Первая часть истории</param>
+        /// <param name="element2">Вторая часть истории</param>
+        public static void Unbind(IElement element1, IElement element2) 
+        { 
+            switch (element1.Type)
+            {
+                case ElemType.Character:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindCharacters(element1, element2);
+                            break;
+                        case ElemType.Location:
+                            UnbindCharLoc(element1, element2);
+                            break;
+                        case ElemType.Item:
+                            UnbindCharItem(element1, element2);
+                            break;
+                        case ElemType.Event:
+                            UnbindCharEvent(element1, element2);
+                            break;
+                    }
+                    break;
+                case ElemType.Location:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindLocChar(element1, element2);
+                            break;
+                        case ElemType.Item:
+                            UnbindLocItem(element1, element2);
+                            break;
+                        case ElemType.Event:
+                            UnbindLocEvent(element1, element2);
+                            break;
+                    }
+                    break;
+                case ElemType.Item:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindItemChar(element1, element2);
+                            break;
+                        case ElemType.Location:
+                            UnbindItemLoc(element1, element2);
+                            break;
+                        case ElemType.Event:
+                            UnbindItemEvent(element1, element2);
+                            break;
+                    }
+                    break;
+                case ElemType.Event:
+                    switch (element2.Type)
+                    {
+                        case ElemType.Character:
+                            UnbindEventChar(element1, element2);
+                            break;
+                        case ElemType.Location:
+                            UnbindEventLoc(element1, element2);
+                            break;
+                        case ElemType.Item:
+                            UnbindEventItem(element1, element2);
+                            break;
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Вспомогательный метод для проверки валидности связывания элементов
+        /// </summary>
+        private static bool IsValidBinding(IElement element1, IElement element2)
+        {
+            return element1 != null && element2 != null && element1 != element2;
+        }
 
         /// <summary>
         /// Связывание двух персонажей
@@ -96,27 +165,53 @@ namespace BaseClasses.Services
         /// <param name="character1">Первый персонаж</param>
         /// <param name="character2">Второй персонаж</param>
         /// <param name="relations">Отношения между персонажами</param>
-        public static void Bind(Character character1, Character character2, double relations)
+        private static void BindCharacters(IElement character1, IElement character2, double relations)
         {
-            if (character1 == null || character2 == null || character1 == character2 || relations == 0)
+            if (!IsValidBinding(character1, character2) || relations == 0)
             {
                 return;
             }
-            if (character1.Relations.FirstOrDefault(rel => rel.Character == character2) != null)
+
+            List<Relation> relations1;
+            if (!character1.Params.ContainsKey("Relations"))
             {
-                character1.Relations.FirstOrDefault(rel => rel.Character == character2).Value = relations;
+                relations1 = new List<Relation>();
+                character1.Params.Add("Relations", relations1);
             }
             else
             {
-                character1.Relations.Add(new Relation { Character = character2, Value = relations });
+                relations1 = (List<Relation>)character1.Params["Relations"];
             }
-            if (character2.Relations.FirstOrDefault(rel => rel.Character == character1) != null)
+
+            List<Relation> relations2;
+            if (!character2.Params.ContainsKey("Relations"))
             {
-                character2.Relations.FirstOrDefault(rel => rel.Character == character1).Value = relations;
+                relations2 = new List<Relation>();
+                character2.Params.Add("Relations", relations2);
             }
             else
             {
-                character2.Relations.Add(new Relation { Character = character1, Value = relations });
+                relations2 = (List<Relation>)character2.Params["Relations"];
+            }
+
+            var rel1 = relations1.FirstOrDefault(rel => rel.Character == character2);
+            if (rel1 != null)
+            {
+                rel1.Value = relations;
+            }
+            else
+            {
+                relations1.Add(new Relation { Character = character2, Value = relations });
+            }
+
+            var rel2 = relations2.FirstOrDefault(rel => rel.Character == character1);
+            if (rel2 != null)
+            {
+                rel2.Value = relations;
+            }
+            else
+            {
+                relations2.Add(new Relation { Character = character1, Value = relations });
             }
         }
 
@@ -125,21 +220,31 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character1">Первый персонаж</param>
         /// <param name="character2">Второй персонаж</param>
-        public static void Unbind(Character character1, Character character2)
+        private static void UnbindCharacters(IElement character1, IElement character2)
         {
-            if (character1 == null || character2 == null || character1 == character2)
+            if (!IsValidBinding(character1, character2))
             {
                 return;
             }
-            Relation rel1 = character1.Relations.FirstOrDefault(rel => rel.Character == character2);
-            Relation rel2 = character2.Relations.FirstOrDefault(rel => rel.Character == character1);
-            if (rel1 != null)
+
+            if (character1.Params.ContainsKey("Relations"))
             {
-                character1.Relations.Remove(rel1);
+                Relation rel1 = ((List<Relation>)character1.Params["Relations"]).
+                                FirstOrDefault(rel => rel.Character == character2);
+                if (rel1 != null)
+                {
+                    ((List<Relation>)character1.Params["Relations"]).Remove(rel1);
+                }
             }
-            if (rel2 != null)
+
+            if (character2.Params.ContainsKey("Relations"))
             {
-                character2.Relations.Remove(rel2);
+                Relation rel2 = ((List<Relation>)character2.Params["Relations"]).
+                                FirstOrDefault(rel => rel.Character == character1);
+                if (rel2 != null)
+                {
+                    ((List<Relation>)character2.Params["Relations"]).Remove(rel2);
+                }
             }
         }
 
@@ -148,19 +253,43 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="location">Локация</param>
-        public static void Bind(Character character, Location location)
+        private static void BindCharLoc(IElement character, IElement location)
         {
-            if (character == null || location == null)
+            if (!IsValidBinding(character, location))
             {
                 return;
             }
-            if (!character.Locations.Contains(location))
+
+            List<IElement> locs;
+            if (!character.Params.ContainsKey("Locations"))
             {
-                character.Locations.Add(location);
+                locs = new List<IElement>();
+                character.Params.Add("Locations", locs);
             }
-            if (!location.Characters.Contains(character))
+            else
             {
-                location.Characters.Add(character);
+                locs = (List<IElement>)character.Params["Locations"];
+            }
+
+            List<IElement> chars;
+            if (!location.Params.ContainsKey("Characters"))
+            {
+                chars = new List<IElement>();
+                location.Params.Add("Characters", chars);
+            }
+            else
+            {
+                chars = (List<IElement>)location.Params["Characters"];
+            }
+
+            if (!locs.Contains(location))
+            {
+                locs.Add(location);
+            }
+
+            if (!chars.Contains(character))
+            {
+                chars.Add(character);
             }
         }
 
@@ -169,19 +298,23 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="location">Локация</param>
-        public static void Unbind(Character character, Location location)
+        private static void UnbindCharLoc(IElement character, IElement location)
         {
-            if (character == null || location == null)
+            if (!IsValidBinding(character, location))
             {
                 return;
             }
-            if (character.Locations.Contains(location))
+
+            if (character.Params.ContainsKey("Locations") &&
+                ((List<IElement>)character.Params["Locations"]).Contains(location))
             {
-                character.Locations.Remove(location);
+                ((List<IElement>)character.Params["Locations"]).Remove(location);
             }
-            if (location.Characters.Contains(character))
+
+            if (location.Params.ContainsKey("Characters") &&
+                ((List<IElement>)location.Params["Characters"]).Contains(character))
             {
-                location.Characters.Remove(character);
+                ((List<IElement>)location.Params["Characters"]).Remove(character);
             }
         }
 
@@ -190,20 +323,44 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="item">Предмет</param>
-        public static void Bind(Character character, Item item)
+        private static void BindCharItem(IElement character, IElement item)
         {
-            if (character == null || item == null)
+            if (!IsValidBinding(character, item))
             {
                 return;
             }
-            if (!character.Items.Contains(item))
+
+            List<IElement> items;
+            if (!character.Params.ContainsKey("Items"))
             {
-                character.Items.Add(item);
+                items = new List<IElement>();
+                character.Params.Add("Items", items);
             }
-            if (item.Host != character)
+            else
             {
-                Unbind(item.Host, item);
-                item.Host = character;
+                items = (List<IElement>)character.Params["Items"];
+            }
+
+            if (!items.Contains(item))
+            {
+                items.Add(item);
+            }
+
+            if (!item.Params.ContainsKey("Host"))
+            {
+                item.Params.Add("Host", character);
+            }
+            else
+            {
+                if ((IElement)item.Params["Host"] != character)
+                {
+                    var prevHost = item.Params["Host"] as IElement;
+                    if (prevHost != null)
+                    {
+                        UnbindCharItem(prevHost, item);
+                    }
+                    item.Params["Host"] = character;
+                }
             }
         }
 
@@ -212,19 +369,23 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="item">Предмет</param>
-        public static void Unbind(Character character, Item item)
+        private static void UnbindCharItem(IElement character, IElement item)
         {
-            if (character == null || item == null)
+            if (!IsValidBinding(character, item))
             {
                 return;
             }
-            if (character.Items.Contains(item))
+
+            if (character.Params.ContainsKey("Items") &&
+                ((List<IElement>)character.Params["Items"]).Contains(item))
             {
-                character.Items.Remove(item);
+                ((List<IElement>)character.Params["Items"]).Remove(item);
             }
-            if (item.Host == character)
+
+            if (item.Params.ContainsKey("Host") &&
+                ((IElement)item.Params["Host"]) == character)
             {
-                item.Host = null;
+                item.Params["Host"] = null;
             }
         }
 
@@ -233,19 +394,43 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="event">Событие</param>
-        public static void Bind(Character character, Event @event)
+        private static void BindCharEvent(IElement character, IElement @event)
         {
-            if (character == null || @event == null)
+            if (!IsValidBinding(character, @event))
             {
                 return;
             }
-            if (!character.Events.Contains(@event))
+
+            List<IElement> events;
+            if (!character.Params.ContainsKey("Events"))
             {
-                character.Events.Add(@event);
+                events = new List<IElement>();
+                character.Params.Add("Events", events);
             }
-            if (!@event.Characters.Contains(character))
+            else
             {
-                @event.Characters.Add(character);
+                events = (List<IElement>)character.Params["Events"];
+            }
+
+            List<IElement> chars;
+            if (!@event.Params.ContainsKey("Characters"))
+            {
+                chars = new List<IElement>();
+                @event.Params.Add("Characters", chars);
+            }
+            else
+            {
+                chars = (List<IElement>)@event.Params["Characters"];
+            }
+
+            if (!events.Contains(@event))
+            {
+                events.Add(@event);
+            }
+
+            if (!chars.Contains(character))
+            {
+                chars.Add(character);
             }
         }
 
@@ -254,19 +439,23 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="character">Персонаж</param>
         /// <param name="event">Событие</param>
-        public static void Unbind(Character character, Event @event)
+        private static void UnbindCharEvent(IElement character, IElement @event)
         {
-            if (character == null || @event == null)
+            if (!IsValidBinding(character, @event))
             {
                 return;
             }
-            if (character.Events.Contains(@event))
+
+            if (character.Params.ContainsKey("Events") &&
+                ((List<IElement>)character.Params["Events"]).Contains(@event))
             {
-                character.Events.Remove(@event);
+                ((List<IElement>)character.Params["Events"]).Remove(@event);
             }
-            if (@event.Characters.Contains(character))
+
+            if (@event.Params.ContainsKey("Characters") &&
+                ((List<IElement>)@event.Params["Characters"]).Contains(character))
             {
-                @event.Characters.Remove(character);
+                ((List<IElement>)@event.Params["Characters"]).Remove(character);
             }
         }
 
@@ -275,9 +464,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="character">Персонаж</param>
-        public static void Bind(Location location, Character character)
+        private static void BindLocChar(IElement location, IElement character)
         {
-            Bind(character, location);
+            BindCharLoc(character, location);
         }
 
         /// <summary>
@@ -285,30 +474,54 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="character">Персонаж</param>
-        public static void Unbind(Location location, Character character)
+        private static void UnbindLocChar(IElement location, IElement character)
         {
-            Unbind(character, location);
+            UnbindCharLoc(character, location);
         }
 
         /// <summary>
-        /// Связывание локации с событием
+        /// Связывание локации с предметом
         /// </summary>
         /// <param name="location">Локация</param>
-        /// <param name="item">Событие</param>
-        public static void Bind(Location location, Item item)
+        /// <param name="item">Предмет</param>
+        private static void BindLocItem(IElement location, IElement item)
         {
-            if (location == null || item == null)
+            if (!IsValidBinding(location, item))
             {
                 return;
             }
-            if (!location.Items.Contains(item))
+
+            List<IElement> items;
+            if (!location.Params.ContainsKey("Items"))
             {
-                location.Items.Add(item);
+                items = new List<IElement>();
+                location.Params.Add("Items", items);
             }
-            if (item.Location != location)
+            else
             {
-                Unbind(item.Location, item);
-                item.Location = location;
+                items = (List<IElement>)location.Params["Items"];
+            }
+
+            if (!items.Contains(item))
+            {
+                items.Add(item);
+            }
+
+            if (!item.Params.ContainsKey("Location"))
+            {
+                item.Params.Add("Location", location);
+            }
+            else
+            {
+                if ((IElement)item.Params["Location"] != location)
+                {
+                    var prevLocation = item.Params["Location"] as IElement;
+                    if (prevLocation != null)
+                    {
+                        UnbindLocItem(prevLocation, item);
+                    }
+                    item.Params["Location"] = location;
+                }
             }
         }
 
@@ -317,19 +530,23 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="item">Предмет</param>
-        public static void Unbind(Location location, Item item)
+        private static void UnbindLocItem(IElement location, IElement item)
         {
-            if (location == null || item == null)
+            if (!IsValidBinding(location, item))
             {
                 return;
             }
-            if (location.Items.Contains(item))
+
+            if (location.Params.ContainsKey("Items") &&
+                ((List<IElement>)location.Params["Items"]).Contains(item))
             {
-                location.Items.Remove(item);
+                ((List<IElement>)location.Params["Items"]).Remove(item);
             }
-            if (item.Location == location)
+
+            if (item.Params.ContainsKey("Location") &&
+                ((IElement)item.Params["Location"]) == location)
             {
-                item.Location = null;
+                item.Params["Location"] = null;
             }
         }
 
@@ -338,19 +555,43 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="event">Событие</param>
-        public static void Bind(Location location, Event @event)
+        private static void BindLocEvent(IElement location, IElement @event)
         {
-            if (location == null || @event == null)
+            if (!IsValidBinding(location, @event))
             {
                 return;
             }
-            if (!location.Events.Contains(@event))
+
+            List<IElement> events;
+            if (!location.Params.ContainsKey("Events"))
             {
-                location.Events.Add(@event);
+                events = new List<IElement>();
+                location.Params.Add("Events", events);
             }
-            if (!@event.Locations.Contains(location))
+            else
             {
-                @event.Locations.Add(location);
+                events = (List<IElement>)location.Params["Events"];
+            }
+
+            List<IElement> locs;
+            if (!@event.Params.ContainsKey("Locations"))
+            {
+                locs = new List<IElement>();
+                @event.Params.Add("Locations", locs);
+            }
+            else
+            {
+                locs = (List<IElement>)@event.Params["Locations"];
+            }
+
+            if (!events.Contains(@event))
+            {
+                events.Add(@event);
+            }
+
+            if (!locs.Contains(location))
+            {
+                locs.Add(location);
             }
         }
 
@@ -359,19 +600,23 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="location">Локация</param>
         /// <param name="event">Событие</param>
-        public static void Unbind(Location location, Event @event)
+        private static void UnbindLocEvent(IElement location, IElement @event)
         {
-            if (location == null || @event == null)
+            if (!IsValidBinding(location, @event))
             {
                 return;
             }
-            if (location.Events.Contains(@event))
+
+            if (location.Params.ContainsKey("Events") &&
+                ((List<IElement>)location.Params["Events"]).Contains(@event))
             {
-                location.Events.Remove(@event);
+                ((List<IElement>)location.Params["Events"]).Remove(@event);
             }
-            if (@event.Locations.Contains(location))
+
+            if (@event.Params.ContainsKey("Locations") &&
+                ((List<IElement>)@event.Params["Locations"]).Contains(location))
             {
-                @event.Locations.Remove(location);
+                ((List<IElement>)@event.Params["Locations"]).Remove(location);
             }
         }
 
@@ -380,9 +625,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="character">Персонаж</param>
-        public static void Bind(Item item, Character character)
+        private static void BindItemChar(IElement item, IElement character)
         {
-            Bind(character, item);
+            BindCharItem(character, item);
         }
 
         /// <summary>
@@ -390,9 +635,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="character">Персонаж</param>
-        public static void Unbind(Item item, Character character)
+        private static void UnbindItemChar(IElement item, IElement character)
         {
-            Unbind(character, item);
+            UnbindCharItem(character, item);
         }
 
         /// <summary>
@@ -400,9 +645,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="location">Локация</param>
-        public static void Bind(Item item, Location location)
+        private static void BindItemLoc(IElement item, IElement location)
         {
-            Bind(location, item);
+            BindLocItem(location, item);
         }
 
         /// <summary>
@@ -410,9 +655,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="location">Локация</param>
-        public static void Unbind(Item item, Location location)
+        private static void UnbindItemLoc(IElement item, IElement location)
         {
-            Unbind(location, item);
+            UnbindLocItem(location, item);
         }
 
         /// <summary>
@@ -420,19 +665,43 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="event">Событие</param>
-        public static void Bind(Item item, Event @event)
+        private static void BindItemEvent(IElement item, IElement @event)
         {
-            if (item == null || @event == null)
+            if (!IsValidBinding(item, @event))
             {
                 return;
             }
-            if (!item.Events.Contains(@event))
+
+            List<IElement> events;
+            if (!item.Params.ContainsKey("Events"))
             {
-                item.Events.Add(@event);
+                events = new List<IElement>();
+                item.Params.Add("Events", events);
             }
-            if (!@event.Items.Contains(item))
+            else
             {
-                @event.Items.Add(item);
+                events = (List<IElement>)item.Params["Events"];
+            }
+
+            List<IElement> items;
+            if (!@event.Params.ContainsKey("Items"))
+            {
+                items = new List<IElement>();
+                @event.Params.Add("Items", items);
+            }
+            else
+            {
+                items = (List<IElement>)@event.Params["Items"];
+            }
+
+            if (!events.Contains(@event))
+            {
+                events.Add(@event);
+            }
+
+            if (!items.Contains(item))
+            {
+                items.Add(item);
             }
         }
 
@@ -441,19 +710,23 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="item">Предмет</param>
         /// <param name="event">Событие</param>
-        public static void Unbind(Item item, Event @event)
+        private static void UnbindItemEvent(IElement item, IElement @event)
         {
-            if (item == null || @event == null)
+            if (!IsValidBinding(item, @event))
             {
                 return;
             }
-            if (item.Events.Contains(@event))
+
+            if (item.Params.ContainsKey("Events") &&
+                ((List<IElement>)item.Params["Events"]).Contains(@event))
             {
-                item.Events.Remove(@event);
+                ((List<IElement>)item.Params["Events"]).Remove(@event);
             }
-            if (@event.Items.Contains(item))
+
+            if (@event.Params.ContainsKey("Items") &&
+                ((List<IElement>)@event.Params["Items"]).Contains(item))
             {
-                @event.Items.Remove(item);
+                ((List<IElement>)@event.Params["Items"]).Remove(item);
             }
         }
 
@@ -462,9 +735,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event"></param>
         /// <param name="character"></param>
-        public static void Bind(Event @event, Character character)
+        private static void BindEventChar(IElement @event, IElement character)
         {
-            Bind(character, @event);
+            BindCharEvent(character, @event);
         }
         
         /// <summary>
@@ -472,9 +745,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="character">Персонаж</param>
-        public static void Unbind(Event @event, Character character)
+        private static void UnbindEventChar(IElement @event, IElement character)
         {
-            Unbind(character, @event);
+            UnbindCharEvent(character, @event);
         }
 
         /// <summary>
@@ -482,9 +755,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="location">Локация</param>
-        public static void Bind(Event @event, Location location)
+        private static void BindEventLoc(IElement @event, IElement location)
         {
-            Bind(location, @event);
+            BindLocEvent(location, @event);
         }
 
         /// <summary>
@@ -492,9 +765,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="location">Локация</param>
-        public static void Unbind(Event @event, Location location)
+        private static void UnbindEventLoc(IElement @event, IElement location)
         {
-            Unbind(location, @event);
+            UnbindLocEvent(location, @event);
         }
 
         /// <summary>
@@ -502,9 +775,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="item">Предмет</param>
-        public static void Bind(Event @event, Item item)
+        private static void BindEventItem(IElement @event, IElement item)
         {
-            Bind(item, @event);
+            BindItemEvent(item, @event);
         }
 
         /// <summary>
@@ -512,9 +785,9 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="event">Событие</param>
         /// <param name="item">Предмет</param>
-        public static void Unbind(Event @event, Item item)
+        private static void UnbindEventItem(IElement @event, IElement item)
         {
-            Unbind(item, @event);
+            UnbindItemEvent(item, @event);
         }
     }
 }
