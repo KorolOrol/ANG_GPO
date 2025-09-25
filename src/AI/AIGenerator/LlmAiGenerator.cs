@@ -243,8 +243,8 @@ namespace AIGenerator
                                 relation = 
                                     ((Dictionary<string, double>)aiElement.Params["Relations"])[e];
                             }
-                            IElement? queuedElement = 
-                                generationQueue.FirstOrDefault(q => q.Item1.Name == e).Item1;
+                            var queuedTuple = generationQueue.FirstOrDefault(q => q.Item1.Name == e);
+                            IElement? queuedElement = queuedTuple.Item1;
                             if (queuedElement != null)
                             {
                                 Binder.Bind(queuedElement, element, relation);
