@@ -134,6 +134,17 @@ namespace AIGenerator
             }
             return element;
         }
+        
+        private readonly static Dictionary<string, ElemType> _elementTypes = new()
+        {
+            { "Relations", ElemType.Character },
+            { "Host", ElemType.Character },
+            { "Characters", ElemType.Character },
+            { "Items", ElemType.Item },
+            { "Locations", ElemType.Location },
+            { "Location", ElemType.Location },
+            { "Events", ElemType.Event }
+        };
 
         public Dictionary<ElemType, List<string>> NewElements(Plot plot)
         {
@@ -154,7 +165,7 @@ namespace AIGenerator
                             {
                                 if (plot.Characters.FirstOrDefault(c => c.Name == rel) == null)
                                 {
-                                    newEl[ElemType.Character].Add(rel);
+                                    newEl[_elementTypes[kvp.Key]].Add(rel);
                                 }
                             }
                         }
@@ -168,8 +179,7 @@ namespace AIGenerator
                             {
                                 if (plot.Elements.FirstOrDefault(e => e.Name == name) == null)
                                 {
-                                    newEl[(ElemType)Enum.Parse(typeof(ElemType), 
-                                        kvp.Key.Substring(0, kvp.Key.Length - 1))].Add(name);
+                                    newEl[_elementTypes[kvp.Key]].Add(name);
                                 }
                             }
                         }
@@ -178,7 +188,7 @@ namespace AIGenerator
                         {
                             if (plot.Elements.FirstOrDefault(e => e.Name == (string)kvp.Value) == null)
                             {
-                                newEl[ElemType.Character].Add((string)kvp.Value);
+                                newEl[_elementTypes[kvp.Key]].Add((string)kvp.Value);
                             }
                         }
                         break;
@@ -186,7 +196,7 @@ namespace AIGenerator
                         {
                             if (plot.Elements.FirstOrDefault(e => e.Name == (string)kvp.Value) == null)
                             {
-                                newEl[ElemType.Location].Add((string)kvp.Value);
+                                newEl[_elementTypes[kvp.Key]].Add((string)kvp.Value);
                             }
                         }
                         break;

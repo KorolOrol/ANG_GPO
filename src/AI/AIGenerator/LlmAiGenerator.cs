@@ -231,7 +231,7 @@ namespace AIGenerator
                 plot.Add(element);
                 if (recursion > 0)
                 {
-                    foreach (var (type, list) in (aiElement).NewElements(plot))
+                    foreach (var (type, list) in aiElement.NewElements(plot))
                     {
                         foreach (string e in list)
                         {
