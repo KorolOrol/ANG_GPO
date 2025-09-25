@@ -24,7 +24,7 @@ public class Property
     [Key(0)]
     public string Name { get; set; }
 
-    [Key(2)]
+    [Key(1)]
     public string FullTypeName { get; set; }
 
     public Property()
