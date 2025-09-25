@@ -13,7 +13,7 @@ public class Schema
     [Key(0)]
     public virtual string Label { get; set; }
 
-    [Key(2)]
+    [Key(1)]
     public List<Property> Properties { get; set; } = new List<Property>();
 }
 
