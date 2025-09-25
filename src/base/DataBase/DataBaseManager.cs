@@ -14,7 +14,7 @@ namespace DataBase
     public class DataBaseManager
     {
         #region MapEnteties
-        // Used to map base propereties of each type of IElement.
+        // Used to map base properties of each type of IElement.
 
         public class Character
         {
