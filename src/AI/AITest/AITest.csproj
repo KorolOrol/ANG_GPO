@@ -24,4 +24,9 @@
     <PackageReference Include="OpenAI" Version="2.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\base\BaseClasses\BaseClasses.csproj" />
+    <ProjectReference Include="..\AIGenerator\AIGenerator.csproj" />
+  </ItemGroup>
+
 </Project>
