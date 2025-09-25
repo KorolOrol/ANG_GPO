@@ -32,7 +32,7 @@ LlmAiGenerator Ogen = new(promptPath);
 */
 
 string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-string savingPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\ANG_GPO\\src\\AI\\AITest\\SavingPath\\";
+string savingPath = "SavingPath\\";
 LlmAiGenerator server = new(promptPath);
 server.TextAiGenerator.Endpoint = "http://127.0.0.1:1234/v1/";
 server.TextAiGenerator.Model = "saiga_nemo_12b_gguf";
