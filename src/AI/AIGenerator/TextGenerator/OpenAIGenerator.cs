@@ -111,9 +111,12 @@ namespace AIGenerator.TextGenerator
             }
         }
 
+        // Precompiled regex for extracting JSON-like objects from result
+        private static readonly Regex JsonObjectRegex = new Regex(@"\{.*\}", RegexOptions.Singleline | RegexOptions.Compiled);
+
         public List<Func<string, string>> ResultFilters { get; set; } = new()
         {
-            (result) => Regex.Match(result, @"\{.*\}", RegexOptions.Singleline).Value,
+            (result) => JsonObjectRegex.Match(result).Value,
             (result) => result.Replace("\n\n", "")
         };
 
