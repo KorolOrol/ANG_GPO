@@ -5,11 +5,11 @@ using BaseClasses.Services;
 
 
 /*
- * Для проверок необходимо использовать собственные Assert методы.
+ * Для тестов, содержащих элементы со связями, необходимо использовать собственные Assert методы.
  * Из-за высокой степени вложенности, а также несоответсвия последовательностей записи и чтения элементов, 
- * прямое сравнение эквивалетности показывает ошибку, даже при правильной работе.
+ * прямое сравнение эквивалетности показывает ошибку даже при правильной работе.
  * 
- * Методы же гарантирует однообразный порядок для элементов до записи и чтения.
+ * Методы же гарантирует однообразный порядок для элементов до записи и после чтения.
  */
 
 
@@ -144,6 +144,10 @@ namespace DataBase.Tests
                 }
             }
 
+            /// <summary>
+            /// Is Read method works correctly,
+            /// when reading relation with param between two characters.
+            /// </summary>
             [Fact]
             public void Read_TwoCharacterNodes_SuccessfulReading()
             {
@@ -228,12 +232,13 @@ namespace DataBase.Tests
             }
 
             /// <summary>
-            /// Read plot with every type of relation.
+            /// Is ReadPlot method works corectly. 
+            /// Plot contains every type of relation between.
             /// </summary>
             [Fact]
-            public void Read_NodesWithRelation_SuccessfulReading()
+            public void Read_Plot_SuccessfulReading()
             {
-                string filepath = @"Read_NodesWithRelation.txt";
+                string filepath = @"Read_Plot.txt";
                 DataBaseManager dbm = new(filepath);
 
                 Element item = new(ElemType.Item, "Item", "ItemDescription");
@@ -272,6 +277,9 @@ namespace DataBase.Tests
                 }
             }
 
+            /// <summary>
+            /// Throws Exception when trying to read empty db.
+            /// </summary>
             [Fact]
             public void Read_EmptyDB_ThrowedException()
             {
@@ -288,6 +296,9 @@ namespace DataBase.Tests
                 }
             }
 
+            /// <summary>
+            /// Is read method Throws Exception if node for reading doesnt exist.
+            /// </summary>
             [Fact]
             public void Read_NodeDoesntFound_ThrowedException()
             {
@@ -308,9 +319,69 @@ namespace DataBase.Tests
 
         public class ManagerUpdateTests
         {
+            /// <summary>
+            /// Is Update method works correctly when 
+            /// node contains only Name, Time and Description.
+            /// </summary>
+            [Fact]
             public void Update_NodeWithoutParams_SuccesfullUpdating()
             {
+                string filepath = @"Update_NodeWithotParams";
+                DataBaseManager dbm = new(filepath);
+                Element char1 = new(ElemType.Character, "Name before", "Description before", time: 10);
+                dbm.Create(char1);
+                char1.Name = "Name after";
+                char1.Description = "Description after";
+                char1.Time = 100;
 
+                try
+                {
+                    dbm.Update(char1, "Name before");
+                    var charb = dbm.Read("Name after");
+
+                    Assert.Equal(char1.Description, charb.Description);
+                    Assert.Equal(char1.Time, charb.Time);
+                }
+                finally
+                {
+                    File.Delete(filepath);
+                }
+            }
+
+            /// <summary>
+            /// Is Update method works correctly when 
+            /// node contains custom params.
+            /// </summary>
+            [Fact]
+            public void Update_NodeWithParams_SuccesfullUpdating()
+            {
+                string filepath = "ReadNodesWithParams.txt";
+                DataBaseManager dbm = new(filepath);
+
+                Element item = new(ElemType.Item, "Item", "ItemDescription", new() { { "Height", "100" } });
+                Element character = new(ElemType.Character, "Character", "CharacterDescription", new() { { "Traits", new string[] { "Evil", "Old" } } });
+
+                dbm.Create(item);
+                dbm.Create(character);
+
+                item.Params["Height"] = "200";
+                character.Params["Traits"] = new string[] { "Evil", "Old", "NewTrait" };
+
+                try
+                {
+                    dbm.Update(item);
+                    dbm.Update(character);
+
+                    var itemr = dbm.Read(item.Name);
+                    var charr = dbm.Read(character.Name);
+
+                    Assert.Equivalent(item.Params, itemr.Params);
+                    Assert.Equivalent(character.Params, charr.Params);
+                }
+                finally
+                {
+                    File.Delete(filepath);
+                }
             }
         }
 

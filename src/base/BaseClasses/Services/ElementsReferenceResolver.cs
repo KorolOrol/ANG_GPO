@@ -13,7 +13,7 @@ namespace BaseClasses.Services
         {
             if (!_referenceIdToObjectMap.TryAdd(referenceId, value))
             {
-                throw new JsonException();
+                throw new JsonException($"Reference ID already exists: {referenceId}");
             }
         }
 
@@ -38,7 +38,7 @@ namespace BaseClasses.Services
         {
             if (!_referenceIdToObjectMap.TryGetValue(referenceId, out object? value))
             {
-                throw new JsonException();
+                throw new JsonException($"Reference ID '{referenceId}' not found.");
             }
 
             return value;

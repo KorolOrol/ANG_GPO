@@ -55,8 +55,11 @@ namespace DataBase
         #endregion
 
         #region Fields
-
+        /// <summary>
+        /// Params of Element those represents relations between.
+        /// </summary>
         private readonly string[] _exceptedProperties = ["Locations", "Location", "Events", "Characters", "Host", "Items", "Relations"];
+        
         /// <summary>
         /// Подключение к базе данных.
         /// </summary>
@@ -67,9 +70,9 @@ namespace DataBase
         #region Constructor
 
         /// <summary>
-        /// Конструктор класса.
+        /// Clss constructor.
         /// </summary>
-        /// <param name="filepath">Путь к файлу базы данных. Расширение файла </param>
+        /// <param name="filepath">Path to db file. File extension can be text.</param>
         public DataBaseManager(string filepath)
         {
             filepath ??= Path.Combine(
@@ -228,11 +231,6 @@ namespace DataBase
             return elementList;
         }
 
-        private IEnumerable<Node> GetNodesByLabel(string label)
-        {
-            return Connection.Nodes().Where(x => x.Labels.Contains(label));
-        }
-
         /// <summary>
         /// Fill params of element from node data.
         /// </summary>
@@ -318,6 +316,15 @@ namespace DataBase
             var @params = element.Params.Keys.Concat(["Description", "Time"]);
 
             var node = Connection.Nodes().Properties("Name".Value(element.Name)).First();
+
+            foreach (var prop in node.Properties.Keys)
+            {
+                if (!new string[] { "Description", "Time", "Name"}.Contains(prop))
+                {
+                    node.Properties.Remove(prop);
+                }
+            }
+
             foreach (var param in @params)
             {
                 if (_exceptedProperties.Contains(param)) 
@@ -345,14 +352,7 @@ namespace DataBase
                         paramValue = element.Params[param].ToString();
                     }
 
-                    if (!node.Properties.ContainsKey(param))
-                    {
-                        node.Properties.Add(param, paramValue);
-                    }
-                    else
-                    {
-                        node.Properties[param] = paramValue;
-                    }
+                    node.Properties[param] = paramValue;
                 }
             }
 
@@ -366,7 +366,7 @@ namespace DataBase
 
             var node = Connection.Nodes().Properties("Name".Value(previousName)).First();
             node.Properties["Name"] = element.Name;
-            Connection.Update(node);
+            Update(element);
         }
 
         #endregion
@@ -423,6 +423,13 @@ namespace DataBase
 
         #region Private methods
 
+        /// <summary>
+        /// Create relations with two nodes with additional params.
+        /// </summary>
+        /// <param name="node1"></param>
+        /// <param name="node2"></param>
+        /// <param name="additionalParams"></param>
+        /// <exception cref="ArgumentException"></exception>
         private void CreateRelations(Node node1, Node node2, Dictionary<string, string> additionalParams = null)
         {
             ArgumentNullException.ThrowIfNull(node1);
@@ -568,7 +575,16 @@ namespace DataBase
                 }
             }      
         }
-        
+
+        /// <summary>
+        /// Get nodes that has some tag(label).
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
+        private IEnumerable<Node> GetNodesByLabel(string label)
+        {
+            return Connection.Nodes().Where(x => x.Labels.Contains(label));
+        }
         #endregion
     }
 }

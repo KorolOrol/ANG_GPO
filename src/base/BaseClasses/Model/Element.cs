@@ -7,7 +7,7 @@ namespace BaseClasses.Model
     /// <summary>
     /// Элемент истории
     /// </summary>
-    public class Element : IElement
+    public class Element : IElement, IEquatable<Element>
     {
         /// <summary>
         /// Тип элемента
@@ -99,15 +99,26 @@ namespace BaseClasses.Model
         /// <returns>Строка значения параметра</returns>
         private string GetValueString(object value)
         {
-            if (value is IEnumerable enumerable)
+            if (value is IEnumerable enumerable and not string)
             {
                 return $"[{string.Join(", ", 
                     enumerable.Cast<object>().Select(item => item.ToString()))}]";
             }
-            else
+            if (value is null)
             {
-                return value.ToString();
+                return "null";
             }
+            return value.ToString();
+        }
+
+        public bool Equals(Element? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Type == other.Type &&
+                   Name == other.Name &&
+                   Description == other.Description &&
+                   Time == other.Time;
         }
     }
 }

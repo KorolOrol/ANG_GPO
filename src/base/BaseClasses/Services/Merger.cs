@@ -1,5 +1,7 @@
 ﻿using BaseClasses.Interface;
 using BaseClasses.Model;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BaseClasses.Services
 {
@@ -17,10 +19,12 @@ namespace BaseClasses.Services
         /// <exception cref="ArgumentException"></exception>
         public static void Merge(IElement baseElement, IElement mergedElement, bool basePriority = true)
         {
-            if (baseElement is null || mergedElement is null)
-                throw new ArgumentNullException("Элемент не может быть null.");
+            if (baseElement is null)
+                throw new ArgumentNullException(nameof(baseElement), "Элемент не может быть null.");
+            if (mergedElement is null)
+                throw new ArgumentNullException(nameof(mergedElement), "Элемент не может быть null.");
             if (baseElement.Type != mergedElement.Type)
-                throw new ArgumentException("Неверный тип элемента.");
+                throw new ArgumentException("Неверный тип элемента.", nameof(mergedElement));
 
             if (baseElement.Name == "" || !basePriority)
             {
@@ -33,7 +37,7 @@ namespace BaseClasses.Services
 
             foreach (KeyValuePair<string, object> kvp in mergedElement.Params)
             {
-                switch (kvp.Value) 
+                switch (kvp.Value)
                 {
                     case List<IElement> elements:
                         {
@@ -52,24 +56,24 @@ namespace BaseClasses.Services
                         break;
                     case List<Relation> relationships:
                         {
-                            foreach(Relation relation in relationships.ToList())
+                            foreach (Relation relation in relationships.ToList())
                             {
                                 Binder.Bind(baseElement, relation.Character, relation.Value);
                                 Binder.Unbind(mergedElement, relation.Character);
                             }
                         }
                         break;
-                    case List<object> values: 
+                    case IList values:
                         {
                             if (!baseElement.Params.ContainsKey(kvp.Key))
                             {
                                 baseElement.Params.Add(kvp.Key, values);
                                 break;
                             }
-                            foreach (var value in values.ToList())
+                            foreach (var value in values.Cast<object>().ToList())
                             {
-                                if (!((List<object>)baseElement.Params[kvp.Key]).Contains(value))
-                                    ((List<object>)baseElement.Params[kvp.Key]).Add(value);
+                                if (!((IList)baseElement.Params[kvp.Key]).Contains(value))
+                                    ((IList)baseElement.Params[kvp.Key]).Add(value);
                             }
                         }
                         break;
@@ -79,9 +83,10 @@ namespace BaseClasses.Services
                             {
                                 baseElement.Params.Add(kvp.Key, value);
                             }
-                            else if (baseElement.Params[kvp.Key] is null || 
-                                (baseElement.Params[kvp.Key] is string s && 
-                                string.IsNullOrWhiteSpace(s)))
+                            else if (baseElement.Params[kvp.Key] is null ||
+                                (baseElement.Params[kvp.Key] is string s &&
+                                string.IsNullOrWhiteSpace(s)) ||
+                                !basePriority)
                             {
                                 baseElement.Params[kvp.Key] = value;
                             }
@@ -89,7 +94,7 @@ namespace BaseClasses.Services
                         break;
                 }
             }
-            
+
             baseElement.Time = Math.Max(baseElement.Time, mergedElement.Time);
         }
     }
