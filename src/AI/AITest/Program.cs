@@ -63,7 +63,7 @@ while (true)
     Console.WriteLine("03: Загрузить из файла");
     Console.WriteLine("04: Напечатать в файл");
     Console.WriteLine("0: Выход");
-    string choice = Console.ReadLine()!;
+    string choice = Console.ReadLine() ?? string.Empty;
     switch (choice)
     {
         case "11":
