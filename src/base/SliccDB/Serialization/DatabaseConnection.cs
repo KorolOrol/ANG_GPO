@@ -455,6 +455,7 @@ namespace SliccDB.Serialization
 
             return result;
         }
+
         /// <summary>
         ///  Creates a Node
         /// </summary>
@@ -482,7 +483,8 @@ namespace SliccDB.Serialization
             Debug.WriteLine("Node created");
             var labels = new HashSet<string>(additionalLabels);
             labels.Add(label);
-            return CreateNode(GetPropertiesFromObject(value), labels);
+            // Added by MonkeHlam
+            return CreateNode(GetPropertiesFromObject(value), labels); 
         }
 
         /// <summary>
