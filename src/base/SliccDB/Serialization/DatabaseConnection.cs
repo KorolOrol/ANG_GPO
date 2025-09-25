@@ -351,7 +351,7 @@ namespace SliccDB.Serialization
             bool exists = Relations.AsParallel().ToList().Exists(x =>
                 x.TargetHash == targetNodeObject.Hash && x.SourceHash == sourceNodeObject.Hash);
             if (exists)
-                throw new RelationExistsException(targetNodeObject.Hash, targetNodeObject.Hash);
+                throw new RelationExistsException(targetNodeObject.Hash, sourceNodeObject.Hash);
             Dictionary<string, string> props = new Dictionary<string, string>();
             HashSet<string> lablSet = new HashSet<string>();
             var relation = new Relation(relationName, properties ?? props, labels ?? lablSet, sourceNodeObject.Hash,
