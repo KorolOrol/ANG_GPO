@@ -283,7 +283,7 @@ namespace DataBase
         /// </summary>
         /// <param name="element"><see cref="IElement"/> to update.</param>
         /// <param name="paramsName">Params to update in IElement node</param>
-        public void Update(IElement element)
+        private void Update(IElement element)
         {
             ArgumentNullException.ThrowIfNull(element);
 
@@ -334,11 +334,16 @@ namespace DataBase
             CreateRelations(element, node);
         }
 
-        public void Update(IElement element, string previousName)
+        /// <summary>
+        /// Update Element
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="previousName"></param>
+        public void Update(IElement element, string previousName = null)
         {
             ArgumentNullException.ThrowIfNull(element);
 
-            var node = Connection.Nodes().Properties("Name".Value(previousName)).First();
+            var node = Connection.Nodes().Properties("Name".Value(previousName == null ? element.Name : previousName)).First();
             node.Properties["Name"] = element.Name;
             Update(element);
         }
@@ -404,7 +409,7 @@ namespace DataBase
         /// <param name="node2"></param>
         /// <param name="additionalParams"></param>
         /// <exception cref="ArgumentException"></exception>
-        private void CreateRelations(Node node1, Node node2, Dictionary<string, string> additionalParams = null)
+        private void CreateRelations(Node node1, Node node2, string relationLabel = null, Dictionary<string, string> additionalParams = null)
         {
             ArgumentNullException.ThrowIfNull(node1);
             ArgumentNullException.ThrowIfNull(node2);
@@ -413,7 +418,7 @@ namespace DataBase
             {
                 try
                 {
-                    Connection.CreateRelation(node1.Labels.First(), sn => sn.First(x => x.Hash == node2.Hash), tn => tn.First(x => x.Hash == node1.Hash), additionalParams);
+                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node2.Hash), tn => tn.First(x => x.Hash == node1.Hash), additionalParams);
                 }
                 catch (RelationExistsException)
                 { }
@@ -446,11 +451,11 @@ namespace DataBase
                 Node newNode;
                 if (element.Params[param] is IEnumerable<IElement> elements)
                 {
-                    foreach (var obj in elements)
+                    foreach (var relement in elements)
                     {
-                        if (Connection.Nodes().Properties("Name".Value(obj.Name)).FirstOrDefault() is var node && node != null)
+                        if (Connection.Nodes().Properties("Name".Value(relement.Name)).FirstOrDefault() is var node && node != null)
                         {
-                            if (Connection.Relations.Where(x => x.SourceHash ==  centralNode.Hash && x.TargetHash == node.Hash).Any())
+                            if (Connection.Relations.Where(x => x.SourceHash == centralNode.Hash && x.TargetHash == node.Hash).Any())
                             {
                                 continue;
                             }
@@ -461,32 +466,9 @@ namespace DataBase
                         }
                         else
                         {
-                            switch (param)
-                            {
-                                case "Locations":
-                                {
-                                    newNode = Connection.CreateNode(new Location() { Name = obj.Name });
-                                    break;
-                                }
-                                case "Events":
-                                {
-                                    newNode = Connection.CreateNode(new Event() { Name = obj.Name });
-                                    break;
-                                }
-                                case "Items":
-                                {
-                                    newNode = Connection.CreateNode(new Item() { Name = obj.Name });
-                                    break;
-                                }
-                                case "Characters":
-                                {
-                                    newNode = Connection.CreateNode(new Character() { Name = obj.Name });
-                                    break;
-                                }
-                                default: { continue; }
-                            }
+                            newNode = CreateRelatedNode(relement);
                         }
-                        CreateRelations(centralNode, newNode);
+                        CreateRelations(centralNode, newNode, param);
                     }
                 }
                 else if (element.Params[param] is IElement obj)
@@ -504,22 +486,9 @@ namespace DataBase
                     }
                     else
                     {
-                        switch (param)
-                        {
-                            case "Host":
-                            {
-                                newNode = Connection.CreateNode(new Character() { Name = obj.Name });
-                                break;
-                            }
-                            case "Location":
-                            {
-                                newNode = Connection.CreateNode(new Location() { Name = obj.Name });
-                                break;
-                            }
-                            default: { continue; }
-                        }
+                        newNode = CreateRelatedNode(obj);
                     }
-                    CreateRelations(centralNode, newNode);
+                    CreateRelations(centralNode, newNode, param);
                 }
                 else if (element.Params[param] is IEnumerable<BaseClasses.Model.Relation> rels && rels != null)
                 {
@@ -574,6 +543,37 @@ namespace DataBase
                     element.Params.Add(prop, values);
                 }
             }
+        }
+
+        public Node CreateRelatedNode(IElement element)
+        {
+            Node newNode;
+            switch (element.Type)
+            {
+                case ElemType.Location:
+                    {
+                        newNode = Connection.CreateNode(new Location() { Name = element.Name });
+                        break;
+                    }
+                case ElemType.Event:
+                    {
+                        newNode = Connection.CreateNode(new Event() { Name = element.Name });
+                        break;
+                    }
+                case ElemType.Item:
+                    {
+                        newNode = Connection.CreateNode(new Item() { Name = element.Name });
+                        break;
+                    }
+                case ElemType.Character:
+                    {
+                        newNode = Connection.CreateNode(new Character() { Name = element.Name });
+                        break;
+                    }
+                default: { newNode = null; break; } // Никогда такого не будет, но компилятор ругается, если не сделать такое присвоение
+
+            }
+            return newNode;
         }
 
         /// <summary>
