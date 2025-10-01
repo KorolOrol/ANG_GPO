@@ -26,7 +26,7 @@ namespace DataBase
         #region Constructor
 
         /// <summary>
-        /// Clss constructor.
+        /// Class constructor.
         /// </summary>
         /// <param name="filepath">Path to db file. File extension can be text.</param>
         public DataBaseManager(string filepath)
