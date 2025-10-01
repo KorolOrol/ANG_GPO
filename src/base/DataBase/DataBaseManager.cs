@@ -255,7 +255,7 @@ namespace DataBase
             }
 
             Connection.Update(elementNode);
-            ClearNodeRelations(elementNode); // Надо переделать когда нибудь для повышения производительности
+            ClearNodeRelations(elementNode); // Need to refactor someday to improve performance
             CreateRelations(element, elementNode);
         }
 
