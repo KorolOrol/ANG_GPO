@@ -88,7 +88,7 @@ namespace DataBase.Tests
             /// contains only basic fields: name and description.
             /// </summary>
             [Fact]
-            public void Create_NodesWithoutParams_SuccsessfulCreation()
+            public void Create_NodesWithoutParams_SuccessfulCreation()
             {
                 string filepath = "CreateNodesWithotRelations.txt";
                 DataBaseManager dbm = new(filepath);
