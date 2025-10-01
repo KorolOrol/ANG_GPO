@@ -121,7 +121,7 @@ namespace DataBase.Tests
             /// contains basic and additional custom fields.
             /// </summary>
             [Fact]
-            public void Create_NodesWithParams_SuccessfullCreation()
+            public void Create_NodesWithParams_SuccessfulCreation()
             {
                 string filepath = "CreateNodesWithParams.txt";
                 DataBaseManager dbm = new(filepath);
@@ -331,7 +331,7 @@ namespace DataBase.Tests
             /// node contains only Name, Time and Description.
             /// </summary>
             [Fact]
-            public void Update_NodeWithoutParams_SuccesfullUpdating()
+            public void Update_NodeWithoutParams_SuccesfulUpdating()
             {
                 string filepath = @"Update_NodeWithoutParams.txt";
                 DataBaseManager dbm = new(filepath);
@@ -360,7 +360,7 @@ namespace DataBase.Tests
             /// node contains custom params.
             /// </summary>
             [Fact]
-            public void Update_NodeWithParams_SuccesfullUpdating()
+            public void Update_NodeWithParams_SuccesfulUpdating()
             {
                 string filepath = "Update_NodesWithParams.txt";
                 DataBaseManager dbm = new(filepath);
@@ -391,7 +391,7 @@ namespace DataBase.Tests
                 }
             }
             [Fact]
-            public void Update_NodesWithRelation_SuccessfulUpdating()
+            public void Update_NodesWithRelation_SuccesfulUpdating()
             {
                 string filepath = @"Update_NodesWithRelation.txt";
                 DataBaseManager dbm = new(filepath);
