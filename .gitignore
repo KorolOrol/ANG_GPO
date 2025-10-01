@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 /src/AI/AITest/SavingPath
 /src/base/Test
+.idea/
