@@ -451,7 +451,7 @@ namespace DataBase
         }
 
         /// <summary>
-        /// Удаляет все исходящие из узла связи.
+        /// Deletes all outgoing relations from the node.
         /// </summary>
         /// <param name="centralnode"></param>
         private void ClearNodeRelations(Node centralnode)
