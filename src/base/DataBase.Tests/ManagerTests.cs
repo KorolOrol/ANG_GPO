@@ -239,7 +239,7 @@ namespace DataBase.Tests
             }
 
             /// <summary>
-            /// Is ReadPlot method works corectly. 
+            /// Is ReadPlot method works correctly. 
             /// Plot contains every type of relation between.
             /// </summary>
             [Fact]
