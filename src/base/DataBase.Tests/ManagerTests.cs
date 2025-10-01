@@ -391,7 +391,7 @@ namespace DataBase.Tests
                 }
             }
             [Fact]
-            public void Update_NodesWithRelation_SuccesfullUpdating()
+            public void Update_NodesWithRelation_SuccessfulUpdating()
             {
                 string filepath = @"Update_NodesWithRelation.txt";
                 DataBaseManager dbm = new(filepath);
