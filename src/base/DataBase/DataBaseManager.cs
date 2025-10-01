@@ -56,7 +56,7 @@ namespace DataBase
         }
 
         /// <summary>
-        /// Creeate a node representing IElement instance.
+        /// Create a node representing IElement instance.
         /// </summary>
         /// <param name="element">IElement to store in db.</param>
         /// <returns></returns>
