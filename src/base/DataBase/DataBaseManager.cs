@@ -13,53 +13,9 @@ namespace DataBase
 {
     public class DataBaseManager
     {
-        #region MapEnteties
-        // Used to map base properties of each type of IElement.
-
-        public class Character
-        {
-            public string Name { get; set; }
-
-            public int Time { get; set; } = -1;
-
-            public string Description { get; set; } = "Description";
-        }
-
-        public class Item
-        {
-            public string Name { get; set; }
-
-            public int Time { get; set; } = -1;
-
-            public string Description { get; set; } = "Description";
-        }
-
-        public class Event
-        {
-            public string Name { get; set; }
-
-            public int Time { get; set; } = -1;
-
-            public string Description { get; set; } = "Description";
-        }
-
-        public class Location
-        {
-            public string Name { get; set; }
-
-            public int Time { get; set; } = -1;
-
-            public string Description { get; set; } = "Description";
-        }
-
-        #endregion
 
         #region Fields
-        /// <summary>
-        /// Params of Element those represents relations between.
-        /// </summary>
-        private readonly string[] _exceptedProperties = ["Locations", "Location", "Events", "Characters", "Host", "Items", "Relations"];
-        
+
         /// <summary>
         /// Подключение к базе данных.
         /// </summary>
@@ -78,7 +34,7 @@ namespace DataBase
             filepath ??= Path.Combine(
                     Environment.GetFolderPath(
                         Environment.SpecialFolder.Personal),
-                    "AGN.sliccdb");
+                    "AGN.txt");
             Connection = new DatabaseConnection(filepath);
         }
         #endregion
@@ -106,7 +62,7 @@ namespace DataBase
         /// <returns></returns>
         public bool Create(IElement element)
         {
-            Node createdNode = null;
+            Node createdNode;
             if (Connection.Nodes().Properties("Name".Value(element.Name)).FirstOrDefault() is var node && node != null)
             {
                 Update(element);
@@ -114,39 +70,11 @@ namespace DataBase
             }
             else
             {
-                switch (element.Type)
-                {
-                    case ElemType.Character:
-                    {
-                        createdNode = Connection.CreateNode(new Character()
-                        {
-                            Name = element.Name,
-                            Description = element.Description,
-                            Time = element.Time
-                        });
-                        break;
-                    }
-                    case ElemType.Item:
-                    {
-                        createdNode = Connection.CreateNode(new Item() { Name = element.Name, Description = element.Description, Time = element.Time });
-                        break;
-                    }
-                    case ElemType.Event:
-                    {
-                        createdNode = Connection.CreateNode(new Event() { Name = element.Name, Description = element.Description, Time = element.Time });
-                        break;
-                    }
-                    case ElemType.Location:
-                    {
-                        createdNode = Connection.CreateNode(new Location() { Name = element.Name, Description = element.Description, Time = element.Time });
-                        break;
-                    }
-                }
-
-            Update(element);
+                createdNode = Connection.CreateNode(
+                    new() { { "Name", element.Name }, { "Description", element.Description }, { "Time", element.Time.ToString() } },
+                    new() { element.Type.ToString() });
+                Update(element);
             }
-
-            CreateRelations(element, createdNode);
             return true;
         }
 
@@ -283,55 +211,52 @@ namespace DataBase
         /// </summary>
         /// <param name="element"><see cref="IElement"/> to update.</param>
         /// <param name="paramsName">Params to update in IElement node</param>
-        private void Update(IElement element)
+        private void Update(IElement element, Node elementNode)
         {
             ArgumentNullException.ThrowIfNull(element);
 
-            var @params = element.Params.Keys.Concat(["Description", "Time"]);
-
-            var node = Connection.Nodes().Properties("Name".Value(element.Name)).First();
-
-            foreach (var prop in node.Properties.Keys)
+            foreach (var prop in elementNode.Properties.Keys)
             {
-                if (!new string[] { "Description", "Time", "Name"}.Contains(prop))
+                if (!new string[] { "Description", "Time", "Name" }.Contains(prop))
                 {
-                    node.Properties.Remove(prop);
+                    elementNode.Properties.Remove(prop);
                 }
             }
 
-            foreach (var param in @params)
+            foreach (var key in element.Params.Keys.Concat(["Description", "Time"]))
             {
-                if (_exceptedProperties.Contains(param)) 
+                string paramValue;
+                if (key == "Description")
+                {
+                    paramValue = element.Description;
+                }
+                else if (key == "Time")
+                {
+                    paramValue = element.Time.ToString();
+                }
+                else if (element.Params[key] is IEnumerable<IElement> || element.Params[key] is IEnumerable<BaseClasses.Model.Relation> || element.Params[key] is IElement)
                 {
                     continue;
                 }
-
-                if (param == "Description")
+                else if (element.Params[key] is IEnumerable<object> p)
                 {
-                    node.Properties[param] = element.Description;
-                }
-                else if (param == "Time")
-                {
-                    node.Properties[param] = element.Time.ToString();
+                    paramValue = string.Join(", ", p);
                 }
                 else
                 {
-                    string paramValue;
-                    if (element.Params[param] is IEnumerable<object> p)
+                    if (element.Params[key] != null)
                     {
-                        paramValue = string.Join(", ", p);
+                        paramValue = element.Params[key].ToString();
                     }
-                    else
-                    {
-                        paramValue = element.Params[param].ToString();
-                    }
-
-                    node.Properties[param] = paramValue;
+                    else { continue; }
                 }
+
+                elementNode.Properties[key] = paramValue;   
             }
 
-            Connection.Update(node);
-            CreateRelations(element, node);
+            Connection.Update(elementNode);
+            ClearNodeRelations(elementNode); // Надо переделать когда нибудь для повышения производительности
+            CreateRelations(element, elementNode);
         }
 
         /// <summary>
@@ -345,7 +270,7 @@ namespace DataBase
 
             var node = Connection.Nodes().Properties("Name".Value(previousName == null ? element.Name : previousName)).First();
             node.Properties["Name"] = element.Name;
-            Update(element);
+            Update(element, node);
         }
 
         #endregion
@@ -425,7 +350,7 @@ namespace DataBase
 
                 try
                 {
-                    Connection.CreateRelation(node2.Labels.First(), sn => sn.First(x => x.Hash == node1.Hash), tn => tn.First(x => x.Hash == node2.Hash), additionalParams);
+                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node1.Hash), tn => tn.First(x => x.Hash == node2.Hash), additionalParams);
                 }
                 catch (RelationExistsException)
                 { }
@@ -466,14 +391,16 @@ namespace DataBase
                         }
                         else
                         {
-                            newNode = CreateRelatedNode(relement);
+                            newNode = Connection.CreateNode(
+                                new() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
+                                new() { relement.Type.ToString()});
                         }
                         CreateRelations(centralNode, newNode, param);
                     }
                 }
-                else if (element.Params[param] is IElement obj)
+                else if (element.Params[param] is IElement relement)
                 {
-                    if (Connection.Nodes().Properties("Name".Value(obj.Name)).FirstOrDefault() is var node && node != null)
+                    if (Connection.Nodes().Properties("Name".Value(relement.Name)).FirstOrDefault() is var node && node != null)
                     {
                         if (Connection.Relations.Where(x => x.SourceHash == centralNode.Hash && x.TargetHash == node.Hash).Any())
                         {
@@ -486,7 +413,9 @@ namespace DataBase
                     }
                     else
                     {
-                        newNode = CreateRelatedNode(obj);
+                        newNode = Connection.CreateNode(
+                                new() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
+                                new() { relement.Type.ToString() });
                     }
                     CreateRelations(centralNode, newNode, param);
                 }
@@ -505,7 +434,9 @@ namespace DataBase
                         }
                         else
                         {
-                           newNode = Connection.CreateNode(new Character() { Name = rel.Character.Name });
+                            newNode = Connection.CreateNode(
+                                new() { { "Name", rel.Character.Name }, { "Description", rel.Character.Description }, { "Time", rel.Character.Time.ToString() } },
+                                new() { rel.Character.Type.ToString() });
                         }
 
                         try
@@ -517,6 +448,18 @@ namespace DataBase
                     continue;
                 }
             }      
+        }
+
+        /// <summary>
+        /// Удаляет все исходящие из узла связи.
+        /// </summary>
+        /// <param name="centralnode"></param>
+        private void ClearNodeRelations(Node centralnode)
+        {
+            foreach (var rel in Connection.Relations.Where(x => x.SourceHash == centralnode.Hash).ToList())
+            {
+                Connection.Relations.Remove(rel);
+            }
         }
 
         /// <summary>
@@ -543,37 +486,6 @@ namespace DataBase
                     element.Params.Add(prop, values);
                 }
             }
-        }
-
-        public Node CreateRelatedNode(IElement element)
-        {
-            Node newNode;
-            switch (element.Type)
-            {
-                case ElemType.Location:
-                    {
-                        newNode = Connection.CreateNode(new Location() { Name = element.Name });
-                        break;
-                    }
-                case ElemType.Event:
-                    {
-                        newNode = Connection.CreateNode(new Event() { Name = element.Name });
-                        break;
-                    }
-                case ElemType.Item:
-                    {
-                        newNode = Connection.CreateNode(new Item() { Name = element.Name });
-                        break;
-                    }
-                case ElemType.Character:
-                    {
-                        newNode = Connection.CreateNode(new Character() { Name = element.Name });
-                        break;
-                    }
-                default: { newNode = null; break; } // Никогда такого не будет, но компилятор ругается, если не сделать такое присвоение
-
-            }
-            return newNode;
         }
 
         /// <summary>

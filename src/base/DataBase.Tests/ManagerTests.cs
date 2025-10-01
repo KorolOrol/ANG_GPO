@@ -30,6 +30,11 @@ namespace DataBase.Tests
 
             foreach (var key in sortedDict.Keys)
             {
+                // Биндер при unbind`e оставляет в элементе пустой параметр, а воспроизвести такой список из бд, которая данные хранит, возможно, но запарно и ненужно
+                if ((sortedDict[key] is IEnumerable<object> objects && objects.Count() == 0) || sortedDict[key] == null) 
+                {
+                    continue;
+                }
                 elem.Params[key] = sortedDict[key];
             }
         }
@@ -45,8 +50,6 @@ namespace DataBase.Tests
         {
             Converter(expected);
             Converter(result);
-
-            var hui = expected.FullInfo();
 
             Assert.Equal(expected.FullInfo(), result.FullInfo());
         }
@@ -68,6 +71,10 @@ namespace DataBase.Tests
                 }
                 plot.Elements = plot.Elements.OrderBy(x => x.Name).ToList();
             }
+
+            var h1 = expected.FullInfo();
+            var h2 = result.FullInfo();
+
             Assert.Equal(expected.FullInfo(), result.FullInfo());
         }
 
@@ -382,6 +389,34 @@ namespace DataBase.Tests
                 {
                     File.Delete(filepath);
                 }
+            }
+            [Fact]
+            public void Update_NodesWithRelation_SuccesfullUpdating()
+            {
+                string filepath = @"Update_NodesWithRelation.txt";
+                DataBaseManager dbm = new(filepath);
+
+                Element item = new(ElemType.Item, "Item", "Item description");
+                Element character = new(ElemType.Character, "Character", "Character description");
+
+                Binder.Bind(character, item);
+
+                Plot plot = new();
+                plot.Add(item);
+                plot.Add(character);
+
+                dbm.StorePlot(plot);
+
+                item.Name = "New item";
+                character.Description = "New description";
+                Binder.Unbind(item, character);
+
+                dbm.Update(item, "Item");
+                dbm.Update(character);
+
+                Assertator(plot, dbm.ReadPlot());
+
+                File.Delete(filepath);
             }
         }
 
