@@ -1,8 +1,6 @@
 ﻿using OpenAI;
-using OpenAI.Managers;
-using OpenAI.ObjectModels;
-using OpenAI.ObjectModels.RequestModels;
-using OpenAI.ObjectModels.ResponseModels;
+using OpenAI.Chat;
+using System.ClientModel;
 using System.Text.RegularExpressions;
 
 namespace AIGenerator.TextGenerator
@@ -10,7 +8,7 @@ namespace AIGenerator.TextGenerator
     /// <summary>
     /// Класс для генерации текста с помощью OpenAI API
     /// </summary>
-    public class OpenAIGenerator : ITextAIGenerator
+    public class OpenAIGenerator : ITextAiGenerator, ISupportStructuredOutput
     {
         /// <summary>
         /// Ключ API для OpenAI
@@ -25,12 +23,12 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Клиент OpenAI
         /// </summary>
-        private OpenAIService _client;
+        private ChatClient _client;
 
         /// <summary>
         /// Модель для генерации текста
         /// </summary>
-        private string _model = Models.Gpt_3_5_Turbo_1106;
+        private string _model = "gpt-3.5-turbo-1106";
 
         /// <summary>
         /// Ключ API для OpenAI
@@ -41,11 +39,12 @@ namespace AIGenerator.TextGenerator
             set
             {
                 _apiKey = value;
-                Client = new OpenAIService(new OpenAiOptions()
-                {
-                    ApiKey = value,
-                    BaseDomain = Endpoint
-                });
+                Client = new ChatClient(Model, new ApiKeyCredential(ApiKey),
+                    new OpenAIClientOptions
+                    {
+                        Endpoint = new Uri(Endpoint),
+                        NetworkTimeout = TimeSpan.FromMinutes(30)
+                    });
             }
         }
 
@@ -58,13 +57,19 @@ namespace AIGenerator.TextGenerator
             set
             {
                 _endpoint = value;
-                Client = new OpenAIService(new OpenAiOptions()
-                {
-                    ApiKey = ApiKey,
-                    BaseDomain = value
-                });
+                Client = new ChatClient(Model, new ApiKeyCredential(ApiKey),
+                    new OpenAIClientOptions
+                    {
+                        Endpoint = new Uri(Endpoint),
+                        NetworkTimeout = TimeSpan.FromMinutes(30)
+                    });
             }
         }
+
+        /// <summary>
+        /// Использовать структурированный вывод
+        /// </summary>
+        public bool UseStructuredOutput { get; set; } = true;
 
         /// <summary>
         /// Получить ключ API из переменной окружения
@@ -72,7 +77,15 @@ namespace AIGenerator.TextGenerator
         /// <param name="envVar">Имя переменной окружения</param>
         public void GetApiKeyFromEnvironment(string envVarName)
         {
-            string envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            string envVar = null;
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            {
+                envVar = Environment.GetEnvironmentVariable(envVarName);
+            }
+            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
+            }
             if (envVar != null)
             {
                 ApiKey = envVar;
@@ -82,7 +95,7 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Клиент OpenAI
         /// </summary>
-        private OpenAIService Client
+        public ChatClient Client
         {
             get => _client;
             set => _client = value;
@@ -94,43 +107,69 @@ namespace AIGenerator.TextGenerator
         public string Model
         {
             get => _model;
-            set => _model = value;
+            set 
+            {
+                _model = value;
+                Client = new ChatClient(Model, new ApiKeyCredential(ApiKey),
+                    new OpenAIClientOptions
+                    {
+                        Endpoint = new Uri(Endpoint),
+                        NetworkTimeout = TimeSpan.FromMinutes(30)
+                    });
+            }
         }
+
+        // Precompiled regex for extracting JSON-like objects from result
+        private readonly static Regex JsonObjectRegex = new Regex(@"\{.*\}", 
+            RegexOptions.Singleline | RegexOptions.Compiled);
+
+        public List<Func<string, string>> ResultFilters { get; set; } =
+        [
+            (result) => JsonObjectRegex.Match(result).Value,
+            (result) => result.Replace("\n\n", "")
+        ];
 
         /// <summary>
         /// Генерация текста
         /// </summary>
-        /// <param name="messages">Список сообщений</param>
+        /// <param name="messages">Список сообщений. 
+        /// Если UseStructuredOutput - true, то первое сообщение используется 
+        /// для структурированного вывода.</param>
         /// <returns>Сгенерированный текст</returns>
         /// <exception cref="Exception">Ошибка генерации текста</exception>
         public async Task<string> GenerateTextAsync(List<string> messages)
         {
-            var completion = await Client.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest()
+            ChatCompletionOptions options = new();
+            if (UseStructuredOutput)
             {
-                Messages = messages.Select(message => ChatMessage.FromSystem(message)).ToList(),
-                Model = Model
-            });
-            if (completion.Successful)
+                options = new ChatCompletionOptions()
+                {
+                    ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat(
+                        jsonSchemaFormatName: "AiElement",
+                        jsonSchema: BinaryData.FromString(messages.First()),
+                        jsonSchemaIsStrict: true)
+                };
+                messages.RemoveAt(0);
+            }
+            var completion = await Client.CompleteChatAsync(messages.Select(
+                message => ChatMessage.CreateUserMessage(message)), options);
+            if (completion.Value.FinishReason == ChatFinishReason.Stop)
             {
-                string trimmedResult = Regex.Match(completion.Choices.First().Message.Content, 
-                                                   @"\{.*\}", RegexOptions.Singleline).Value;
+                string trimmedResult = completion.Value.Content.First().Text;
+                foreach (var filter in ResultFilters)
+                {
+                    trimmedResult = filter(trimmedResult);
+                }
                 if (trimmedResult == "")
                 {
                     throw new Exception("Failed to generate text: " + 
-                        completion.Choices.First().Message.Content);
+                        completion.Value.Content.First().Text);
                 }
                 return trimmedResult;
             }
             else
             {
-                await Task.Delay(5000);
-                return await GenerateTextAsync(messages);
-                if (completion.HttpStatusCode == System.Net.HttpStatusCode.TooManyRequests)
-                {
-                    await Task.Delay(5000);
-                    return await GenerateTextAsync(messages);
-                }
-                throw new Exception("Failed to generate text: " + completion.Error.Message);
+                throw new Exception("Failed to generate text: " + completion.Value.FinishReason);
             }
         }
 

@@ -7,14 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Betalgo.OpenAI" Version="8.6.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OpenAI" Version="2.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="BaseClasses">
       <HintPath>..\..\base\BaseClasses\bin\Debug\net8.0\BaseClasses.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\base\BaseClasses\BaseClasses.csproj" />
   </ItemGroup>
 
 </Project>

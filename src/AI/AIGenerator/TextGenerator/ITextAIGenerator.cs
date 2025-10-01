@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AIGenerator.TextGenerator
+﻿namespace AIGenerator.TextGenerator
 {
     /// <summary>
     /// Интерфейс для генерации текста с помощью AI
     /// </summary>
-    public interface ITextAIGenerator
+    public interface ITextAiGenerator
     {
         /// <summary>
         /// Ключ API для AI
