@@ -480,7 +480,6 @@ namespace SliccDB.Serialization
                         { FullTypeName = prop.PropertyType.FullName, Name = prop.Name }).ToList()
                 });
             }
-            Debug.WriteLine("Node created");
             var labels = new HashSet<string>(additionalLabels);
             labels.Add(label);
             // Added by MonkeHlam
