@@ -1,4 +1,7 @@
-﻿using BaseClasses.Interface;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Enum;
 using BaseClasses.Services;
@@ -54,7 +57,7 @@ namespace AIGenerator
                             if (list.Count == 0) break;
                             switch (list.First())
                             {
-                                case IElement:
+                                case IElement _:
                                     {
                                         List<string> strList = new List<string>();
                                         foreach (IElement e in list)
@@ -64,7 +67,7 @@ namespace AIGenerator
                                         Params.Add(kvp.Key, strList);
                                     }
                                     break;
-                                case Relation:
+                                case Relation _:
                                     {
                                         Dictionary<string, double> dict = 
                                             new Dictionary<string, double>();
@@ -75,7 +78,7 @@ namespace AIGenerator
                                         Params.Add(kvp.Key, dict);
                                     }
                                     break;
-                                case string:
+                                case string _:
                                     {
                                         Params.Add(kvp.Key, list);
                                     }
@@ -168,7 +171,7 @@ namespace AIGenerator
         /// <summary>
         /// Словарь для определения типа элемента по имени параметра
         /// </summary>
-        private readonly static Dictionary<string, ElemType> _elementTypes = new()
+        private readonly static Dictionary<string, ElemType> _elementTypes = new Dictionary<string, ElemType>()
         {
             { "Relations", ElemType.Character },
             { "Host", ElemType.Character },
@@ -258,13 +261,13 @@ namespace AIGenerator
                         case JsonValueKind.Array:
                             {
                                 Params[kvp.Key] =
-                                    jsonElement.Deserialize<List<string>>() ?? new();
+                                    jsonElement.Deserialize<List<string>>() ?? new List<string>();
                             }
                             break;
                         case JsonValueKind.Object:
                             {
                                 Params[kvp.Key] =
-                                    jsonElement.Deserialize<Dictionary<string, double>>() ?? new();
+                                    jsonElement.Deserialize<Dictionary<string, double>>() ?? new Dictionary<string, double>();
                             }
                             break;
                         case JsonValueKind.String:
