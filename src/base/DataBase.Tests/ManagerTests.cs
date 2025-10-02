@@ -31,7 +31,7 @@ namespace DataBase.Tests
             foreach (var key in sortedDict.Keys)
             {
                 // Биндер при unbind`e оставляет в элементе пустой параметр, а воспроизвести такой список из бд, которая данные хранит, возможно, но запарно и ненужно
-                if ((sortedDict[key] is IEnumerable<object> objects && objects.Count() == 0) || sortedDict[key] == null) 
+                if ((sortedDict[key] is IEnumerable<object> objects && !objects.Any()) || sortedDict[key] == null) 
                 {
                     continue;
                 }
