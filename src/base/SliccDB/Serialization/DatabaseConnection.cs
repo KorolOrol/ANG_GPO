@@ -32,7 +32,7 @@ namespace SliccDB.Serialization
         /// <summary>
         /// Creates new Database Connection Instance
         /// </summary>
-        /// <param name="filePath">Path to a database file</param>
+        /// <param name="filepath">Path to a database file</param>
         /// <param name="realtime">if true, attempts to save the database on every operation. Disabled by default as it is memory intensive</param>
         public DatabaseConnection(string filePath, bool realtime = false)
         {
