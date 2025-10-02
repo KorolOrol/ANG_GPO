@@ -82,15 +82,18 @@ namespace AIGenerator.TextGenerator
         public void GetApiKeyFromEnvironment(string envVarName)
         {
             string envVar;
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            // Try to get the environment variable in the most compatible way
+            // On Windows, try User first, then Process; on other platforms, just use the default
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User)
+                    ?? Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.Process);
+            }
+            else
             {
                 envVar = Environment.GetEnvironmentVariable(envVarName);
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
-            }
-            if (envVar != null)
+            if (!string.IsNullOrEmpty(envVar))
             {
                 ApiKey = envVar;
             }
