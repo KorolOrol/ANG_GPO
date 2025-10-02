@@ -1,4 +1,5 @@
-﻿using BaseClasses.Enum;
+﻿using System.Collections.Generic;
+using BaseClasses.Enum;
 using BaseClasses.Model;
 using System.Text.Json.Serialization;
 

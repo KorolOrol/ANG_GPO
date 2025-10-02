@@ -1,4 +1,5 @@
-﻿using BaseClasses.Interface;
+﻿using System;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Enum;
 using System.Text.Encodings.Web;
@@ -6,6 +7,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace BaseClasses.Services
 {
@@ -70,11 +74,10 @@ namespace BaseClasses.Services
             }
             else
             {
-                throw new ArgumentException($"Deserialization failed: Only 'Plot' and 'Element' types are supported by this method. " 
-                    + $"Attempted to deserialize type '{typeof(T).Name}', which is not supported. JSON root properties: [{ 
-                        string.Join(", ", rootElement
-                              .EnumerateObject()
-                              .Select(p => p.Name))}]");
+                throw new ArgumentException($"Deserialization failed: Only 'Plot' and 'Element' types " +
+                    $"are supported by this method. " 
+                    + $"Attempted to deserialize type '{typeof(T).Name}', which is not supported. " +
+                    $"JSON root properties: [{ string.Join(", ", rootElement .EnumerateObject() .Select(p => p.Name))}]");
             }
         }
 
@@ -173,7 +176,7 @@ namespace BaseClasses.Services
                         }
                         else if (MatchesProperties(typeof(Relation), json))
                         {
-                            Relation rel = new()
+                            Relation rel = new Relation()
                             {
                                 Character = ReadValue(json.GetProperty("Character"), resolver) as IElement,
                                 Value = json.GetProperty("Value").GetDouble()
