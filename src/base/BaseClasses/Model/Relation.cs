@@ -1,4 +1,5 @@
-﻿using BaseClasses.Interface;
+﻿using System;
+using BaseClasses.Interface;
 using System.Text.Json.Serialization;
 
 namespace BaseClasses.Model
@@ -11,7 +12,7 @@ namespace BaseClasses.Model
         /// <summary>
         /// Персонаж
         /// </summary>
-        public required IElement Character { get; set; }
+        public IElement Character { get; set; }
 
         /// <summary>
         /// Значение отношения

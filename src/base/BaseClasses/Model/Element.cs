@@ -1,6 +1,9 @@
-﻿using BaseClasses.Enum;
+﻿using System;
+using BaseClasses.Enum;
 using BaseClasses.Interface;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BaseClasses.Model
 {
@@ -32,7 +35,7 @@ namespace BaseClasses.Model
         /// <summary>
         /// Параметры элемента
         /// </summary>
-        public Dictionary<string, object> Params { get; set; } = new();
+        public Dictionary<string, object> Params { get; set; }
 
         /// <summary>
         /// Время создания элемента
@@ -71,8 +74,7 @@ namespace BaseClasses.Model
         {
             return $"{Type}: {Name}\n" +
                    $"Description: {Description}\n" +
-                   $"{string.Join("\n", Params.Select(kvp => 
-                   $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
+                   $"{string.Join("\n", Params.Select(kvp => $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
                    $"Creation time: {Time}\n";
         }
 
@@ -99,10 +101,9 @@ namespace BaseClasses.Model
         /// <returns>Строка значения параметра</returns>
         private string GetValueString(object value)
         {
-            if (value is IEnumerable enumerable and not string)
+            if (value is IEnumerable enumerable && value.GetType() != typeof(string))
             {
-                return $"[{string.Join(", ", 
-                    enumerable.Cast<object>().Select(item => item.ToString()))}]";
+                return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString()))}]";
             }
             if (value is null)
             {

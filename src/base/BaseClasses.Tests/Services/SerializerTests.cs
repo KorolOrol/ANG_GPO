@@ -1,8 +1,11 @@
-﻿using BaseClasses.Model;
+﻿using System;
+using BaseClasses.Model;
 using BaseClasses.Enum;
 using BaseClasses.Services;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using Xunit;
 
 namespace BaseClasses.Tests.Services
 {
@@ -24,7 +27,8 @@ namespace BaseClasses.Tests.Services
                 if (!element2.Params.ContainsKey(key)) return false;
                 if (element1.Params[key] is IEnumerable)
                 {
-                    if (element2.Params[key] is not IEnumerable) return false;
+                  var enumerable = element2.Params[key] as IEnumerable;
+                  if (enumerable == null) return false;
                     var list1 = (IEnumerable)element1.Params[key];
                     var list2 = (IEnumerable)element2.Params[key];
                     var enumerator1 = list1.GetEnumerator();
