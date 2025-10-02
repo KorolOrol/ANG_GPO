@@ -96,7 +96,7 @@ namespace DataBase.Tests
             [Fact]
             public void Create_NodesWithoutParams_SuccessfulCreation()
             {
-                string filepath = "CreateNodesWithotRelations.txt";
+                string filepath = "CreateNodesWithoutRelations.txt";
                 DataBaseManager dbm = new DataBaseManager(filepath);
 
                 Element item = new Element(ElemType.Item, "Item", "ItemDescription");
