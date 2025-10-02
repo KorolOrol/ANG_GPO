@@ -300,7 +300,7 @@ namespace DataBase
         /// Delete the node of <see cref="IElement"/>.
         /// </summary>
         /// <param name="element">Element to delete.</param>
-        /// <exception cref="Exception">Errorr on deletion.</exception>
+        /// <exception cref="Exception">Error on deletion.</exception>
         public void Delete(string elementName)
         {
             try
