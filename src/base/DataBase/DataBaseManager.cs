@@ -446,7 +446,7 @@ namespace DataBase
 
                         try
                         {
-                            Connection.CreateRelation(param[..^1], sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
+                            Connection.CreateRelation(param.Substring(0, param.Length - 1), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
                         }
                         catch (RelationExistsException) { }
                     }
