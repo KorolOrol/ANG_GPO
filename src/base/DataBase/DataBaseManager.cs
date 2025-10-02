@@ -102,7 +102,7 @@ namespace DataBase
 
             Element element = new(
                 Enum.Parse<ElemType>(elementNode.Labels.First()),
-                elementName, 
+                elementName,
                 elementNode.Properties["Description"],
                 time: Convert.ToInt32(elementNode.Properties["Time"]));
 
@@ -203,7 +203,7 @@ namespace DataBase
         }
 
         #endregion
-        
+
         #region Update
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace DataBase
                     else { continue; }
                 }
 
-                elementNode.Properties[key] = paramValue;   
+                elementNode.Properties[key] = paramValue;
             }
 
             Connection.Update(elementNode);
@@ -393,7 +393,7 @@ namespace DataBase
                         {
                             newNode = Connection.CreateNode(
                                 new() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
-                                new() { relement.Type.ToString()});
+                                new() { relement.Type.ToString() });
                         }
                         CreateRelations(centralNode, newNode, param);
                     }
@@ -447,7 +447,7 @@ namespace DataBase
                     }
                     continue;
                 }
-            }      
+            }
         }
 
         /// <summary>
