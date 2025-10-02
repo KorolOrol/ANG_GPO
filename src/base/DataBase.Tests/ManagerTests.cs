@@ -2,6 +2,12 @@
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Xunit;
+
 
 
 /*
@@ -91,12 +97,12 @@ namespace DataBase.Tests
             public void Create_NodesWithoutParams_SuccessfulCreation()
             {
                 string filepath = "CreateNodesWithotRelations.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(ElemType.Item, "Item", "ItemDescription");
-                Element character = new(ElemType.Character, "Character", "CharacterDescription");
-                Element location = new(ElemType.Location, "Location", "LocationDescription");
-                Element @event = new(ElemType.Event, "Event", "EventDescription");
+                Element item = new Element(ElemType.Item, "Item", "ItemDescription");
+                Element character = new Element(ElemType.Character, "Character", "CharacterDescription");
+                Element location = new Element(ElemType.Location, "Location", "LocationDescription");
+                Element @event = new Element(ElemType.Event, "Event", "EventDescription");
 
                 var itemResult = dbm.Create(item);
                 var characterResult = dbm.Create(character);
@@ -124,18 +130,18 @@ namespace DataBase.Tests
             public void Create_NodesWithParams_SuccessfulCreation()
             {
                 string filepath = "CreateNodesWithParams.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(
+                Element item = new Element(
                     ElemType.Item,
                     "Item1",
                     "ItemDescription",
-                    new() { { "Height", "100" } });
+                    new Dictionary<string, object>() { { "Height", "100" } });
 
-                Element character = new(
+                Element character = new Element(
                     ElemType.Character,
                     "Character", "CharacterDescription",
-                    new() { { "Traits", new string[] { "Trait1", "Trait2" } } });
+                    new Dictionary<string, object>() { { "Traits", new string[] { "Trait1", "Trait2" } } });
 
                 var itemResult = dbm.Create(item);
                 var characterResult = dbm.Create(character);
@@ -159,14 +165,14 @@ namespace DataBase.Tests
             public void Read_TwoCharacterNodes_SuccessfulReading()
             {
                 string filepath = "ReadTwoChars.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element char1 = new(ElemType.Character, "Char1", "Char1 desc.");
-                Element char2 = new(ElemType.Character, "Char2", "Char2 desc.");
+                Element char1 = new Element(ElemType.Character, "Char1", "Char1 desc.");
+                Element char2 = new Element(ElemType.Character, "Char2", "Char2 desc.");
 
                 Binder.Bind(char1, char2, 20);
 
-                Plot p = new();
+                Plot p = new Plot();
                 p.Add(char1);
                 p.Add(char2);
 
@@ -192,10 +198,10 @@ namespace DataBase.Tests
             public void Read_NodeWithoutParms_SuccessfulReading()
             {
                 string filepath = "ReadNodesWithoutParams.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(ElemType.Item, "Item", "ItemDescription");
-                Element character = new(ElemType.Character, "Character", "CharacterDescription");
+                Element item = new Element(ElemType.Item, "Item", "ItemDescription");
+                Element character = new Element(ElemType.Character, "Character", "CharacterDescription");
 
                 dbm.Create(item);
                 dbm.Create(character);
@@ -219,10 +225,10 @@ namespace DataBase.Tests
             public void Read_NodeWithParms_SuccessfulReading()
             {
                 string filepath = "ReadNodesWithParams.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(ElemType.Item, "Item", "ItemDescription", new() { { "Height", "100" } });
-                Element character = new(ElemType.Character, "Character", "CharacterDescription", new() { { "Traits", new string[] { "Evil", "Old" } } });
+                Element item = new Element(ElemType.Item, "Item", "ItemDescription", new Dictionary<string, object>() { { "Height", "100" } });
+                Element character = new Element(ElemType.Character, "Character", "CharacterDescription", new Dictionary<string, object>() { { "Traits", new string[] { "Evil", "Old" } } });
 
                 dbm.Create(item);
                 dbm.Create(character);
@@ -246,13 +252,13 @@ namespace DataBase.Tests
             public void Read_Plot_SuccessfulReading()
             {
                 string filepath = @"Read_Plot.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(ElemType.Item, "Item", "ItemDescription");
-                Element character1 = new(ElemType.Character, "Character1", "Character1Description");
-                Element character2 = new(ElemType.Character, "Character2", "Character2Description");
-                Element location = new(ElemType.Location, "Location", "LocationDescription");
-                Element @event = new(ElemType.Event, "Event", "EventDescription");
+                Element item = new Element(ElemType.Item, "Item", "ItemDescription");
+                Element character1 = new Element    (ElemType.Character, "Character1", "Character1Description");
+                Element character2 = new Element(ElemType.Character, "Character2", "Character2Description");
+                Element location = new Element(ElemType.Location, "Location", "LocationDescription");
+                Element @event = new Element(ElemType.Event, "Event", "EventDescription");
 
                 Binder.Bind(character1, character2, 100);
                 Binder.Bind(character2, character1, 10);
@@ -265,7 +271,7 @@ namespace DataBase.Tests
 
                 Binder.Bind(location, @event);
 
-                Plot plot = new();
+                Plot plot = new Plot();
                 plot.Add(character1);
                 plot.Add(character2);
                 plot.Add(item);
@@ -291,7 +297,7 @@ namespace DataBase.Tests
             public void Read_EmptyDB_ThrowedException()
             {
                 string filepath = @"Read_EmptyDB.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
                 try
                 {
@@ -310,8 +316,8 @@ namespace DataBase.Tests
             public void Read_NodeDoesntFound_ThrowedException()
             {
                 string filepath = @"Read_NodeDoesntExist.txt";
-                DataBaseManager dbm = new(filepath);
-                Element item = new(ElemType.Item, "Item", "ItemDescription");
+                DataBaseManager dbm = new DataBaseManager(filepath);
+                Element item = new Element(ElemType.Item, "Item", "ItemDescription");
 
                 try
                 {
@@ -334,8 +340,8 @@ namespace DataBase.Tests
             public void Update_NodeWithoutParams_SuccesfulUpdating()
             {
                 string filepath = @"Update_NodeWithoutParams.txt";
-                DataBaseManager dbm = new(filepath);
-                Element char1 = new(ElemType.Character, "Name before", "Description before", time: 10);
+                DataBaseManager dbm = new DataBaseManager(filepath);
+                Element char1 = new Element(ElemType.Character, "Name before", "Description before", time: 10);
                 dbm.Create(char1);
                 char1.Name = "Name after";
                 char1.Description = "Description after";
@@ -363,10 +369,10 @@ namespace DataBase.Tests
             public void Update_NodeWithParams_SuccesfulUpdating()
             {
                 string filepath = "Update_NodesWithParams.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(ElemType.Item, "Item", "ItemDescription", new() { { "Height", "100" } });
-                Element character = new(ElemType.Character, "Character", "CharacterDescription", new() { { "Traits", new string[] { "Evil", "Old" } } });
+                Element item = new Element(ElemType.Item, "Item", "ItemDescription", new Dictionary<string, object>() { { "Height", "100" } });
+                Element character = new Element(ElemType.Character, "Character", "CharacterDescription", new Dictionary<string, object>() { { "Traits", new string[] { "Evil", "Old" } } });
 
                 dbm.Create(item);
                 dbm.Create(character);
@@ -394,14 +400,14 @@ namespace DataBase.Tests
             public void Update_NodesWithRelation_SuccesfulUpdating()
             {
                 string filepath = @"Update_NodesWithRelation.txt";
-                DataBaseManager dbm = new(filepath);
+                DataBaseManager dbm = new DataBaseManager(filepath);
 
-                Element item = new(ElemType.Item, "Item", "Item description");
-                Element character = new(ElemType.Character, "Character", "Character description");
+                Element item = new Element(ElemType.Item, "Item", "Item description");
+                Element character = new Element(ElemType.Character, "Character", "Character description");
 
                 Binder.Bind(character, item);
 
-                Plot plot = new();
+                Plot plot = new Plot();
                 plot.Add(item);
                 plot.Add(character);
 

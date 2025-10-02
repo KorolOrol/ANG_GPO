@@ -6,6 +6,11 @@ using SliccDB.Core;
 using SliccDB.Exceptions;
 using SliccDB.Fluent;
 using SliccDB.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 
 
 
@@ -71,8 +76,8 @@ namespace DataBase
             else
             {
                 createdNode = Connection.CreateNode(
-                    new() { { "Name", element.Name }, { "Description", element.Description }, { "Time", element.Time.ToString() } },
-                    new() { element.Type.ToString() });
+                    new Dictionary<string, string>() { { "Name", element.Name }, { "Description", element.Description }, { "Time", element.Time.ToString() } },
+                    new HashSet<string>() { element.Type.ToString() });
                 Update(element);
             }
             return true;
@@ -100,7 +105,7 @@ namespace DataBase
 
             if (elementNode is null) throw new ArgumentException("Element has not found.");
 
-            Element element = new(
+            Element element = new Element(
                 Enum.Parse<ElemType>(elementNode.Labels.First()),
                 elementName,
                 elementNode.Properties["Description"],
@@ -117,7 +122,7 @@ namespace DataBase
                     var relatedNode = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
                     if (relatedNode != null)
                     {
-                        Element relatedElement = new(
+                        Element relatedElement = new Element(
                             Enum.Parse<ElemType>(relatedNode.Labels.First()),
                             relatedNode.Properties["Name"],
                             relatedNode.Properties["Description"],
@@ -149,7 +154,7 @@ namespace DataBase
         {
             var nodes = GetNodesByLabel(type.ToString());
 
-            List<IElement> elementList = new();
+            List<IElement> elementList = new List<IElement>();
 
             foreach (var node in nodes)
             {
@@ -165,10 +170,10 @@ namespace DataBase
         /// <returns>Filled <see cref="Plot"/> instance.</returns>
         public Plot ReadPlot()
         {
-            Plot plot = new();
+            Plot plot = new Plot();
             foreach (var node in Connection.Nodes)
             {
-                Element elem = new(Enum.Parse<ElemType>(node.Labels.First()))
+                Element elem = new Element(Enum.Parse<ElemType>(node.Labels.First()))
                 {
                     Name = node.Properties["Name"],
                     Description = node.Properties["Description"],
@@ -213,7 +218,7 @@ namespace DataBase
         /// <param name="paramsName">Params to update in IElement node</param>
         private void Update(IElement element, Node elementNode)
         {
-            ArgumentNullException.ThrowIfNull(element);
+            if (element == null) { throw new ArgumentNullException(); }
 
             foreach (var prop in elementNode.Properties.Keys)
             {
@@ -223,7 +228,7 @@ namespace DataBase
                 }
             }
 
-            foreach (var key in element.Params.Keys.Concat(["Description", "Time"]))
+            foreach (var key in element.Params.Keys.Concat(new string[] { "Description", "Time" }))
             {
                 string paramValue;
                 if (key == "Description")
@@ -266,7 +271,7 @@ namespace DataBase
         /// <param name="previousName"></param>
         public void Update(IElement element, string previousName = null)
         {
-            ArgumentNullException.ThrowIfNull(element);
+            if (element == null) { throw new ArgumentNullException(); }
 
             var node = Connection.Nodes().Properties("Name".Value(previousName == null ? element.Name : previousName)).First();
             node.Properties["Name"] = element.Name;
@@ -284,7 +289,7 @@ namespace DataBase
         /// <exception cref="Exception">Error on deletion.</exception>
         public void Delete(IElement element)
         {
-            ArgumentNullException.ThrowIfNull(element);
+            if (element == null) { throw new ArgumentNullException(); }
 
             try
             {
@@ -336,8 +341,8 @@ namespace DataBase
         /// <exception cref="ArgumentException"></exception>
         private void CreateRelations(Node node1, Node node2, string relationLabel = null, Dictionary<string, string> additionalParams = null)
         {
-            ArgumentNullException.ThrowIfNull(node1);
-            ArgumentNullException.ThrowIfNull(node2);
+            if (node1 == null) { throw new ArgumentNullException(); }
+            if (node2 == null) { throw new ArgumentNullException(); }
 
             if (Connection.Nodes.Contains(node1) && Connection.Nodes.Contains(node2))
             {
@@ -368,8 +373,8 @@ namespace DataBase
         /// <param name="centralNode"></param>
         private void CreateRelations(IElement element, Node centralNode)
         {
-            ArgumentNullException.ThrowIfNull(element);
-            ArgumentNullException.ThrowIfNull(centralNode);
+            if (element == null) { throw new ArgumentNullException(); }
+            if (centralNode == null) { throw new ArgumentNullException(); }
 
             foreach (var param in element.Params.Keys)
             {
@@ -392,8 +397,8 @@ namespace DataBase
                         else
                         {
                             newNode = Connection.CreateNode(
-                                new() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
-                                new() { relement.Type.ToString() });
+                                new Dictionary<string, string>() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
+                                new HashSet<string>() { relement.Type.ToString() });
                         }
                         CreateRelations(centralNode, newNode, param);
                     }
@@ -414,8 +419,8 @@ namespace DataBase
                     else
                     {
                         newNode = Connection.CreateNode(
-                                new() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
-                                new() { relement.Type.ToString() });
+                                new Dictionary<string, string>() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
+                                new HashSet<string>() { relement.Type.ToString() });
                     }
                     CreateRelations(centralNode, newNode, param);
                 }
@@ -435,8 +440,8 @@ namespace DataBase
                         else
                         {
                             newNode = Connection.CreateNode(
-                                new() { { "Name", rel.Character.Name }, { "Description", rel.Character.Description }, { "Time", rel.Character.Time.ToString() } },
-                                new() { rel.Character.Type.ToString() });
+                                new Dictionary<string, string>() { { "Name", rel.Character.Name }, { "Description", rel.Character.Description }, { "Time", rel.Character.Time.ToString() } },
+                                new HashSet<string>() { rel.Character.Type.ToString() });
                         }
 
                         try
