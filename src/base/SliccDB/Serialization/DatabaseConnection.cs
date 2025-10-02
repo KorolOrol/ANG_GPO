@@ -243,8 +243,8 @@ namespace SliccDB.Serialization
         public Node CreateNode(Dictionary<string, string> properties = null, HashSet<string> labels = null)
         {
             Dictionary<string, string> props = new Dictionary<string, string>();
-            HashSet<string> lablSet = new HashSet<string>();
-            var node = new Node(properties ?? props, labels ?? lablSet);
+            HashSet<string> labelSet = new HashSet<string>();
+            var node = new Node(properties ?? props, labels ?? labelSet);
             ValidateSchema(node);
             Database.Nodes.Add(node);
             if(realtime) SaveDatabase();
