@@ -353,8 +353,8 @@ namespace SliccDB.Serialization
             if (exists)
                 throw new RelationExistsException(targetNodeObject.Hash, sourceNodeObject.Hash);
             Dictionary<string, string> props = new Dictionary<string, string>();
-            HashSet<string> lablSet = new HashSet<string>();
-            var relation = new Relation(relationName, properties ?? props, labels ?? lablSet, sourceNodeObject.Hash,
+            HashSet<string> labelSet = new HashSet<string>();
+            var relation = new Relation(relationName, properties ?? props, labels ?? labelSet, sourceNodeObject.Hash,
                 targetNodeObject.Hash);
             ValidateSchema(relation);
             Database.Relations.Add(relation);
