@@ -1,4 +1,5 @@
-﻿using BaseClasses.Interface;
+﻿using System.Collections.Generic;
+using BaseClasses.Interface;
 using BaseClasses.Enum;
 using System.Text.Json.Serialization;
 
