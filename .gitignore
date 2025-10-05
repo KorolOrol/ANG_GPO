@@ -399,3 +399,33 @@ FodyWeavers.xsd
 /src/AI/AITest/SavingPath
 /src/base/Test
 .idea/
+
+# Unity
+Library/
+Temp/
+Obj/
+Logs/
+MemoryCaptures/
+UserSettings/
+
+# Builds
+Build/
+Builds/
+*.apk
+*.exe
+*.app
+
+# IDE
+.vs/
+*.csproj
+*.sln
+*.user
+*.suo
+*.tmp
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
