@@ -1,10 +1,15 @@
-﻿using AIGenerator.TextGenerator;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using AIGenerator.TextGenerator;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Services;
 using BaseClasses.Enum;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace AIGenerator
 {
@@ -21,7 +26,7 @@ namespace AIGenerator
         /// <summary>
         /// Системные подсказки
         /// </summary>
-        public Dictionary<string, string> SystemPrompt { get; set; } = new();
+        public Dictionary<string, string> SystemPrompt { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Настройки сериализации
@@ -114,7 +119,7 @@ namespace AIGenerator
         /// <returns>Список подсказок</returns>
         private List<string> GetPromptForResponse(Plot plot, IElement element)
         {
-            List<string> prompts = new();
+            List<string> prompts = new List<string>();
             if (UseStructuredOutput)
             {
                 prompts.Add(SystemPrompt[$"{element.Type}StructuredOutput"]);
@@ -219,7 +224,7 @@ namespace AIGenerator
             int recursion = 3)
         {
             bool isRoot = generationQueue == null;
-            if (generationQueue == null) generationQueue = new();
+            if (generationQueue == null) generationQueue = new Queue<(IElement, IElement, int)>();
             List<string> prompts = GetPromptForResponse(plot, preparedElement);
             string response = await TextAiGenerator.GenerateTextAsync(prompts);
             try

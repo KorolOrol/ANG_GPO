@@ -1,7 +1,11 @@
-﻿using OpenAI;
+﻿using System;
+using OpenAI;
 using OpenAI.Chat;
 using System.ClientModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace AIGenerator.TextGenerator
 {
@@ -77,16 +81,19 @@ namespace AIGenerator.TextGenerator
         /// <param name="envVar">Имя переменной окружения</param>
         public void GetApiKeyFromEnvironment(string envVarName)
         {
-            string envVar = null;
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            string envVar;
+            // Try to get the environment variable in the most compatible way
+            // On Windows, try User first, then Process; on other platforms, just use the default
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User)
+                    ?? Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.Process);
+            }
+            else
             {
                 envVar = Environment.GetEnvironmentVariable(envVarName);
             }
-            else if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                envVar = Environment.GetEnvironmentVariable(envVarName, EnvironmentVariableTarget.User);
-            }
-            if (envVar != null)
+            if (!string.IsNullOrEmpty(envVar))
             {
                 ApiKey = envVar;
             }
@@ -123,11 +130,11 @@ namespace AIGenerator.TextGenerator
         private readonly static Regex JsonObjectRegex = new Regex(@"\{.*\}", 
             RegexOptions.Singleline | RegexOptions.Compiled);
 
-        public List<Func<string, string>> ResultFilters { get; set; } =
-        [
+        public List<Func<string, string>> ResultFilters { get; set; } = new List<Func<string, string>>
+        {
             (result) => JsonObjectRegex.Match(result).Value,
             (result) => result.Replace("\n\n", "")
-        ];
+        };
 
         /// <summary>
         /// Генерация текста
@@ -139,7 +146,7 @@ namespace AIGenerator.TextGenerator
         /// <exception cref="Exception">Ошибка генерации текста</exception>
         public async Task<string> GenerateTextAsync(List<string> messages)
         {
-            ChatCompletionOptions options = new();
+            ChatCompletionOptions options = new ChatCompletionOptions();
             if (UseStructuredOutput)
             {
                 options = new ChatCompletionOptions()

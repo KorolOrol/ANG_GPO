@@ -1,4 +1,8 @@
-﻿namespace AIGenerator.TextGenerator
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace AIGenerator.TextGenerator
 {
     /// <summary>
     /// Интерфейс для генерации текста с помощью AI
