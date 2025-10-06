@@ -419,10 +419,15 @@ namespace DataBase.Tests
 
                 dbm.Update(item, "Item");
                 dbm.Update(character);
+                try
+                {
 
                 Assertator(plot, dbm.ReadPlot());
-
-                File.Delete(filepath);
+                }
+                finally
+                {
+                    File.Delete(filepath);
+                }
             }
         }
 

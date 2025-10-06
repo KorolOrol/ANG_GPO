@@ -26,6 +26,11 @@ namespace DataBase
         /// </summary>
         private readonly DatabaseConnection Connection;
 
+        /// <summary>
+        /// Array of params, that contains iside IElement as a field.
+        /// </summary>
+        private static readonly string[] sourceArray = new string[] { "Description", "Time", "Name" };
+
         #endregion
 
         #region Constructor
@@ -222,15 +227,16 @@ namespace DataBase
 
             foreach (var prop in elementNode.Properties.Keys)
             {
-                if (!new string[] { "Description", "Time", "Name" }.Contains(prop))
+                if (!sourceArray.Contains(prop))
                 {
                     elementNode.Properties.Remove(prop);
                 }
             }
 
-            foreach (var key in element.Params.Keys.Concat(new string[] { "Description", "Time" }))
+            foreach (var key in element.Params.Keys.Concat(sourceArray))
             {
                 string paramValue;
+                if (key == "Name") { continue; }
                 if (key == "Description")
                 {
                     paramValue = element.Description;
@@ -239,7 +245,9 @@ namespace DataBase
                 {
                     paramValue = element.Time.ToString();
                 }
-                else if (element.Params[key] is IEnumerable<IElement> || element.Params[key] is IEnumerable<BaseClasses.Model.Relation> || element.Params[key] is IElement)
+                else if (element.Params[key] is IEnumerable<IElement> || 
+                    element.Params[key] is IEnumerable<BaseClasses.Model.Relation> || 
+                    element.Params[key] is IElement)
                 {
                     continue;
                 }
@@ -339,7 +347,7 @@ namespace DataBase
         /// <param name="node2"></param>
         /// <param name="additionalParams"></param>
         /// <exception cref="ArgumentException"></exception>
-        private void CreateRelations(Node node1, Node node2, string relationLabel = null, Dictionary<string, string> additionalParams = null)
+        private void CreateRelations(Node node1, Node node2, string relationLabel, Dictionary<string, string> additionalParams = null)
         {
             if (node1 == null) { throw new ArgumentNullException(); }
             if (node2 == null) { throw new ArgumentNullException(); }
@@ -348,14 +356,16 @@ namespace DataBase
             {
                 try
                 {
-                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node2.Hash), tn => tn.First(x => x.Hash == node1.Hash), additionalParams);
+                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node1.Hash), tn => tn.First(x => x.Hash == node2.Hash), additionalParams);
                 }
                 catch (RelationExistsException)
-                { }
+                {
+                    Connection.Relations.Where(sn => sn.SourceHash == node1.Hash && sn.TargetHash == node2.Hash).First().RelationName = relationLabel;
+                }
 
                 try
                 {
-                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node1.Hash), tn => tn.First(x => x.Hash == node2.Hash), additionalParams);
+                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node2.Hash), tn => tn.First(x => x.Hash == node1.Hash), additionalParams);
                 }
                 catch (RelationExistsException)
                 { }

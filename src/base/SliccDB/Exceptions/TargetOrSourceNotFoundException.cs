@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SliccDB.Exceptions
+﻿namespace SliccDB.Exceptions
 {
     public class TargetOrSourceNotFoundException : SliccDbException
     {

@@ -1,7 +1,4 @@
-﻿using System;
-using SliccDB.Core;
-
-namespace SliccDB.Exceptions;
+﻿namespace SliccDB.Exceptions;
 
 public class SchemaExistsException : SliccDbException
 {
