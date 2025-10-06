@@ -1,0 +1,11 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="ViewAction" style="flex-grow: 1; flex-direction: row;">
+        <ui:VisualElement name="ElementsView" style="flex-grow: 1;">
+            <ui:VisualElement name="FilterBar" style="flex-grow: 0; height: 30px;" />
+            <ui:VisualElement name="ElementsSelector" style="flex-grow: 1; flex-direction: row;">
+                <ui:ListView name="ElementsList" style="width: 30%;" />
+                <ui:VisualElement name="ElementView" style="flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
