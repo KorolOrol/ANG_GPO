@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIGenerator", "AIGenerator.csproj", "{6D8025FD-4324-4C84-9DBA-667C6855B1CF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses", "..\..\base\BaseClasses\BaseClasses.csproj", "{52E07184-8238-41A8-B2AB-74A0EDBADC12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{6D8025FD-4324-4C84-9DBA-667C6855B1CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D8025FD-4324-4C84-9DBA-667C6855B1CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D8025FD-4324-4C84-9DBA-667C6855B1CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E07184-8238-41A8-B2AB-74A0EDBADC12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E07184-8238-41A8-B2AB-74A0EDBADC12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E07184-8238-41A8-B2AB-74A0EDBADC12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E07184-8238-41A8-B2AB-74A0EDBADC12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
