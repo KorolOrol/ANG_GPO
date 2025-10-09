@@ -1,7 +1,20 @@
 :root {
-    --background-dark: rgb(46, 52, 64);
-    --button-background: rgb(59, 66, 82);
-    --text-color: rgb(216, 222, 233);
+    --nord-dark: rgb(46, 52, 64);
+    --nord-semidark: rgb(59, 66, 82);
+    --nord-semilight: rgb(67, 76, 94);
+    --nord-light: rgb(76, 86, 106);
+    --nord-white: rgb(236, 239, 244);
+    --nord-darkwhite: rgb(229, 233, 240);
+    --nord-gray: rgb(216, 222, 233);
+    --nord-red: rgb(191, 97, 106);
+    --nord-orange: rgb(208, 135, 112);
+    --nord-yellow: rgb(235, 203, 139);
+    --nord-green: rgb(163, 190, 140);
+    --nord-purple: rgb(180, 142, 173);
+    color: var(--nord-white);
+    font-size: 20px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Nunito-Regular.ttf?fileID=12800000&guid=51d57c9009214d79e84cd21c3124d41d&type=3#Nunito-Regular");
+    -unity-font-style: normal;
 }
 
 .Button {
@@ -12,12 +25,29 @@
     border-right-width: 0;
     border-bottom-width: 0;
     border-left-width: 0;
-    --background: rgb(59, 66, 82);
-    --text: rgb(216, 222, 233);
     color: var(--text);
     background-color: var(--background);
-    margin-top: 0;
-    margin-right: 0;
-    margin-bottom: 0;
-    margin-left: 0;
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    margin-left: 4px;
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+    align-content: center;
+    align-items: center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.ButtonIcon {
+    flex-grow: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    margin-left: 4px;
 }

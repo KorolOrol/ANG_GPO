@@ -1,14 +1,39 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
-    <ui:VisualElement name="MainWindow" style="flex-grow: 1;">
+    <ui:VisualElement name="MainWindow" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
         <ui:VisualElement name="Header" style="flex-grow: 0; left: 0; top: 0; right: 0; height: 30px; flex-direction: row;">
-            <ui:VisualElement name="AppLogo" style="flex-grow: 0; width: 30px; height: 30px; background-image: url(&quot;project://database/Assets/UI/Icons/AppIcon.png?fileID=2800000&amp;guid=6f435d8bd9f852c5cb0f6f213375cdc9&amp;type=3#AppIcon&quot;);" />
-            <ui:Button text="File" name="FileButton" class="Button" style="width: 100px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
-            <ui:Button text="Edit" name="EditButton" class="Button" style="width: 100px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;" />
+            <ui:Button name="MenuButton" class="Button">
+                <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/MenuIcon.svg?fileID=7388822144124034973&amp;guid=ff6a9f67bdafe054b84cffe52970ebdd&amp;type=3#MenuIcon&quot;);" />
+                <ui:Label text="Menu" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            </ui:Button>
+            <ui:Button name="SaveButton" class="Button">
+                <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/SaveIcon.svg?fileID=7388822144124034973&amp;guid=cad658b7c05d14c63bc65632add4f781&amp;type=3#SaveIcon&quot;);" />
+                <ui:Label text="Save" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            </ui:Button>
+            <ui:Button name="NewButton" class="Button">
+                <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/NewIcon.svg?fileID=7388822144124034973&amp;guid=470a5db35bd0b8d158f4058c81345127&amp;type=3#NewIcon&quot;);" />
+                <ui:Label text="New" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            </ui:Button>
+            <ui:Button name="OpenButton" class="Button">
+                <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/OpenIcon.svg?fileID=7388822144124034973&amp;guid=e2b9554e4b4c6f1a8af949be10c01433&amp;type=3#OpenIcon&quot;);" />
+                <ui:Label text="Open" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            </ui:Button>
+            <ui:Button name="AboutButton" class="Button">
+                <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/AboutIcon.svg?fileID=7388822144124034973&amp;guid=599e0b6496a9baa7e8f34f47df208eaf&amp;type=3#AboutIcon&quot;);" />
+                <ui:Label text="About" style="margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+            </ui:Button>
+            <Bindings>
+                <ui:DataBinding property="style.backgroundColor" data-source-path="colors[3]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
+            </Bindings>
         </ui:VisualElement>
         <ui:VisualElement name="WorkArea" style="flex-grow: 1; flex-direction: row;">
             <ui:VisualElement name="ActionBar" style="flex-grow: 0; width: 30px;">
-                <ui:Button icon-image="project://database/Assets/UI/Icons/PlotIcon.png?fileID=2800000&amp;guid=ecc297da01bed5336b7624801f9fe415&amp;type=3#PlotIcon" name="ViewAction" class="Button" style="width: 30px; height: 30px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
+                <ui:Button icon-image="project://database/Assets/UI/Icons/PlotIcon.png?fileID=2800000&amp;guid=ecc297da01bed5336b7624801f9fe415&amp;type=3#PlotIcon" name="ViewAction" class="Button">
+                    <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/ViewAction.svg?fileID=7388822144124034973&amp;guid=21c1b907e7d71e9dd9394a1f1ca8ef3f&amp;type=3#ViewAction&quot;);" />
+                </ui:Button>
+                <Bindings>
+                    <ui:DataBinding property="style.backgroundColor" data-source-path="colors[1]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
+                </Bindings>
             </ui:VisualElement>
             <ui:VisualElement name="ActionArea" style="flex-grow: 1; width: auto;" />
         </ui:VisualElement>
