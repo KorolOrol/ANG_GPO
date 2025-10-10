@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.1</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Title>SliccDB</Title>
+		<PackageIcon>SLICC_128.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageId>SliccDB</PackageId>
+		<Version>0.1.1</Version>
+		<Description>A simple, one file graph database!</Description>
+		<Authors>Piotr Mikstacki</Authors>
+		<ProjectUrl>https://github.com/pmikstacki/SliccDB</ProjectUrl>
+		<PackageProjectUrl>https://github.com/pmikstacki/SliccDB</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/pmikstacki/SliccDB</RepositoryUrl>
+		<readMeMdUrl>https://raw.githubusercontent.com/pmikstacki/SliccDB/master/README.md</readMeMdUrl>
+		<PackageTags>Graph, Database</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="SLICC_128.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="SLICC_128.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Resource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="deniszykov.TypeConversion" Version="3.2.3" />
+		<PackageReference Include="MessagePack" Version="3.1.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Database.cs">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Compile>
+	</ItemGroup>
+
+</Project>
