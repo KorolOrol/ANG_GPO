@@ -25,8 +25,8 @@
     border-right-width: 0;
     border-bottom-width: 0;
     border-left-width: 0;
-    color: var(--text);
-    background-color: var(--background);
+    color: var(--nord-white);
+    background-color: var(--nord-semidark);
     margin-top: 4px;
     margin-right: 4px;
     margin-bottom: 4px;
@@ -50,4 +50,38 @@
     margin-right: 4px;
     margin-bottom: 4px;
     margin-left: 4px;
+}
+
+.Dropdown {
+    width: auto;
+    min-width: auto;
+}
+
+.Dropdown > .unity-base-field__label {
+    min-width: auto;
+}
+
+.Dropdown > .unity-base-field__label:enabled {
+    color: var(--nord-gray);
+}
+
+.Dropdown > .unity-base-field__input {
+    background-color: var(--nord-white);
+    color: var(--nord-dark);
+}
+
+.TextField {
+}
+
+.TextField > .unity-base-field__label {
+    min-width: auto;
+}
+
+.TextField > .unity-base-field__label:enabled {
+    color: var(--nord-darkwhite);
+}
+
+.TextField > .unity-base-field__input {
+    background-color: var(--nord-white);
+    color: var(--nord-dark);
 }

@@ -1,11 +1,13 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
     <ui:VisualElement name="ViewAction" content-container="ElementsList" style="flex-grow: 1; flex-direction: row; right: 0; bottom: 0; left: 0; top: 0;">
-        <ui:VisualElement name="ElementsView" style="flex-grow: 1;">
-            <ui:VisualElement name="FilterBar" style="flex-grow: 0; height: 30px;" />
-            <ui:VisualElement name="ElementsSelector" style="flex-grow: 1; flex-direction: row;">
-                <ui:ListView name="ElementsList" style="width: 30%;" />
-                <ui:VisualElement name="ElementView" style="flex-grow: 1;" />
+        <ui:VisualElement name="ElementsView" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement name="ElementsFilter" style="flex-grow: 1; width: 30%;">
+                <ui:DropdownField label="Filter" name="FilterDropdown" choices="All elements,Characters,Items,Locations,Events" class="Dropdown" />
+                <ui:TextField label="Search" name="SearchTextField" class="TextField" />
+                <ui:ListView name="ElementsListView" style="flex-grow: 1;" />
             </ui:VisualElement>
+            <ui:VisualElement name="SelectedElement" style="flex-grow: 1; width: 60%;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
