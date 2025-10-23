@@ -1,6 +1,7 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="ElementRoot" style="flex-grow: 1; width: auto; height: 50px; max-height: 50px; flex-direction: row;">
-        <ui:VisualElement name="ElementIcon" style="flex-grow: 0; width: 50px; height: 50px;" />
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
+    <ui:VisualElement name="ElementRoot" style="flex-grow: 1; width: auto; height: 50px; max-height: 50px; flex-direction: row; flex-shrink: 0;">
+        <ui:VisualElement name="ElementIcon" style="flex-grow: 0; width: 50px; height: 50px; -unity-background-scale-mode: scale-to-fit;" />
         <ui:Label text="Label" name="ElementName" style="flex-direction: row; align-self: center;" />
     </ui:VisualElement>
 </ui:UXML>
