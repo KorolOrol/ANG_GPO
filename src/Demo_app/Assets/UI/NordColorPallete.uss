@@ -59,14 +59,13 @@
 
 .Dropdown > .unity-base-field__label {
     min-width: auto;
-}
-
-.Dropdown > .unity-base-field__label:enabled {
+    width: 30%;
     color: var(--nord-gray);
 }
 
 .Dropdown > .unity-base-field__input {
     background-color: var(--nord-white);
+    border-width: 0;
     color: var(--nord-dark);
 }
 
@@ -75,13 +74,12 @@
 
 .TextField > .unity-base-field__label {
     min-width: auto;
-}
-
-.TextField > .unity-base-field__label:enabled {
+    width: 30%;
     color: var(--nord-darkwhite);
 }
 
 .TextField > .unity-base-field__input {
     background-color: var(--nord-white);
+    border-width: 0;
     color: var(--nord-dark);
 }

@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="EditSelectedElement" src="project://database/Assets/UI/EditSelectedElement.uxml?fileID=9197481963319205126&amp;guid=abaa16729a5c73d219a73d9731163b58&amp;type=3#EditSelectedElement" />
     <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
     <ui:VisualElement name="ViewAction" content-container="ElementsList" style="flex-grow: 1; flex-direction: row; right: 0; bottom: 0; left: 0; top: 0;">
         <ui:VisualElement name="ElementsView" style="flex-grow: 1; flex-direction: row;">
@@ -7,7 +8,9 @@
                 <ui:TextField label="Search" name="SearchTextField" class="TextField" />
                 <ui:ListView name="ElementsListView" item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" show-add-remove-footer="true" allow-add="true" fixed-item-height="50" style="flex-grow: 1;" />
             </ui:VisualElement>
-            <ui:VisualElement name="SelectedElement" style="flex-grow: 1; width: 60%;" />
+            <ui:VisualElement name="SelectedElement" style="flex-grow: 1; width: 60%; display: flex;">
+                <ui:Instance template="EditSelectedElement" enabled="true" name="EditSelectedElement" style="display: none; visibility: visible;" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

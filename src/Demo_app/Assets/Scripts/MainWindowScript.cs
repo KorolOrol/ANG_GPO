@@ -12,7 +12,6 @@ public class MainWindowScript : MonoBehaviour
     private VisualElement root;
     private Dictionary<Button, VisualElement> actions;
     private VisualElement currentAction;
-    private ListView elementsListView;
     private static List<Element> elements = new List<Element>();
     
     void OnEnable()
@@ -35,8 +34,7 @@ public class MainWindowScript : MonoBehaviour
         elements.Add(new Element(ElemType.Location, "3"));
         elements.Add(new Element(ElemType.Event, "4"));
         
-        elementsListView = root.Q<ListView>("ElementsListView");
-        ViewActionScript.BindElementsToList(elementsListView, elements);
+        ViewActionScript.BindElementsToList(root, elements);
     }
 
     private void OnActionButtonClicked(Button button)
