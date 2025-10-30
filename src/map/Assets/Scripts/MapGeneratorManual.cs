@@ -27,9 +27,9 @@ public class MapSaveData
     public int mapWidth;
     public int mapHeight;
 
-    // flattened arrays: index = x + y * width
-    public float[] heightMap;
-    public float[] biomeNoiseMap;
+    // Сжатые массивы вместо float[] - уменьшает размер в 4 раза
+    public byte[] compressedHeightMap;
+    public byte[] compressedBiomeMap;
 
     public List<LocationSaveData> locations;
 
@@ -82,6 +82,43 @@ public class MapGeneratorManual : MonoBehaviour
 
     // Сохранённые позиции локаций (имя -> px,py)
     private Dictionary<string, Vector2> placedLocations = new Dictionary<string, Vector2>();
+
+    // ========== Compression Methods ==========
+
+    /// <summary>
+    /// Сжимает float массив [0,1] в byte массив [0,255]
+    /// Уменьшает размер в 4 раза с приемлемой точностью для карт
+    /// </summary>
+    private byte[] CompressFloatMap(float[,] map, int width, int height)
+    {
+        byte[] compressed = new byte[width * height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Преобразуем float [0,1] в byte [0,255]
+                compressed[y * width + x] = (byte)Mathf.Clamp(Mathf.RoundToInt(map[x, y] * 255f), 0, 255);
+            }
+        }
+        return compressed;
+    }
+
+    /// <summary>
+    /// Восстанавливает float массив из сжатого byte массива
+    /// </summary>
+    private float[,] DecompressByteMap(byte[] compressed, int width, int height)
+    {
+        float[,] map = new float[width, height];
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                // Преобразуем byte [0,255] обратно в float [0,1]
+                map[x, y] = compressed[y * width + x] / 255f;
+            }
+        }
+        return map;
+    }
 
     public void GenerateManualMap()
     {
@@ -366,13 +403,14 @@ public class MapGeneratorManual : MonoBehaviour
         string pngPath = Path.Combine(dir, fileName + ".png");
         File.WriteAllBytes(pngPath, png);
 
-        // 2) JSON (данные)
+        // 2) JSON (данные) - ИСПОЛЬЗУЕМ СЖАТИЕ
         MapSaveData data = new MapSaveData
         {
             mapWidth = mapWidth,
             mapHeight = mapHeight,
-            heightMap = new float[mapWidth * mapHeight],
-            biomeNoiseMap = new float[mapWidth * mapHeight],
+            // Используем сжатые массивы вместо float[]
+            compressedHeightMap = CompressFloatMap(heightMap, mapWidth, mapHeight),
+            compressedBiomeMap = CompressFloatMap(biomeNoiseMap, mapWidth, mapHeight),
             locations = new List<LocationSaveData>(),
             seed = seed,
             noiseScale = noiseScale,
@@ -385,14 +423,6 @@ public class MapGeneratorManual : MonoBehaviour
             showChunkBiomes = showChunkBiomes,
             highlightDominantBiome = highlightDominantBiome
         };
-
-        for (int y = 0; y < mapHeight; y++)
-            for (int x = 0; x < mapWidth; x++)
-            {
-                int idx = x + y * mapWidth;
-                data.heightMap[idx] = heightMap[x, y];
-                data.biomeNoiseMap[idx] = biomeNoiseMap[x, y];
-            }
 
         // locations + positions
         foreach (var locDef in locations)
@@ -415,7 +445,7 @@ public class MapGeneratorManual : MonoBehaviour
             data.locations.Add(lsd);
         }
 
-        string json = JsonUtility.ToJson(data, true);
+        string json = JsonUtility.ToJson(data, false);
         string jsonPath = Path.Combine(dir, fileName + ".json");
         File.WriteAllText(jsonPath, json);
 
@@ -423,7 +453,7 @@ public class MapGeneratorManual : MonoBehaviour
         UnityEditor.AssetDatabase.Refresh();
 #endif
 
-        Debug.Log($"Карта сохранена в {dir} как {fileName}.png и {fileName}.json");
+        Debug.Log($"Карта сохранена в {dir} как {fileName}.png и {fileName}.json (размер уменьшен в 4 раза)");
     }
 
     [ContextMenu("Load Map (from SavedMaps)")]
@@ -476,18 +506,26 @@ public class MapGeneratorManual : MonoBehaviour
         showChunkBiomes = data.showChunkBiomes;
         highlightDominantBiome = data.highlightDominantBiome;
 
-        // 2) Восстанавливаем heightMap и biomeNoiseMap
-        heightMap = new float[mapWidth, mapHeight];
-        biomeNoiseMap = new float[mapWidth, mapHeight];
-        for (int y = 0; y < mapHeight; y++)
-            for (int x = 0; x < mapWidth; x++)
-            {
-                int idx = x + y * mapWidth;
-                if (data.heightMap != null && data.heightMap.Length == mapWidth * mapHeight)
-                    heightMap[x, y] = data.heightMap[idx];
-                if (data.biomeNoiseMap != null && data.biomeNoiseMap.Length == mapWidth * mapHeight)
-                    biomeNoiseMap[x, y] = data.biomeNoiseMap[idx];
-            }
+        // 2) Восстанавливаем heightMap и biomeNoiseMap ИЗ СЖАТЫХ ДАННЫХ
+        if (data.compressedHeightMap != null && data.compressedHeightMap.Length == mapWidth * mapHeight)
+        {
+            heightMap = DecompressByteMap(data.compressedHeightMap, mapWidth, mapHeight);
+        }
+        else
+        {
+            Debug.LogWarning("Сжатые данные heightMap отсутствуют или неверного размера");
+            heightMap = new float[mapWidth, mapHeight];
+        }
+
+        if (data.compressedBiomeMap != null && data.compressedBiomeMap.Length == mapWidth * mapHeight)
+        {
+            biomeNoiseMap = DecompressByteMap(data.compressedBiomeMap, mapWidth, mapHeight);
+        }
+        else
+        {
+            Debug.LogWarning("Сжатые данные biomeMap отсутствуют или неверного размера");
+            biomeNoiseMap = new float[mapWidth, mapHeight];
+        }
 
         // 3) Восстанавливаем colourMap (генерируем заново из высот/биомов)
         colourMap = new Color[mapWidth * mapHeight];
@@ -599,7 +637,6 @@ public class MapGeneratorManual : MonoBehaviour
         // Сохраним в runtime placedLocations для дальнейших операций
         placedLocations = loadedPositions;
 
-        Debug.Log($"Карта загружена из {jsonPath}");
+        Debug.Log($"Карта загружена из {jsonPath} (использованы сжатые данные)");
     }
-
 }
