@@ -95,7 +95,7 @@ public static class ViewActionScript
     private static void ElementsListViewSelectedIndicesChanged(IEnumerable<int> indices)
     {
         int index = -1;
-        foreach (var i in indices)
+        foreach (int i in indices)
         {
             index = i;
             break;
@@ -126,7 +126,7 @@ public static class ViewActionScript
         _descriptionTextField.value = _currentElement.Description;
         _timeTextField.value = _currentElement.Time.ToString();
         _paramsFoldout.contentContainer.Clear();
-        foreach (var param in _currentElement.Params)
+        foreach (KeyValuePair<string, object> param in _currentElement.Params)
         {
             switch (param.Value)
             {
@@ -134,7 +134,7 @@ public static class ViewActionScript
                     {
                         // Список элементов -> список текстовых полей с именами элементов
                         List<Element> elementList = list.Cast<Element>().ToList();
-                        var values = elementList.Select(el => el.Name);
+                        IEnumerable<string> values = elementList.Select(el => el.Name);
                         var listView = CreateTextFieldList(param.Key, values);
                         _paramsFoldout.contentContainer.Add(listView);
                     }
@@ -142,7 +142,8 @@ public static class ViewActionScript
                 case List<Relation> relationList:
                     {
                         // Список отношений -> список текстовых полей в формате "Имя (Значение)"
-                        var values = relationList.Select(r => $"{r.Character.Name} ({r.Value})");
+                        IEnumerable<string> values = relationList
+                            .Select(r => $"{r.Character.Name} ({r.Value})");
                         var listView = CreateTextFieldList(param.Key, values);
                         _paramsFoldout.contentContainer.Add(listView);
                     }
@@ -161,7 +162,8 @@ public static class ViewActionScript
                     break;
                 default:
                     {
-                        var stringField = CreateTextField(param.Key, param.Value.ToString());
+                        var stringField = CreateTextField(param.Key, 
+                            param.Value is not null ? param.Value.ToString() : string.Empty);
                         _paramsFoldout.contentContainer.Add(stringField);
                     }
                     break;
@@ -181,91 +183,111 @@ public static class ViewActionScript
         {
             _currentElement.Time = time;
         }
-        foreach (VisualElement paramField in _paramsFoldout.contentContainer.Children())
+        foreach (var paramField in _paramsFoldout.contentContainer.Children())
         {
-            if (paramField is ListView listView)
+            switch (paramField)
             {
-                string paramKey = listView.headerTitle;
-                switch (paramKey)
-                {
-                    case "Relations":
+                case TextField textField:
+                    {
+                        string key = textField.label;
+                        string value = textField.value;
+                        if (_currentElement.Params.TryGetValue(key, out object existingValue))
                         {
-                            if (_currentElement.Params[paramKey] is List<Relation> oldRelations) 
-                                foreach (var relation in oldRelations.ToList())
-                                {
-                                    Binder.Unbind(_currentElement, relation.Character);
-                                }
-                            foreach (var item in listView.itemsSource)
+                            switch (existingValue)
                             {
-                                if (item is TextField field)
-                                {
-                                    string text = field.value;
-                                    int openParenIndex = text.LastIndexOf('(');
-                                    int closeParenIndex = text.LastIndexOf(')');
-                                    if (openParenIndex > 0 && closeParenIndex > openParenIndex)
+                                case Element existingElement:
                                     {
-                                        string namePart = text.Substring(0, openParenIndex).Trim();
-                                        string valuePart = text.Substring(openParenIndex + 1, 
-                                            closeParenIndex - openParenIndex - 1).Trim();
-                                        Element relatedElement = _elements.Find(
-                                            e => e.Name == namePart && e.Type == ElemType.Character);
-                                        if (relatedElement != null 
-                                            && double.TryParse(valuePart, out double relationValue))
+                                        var element = _elements.FirstOrDefault(e => e.Name == value);
+                                        if (element != null)
                                         {
-                                            Binder.Bind(_currentElement, relatedElement, relationValue);
+                                            Binder.Unbind(_currentElement, existingElement);
+                                            Binder.Bind(_currentElement, element);
                                         }
                                     }
-                                }
-                            }
-                        }
-                        break;
-                    case "Characters":
-                    case "Items":
-                    case "Locations":
-                    case "Events":
-                        {
-                            if (_currentElement.Params[paramKey] is List<Element> oldElements) 
-                                foreach (var elem in oldElements.ToList())
-                                {
-                                    Binder.Unbind(_currentElement, elem);
-                                }
-                            List<Element> paramElements = new List<Element>();
-                            foreach (var item in listView.itemsSource)
-                            {
-                                if (item is TextField field)
-                                {
-                                    string name = field.value;
-                                    Element foundElement = _elements.Find(e => e.Name == name);
-                                    if (foundElement != null)
+                                    break;
+                                case List<string>:
                                     {
-                                        Binder.Bind(_currentElement, foundElement);
+                                        List<string> stringList = value
+                                            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                            .Select(s => s.Trim())
+                                            .ToList();
+                                        _currentElement.Params[key] = stringList;
                                     }
-                                }
+                                    break;
+                                default:
+                                    _currentElement.Params[key] = value;
+                                    break;
                             }
-                            _currentElement.Params[paramKey] = paramElements;
                         }
-                        break;
-                }
-            }
-            if (paramField is TextField textField)
-            {
-                string paramKey = textField.label;
-                switch (paramKey)
-                {
-                    case "Traits":
+                    }
+                    break;
+                case ListView listView:
+                    {
+                        string key = listView.headerTitle;
+                        if (_currentElement.Params.TryGetValue(key, out object existingValue))
                         {
-                            var traits = textField.value.Split(new[] { ',' }, 
-                                    StringSplitOptions.RemoveEmptyEntries)
-                                .Select(s => s.Trim()).ToList();
-                            _currentElement.Params[paramKey] = traits;
+                            switch (existingValue)
+                            {
+                                case List<IElement> existingElements:
+                                    {
+                                        List<string> elementNames = listView.itemsSource
+                                            .Cast<string>()
+                                            .ToList();
+                                        List<Element> newElements = _elements
+                                            .Where(e => elementNames.Contains(e.Name))
+                                            .ToList();
+                                        foreach (var oldElem in existingElements.ToList()
+                                            .Where(oldElem => !newElements.Contains(oldElem)))
+                                        {
+                                            Binder.Unbind(_currentElement, oldElem);
+                                        }
+                                        foreach (var newElem in newElements
+                                            .Where(newElem => !existingElements.Contains(newElem)))
+                                        {
+                                            Binder.Bind(_currentElement, newElem);
+                                        }
+                                    }
+                                    break;
+                                case List<Relation> existingRelations:
+                                    {
+                                        List<string> relationStrings = listView.itemsSource
+                                            .Cast<string>()
+                                            .ToList();
+                                        List<(Element, double)> newRelations = relationStrings
+                                            .Select(rs =>
+                                            {
+                                                int startIdx = rs.LastIndexOf('(');
+                                                int endIdx = rs.LastIndexOf(')');
+                                                if (startIdx < 0 || endIdx < 0 || endIdx <= startIdx)
+                                                    return (_currentElement, 0);
+                                                string name = rs[..startIdx].Trim();
+                                                string valueStr = rs
+                                                    .Substring(startIdx + 1, endIdx - startIdx - 1)
+                                                    .Trim();
+                                                if (!double.TryParse(valueStr, out double value))
+                                                    return (_currentElement, 0);
+                                                var element = _elements.FirstOrDefault(e => e.Name == name);
+                                                return element == null ? 
+                                                    (_currentElement, 0) : (element, value);
+                                            })
+                                            .Where(t => t != (_currentElement, 0))
+                                            .ToList();
+                                        foreach (var oldRel in existingRelations.ToList()
+                                            .Where(oldRel => newRelations
+                                                .All(nr => nr.Item1 != oldRel.Character)))
+                                        {
+                                            Binder.Unbind(_currentElement, oldRel.Character);
+                                        }
+                                        foreach (var newRel in newRelations)
+                                        {
+                                            Binder.Bind(_currentElement, newRel.Item1, newRel.Item2);
+                                        }
+                                    }
+                                    break;
+                            }
                         }
-                        break;
-                    default:
-                        {
-                            _currentElement.Params[paramKey] = textField.value;
-                        }
-                        break;
-                }
+                    }
+                    break;
             }
         }
     }
@@ -303,46 +325,42 @@ public static class ViewActionScript
             fixedItemHeight = 50
         };
 
-        List<TextField> fields = values
-            .Select((v, i) =>
-            {
-                var f = new TextField($"{labelBase} {i + 1}") { value = v };
-                f.AddToClassList("TextField");
-                return f;
-            })
-            .ToList();
+        List<string> items = values.ToList();
 
         listView.makeItem = () =>
         {
             var field = new TextField();
             field.AddToClassList("TextField");
+            field.RegisterValueChangedCallback(evt =>
+            {
+                if (field.userData is int idx and >= 0 && idx < listView.itemsSource.Count)
+                    items[idx] = evt.newValue;
+            });
             return field;
         };
         listView.bindItem = (e, i) =>
         {
-            if (e is TextField field)
-            {
-                field.label = $"{labelBase} {i + 1}";
-                field.value = fields[i].value;
-            }
+            if (e is not TextField field) return;
+            field.label = $"{labelBase} {i + 1}";
+            field.userData = i;
+            field.SetValueWithoutNotify(items[i]);
         };
-        listView.onAdd = (blv) =>
+        listView.onAdd = blv =>
         {
             int index = blv.itemsSource.Count;
-            var textField = new TextField($"{labelBase} {index + 1}");
-            textField.AddToClassList("TextField");
-            blv.itemsSource.Add(textField);
+            var src = (List<string>)blv.itemsSource;
+            src.Add(string.Empty);
             blv.RefreshItems();
             blv.ScrollToItem(index);
         };
-        listView.onRemove = (blv) =>
+        listView.onRemove = blv =>
         {
             int index = blv.selectedIndex;
             blv.itemsSource.RemoveAt(index);
             blv.RefreshItems();
             blv.ScrollToItem(index);
         };
-        listView.itemsSource = fields;
+        listView.itemsSource = items;
         return listView;
     }
 
@@ -363,23 +381,17 @@ public static class ViewActionScript
     {
         var labelUI = e.Q<Label>("ElementName");
         var iconUI = e.Q<VisualElement>("ElementIcon");
-        VectorImage icon = ScriptableObject.CreateInstance<VectorImage>();
-        Element element = _elements[i];
-        switch (element.Type)
+        var icon = ScriptableObject.CreateInstance<VectorImage>();
+        var element = _elements[i];
+        icon = element.Type switch
         {
-            case ElemType.Character:
-                icon = AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeCharacterIcon.svg");
-                break;
-            case ElemType.Item:
-                icon = AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeItemIcon.svg");
-                break;
-            case ElemType.Location:
-                icon = AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeLocationIcon.svg");
-                break;
-            case ElemType.Event:
-                icon = AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeEventIcon.svg");
-                break;
-        }
+            ElemType.Character =>
+                AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeCharacterIcon.svg"),
+            ElemType.Item => AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeItemIcon.svg"),
+            ElemType.Location => AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeLocationIcon.svg"),
+            ElemType.Event => AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeEventIcon.svg"),
+            _ => icon
+        };
         labelUI.text = element.Name;
         iconUI.style.backgroundImage = new StyleBackground(Background.FromVectorImage(icon));
     };
