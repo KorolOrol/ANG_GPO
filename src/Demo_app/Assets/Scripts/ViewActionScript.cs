@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
+using BaseClasses.Interface;
 using BaseClasses.Model;
+using BaseClasses.Services;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -42,14 +44,19 @@ public static class ViewActionScript
         updateElementButton.clicked += UpdateSelectedElement;
     }
     
-    private static void ElementsListViewSelectedIndicesChanged(IEnumerable<int> ints)
+    private static void ElementsListViewSelectedIndicesChanged(IEnumerable<int> indices)
     {
-        if (!ints.Any())
+        int index = -1;
+        foreach (var i in indices)
+        {
+            index = i;
+            break;
+        }
+        if (index < 0)
         {
             currentElement = null;
             return;
         }
-        int index = ints.FirstOrDefault();
         Debug.Log($"{elements[index].Name}, {elements[index].Type}");
         currentElement = elements[index];
         LoadSelectedElement();
@@ -72,52 +79,39 @@ public static class ViewActionScript
         {
             switch (param.Value)
             {
-                case List<string> stringList:
+                case List<IElement> list:
                     {
-                        var listField = new TextField(param.Key)
-                        {
-                            value = string.Join(", ", stringList)
-                        };
-                        paramsFoldout.contentContainer.Add(listField);
+                        // Список элементов -> список текстовых полей с именами элементов
+                        List<Element> elementList = list.Cast<Element>().ToList();
+                        var values = elementList.Select(el => el.Name);
+                        var listView = CreateTextFieldList(param.Key, values);
+                        paramsFoldout.contentContainer.Add(listView);
                     }
                     break;
-                case List<Element> elementList:
+                case List<Relation> relationList:
                     {
-                        var listView = new ListView();
-                        listView.allowAdd = true;
-                        listView.allowRemove = true;
-                        listView.showAddRemoveFooter = true;
-                        List<TextField> fields = new List<TextField>();
-                        for (int i = 0; i < elementList.Count; i++)
-                        {
-                            var field = new TextField($"{param.Key} {i + 1}")
-                            {
-                                value = elementList[i].Name
-                            };
-                            fields.Add(field);
-                        }
-                        listView.makeItem = () =>
-                        {
-                            var field = new TextField();
-                            return field;
-                        };
-                        listView.bindItem = (e, i) =>
-                        {
-                            var field = e as TextField;
-                            field.label = $"{param.Key} {i + 1}";
-                            field.value = fields[i].value;
-                        };
-                        listView.itemsSource = fields;
+                        // Список отношений -> список текстовых полей в формате "Имя (Значение)"
+                        var values = relationList.Select(r => $"{r.Character.Name} ({r.Value})");
+                        var listView = CreateTextFieldList(param.Key, values);
                         paramsFoldout.contentContainer.Add(listView);
+                    }
+                    break;
+                case List<string> stringList:
+                    {
+                        var listField = CreateTextField(param.Key, string.Join(", ", stringList));
+                        paramsFoldout.contentContainer.Add(listField);
                     }
                     break;
                 case Element element:
                     {
-                        var elementField = new TextField(param.Key)
-                        {
-                            value = element.Name
-                        };
+                        var elementField = CreateTextField(param.Key, element.Name);
                         paramsFoldout.contentContainer.Add(elementField);
+                    }
+                    break;
+                default:
+                    {
+                        var stringField = CreateTextField(param.Key, param.Value.ToString());
+                        paramsFoldout.contentContainer.Add(stringField);
                     }
                     break;
             }
@@ -135,8 +129,153 @@ public static class ViewActionScript
         }
         foreach (VisualElement paramField in paramsFoldout.contentContainer.Children())
         {
-            
+            if (paramField is ListView listView)
+            {
+                string paramKey = listView.headerTitle;
+                switch (paramKey)
+                {
+                    case "Relations":
+                        {
+                            if (currentElement.Params[paramKey] is List<Relation> oldRelations) 
+                                foreach (var relation in oldRelations.ToList())
+                                {
+                                    Binder.Unbind(currentElement, relation.Character);
+                                }
+                            List<(Element, double)> relations = new List<(Element, double)>();
+                            foreach (var item in listView.itemsSource)
+                            {
+                                if (item is TextField field)
+                                {
+                                    string text = field.value;
+                                    int openParenIndex = text.LastIndexOf('(');
+                                    int closeParenIndex = text.LastIndexOf(')');
+                                    if (openParenIndex > 0 && closeParenIndex > openParenIndex)
+                                    {
+                                        string namePart = text.Substring(0, openParenIndex).Trim();
+                                        string valuePart = text.Substring(openParenIndex + 1, 
+                                            closeParenIndex - openParenIndex - 1).Trim();
+                                        Element relatedElement = elements.Find(
+                                            e => e.Name == namePart && e.Type == ElemType.Character);
+                                        if (relatedElement != null 
+                                            && double.TryParse(valuePart, out double relationValue))
+                                        {
+                                            Binder.Bind(currentElement, relatedElement, relationValue);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    case "Characters":
+                    case "Items":
+                    case "Locations":
+                    case "Events":
+                        {
+                            if (currentElement.Params[paramKey] is List<Element> oldElements) 
+                                foreach (var elem in oldElements.ToList())
+                                {
+                                    Binder.Unbind(currentElement, elem);
+                                }
+                            List<Element> paramElements = new List<Element>();
+                            foreach (var item in listView.itemsSource)
+                            {
+                                if (item is TextField field)
+                                {
+                                    string name = field.value;
+                                    Element foundElement = elements.Find(e => e.Name == name);
+                                    if (foundElement != null)
+                                    {
+                                        Binder.Bind(currentElement, foundElement);
+                                    }
+                                }
+                            }
+                            currentElement.Params[paramKey] = paramElements;
+                        }
+                        break;
+                }
+            }
+            if (paramField is TextField textField)
+            {
+                string paramKey = textField.label;
+                switch (paramKey)
+                {
+                    case "Traits":
+                        {
+                            var traits = textField.value.Split(new[] { ',' }, 
+                                    StringSplitOptions.RemoveEmptyEntries)
+                                .Select(s => s.Trim()).ToList();
+                            currentElement.Params[paramKey] = traits;
+                        }
+                        break;
+                    default:
+                        {
+                            currentElement.Params[paramKey] = textField.value;
+                        }
+                        break;
+                }
+            }
         }
+    }
+
+    // Вспомогательные методы для создания типовых UI-элементов
+    private static TextField CreateTextField(string label, string value)
+    {
+        var field = new TextField(label)
+        {
+            value = value
+        };
+        field.AddToClassList("TextField");
+        return field;
+    }
+
+    private static ListView CreateTextFieldList(string labelBase, IEnumerable<string> values)
+    {
+        var listView = new ListView();
+        listView.headerTitle = labelBase;
+        listView.allowAdd = true;
+        listView.allowRemove = true;
+        listView.showAddRemoveFooter = true;
+        listView.fixedItemHeight = 50;
+
+        List<TextField> fields = values
+            .Select((v, i) =>
+            {
+                var f = new TextField($"{labelBase} {i + 1}") { value = v };
+                f.AddToClassList("TextField");
+                return f;
+            })
+            .ToList();
+
+        listView.makeItem = () =>
+        {
+            var field = new TextField();
+            field.AddToClassList("TextField");
+            return field;
+        };
+        listView.bindItem = (e, i) =>
+        {
+            var field = e as TextField;
+            field.label = $"{labelBase} {i + 1}";
+            field.value = fields[i].value;
+        };
+        listView.onAdd = (blv) =>
+        {
+            int index = blv.itemsSource.Count;
+            var textField = new TextField($"{labelBase} {index + 1}");
+            textField.AddToClassList("TextField");
+            blv.itemsSource.Add(textField);
+            blv.RefreshItems();
+            blv.ScrollToItem(index);
+        };
+        listView.onRemove = (blv) =>
+        {
+            int index = blv.selectedIndex;
+            blv.itemsSource.RemoveAt(index);
+            blv.RefreshItems();
+            blv.ScrollToItem(index);
+        };
+        listView.itemsSource = fields;
+        return listView;
     }
 
     private readonly static Func<VisualElement> MakeElementListItem = () =>
@@ -182,7 +321,7 @@ public static class ViewActionScript
 
     private readonly static Action<BaseListView> ElementsListViewOnRemove = (BaseListView listView) =>
     {
-        int index = listView.itemsSource.Count;
+        int index = listView.selectedIndex;
         listView.itemsSource.RemoveAt(index - 1);
         listView.RefreshItems();
         listView.ScrollToItem(index - 2);

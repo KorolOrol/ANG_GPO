@@ -11,7 +11,7 @@
     --nord-yellow: rgb(235, 203, 139);
     --nord-green: rgb(163, 190, 140);
     --nord-purple: rgb(180, 142, 173);
-    color: var(--nord-white);
+    color: var(--nord-gray);
     font-size: 20px;
     -unity-font-definition: url("project://database/Assets/Fonts/Nunito-Regular.ttf?fileID=12800000&guid=51d57c9009214d79e84cd21c3124d41d&type=3#Nunito-Regular");
     -unity-font-style: normal;
@@ -69,17 +69,48 @@
     color: var(--nord-dark);
 }
 
+.Dropdown > .unity-base-field:focus:enabled > .unity-base-field__label {
+    color: var(--nord-white);
+}
+
 .TextField {
 }
 
 .TextField > .unity-base-field__label {
     min-width: auto;
     width: 30%;
-    color: var(--nord-darkwhite);
+    color: var(--nord-gray);
 }
 
 .TextField > .unity-base-field__input {
     background-color: var(--nord-white);
     border-width: 0;
     color: var(--nord-dark);
+}
+
+.TextField > .unity-base-field:focus:enabled > .unity-base-field__label {
+    color: var(--nord-white);
+}
+
+.unity-foldout__checkmark {
+    background-image: url("project://database/Assets/Icons/ArrowDropDown.svg?fileID=7388822144124034973&guid=9d40353fc8a260299a4285bfa38d5346&type=3#ArrowDropDown");
+    -unity-background-image-tint-color: var(--nord-gray);
+}
+
+.Foldout {
+}
+
+.Foldout > .unity-foldout__toggle > .unity-toggle__input:focus:enabled > .unity-label {
+    color: var(--nord-white);
+}
+
+.ListView {
+}
+
+.unity-collection-view:focus:enabled .unity-collection-view__item--selected {
+    background-color: var(--nord-semidark);
+}
+
+.unity-collection-view__item--selected {
+    background-color: var(--nord-light);
 }

@@ -6,7 +6,7 @@
             <ui:VisualElement name="ElementsFilter" style="flex-grow: 1; width: 30%;">
                 <ui:DropdownField label="Filter" name="FilterDropdown" choices="All elements,Characters,Items,Locations,Events" class="Dropdown" />
                 <ui:TextField label="Search" name="SearchTextField" class="TextField" />
-                <ui:ListView name="ElementsListView" item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" show-add-remove-footer="true" allow-add="true" fixed-item-height="50" style="flex-grow: 1;" />
+                <ui:ListView name="ElementsListView" item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" show-add-remove-footer="true" allow-add="true" fixed-item-height="50" class="ListView" style="flex-grow: 1;" />
             </ui:VisualElement>
             <ui:VisualElement name="SelectedElement" style="flex-grow: 1; width: 60%; display: flex;">
                 <ui:Instance template="EditSelectedElement" enabled="true" name="EditSelectedElement" style="display: none; visibility: visible;" />
