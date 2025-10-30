@@ -11,39 +11,87 @@ using UnityEngine.UIElements;
 
 public static class ViewActionScript
 {
-    private static List<Element> elements;
-    private static Element currentElement;
-    private static ListView elementsListView;
-    private static VisualElement editSelectedElement;
-    private static TextField typeTextField;
-    private static TextField nameTextField;
-    private static TextField descriptionTextField;
-    private static Foldout paramsFoldout;
-    private static TextField timeTextField;
-    private static Button updateElementButton;
+    /// <summary>
+    /// Список всех элементов для отображения и редактирования
+    /// </summary>
+    private static List<Element> _elements;
     
+    /// <summary>
+    /// Текущий выбранный элемент для редактирования
+    /// </summary>
+    private static Element _currentElement;
+    
+    /// <summary>
+    /// Список элементов для редактирования
+    /// </summary>
+    private static ListView _elementsListView;
+    
+    /// <summary>
+    /// Панель редактирования выбранного элемента
+    /// </summary>
+    private static VisualElement _editSelectedElement;
+    
+    /// <summary>
+    /// Поле типа выбранного элемента
+    /// </summary>
+    private static TextField _typeTextField;
+    
+    /// <summary>
+    /// Поле имени выбранного элемента
+    /// </summary>
+    private static TextField _nameTextField;
+    
+    /// <summary>
+    /// Поле описания выбранного элемента
+    /// </summary>
+    private static TextField _descriptionTextField;
+    
+    /// <summary>
+    /// Складной элемент для параметров выбранного элемента
+    /// </summary>
+    private static Foldout _paramsFoldout;
+    
+    /// <summary>
+    /// Поле времени выбранного элемента
+    /// </summary>
+    private static TextField _timeTextField;
+    
+    /// <summary>
+    /// Кнопка обновления выбранного элемента
+    /// </summary>
+    private static Button _updateElementButton;
+    
+    /// <summary>
+    /// Привязка элементов к списку в UI
+    /// </summary>
+    /// <param name="root">Корневой элемент UI</param>
+    /// <param name="newElements">Список элементов для отображения</param>
     public static void BindElementsToList(VisualElement root, List<Element> newElements)
     {
-        elementsListView = root.Q<ListView>("ElementsListView");
-        editSelectedElement = root.Q<VisualElement>("EditSelectedElement");
-        typeTextField = root.Q<TextField>("TypeTextField");
-        nameTextField = root.Q<TextField>("NameTextField");
-        descriptionTextField = root.Q<TextField>("DescriptionTextField");
-        paramsFoldout = root.Q<Foldout>("ParamsFoldout");
-        timeTextField = root.Q<TextField>("TimeTextField");
-        updateElementButton = root.Q<Button>("UpdateElementButton");
+        _elementsListView = root.Q<ListView>("ElementsListView");
+        _editSelectedElement = root.Q<VisualElement>("EditSelectedElement");
+        _typeTextField = root.Q<TextField>("TypeTextField");
+        _nameTextField = root.Q<TextField>("NameTextField");
+        _descriptionTextField = root.Q<TextField>("DescriptionTextField");
+        _paramsFoldout = root.Q<Foldout>("ParamsFoldout");
+        _timeTextField = root.Q<TextField>("TimeTextField");
+        _updateElementButton = root.Q<Button>("UpdateElementButton");
         
-        elements = newElements;
-        elementsListView.makeItem = MakeElementListItem;
-        elementsListView.bindItem = BindElementListItem;
-        elementsListView.onAdd = ElementsListViewOnAdd;
-        elementsListView.onRemove = ElementsListViewOnRemove;
-        elementsListView.itemsSource = elements;
-        elementsListView.selectedIndicesChanged += ElementsListViewSelectedIndicesChanged;
+        _elements = newElements;
+        _elementsListView.makeItem = MakeElementListItem;
+        _elementsListView.bindItem = BindElementListItem;
+        _elementsListView.onAdd = ElementsListViewOnAdd;
+        _elementsListView.onRemove = ElementsListViewOnRemove;
+        _elementsListView.itemsSource = _elements;
+        _elementsListView.selectedIndicesChanged += ElementsListViewSelectedIndicesChanged;
 
-        updateElementButton.clicked += UpdateSelectedElement;
+        _updateElementButton.clicked += UpdateSelectedElement;
     }
     
+    /// <summary>
+    /// Обработчик изменения выбранных индексов в списке элементов
+    /// </summary>
+    /// <param name="indices">Выбранные индексы</param>
     private static void ElementsListViewSelectedIndicesChanged(IEnumerable<int> indices)
     {
         int index = -1;
@@ -54,28 +102,31 @@ public static class ViewActionScript
         }
         if (index < 0)
         {
-            currentElement = null;
+            _currentElement = null;
             return;
         }
-        Debug.Log($"{elements[index].Name}, {elements[index].Type}");
-        currentElement = elements[index];
+        Debug.Log($"{_elements[index].Name}, {_elements[index].Type}");
+        _currentElement = _elements[index];
         LoadSelectedElement();
     }
 
+    /// <summary>
+    /// Загрузка данных выбранного элемента в панель редактирования
+    /// </summary>
     private static void LoadSelectedElement()
     {
-        if (currentElement == null)
+        if (_currentElement == null)
         {
-            editSelectedElement.style.display = DisplayStyle.None;
+            _editSelectedElement.style.display = DisplayStyle.None;
             return;
         }
-        editSelectedElement.style.display = DisplayStyle.Flex;
-        typeTextField.value = currentElement.Type.ToString();
-        nameTextField.value = currentElement.Name;
-        descriptionTextField.value = currentElement.Description;
-        timeTextField.value = currentElement.Time.ToString();
-        paramsFoldout.contentContainer.Clear();
-        foreach (var param in currentElement.Params)
+        _editSelectedElement.style.display = DisplayStyle.Flex;
+        _typeTextField.value = _currentElement.Type.ToString();
+        _nameTextField.value = _currentElement.Name;
+        _descriptionTextField.value = _currentElement.Description;
+        _timeTextField.value = _currentElement.Time.ToString();
+        _paramsFoldout.contentContainer.Clear();
+        foreach (var param in _currentElement.Params)
         {
             switch (param.Value)
             {
@@ -85,7 +136,7 @@ public static class ViewActionScript
                         List<Element> elementList = list.Cast<Element>().ToList();
                         var values = elementList.Select(el => el.Name);
                         var listView = CreateTextFieldList(param.Key, values);
-                        paramsFoldout.contentContainer.Add(listView);
+                        _paramsFoldout.contentContainer.Add(listView);
                     }
                     break;
                 case List<Relation> relationList:
@@ -93,41 +144,44 @@ public static class ViewActionScript
                         // Список отношений -> список текстовых полей в формате "Имя (Значение)"
                         var values = relationList.Select(r => $"{r.Character.Name} ({r.Value})");
                         var listView = CreateTextFieldList(param.Key, values);
-                        paramsFoldout.contentContainer.Add(listView);
+                        _paramsFoldout.contentContainer.Add(listView);
                     }
                     break;
                 case List<string> stringList:
                     {
                         var listField = CreateTextField(param.Key, string.Join(", ", stringList));
-                        paramsFoldout.contentContainer.Add(listField);
+                        _paramsFoldout.contentContainer.Add(listField);
                     }
                     break;
                 case Element element:
                     {
                         var elementField = CreateTextField(param.Key, element.Name);
-                        paramsFoldout.contentContainer.Add(elementField);
+                        _paramsFoldout.contentContainer.Add(elementField);
                     }
                     break;
                 default:
                     {
                         var stringField = CreateTextField(param.Key, param.Value.ToString());
-                        paramsFoldout.contentContainer.Add(stringField);
+                        _paramsFoldout.contentContainer.Add(stringField);
                     }
                     break;
             }
         }
     }
 
+    /// <summary>
+    /// Обновление данных выбранного элемента из панели редактирования
+    /// </summary>
     private static void UpdateSelectedElement()
     {
-        if (currentElement == null) return;
-        currentElement.Name = nameTextField.value;
-        currentElement.Description = descriptionTextField.value;
-        if (int.TryParse(timeTextField.value, out int time))
+        if (_currentElement == null) return;
+        _currentElement.Name = _nameTextField.value;
+        _currentElement.Description = _descriptionTextField.value;
+        if (int.TryParse(_timeTextField.value, out int time))
         {
-            currentElement.Time = time;
+            _currentElement.Time = time;
         }
-        foreach (VisualElement paramField in paramsFoldout.contentContainer.Children())
+        foreach (VisualElement paramField in _paramsFoldout.contentContainer.Children())
         {
             if (paramField is ListView listView)
             {
@@ -136,10 +190,10 @@ public static class ViewActionScript
                 {
                     case "Relations":
                         {
-                            if (currentElement.Params[paramKey] is List<Relation> oldRelations) 
+                            if (_currentElement.Params[paramKey] is List<Relation> oldRelations) 
                                 foreach (var relation in oldRelations.ToList())
                                 {
-                                    Binder.Unbind(currentElement, relation.Character);
+                                    Binder.Unbind(_currentElement, relation.Character);
                                 }
                             List<(Element, double)> relations = new List<(Element, double)>();
                             foreach (var item in listView.itemsSource)
@@ -154,12 +208,12 @@ public static class ViewActionScript
                                         string namePart = text.Substring(0, openParenIndex).Trim();
                                         string valuePart = text.Substring(openParenIndex + 1, 
                                             closeParenIndex - openParenIndex - 1).Trim();
-                                        Element relatedElement = elements.Find(
+                                        Element relatedElement = _elements.Find(
                                             e => e.Name == namePart && e.Type == ElemType.Character);
                                         if (relatedElement != null 
                                             && double.TryParse(valuePart, out double relationValue))
                                         {
-                                            Binder.Bind(currentElement, relatedElement, relationValue);
+                                            Binder.Bind(_currentElement, relatedElement, relationValue);
                                         }
                                     }
                                 }
@@ -171,10 +225,10 @@ public static class ViewActionScript
                     case "Locations":
                     case "Events":
                         {
-                            if (currentElement.Params[paramKey] is List<Element> oldElements) 
+                            if (_currentElement.Params[paramKey] is List<Element> oldElements) 
                                 foreach (var elem in oldElements.ToList())
                                 {
-                                    Binder.Unbind(currentElement, elem);
+                                    Binder.Unbind(_currentElement, elem);
                                 }
                             List<Element> paramElements = new List<Element>();
                             foreach (var item in listView.itemsSource)
@@ -182,14 +236,14 @@ public static class ViewActionScript
                                 if (item is TextField field)
                                 {
                                     string name = field.value;
-                                    Element foundElement = elements.Find(e => e.Name == name);
+                                    Element foundElement = _elements.Find(e => e.Name == name);
                                     if (foundElement != null)
                                     {
-                                        Binder.Bind(currentElement, foundElement);
+                                        Binder.Bind(_currentElement, foundElement);
                                     }
                                 }
                             }
-                            currentElement.Params[paramKey] = paramElements;
+                            _currentElement.Params[paramKey] = paramElements;
                         }
                         break;
                 }
@@ -204,12 +258,12 @@ public static class ViewActionScript
                             var traits = textField.value.Split(new[] { ',' }, 
                                     StringSplitOptions.RemoveEmptyEntries)
                                 .Select(s => s.Trim()).ToList();
-                            currentElement.Params[paramKey] = traits;
+                            _currentElement.Params[paramKey] = traits;
                         }
                         break;
                     default:
                         {
-                            currentElement.Params[paramKey] = textField.value;
+                            _currentElement.Params[paramKey] = textField.value;
                         }
                         break;
                 }
@@ -217,7 +271,12 @@ public static class ViewActionScript
         }
     }
 
-    // Вспомогательные методы для создания типовых UI-элементов
+    /// <summary>
+    /// Создание текстового поля с заданной меткой и значением
+    /// </summary>
+    /// <param name="label">Метка поля</param>
+    /// <param name="value">Значение поля</param>
+    /// <returns>Созданное текстовое поле</returns>
     private static TextField CreateTextField(string label, string value)
     {
         var field = new TextField(label)
@@ -228,6 +287,12 @@ public static class ViewActionScript
         return field;
     }
 
+    /// <summary>
+    /// Создание списка текстовых полей с возможностью добавления и удаления
+    /// </summary>
+    /// <param name="labelBase">Базовая метка для полей</param>
+    /// <param name="values">Значения для полей</param>
+    /// <returns>Созданный список текстовых полей</returns>
     private static ListView CreateTextFieldList(string labelBase, IEnumerable<string> values)
     {
         var listView = new ListView();
@@ -278,6 +343,9 @@ public static class ViewActionScript
         return listView;
     }
 
+    /// <summary>
+    /// Создание элемента списка для отображения в ListView
+    /// </summary>
     private readonly static Func<VisualElement> MakeElementListItem = () =>
     {
         var elementAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
@@ -285,12 +353,15 @@ public static class ViewActionScript
         return element;
     };
 
+    /// <summary>
+    /// Привязка данных элемента к элементу списка в UI
+    /// </summary>
     private readonly static Action<VisualElement, int> BindElementListItem = (e, i) =>
     {
         var labelUI = e.Q<Label>("ElementName");
         var iconUI = e.Q<VisualElement>("ElementIcon");
         VectorImage icon = ScriptableObject.CreateInstance<VectorImage>();
-        Element element = elements[i];
+        Element element = _elements[i];
         switch (element.Type)
         {
             case ElemType.Character:
@@ -310,6 +381,9 @@ public static class ViewActionScript
         iconUI.style.backgroundImage = new StyleBackground(Background.FromVectorImage(icon));
     };
 
+    /// <summary>
+    /// Обработчик добавления нового элемента в список элементов
+    /// </summary>
     private readonly static Action<BaseListView> ElementsListViewOnAdd = (BaseListView listView) =>
     {
         int index = listView.itemsSource.Count;
@@ -319,6 +393,9 @@ public static class ViewActionScript
         listView.ScrollToItem(index);
     };
 
+    /// <summary>
+    /// Обработчик удаления выбранного элемента из списка элементов
+    /// </summary>
     private readonly static Action<BaseListView> ElementsListViewOnRemove = (BaseListView listView) =>
     {
         int index = listView.selectedIndex;
