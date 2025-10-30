@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
+using System.Xml.Linq;
+using BaseClasses.Model;
 
 public class PrCharacter
 {
@@ -212,4 +214,38 @@ public class PrCharacter
 
     #endregion
 
+    #region [Translate To BaseClass]
+
+    public Element Translate(PrCharacter character)
+    {
+        string baseName = character.Name;
+        string description = "";
+
+        if (character.Surname != null) { baseName += " " + character.Surname; }
+
+        if (character.Description != null) { description = character.Description; }
+
+        Dictionary<string, object> baseParams = new Dictionary<string, object>();
+
+        List<string> traits = new List<string>();
+        List<string> phobias = new List<string>();
+
+        foreach (var trait in character.Traits)
+        {
+            traits.Add(trait.Title);
+        }
+
+        foreach (var phobia in character.Phobias)
+        {
+            phobias.Add(phobia.Title);
+        }
+        baseParams.Add("Черты характера", traits);
+        baseParams.Add("Фобии", phobias);
+
+        Element baseCharacter = new Element(ElemType.Character, baseName, description);
+
+        return baseCharacter;
+    }
+
+    #endregion
 }
