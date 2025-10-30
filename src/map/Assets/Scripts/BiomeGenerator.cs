@@ -13,7 +13,7 @@ public class BiomeGenerator : MonoBehaviour
     public Vector2 offset;
 
     /// <summary>
-    /// Генерирует карту шума для биомов.
+    /// Р“РµРЅРµСЂРёСЂСѓРµС‚ РєР°СЂС‚Сѓ С€СѓРјР° РґР»СЏ Р±РёРѕРјРѕРІ.
     /// </summary>
     public float[,] GenerateBiomeNoiseMap(int width, int height)
     {

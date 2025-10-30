@@ -11,28 +11,28 @@ public class MapGeneratorManualEditor : Editor
         MapGeneratorManual generator = (MapGeneratorManual)target;
 
         GUILayout.Space(10);
-        GUILayout.Label("=== Управление картой ===", EditorStyles.boldLabel);
+        GUILayout.Label("=== РЈРїСЂР°РІР»РµРЅРёРµ РєР°СЂС‚РѕР№ ===", EditorStyles.boldLabel);
 
-        if (GUILayout.Button("Сгенерировать карту вручную"))
+        if (GUILayout.Button("РЎРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РєР°СЂС‚Сѓ РІСЂСѓС‡РЅСѓСЋ"))
         {
             generator.GenerateManualMap();
         }
 
         GUILayout.Space(5);
 
-        if (GUILayout.Button("Сохранить карту"))
+        if (GUILayout.Button("РЎРѕС…СЂР°РЅРёС‚СЊ РєР°СЂС‚Сѓ"))
         {
             generator.SaveMapContext();
         }
 
-        if (GUILayout.Button("Zагрузить карту"))
+        if (GUILayout.Button("ZР°РіСЂСѓР·РёС‚СЊ РєР°СЂС‚Сѓ"))
         {
             generator.LoadMapContext();
         }
 
         GUILayout.Space(10);
         EditorGUILayout.HelpBox(
-            "Файлы сохраняются в Assets/SavedMaps как .png и .json.\n" +
-            "Имя файла задаётся в поле 'saveFileName'.", MessageType.Info);
+            "Р¤Р°Р№Р»С‹ СЃРѕС…СЂР°РЅСЏСЋС‚СЃСЏ РІ Assets/SavedMaps РєР°Рє .png Рё .json.\n" +
+            "РРјСЏ С„Р°Р№Р»Р° Р·Р°РґР°С‘С‚СЃСЏ РІ РїРѕР»Рµ 'saveFileName'.", MessageType.Info);
     }
 }

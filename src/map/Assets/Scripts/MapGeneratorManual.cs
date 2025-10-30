@@ -27,7 +27,7 @@ public class MapSaveData
     public int mapWidth;
     public int mapHeight;
 
-    // Сжатые массивы вместо float[] - уменьшает размер в 4 раза
+    // РЎР¶Р°С‚С‹Рµ РјР°СЃСЃРёРІС‹ РІРјРµСЃС‚Рѕ float[] - СѓРјРµРЅСЊС€Р°РµС‚ СЂР°Р·РјРµСЂ РІ 4 СЂР°Р·Р°
     public byte[] compressedHeightMap;
     public byte[] compressedBiomeMap;
 
@@ -73,21 +73,21 @@ public class MapGeneratorManual : MonoBehaviour
     public GameObject objectPrefab;
 
     [Header("Save/Load")]
-    [Tooltip("Имя файла (без расширения) для сохранения/загрузки")]
+    [Tooltip("РРјСЏ С„Р°Р№Р»Р° (Р±РµР· СЂР°СЃС€РёСЂРµРЅРёСЏ) РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ/Р·Р°РіСЂСѓР·РєРё")]
     public string saveFileName = "map_saved";
 
     private float[,] heightMap;
     private float[,] biomeNoiseMap;
     private Color[] colourMap;
 
-    // Сохранённые позиции локаций (имя -> px,py)
+    // РЎРѕС…СЂР°РЅС‘РЅРЅС‹Рµ РїРѕР·РёС†РёРё Р»РѕРєР°С†РёР№ (РёРјСЏ -> px,py)
     private Dictionary<string, Vector2> placedLocations = new Dictionary<string, Vector2>();
 
     // ========== Compression Methods ==========
 
     /// <summary>
-    /// Сжимает float массив [0,1] в byte массив [0,255]
-    /// Уменьшает размер в 4 раза с приемлемой точностью для карт
+    /// РЎР¶РёРјР°РµС‚ float РјР°СЃСЃРёРІ [0,1] РІ byte РјР°СЃСЃРёРІ [0,255]
+    /// РЈРјРµРЅСЊС€Р°РµС‚ СЂР°Р·РјРµСЂ РІ 4 СЂР°Р·Р° СЃ РїСЂРёРµРјР»РµРјРѕР№ С‚РѕС‡РЅРѕСЃС‚СЊСЋ РґР»СЏ РєР°СЂС‚
     /// </summary>
     private byte[] CompressFloatMap(float[,] map, int width, int height)
     {
@@ -96,7 +96,7 @@ public class MapGeneratorManual : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                // Преобразуем float [0,1] в byte [0,255]
+                // РџСЂРµРѕР±СЂР°Р·СѓРµРј float [0,1] РІ byte [0,255]
                 compressed[y * width + x] = (byte)Mathf.Clamp(Mathf.RoundToInt(map[x, y] * 255f), 0, 255);
             }
         }
@@ -104,7 +104,7 @@ public class MapGeneratorManual : MonoBehaviour
     }
 
     /// <summary>
-    /// Восстанавливает float массив из сжатого byte массива
+    /// Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ float РјР°СЃСЃРёРІ РёР· СЃР¶Р°С‚РѕРіРѕ byte РјР°СЃСЃРёРІР°
     /// </summary>
     private float[,] DecompressByteMap(byte[] compressed, int width, int height)
     {
@@ -113,7 +113,7 @@ public class MapGeneratorManual : MonoBehaviour
         {
             for (int x = 0; x < width; x++)
             {
-                // Преобразуем byte [0,255] обратно в float [0,1]
+                // РџСЂРµРѕР±СЂР°Р·СѓРµРј byte [0,255] РѕР±СЂР°С‚РЅРѕ РІ float [0,1]
                 map[x, y] = compressed[y * width + x] / 255f;
             }
         }
@@ -122,7 +122,7 @@ public class MapGeneratorManual : MonoBehaviour
 
     public void GenerateManualMap()
     {
-        // 0) Удаляем все сгенерированные объекты
+        // 0) РЈРґР°Р»СЏРµРј РІСЃРµ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅС‹Рµ РѕР±СЉРµРєС‚С‹
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             var child = transform.GetChild(i).gameObject;
@@ -134,17 +134,17 @@ public class MapGeneratorManual : MonoBehaviour
 
         placedLocations.Clear();
 
-        // 1) Шумы
+        // 1) РЁСѓРјС‹
         heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, noiseOffset);
         biomeNoiseMap = biomeGenerator.GenerateBiomeNoiseMap(mapWidth, mapHeight);
 
-        // 2) Заливка биомов
+        // 2) Р—Р°Р»РёРІРєР° Р±РёРѕРјРѕРІ
         colourMap = new Color[mapWidth * mapHeight];
         for (int y = 0; y < mapHeight; y++)
             for (int x = 0; x < mapWidth; x++)
                 colourMap[y * mapWidth + x] = GetColorForBiome(GetBiome(heightMap[x, y], biomeNoiseMap[x, y]));
 
-        // 2.5) Границы чанков
+        // 2.5) Р“СЂР°РЅРёС†С‹ С‡Р°РЅРєРѕРІ
         if (drawChunkBorders)
         {
             for (int cx = 0; cx <= mapWidth; cx += chunkSize)
@@ -156,7 +156,7 @@ public class MapGeneratorManual : MonoBehaviour
                     if (cy < mapHeight) colourMap[cy * mapWidth + x] = Color.black;
         }
 
-        // 3) Определяем батю на районе
+        // 3) РћРїСЂРµРґРµР»СЏРµРј Р±Р°С‚СЋ РЅР° СЂР°Р№РѕРЅРµ
         int chunksX = Mathf.CeilToInt((float)mapWidth / chunkSize);
         int chunksY = Mathf.CeilToInt((float)mapHeight / chunkSize);
         string[,] chunkBiome = new string[chunksX, chunksY];
@@ -184,7 +184,7 @@ public class MapGeneratorManual : MonoBehaviour
                 mainBiome ??= "Grassland";
                 chunkBiome[cx, cy] = mainBiome;
 
-                // подпись + фон
+                // РїРѕРґРїРёСЃСЊ + С„РѕРЅ
                 if (showChunkBiomes)
                 {
                     float centerX = cx * chunkSize + chunkSize / 2f;
@@ -192,7 +192,7 @@ public class MapGeneratorManual : MonoBehaviour
                     float worldX = -(centerX - mapWidth / 2f) * 10f;
                     float worldZ = -(centerY - mapHeight / 2f) * 10f;
 
-                    // текст
+                    // С‚РµРєСЃС‚
                     var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
                     textObj.transform.SetParent(transform);
                     textObj.transform.position = new Vector3(worldX, 10f, worldZ);
@@ -209,7 +209,7 @@ public class MapGeneratorManual : MonoBehaviour
                     tm.overflowMode = TextOverflowModes.Overflow;
                     tm.ForceMeshUpdate();
 
-                    // фон под текст
+                    // С„РѕРЅ РїРѕРґ С‚РµРєСЃС‚
                     Vector2 ts = tm.GetRenderedValues(false);
                     float padX = 0.2f, padY = 0.1f;
                     var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -225,7 +225,7 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        // 3.5) Подсветка главного биома на красный чтобы красиво
+        // 3.5) РџРѕРґСЃРІРµС‚РєР° РіР»Р°РІРЅРѕРіРѕ Р±РёРѕРјР° РЅР° РєСЂР°СЃРЅС‹Р№ С‡С‚РѕР±С‹ РєСЂР°СЃРёРІРѕ
         if (highlightDominantBiome)
         {
             for (int cx = 0; cx < chunksX; cx++)
@@ -245,18 +245,18 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        // 4) Локации 
+        // 4) Р›РѕРєР°С†РёРё 
         placedLocations.Clear();
         for (int i = 0; i < locations.Count; i++)
         {
             var loc = locations[i];
-            // ищем чанки...
+            // РёС‰РµРј С‡Р°РЅРєРё...
             List<Vector2Int> valid = new();
             for (int cx = 0; cx < chunksX; cx++)
                 for (int cy = 0; cy < chunksY; cy++)
                     if (chunkBiome[cx, cy] == loc.biome)
                         valid.Add(new Vector2Int(cx, cy));
-            if (valid.Count == 0) { Debug.LogWarning($"Нет чанков с {loc.biome}"); continue; }
+            if (valid.Count == 0) { Debug.LogWarning($"РќРµС‚ С‡Р°РЅРєРѕРІ СЃ {loc.biome}"); continue; }
             var ch = valid[Random.Range(0, valid.Count)];
             int px = Mathf.Clamp(ch.x * chunkSize + Random.Range(0, chunkSize), 0, mapWidth - 1);
             int py = Mathf.Clamp(ch.y * chunkSize + Random.Range(0, chunkSize), 0, mapHeight - 1);
@@ -264,14 +264,14 @@ public class MapGeneratorManual : MonoBehaviour
             CreateLocationObject(loc.locationName, px, py);
         }
 
-        // 5) Дороги
+        // 5) Р”РѕСЂРѕРіРё
         foreach (var loc in locations)
             if (placedLocations.TryGetValue(loc.locationName, out var s))
                 foreach (var other in loc.connectedLocations)
                     if (placedLocations.TryGetValue(other, out var e))
                         DrawSimpleRoad(s, e);
 
-        // 6) Рендер
+        // 6) Р РµРЅРґРµСЂ
         FindObjectOfType<MapDisplay>()
             .DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
     }
@@ -356,7 +356,7 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        // рисуем
+        // СЂРёСЃСѓРµРј
         Vector2 p = b;
         while (came.ContainsKey(p))
         {
@@ -382,14 +382,14 @@ public class MapGeneratorManual : MonoBehaviour
         string dir = Path.Combine(Application.dataPath, "SavedMaps");
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-        // 1) PNG (визуальный)
+        // 1) PNG (РІРёР·СѓР°Р»СЊРЅС‹Р№)
         if (colourMap == null || colourMap.Length != mapWidth * mapHeight)
         {
-            Debug.Log("Colour map отсутствует или неактуальна — регенерируем для сохранения PNG.");
+            Debug.Log("Colour map РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёР»Рё РЅРµР°РєС‚СѓР°Р»СЊРЅР° вЂ” СЂРµРіРµРЅРµСЂРёСЂСѓРµРј РґР»СЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ PNG.");
             // regenerate colourMap from height/biome arrays:
             if (heightMap == null || biomeNoiseMap == null)
             {
-                Debug.LogError("Нечего сохранять: heightMap/biomeNoiseMap пустые. Сначала сгенерируй карту.");
+                Debug.LogError("РќРµС‡РµРіРѕ СЃРѕС…СЂР°РЅСЏС‚СЊ: heightMap/biomeNoiseMap РїСѓСЃС‚С‹Рµ. РЎРЅР°С‡Р°Р»Р° СЃРіРµРЅРµСЂРёСЂСѓР№ РєР°СЂС‚Сѓ.");
                 return;
             }
             colourMap = new Color[mapWidth * mapHeight];
@@ -403,12 +403,12 @@ public class MapGeneratorManual : MonoBehaviour
         string pngPath = Path.Combine(dir, fileName + ".png");
         File.WriteAllBytes(pngPath, png);
 
-        // 2) JSON (данные) - ИСПОЛЬЗУЕМ СЖАТИЕ
+        // 2) JSON (РґР°РЅРЅС‹Рµ) - РРЎРџРћР›Р¬Р—РЈР•Рњ РЎР–РђРўРР•
         MapSaveData data = new MapSaveData
         {
             mapWidth = mapWidth,
             mapHeight = mapHeight,
-            // Используем сжатые массивы вместо float[]
+            // РСЃРїРѕР»СЊР·СѓРµРј СЃР¶Р°С‚С‹Рµ РјР°СЃСЃРёРІС‹ РІРјРµСЃС‚Рѕ float[]
             compressedHeightMap = CompressFloatMap(heightMap, mapWidth, mapHeight),
             compressedBiomeMap = CompressFloatMap(biomeNoiseMap, mapWidth, mapHeight),
             locations = new List<LocationSaveData>(),
@@ -453,7 +453,7 @@ public class MapGeneratorManual : MonoBehaviour
         UnityEditor.AssetDatabase.Refresh();
 #endif
 
-        Debug.Log($"Карта сохранена в {dir} как {fileName}.png и {fileName}.json (размер уменьшен в 4 раза)");
+        Debug.Log($"РљР°СЂС‚Р° СЃРѕС…СЂР°РЅРµРЅР° РІ {dir} РєР°Рє {fileName}.png Рё {fileName}.json (СЂР°Р·РјРµСЂ СѓРјРµРЅСЊС€РµРЅ РІ 4 СЂР°Р·Р°)");
     }
 
     [ContextMenu("Load Map (from SavedMaps)")]
@@ -469,7 +469,7 @@ public class MapGeneratorManual : MonoBehaviour
         string jsonPath = Path.Combine(dir, fileName + ".json");
         if (!File.Exists(jsonPath))
         {
-            Debug.LogError($"Файл {jsonPath} не найден");
+            Debug.LogError($"Р¤Р°Р№Р» {jsonPath} РЅРµ РЅР°Р№РґРµРЅ");
             return;
         }
 
@@ -477,11 +477,11 @@ public class MapGeneratorManual : MonoBehaviour
         MapSaveData data = JsonUtility.FromJson<MapSaveData>(json);
         if (data == null)
         {
-            Debug.LogError("Не удалось распарсить JSON");
+            Debug.LogError("РќРµ СѓРґР°Р»РѕСЃСЊ СЂР°СЃРїР°СЂСЃРёС‚СЊ JSON");
             return;
         }
 
-        // 0) Очистка старого
+        // 0) РћС‡РёСЃС‚РєР° СЃС‚Р°СЂРѕРіРѕ
         for (int i = transform.childCount - 1; i >= 0; i--)
         {
             var child = transform.GetChild(i).gameObject;
@@ -492,7 +492,7 @@ public class MapGeneratorManual : MonoBehaviour
         }
         placedLocations.Clear();
 
-        // 1) Восстанавливаем размеры и поля
+        // 1) Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј СЂР°Р·РјРµСЂС‹ Рё РїРѕР»СЏ
         mapWidth = data.mapWidth;
         mapHeight = data.mapHeight;
         seed = data.seed;
@@ -506,14 +506,14 @@ public class MapGeneratorManual : MonoBehaviour
         showChunkBiomes = data.showChunkBiomes;
         highlightDominantBiome = data.highlightDominantBiome;
 
-        // 2) Восстанавливаем heightMap и biomeNoiseMap ИЗ СЖАТЫХ ДАННЫХ
+        // 2) Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј heightMap Рё biomeNoiseMap РР— РЎР–РђРўР«РҐ Р”РђРќРќР«РҐ
         if (data.compressedHeightMap != null && data.compressedHeightMap.Length == mapWidth * mapHeight)
         {
             heightMap = DecompressByteMap(data.compressedHeightMap, mapWidth, mapHeight);
         }
         else
         {
-            Debug.LogWarning("Сжатые данные heightMap отсутствуют или неверного размера");
+            Debug.LogWarning("РЎР¶Р°С‚С‹Рµ РґР°РЅРЅС‹Рµ heightMap РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РёР»Рё РЅРµРІРµСЂРЅРѕРіРѕ СЂР°Р·РјРµСЂР°");
             heightMap = new float[mapWidth, mapHeight];
         }
 
@@ -523,17 +523,17 @@ public class MapGeneratorManual : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Сжатые данные biomeMap отсутствуют или неверного размера");
+            Debug.LogWarning("РЎР¶Р°С‚С‹Рµ РґР°РЅРЅС‹Рµ biomeMap РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РёР»Рё РЅРµРІРµСЂРЅРѕРіРѕ СЂР°Р·РјРµСЂР°");
             biomeNoiseMap = new float[mapWidth, mapHeight];
         }
 
-        // 3) Восстанавливаем colourMap (генерируем заново из высот/биомов)
+        // 3) Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј colourMap (РіРµРЅРµСЂРёСЂСѓРµРј Р·Р°РЅРѕРІРѕ РёР· РІС‹СЃРѕС‚/Р±РёРѕРјРѕРІ)
         colourMap = new Color[mapWidth * mapHeight];
         for (int y = 0; y < mapHeight; y++)
             for (int x = 0; x < mapWidth; x++)
                 colourMap[y * mapWidth + x] = GetColorForBiome(GetBiome(heightMap[x, y], biomeNoiseMap[x, y]));
 
-        // восстановим чанки/подписи точно так же, как в генерации
+        // РІРѕСЃСЃС‚Р°РЅРѕРІРёРј С‡Р°РЅРєРё/РїРѕРґРїРёСЃРё С‚РѕС‡РЅРѕ С‚Р°Рє Р¶Рµ, РєР°Рє РІ РіРµРЅРµСЂР°С†РёРё
         int chunksX = Mathf.CeilToInt((float)mapWidth / chunkSize);
         int chunksY = Mathf.CeilToInt((float)mapHeight / chunkSize);
         string[,] chunkBiome = new string[chunksX, chunksY];
@@ -599,7 +599,7 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        // 4) Восстанавливаем локации из saved data
+        // 4) Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј Р»РѕРєР°С†РёРё РёР· saved data
         Dictionary<string, Vector2> loadedPositions = new Dictionary<string, Vector2>();
         if (data.locations != null)
         {
@@ -613,7 +613,7 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        // 5) Восстанавливаем дороги между локациями по списку connectedLocations (если позиции загружены)
+        // 5) Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј РґРѕСЂРѕРіРё РјРµР¶РґСѓ Р»РѕРєР°С†РёСЏРјРё РїРѕ СЃРїРёСЃРєСѓ connectedLocations (РµСЃР»Рё РїРѕР·РёС†РёРё Р·Р°РіСЂСѓР¶РµРЅС‹)
         if (data.locations != null)
         {
             foreach (var ls in data.locations)
@@ -630,13 +630,13 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        // 6) Рендерим текстуру
+        // 6) Р РµРЅРґРµСЂРёРј С‚РµРєСЃС‚СѓСЂСѓ
         FindObjectOfType<MapDisplay>()
             .DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
 
-        // Сохраним в runtime placedLocations для дальнейших операций
+        // РЎРѕС…СЂР°РЅРёРј РІ runtime placedLocations РґР»СЏ РґР°Р»СЊРЅРµР№С€РёС… РѕРїРµСЂР°С†РёР№
         placedLocations = loadedPositions;
 
-        Debug.Log($"Карта загружена из {jsonPath} (использованы сжатые данные)");
+        Debug.Log($"РљР°СЂС‚Р° Р·Р°РіСЂСѓР¶РµРЅР° РёР· {jsonPath} (РёСЃРїРѕР»СЊР·РѕРІР°РЅС‹ СЃР¶Р°С‚С‹Рµ РґР°РЅРЅС‹Рµ)");
     }
 }
