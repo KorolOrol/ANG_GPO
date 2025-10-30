@@ -195,7 +195,6 @@ public static class ViewActionScript
                                 {
                                     Binder.Unbind(_currentElement, relation.Character);
                                 }
-                            List<(Element, double)> relations = new List<(Element, double)>();
                             foreach (var item in listView.itemsSource)
                             {
                                 if (item is TextField field)
@@ -295,12 +294,14 @@ public static class ViewActionScript
     /// <returns>Созданный список текстовых полей</returns>
     private static ListView CreateTextFieldList(string labelBase, IEnumerable<string> values)
     {
-        var listView = new ListView();
-        listView.headerTitle = labelBase;
-        listView.allowAdd = true;
-        listView.allowRemove = true;
-        listView.showAddRemoveFooter = true;
-        listView.fixedItemHeight = 50;
+        var listView = new ListView
+        {
+            headerTitle = labelBase,
+            allowAdd = true,
+            allowRemove = true,
+            showAddRemoveFooter = true,
+            fixedItemHeight = 50
+        };
 
         List<TextField> fields = values
             .Select((v, i) =>
@@ -319,9 +320,11 @@ public static class ViewActionScript
         };
         listView.bindItem = (e, i) =>
         {
-            var field = e as TextField;
-            field.label = $"{labelBase} {i + 1}";
-            field.value = fields[i].value;
+            if (e is TextField field)
+            {
+                field.label = $"{labelBase} {i + 1}";
+                field.value = fields[i].value;
+            }
         };
         listView.onAdd = (blv) =>
         {
@@ -384,7 +387,7 @@ public static class ViewActionScript
     /// <summary>
     /// Обработчик добавления нового элемента в список элементов
     /// </summary>
-    private readonly static Action<BaseListView> ElementsListViewOnAdd = (BaseListView listView) =>
+    private readonly static Action<BaseListView> ElementsListViewOnAdd = listView =>
     {
         int index = listView.itemsSource.Count;
         var newElement = new Element(ElemType.Character, index.ToString());
@@ -396,7 +399,7 @@ public static class ViewActionScript
     /// <summary>
     /// Обработчик удаления выбранного элемента из списка элементов
     /// </summary>
-    private readonly static Action<BaseListView> ElementsListViewOnRemove = (BaseListView listView) =>
+    private readonly static Action<BaseListView> ElementsListViewOnRemove = listView =>
     {
         int index = listView.selectedIndex;
         listView.itemsSource.RemoveAt(index - 1);
