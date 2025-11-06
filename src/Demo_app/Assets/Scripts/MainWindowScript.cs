@@ -10,7 +10,7 @@ public class MainWindowScript : MonoBehaviour
     private VisualElement _root;
     private Dictionary<Button, VisualElement> _actions;
     private VisualElement _currentAction;
-    private readonly static List<Element> Elements = new List<Element>();
+    private readonly static Plot Plot = new Plot();
     
     /// <summary>
     /// Инициализация главного окна и установка обработчиков кнопок.
@@ -30,17 +30,17 @@ public class MainWindowScript : MonoBehaviour
             pair.Key.clicked += () => OnActionButtonClicked(pair.Key);
         }
         
-        Elements.Add(new Element(ElemType.Character, "1"));
-        Elements.Add(new Element(ElemType.Item, "2"));
-        Elements.Add(new Element(ElemType.Location, "3"));
-        Elements.Add(new Element(ElemType.Event, "4"));
-        Elements.Add(new Element(ElemType.Character, "5"));
-        Binder.Bind(Elements[0], Elements[1]);
-        Binder.Bind(Elements[0], Elements[2]);
-        Binder.Bind(Elements[0], Elements[3]);
-        Binder.Bind(Elements[0], Elements[4], 50);
+        Plot.Add(new Element(ElemType.Character, "1"));
+        Plot.Add(new Element(ElemType.Item, "2"));
+        Plot.Add(new Element(ElemType.Location, "3"));
+        Plot.Add(new Element(ElemType.Event, "4"));
+        Plot.Add(new Element(ElemType.Character, "5"));
+        Binder.Bind(Plot.Elements[0], Plot.Elements[1]);
+        Binder.Bind(Plot.Elements[0], Plot.Elements[2]);
+        Binder.Bind(Plot.Elements[0], Plot.Elements[3]);
+        Binder.Bind(Plot.Elements[0], Plot.Elements[4], 50);
         
-        ViewActionScript.BindElementsToList(_root, Elements);
+        ViewActionScript.BindElementsToList(_root, Plot);
     }
 
     /// <summary>

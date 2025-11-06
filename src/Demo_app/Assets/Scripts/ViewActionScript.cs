@@ -14,7 +14,7 @@ public static class ViewActionScript
     /// <summary>
     /// Список всех элементов для отображения и редактирования
     /// </summary>
-    private static List<Element> _elements;
+    private static Plot _plot;
     
     /// <summary>
     /// Текущий выбранный элемент для редактирования
@@ -25,6 +25,26 @@ public static class ViewActionScript
     /// Список элементов для редактирования
     /// </summary>
     private static ListView _elementsListView;
+    
+    /// <summary>
+    /// Кнопки добавления новых персонажей
+    /// </summary>
+    private static Button _addCharacterButton;
+    
+    /// <summary>
+    /// Кнопки добавления новых предметов
+    /// </summary>
+    private static Button _addItemButton;
+    
+    /// <summary>
+    /// Кнопки добавления новых локаций
+    /// </summary>
+    private static Button _addLocationButton;
+    
+    /// <summary>
+    /// Кнопки добавления новых событий
+    /// </summary>
+    private static Button _addEventButton;
     
     /// <summary>
     /// Панель редактирования выбранного элемента
@@ -65,10 +85,14 @@ public static class ViewActionScript
     /// Привязка элементов к списку в UI
     /// </summary>
     /// <param name="root">Корневой элемент UI</param>
-    /// <param name="newElements">Список элементов для отображения</param>
-    public static void BindElementsToList(VisualElement root, List<Element> newElements)
+    /// <param name="plot">Сюжет с элементами</param>
+    public static void BindElementsToList(VisualElement root, Plot plot)
     {
         _elementsListView = root.Q<ListView>("ElementsListView");
+        _addCharacterButton = root.Q<Button>("AddCharacterButton");
+        _addItemButton = root.Q<Button>("AddItemButton");
+        _addLocationButton = root.Q<Button>("AddLocationButton");
+        _addEventButton = root.Q<Button>("AddEventButton");
         _editSelectedElement = root.Q<VisualElement>("EditSelectedElement");
         _typeTextField = root.Q<TextField>("TypeTextField");
         _nameTextField = root.Q<TextField>("NameTextField");
@@ -77,13 +101,18 @@ public static class ViewActionScript
         _timeTextField = root.Q<TextField>("TimeTextField");
         _updateElementButton = root.Q<Button>("UpdateElementButton");
         
-        _elements = newElements;
+        _plot = plot;
         _elementsListView.makeItem = MakeElementListItem;
         _elementsListView.bindItem = BindElementListItem;
         _elementsListView.onAdd = ElementsListViewOnAdd;
         _elementsListView.onRemove = ElementsListViewOnRemove;
-        _elementsListView.itemsSource = _elements;
+        _elementsListView.itemsSource = _plot.Elements;
         _elementsListView.selectedIndicesChanged += ElementsListViewSelectedIndicesChanged;
+
+        _addCharacterButton.clicked += AddElementListItem(ElemType.Character);
+        _addItemButton.clicked += AddElementListItem(ElemType.Item);
+        _addLocationButton.clicked += AddElementListItem(ElemType.Location);
+        _addEventButton.clicked += AddElementListItem(ElemType.Event);
 
         _updateElementButton.clicked += UpdateSelectedElement;
     }
@@ -105,9 +134,25 @@ public static class ViewActionScript
             _currentElement = null;
             return;
         }
-        Debug.Log($"{_elements[index].Name}, {_elements[index].Type}");
-        _currentElement = _elements[index];
+        Debug.Log($"{_plot.Elements[index].Name}, {_plot.Elements[index].Type}");
+        _currentElement = (Element)_plot.Elements[index];
         LoadSelectedElement();
+    }
+
+    /// <summary>
+    /// Обработчик добавления нового элемента заданного типа в список элементов
+    /// </summary>
+    /// <param name="elemType">Тип нового элемента</param>
+    /// <returns>Действие добавления элемента</returns>
+    private static Action AddElementListItem(ElemType elemType)
+    {
+        return () =>
+        {
+            var newElement = FullElementConstructor.CreateFullElement(elemType, "New " + elemType);
+            _plot.Add(newElement);
+            _elementsListView.RefreshItems();
+            _elementsListView.ScrollToItem(_plot.Elements.Count - 1);
+        };
     }
 
     /// <summary>
@@ -197,7 +242,7 @@ public static class ViewActionScript
                             {
                                 case Element existingElement:
                                     {
-                                        var element = _elements.FirstOrDefault(e => e.Name == value);
+                                        var element = _plot.Elements.FirstOrDefault(e => e.Name == value);
                                         if (element != null)
                                         {
                                             Binder.Unbind(_currentElement, existingElement);
@@ -233,7 +278,7 @@ public static class ViewActionScript
                                         List<string> elementNames = listView.itemsSource
                                             .Cast<string>()
                                             .ToList();
-                                        List<Element> newElements = _elements
+                                        List<IElement> newElements = _plot.Elements
                                             .Where(e => elementNames.Contains(e.Name))
                                             .ToList();
                                         foreach (var oldElem in existingElements.ToList()
@@ -253,7 +298,7 @@ public static class ViewActionScript
                                         List<string> relationStrings = listView.itemsSource
                                             .Cast<string>()
                                             .ToList();
-                                        List<(Element, double)> newRelations = relationStrings
+                                        List<(IElement element, double value)> newRelations = relationStrings
                                             .Select(rs =>
                                             {
                                                 int startIdx = rs.LastIndexOf('(');
@@ -266,7 +311,8 @@ public static class ViewActionScript
                                                     .Trim();
                                                 if (!double.TryParse(valueStr, out double value))
                                                     return (_currentElement, 0);
-                                                var element = _elements.FirstOrDefault(e => e.Name == name);
+                                                var element = _plot.Elements
+                                                    .FirstOrDefault(e => e.Name == name);
                                                 return element == null ? 
                                                     (_currentElement, 0) : (element, value);
                                             })
@@ -290,6 +336,7 @@ public static class ViewActionScript
                     break;
             }
         }
+        _elementsListView.RefreshItems();
     }
 
     /// <summary>
@@ -348,7 +395,7 @@ public static class ViewActionScript
         listView.onAdd = blv =>
         {
             int index = blv.itemsSource.Count;
-            var src = (List<string>)blv.itemsSource;
+            List<string> src = (List<string>)blv.itemsSource;
             src.Add(string.Empty);
             blv.RefreshItems();
             blv.ScrollToItem(index);
@@ -382,7 +429,7 @@ public static class ViewActionScript
         var labelUI = e.Q<Label>("ElementName");
         var iconUI = e.Q<VisualElement>("ElementIcon");
         var icon = ScriptableObject.CreateInstance<VectorImage>();
-        var element = _elements[i];
+        var element = _plot.Elements[i];
         icon = element.Type switch
         {
             ElemType.Character =>
