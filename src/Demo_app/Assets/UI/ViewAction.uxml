@@ -4,7 +4,7 @@
     <ui:VisualElement name="ViewAction" content-container="ElementsList" style="flex-grow: 1; flex-direction: row; right: 0; bottom: 0; left: 0; top: 0;">
         <ui:VisualElement name="ElementsView" style="flex-grow: 1; flex-direction: row;">
             <ui:VisualElement name="ElementsFilter" style="flex-grow: 1; width: 30%;">
-                <ui:DropdownField label="Filter" name="FilterDropdown" choices="All elements,Characters,Items,Locations,Events" class="Dropdown" />
+                <ui:DropdownField label="Filter" name="FilterDropdown" choices="All elements,Character,Item,Location,Event" index="0" class="Dropdown" />
                 <ui:TextField label="Search" name="SearchTextField" class="TextField" />
                 <ui:ListView name="ElementsListView" item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" show-add-remove-footer="false" allow-add="true" fixed-item-height="50" class="ListView" style="flex-grow: 1;" />
                 <ui:VisualElement name="AddElementsBar" style="flex-grow: 0; height: 50px; flex-direction: row; align-content: stretch; justify-content: space-around; align-items: stretch;">
@@ -19,6 +19,9 @@
                     </ui:Button>
                     <ui:Button name="AddEventButton" class="Button">
                         <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icons/AddEventIcon.svg?fileID=7388822144124034973&amp;guid=d24a87880b39145e9824a9ca75fce51e&amp;type=3#AddEventIcon&quot;); width: 48px; height: 48px;" />
+                    </ui:Button>
+                    <ui:Button name="DeleteElementButton" class="Button">
+                        <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icons/DeleteIcon.svg?fileID=7388822144124034973&amp;guid=8c5d7eb9f2901265b923c9fd533e7524&amp;type=3#DeleteIcon&quot;); width: 48px; height: 48px;" />
                     </ui:Button>
                 </ui:VisualElement>
             </ui:VisualElement>

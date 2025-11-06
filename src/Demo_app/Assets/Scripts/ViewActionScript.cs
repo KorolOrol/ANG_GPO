@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
@@ -25,6 +26,16 @@ public static class ViewActionScript
     /// Список элементов для редактирования
     /// </summary>
     private static ListView _elementsListView;
+
+    /// <summary>
+    /// Выпадающий список для фильтрации по типу элемента
+    /// </summary>
+    private static DropdownField _filterDropdown;
+    
+    /// <summary>
+    /// Текстовое поле для фильтрации списка элементов
+    /// </summary>
+    private static TextField _searchTextField;
     
     /// <summary>
     /// Кнопки добавления новых персонажей
@@ -45,6 +56,11 @@ public static class ViewActionScript
     /// Кнопки добавления новых событий
     /// </summary>
     private static Button _addEventButton;
+    
+    /// <summary>
+    /// Кнопка удаления выбранного элемента
+    /// </summary>
+    private static Button _deleteElementButton;
     
     /// <summary>
     /// Панель редактирования выбранного элемента
@@ -89,10 +105,13 @@ public static class ViewActionScript
     public static void BindElementsToList(VisualElement root, Plot plot)
     {
         _elementsListView = root.Q<ListView>("ElementsListView");
+        _filterDropdown = root.Q<DropdownField>("FilterDropdown");
+        _searchTextField = root.Q<TextField>("SearchTextField");
         _addCharacterButton = root.Q<Button>("AddCharacterButton");
         _addItemButton = root.Q<Button>("AddItemButton");
         _addLocationButton = root.Q<Button>("AddLocationButton");
         _addEventButton = root.Q<Button>("AddEventButton");
+        _deleteElementButton = root.Q<Button>("DeleteElementButton");
         _editSelectedElement = root.Q<VisualElement>("EditSelectedElement");
         _typeTextField = root.Q<TextField>("TypeTextField");
         _nameTextField = root.Q<TextField>("NameTextField");
@@ -109,12 +128,32 @@ public static class ViewActionScript
         _elementsListView.itemsSource = _plot.Elements;
         _elementsListView.selectedIndicesChanged += ElementsListViewSelectedIndicesChanged;
 
+        _filterDropdown.RegisterValueChangedCallback(_ => ApplyFilters());
+        _searchTextField.RegisterValueChangedCallback(_ => ApplyFilters());
+
         _addCharacterButton.clicked += AddElementListItem(ElemType.Character);
         _addItemButton.clicked += AddElementListItem(ElemType.Item);
         _addLocationButton.clicked += AddElementListItem(ElemType.Location);
         _addEventButton.clicked += AddElementListItem(ElemType.Event);
+        _deleteElementButton.clicked += () => ElementsListViewOnRemove(_elementsListView);
 
         _updateElementButton.clicked += UpdateSelectedElement;
+    }
+
+    /// <summary>
+    /// Поиск индекса элемента в текущем источнике элементов списка
+    /// </summary>
+    /// <param name="element">Искомый элемент</param>
+    /// <returns>Индекс элемента или -1, если не найден</returns>
+    private static int FindIndexInItems(object element)
+    {
+        if (_elementsListView.itemsSource is not List<IElement> items) return -1;
+        for (int i = 0; i < items.Count; i++)
+        {
+            var it = items[i];
+            if (it == element || it.Equals(element)) return i;
+        }
+        return -1;
     }
     
     /// <summary>
@@ -129,13 +168,19 @@ public static class ViewActionScript
             index = i;
             break;
         }
-        if (index < 0)
+        if (index < 0 || _elementsListView.itemsSource is not List<IElement> items || index >= items.Count)
         {
             _currentElement = null;
             return;
         }
-        Debug.Log($"{_plot.Elements[index].Name}, {_plot.Elements[index].Type}");
-        _currentElement = (Element)_plot.Elements[index];
+        var elem = items[index];
+        if (elem == null)
+        {
+            _currentElement = null;
+            return;
+        }
+        Debug.Log($"{elem.Name}, {elem.Type}");
+        _currentElement = (Element)elem;
         LoadSelectedElement();
     }
 
@@ -150,9 +195,41 @@ public static class ViewActionScript
         {
             var newElement = FullElementConstructor.CreateFullElement(elemType, "New " + elemType);
             _plot.Add(newElement);
-            _elementsListView.RefreshItems();
-            _elementsListView.ScrollToItem(_plot.Elements.Count - 1);
+            ApplyFilters();
+            
+            int idx = FindIndexInItems(newElement);
+            if (idx >= 0)
+            {
+                _elementsListView.ScrollToItem(idx);
+            }
         };
+    }
+    /// <summary>
+    /// Применение фильтров к списку элементов
+    /// </summary>
+    private static void ApplyFilters()
+    {
+        List<IElement> items = _plot.Elements;
+        
+        string filterType = _filterDropdown.value;
+        if (filterType != "All elements")
+        {
+            if (Enum.TryParse(filterType, out ElemType elemType))
+            {
+                items = items.Where(e => e.Type == elemType).ToList();
+            }
+        }
+        
+        string searchText = _searchTextField.value;
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            searchText = searchText.Trim();
+            items = items.Where(e => e.Name
+                .Contains(searchText, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+        
+        _elementsListView.itemsSource = items;
+        _elementsListView.RefreshItems();
     }
 
     /// <summary>
@@ -246,6 +323,15 @@ public static class ViewActionScript
                                         if (element != null)
                                         {
                                             Binder.Unbind(_currentElement, existingElement);
+                                            Binder.Bind(_currentElement, element);
+                                        }
+                                    }
+                                    break;
+                                case null:
+                                    {
+                                        var element = _plot.Elements.FirstOrDefault(e => e.Name == value);
+                                        if (element != null)
+                                        {
                                             Binder.Bind(_currentElement, element);
                                         }
                                     }
@@ -403,6 +489,7 @@ public static class ViewActionScript
         listView.onRemove = blv =>
         {
             int index = blv.selectedIndex;
+            if (index == -1) index = blv.itemsSource.Count - 1;
             blv.itemsSource.RemoveAt(index);
             blv.RefreshItems();
             blv.ScrollToItem(index);
@@ -429,8 +516,15 @@ public static class ViewActionScript
         var labelUI = e.Q<Label>("ElementName");
         var iconUI = e.Q<VisualElement>("ElementIcon");
         var icon = ScriptableObject.CreateInstance<VectorImage>();
-        var element = _plot.Elements[i];
-        icon = element.Type switch
+        IElement element = null;
+        var items = _elementsListView.itemsSource;
+        if (items != null && i >= 0 && i < items.Count)
+        {
+            element = items[i] as IElement;
+        }
+
+        if (element == null) return;
+        var vectorImage = element.Type switch
         {
             ElemType.Character =>
                 AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeCharacterIcon.svg"),
@@ -440,7 +534,7 @@ public static class ViewActionScript
             _ => icon
         };
         labelUI.text = element.Name;
-        iconUI.style.backgroundImage = new StyleBackground(Background.FromVectorImage(icon));
+        iconUI.style.backgroundImage = new StyleBackground(vectorImage);
     };
 
     /// <summary>
@@ -448,11 +542,15 @@ public static class ViewActionScript
     /// </summary>
     private readonly static Action<BaseListView> ElementsListViewOnAdd = listView =>
     {
-        int index = listView.itemsSource.Count;
-        var newElement = new Element(ElemType.Character, index.ToString());
-        listView.itemsSource.Add(newElement);
-        listView.RefreshItems();
-        listView.ScrollToItem(index);
+        var newElement = FullElementConstructor.CreateFullElement(ElemType.Character, "New Character");
+        _plot.Add(newElement);
+        ApplyFilters();
+        
+        int index = FindIndexInItems(newElement);
+        if (index >= 0)
+        {
+            listView.ScrollToItem(index);
+        }
     };
 
     /// <summary>
@@ -461,8 +559,23 @@ public static class ViewActionScript
     private readonly static Action<BaseListView> ElementsListViewOnRemove = listView =>
     {
         int index = listView.selectedIndex;
-        listView.itemsSource.RemoveAt(index - 1);
-        listView.RefreshItems();
-        listView.ScrollToItem(index - 2);
+        if (index == -1) index = listView.itemsSource.Count - 1;
+        var items = listView.itemsSource;
+        if (items == null || index >= items.Count) return;
+        if (items[index] is not IElement element) return;
+        foreach (var e in _plot.Elements.ToList())
+        {
+            Binder.Unbind(e, element);
+        }
+        if (_plot.Elements.Contains(element))
+            _plot.Elements.Remove(element);
+        
+        ApplyFilters();
+        
+        var newItems = listView.itemsSource;
+        if (newItems is not { Count: > 0 }) return;
+        int newIndex = Math.Min(newItems.Count - 1, index);
+        listView.ScrollToItem(newIndex);
+        ElementsListViewSelectedIndicesChanged(new[] { newIndex });
     };
 }
