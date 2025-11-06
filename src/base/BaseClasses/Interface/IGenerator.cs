@@ -1,4 +1,5 @@
-﻿using BaseClasses.Model;
+﻿using System.Threading.Tasks;
+using BaseClasses.Model;
 
 namespace BaseClasses.Interface
 {
@@ -8,48 +9,11 @@ namespace BaseClasses.Interface
     public interface IGenerator
     {
         /// <summary>
-        /// Генерация персонажа
+        /// Генерация элемента истории
         /// </summary>
         /// <param name="plot">История</param>
-        /// <returns>Сгенерированный персонаж</returns>
-        public async Task<Character> GenerateCharacterAsync(Plot plot)
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Генерация локации
-        /// </summary>
-        /// <param name="plot">История</param>
-        /// <returns>Сгенерированная локация</returns>
-        public async Task<Location> GenerateLocationAsync(Plot plot)
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Генерация предмета
-        /// </summary>
-        /// <param name="plot">История</param>
-        /// <returns>Сгенерированный предмет</returns>
-        public async Task<Item> GenerateItemAsync(Plot plot)
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Генерация события
-        /// </summary>
-        /// <param name="plot">История</param>
-        /// <returns>Сгенерированное событие</returns>
-        public async Task<Event> GenerateEventAsync(Plot plot)
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
-
+        /// <param name="preparedElement">Подготовленный элемент</param>
+        /// <returns>Сгенерированный элемент</returns>
+        public Task<IElement> GenerateAsync(Plot plot, IElement preparedElement);
     }
 }

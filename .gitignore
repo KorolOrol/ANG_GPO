@@ -235,3 +235,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+/src/AI/AITest/SavingPath
+/src/base/Test
+
+# Test zone
+
+/src/base/ConsoleApp1
