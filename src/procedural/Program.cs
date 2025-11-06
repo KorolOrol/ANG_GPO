@@ -6,13 +6,8 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.IO;
 
-string choice;
-bool isGeneratingTraits = true;
-bool isGeneratingPhobias = true;
-
-Console.BackgroundColor = ConsoleColor.DarkGray;
-Console.WindowWidth = 150;
 
 /*PrCharacter Tony = new PrCharacter("Тони", "Сальвоне", 25, true);
 PrGenerator.CreateByLogicRandomTraits(Tony, 4);
@@ -25,6 +20,10 @@ PrGenerator.CreateByTwoParentsHalfRandomTraits(Kid, 3, Tony, Pain, "Кид");*/
 
 while (true)
 {
+    string choice;
+    bool isGeneratingTraits = true;
+    bool isGeneratingPhobias = true;
+
     Console.WriteLine("\nВыберите:");
     Console.Write("1 - генерация персонажа, 2 - прочесть персонажа, 3 - настройка генерации персонажа, 4 - редактор персонажа, 5 - экспорт персонажа, 0 - выход: ");
     choice = Console.ReadLine();
@@ -157,7 +156,7 @@ while (true)
 
                                 case "0": // 0 - выход
                                     return 0;
-                                    
+
                                 default:
                                     {
                                         Console.WriteLine("\nERR: Неправильный запрос.\n");

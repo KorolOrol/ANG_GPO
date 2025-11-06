@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using System.Xml.Linq;
-using BaseClasses.Model;
 
 public class PrCharacter
 {
@@ -216,7 +213,7 @@ public class PrCharacter
 
     #region [Translate To BaseClass]
 
-    public Element Translate(PrCharacter character)
+/*    public Element Translate(PrCharacter character)
     {
         string baseName = character.Name;
         string description = "";
@@ -245,7 +242,7 @@ public class PrCharacter
         Element baseCharacter = new Element(ElemType.Character, baseName, description);
 
         return baseCharacter;
-    }
+    }*/
 
     #endregion
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class PrGenerator
 {
@@ -227,7 +229,7 @@ public class PrGenerator
             if (traits_count != character.Traits.Count)
             {
                 Random rand = new Random();
-                double random = Math.Round(rand.NextSingle(), 3);
+                double random = Math.Round(rand.NextDouble(), 3);
 
                 if (character.Traits.Count == 0 || CheckTabl(character, GlobalData.TraitsList.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {
@@ -286,7 +288,7 @@ public class PrGenerator
             for (int i = 0; i < cmb_traits_count; i++)
             {
                 Random rand = new Random();
-                double random = Math.Round(rand.NextSingle(), 3);
+                double random = Math.Round(rand.NextDouble(), 3);
 
                 if (character.Traits.Count == 0 || CheckTabl(character, GlobalData.TraitsList.IndexOf(combined_traits[i])) && random <= 0.85d)
                 {

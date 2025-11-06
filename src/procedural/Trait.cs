@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 public class Trait
 {
     private static Random rand = new Random();
 
     public string Title;
-    public double Affection = Math.Round(rand.NextSingle(), 3);
+    public double Affection = Math.Round(rand.NextDouble(), 3);
     public string Description;
 
     public Trait(string title)
