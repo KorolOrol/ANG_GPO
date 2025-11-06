@@ -25,7 +25,7 @@ public class MapGeneratorManualEditor : Editor
             generator.SaveMapContext();
         }
 
-        if (GUILayout.Button("Zагрузить карту"))
+        if (GUILayout.Button("Загрузить карту"))
         {
             generator.LoadMapContext();
         }
