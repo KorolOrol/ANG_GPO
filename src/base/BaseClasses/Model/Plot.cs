@@ -25,7 +25,21 @@ namespace BaseClasses.Model
             if (element.Time == -1) element.Time = Time++;
             Elements.Add(element); 
         }
-
+        
+        /// <summary>
+        /// Удаление элемента из истории
+        /// </summary>
+        /// <param name="element">Удаляемый элемент</param>
+        public void Remove(IElement element)
+        {
+            if (!Elements.Contains(element)) return;
+            foreach (var e in Elements)
+            {
+                Binder.Unbind(element, e);
+            }
+            Elements.Remove(element);
+        }
+            
         /// <summary>
         /// Персонажи
         /// </summary>
