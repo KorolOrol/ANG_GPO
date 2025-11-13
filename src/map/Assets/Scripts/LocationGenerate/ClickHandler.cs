@@ -1,6 +1,4 @@
 using UnityEngine;
-using static UnityEditor.FilePathAttribute;
-
 public class LocationClickHandler : MonoBehaviour
 {
     public MapManager mapManager;
