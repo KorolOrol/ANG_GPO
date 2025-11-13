@@ -22,7 +22,8 @@ public class MainWindowScript : MonoBehaviour
 
         _actions = new Dictionary<Button, VisualElement>
         {
-            { _root.Q<Button>("ViewActionButton"), _root.Q<VisualElement>("ViewAction") }
+            { _root.Q<Button>("ViewActionButton"), _root.Q<VisualElement>("ViewAction") },
+            { _root.Q<Button>("AIActionButton"), _root.Q<VisualElement>("AIAction") }
         };
 
         foreach (var pair in _actions)
@@ -30,17 +31,17 @@ public class MainWindowScript : MonoBehaviour
             pair.Key.clicked += () => OnActionButtonClicked(pair.Key);
         }
         
-        Plot.Add(new Element(ElemType.Character, "1"));
-        Plot.Add(new Element(ElemType.Item, "2"));
-        Plot.Add(new Element(ElemType.Location, "3"));
-        Plot.Add(new Element(ElemType.Event, "4"));
-        Plot.Add(new Element(ElemType.Character, "5"));
+        Plot.Add(FullElementConstructor.CreateFullElement(ElemType.Character, "1"));
+        Plot.Add(FullElementConstructor.CreateFullElement(ElemType.Item, "2"));
+        Plot.Add(FullElementConstructor.CreateFullElement(ElemType.Location, "3"));
+        Plot.Add(FullElementConstructor.CreateFullElement(ElemType.Event, "4"));
+        Plot.Add(FullElementConstructor.CreateFullElement(ElemType.Character, "5"));
         Binder.Bind(Plot.Elements[0], Plot.Elements[1]);
         Binder.Bind(Plot.Elements[0], Plot.Elements[2]);
         Binder.Bind(Plot.Elements[0], Plot.Elements[3]);
         Binder.Bind(Plot.Elements[0], Plot.Elements[4], 50);
         
-        ViewActionScript.BindElementsToList(_root, Plot);
+        ViewActionScript.Initiate(_root, Plot);
     }
 
     /// <summary>

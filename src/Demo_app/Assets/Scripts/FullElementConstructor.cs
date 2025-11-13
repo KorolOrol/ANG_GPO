@@ -13,6 +13,8 @@ public static class FullElementConstructor
         {
             case ElemType.Character:
                 {
+                    @params.Add("Traits", new List<string>());
+                    @params.Add("Phobias", new List<string>());
                     @params.Add("Relations", new List<Relation>());
                     @params.Add("Items", new List<IElement>());
                     @params.Add("Locations", new List<IElement>());
@@ -21,8 +23,8 @@ public static class FullElementConstructor
                 break;
             case ElemType.Item:
                 {
-                    @params.Add("Host", (IElement)null);
-                    @params.Add("Location", (IElement)null);
+                    @params.Add("Host", null);
+                    @params.Add("Location", null);
                     @params.Add("Events", new List<IElement>());
                 }
                 break;

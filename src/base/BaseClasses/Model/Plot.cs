@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BaseClasses.Interface;
 using BaseClasses.Enum;
+using BaseClasses.Services;
 using System.Text.Json.Serialization;
 
 namespace BaseClasses.Model

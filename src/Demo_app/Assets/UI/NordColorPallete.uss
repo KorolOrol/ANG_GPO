@@ -114,3 +114,21 @@
 .unity-collection-view__item--selected {
     background-color: var(--nord-light);
 }
+
+.RadioButton {
+}
+
+.RadioButton > .unity-radio-button__input {
+    flex-grow: 0;
+}
+
+.GroupBox {
+    background-color: var(--nord-semidark);
+}
+
+.Toggle {
+}
+
+.Toggle > .unity-toggle__input {
+    flex-grow: 0;
+}

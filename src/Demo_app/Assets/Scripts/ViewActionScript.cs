@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
@@ -102,7 +101,7 @@ public static class ViewActionScript
     /// </summary>
     /// <param name="root">Корневой элемент UI</param>
     /// <param name="plot">Сюжет с элементами</param>
-    public static void BindElementsToList(VisualElement root, Plot plot)
+    public static void Initiate(VisualElement root, Plot plot)
     {
         _elementsListView = root.Q<ListView>("ElementsListView");
         _filterDropdown = root.Q<DropdownField>("FilterDropdown");
@@ -113,12 +112,12 @@ public static class ViewActionScript
         _addEventButton = root.Q<Button>("AddEventButton");
         _deleteElementButton = root.Q<Button>("DeleteElementButton");
         _editSelectedElement = root.Q<VisualElement>("EditSelectedElement");
-        _typeTextField = root.Q<TextField>("TypeTextField");
-        _nameTextField = root.Q<TextField>("NameTextField");
-        _descriptionTextField = root.Q<TextField>("DescriptionTextField");
-        _paramsFoldout = root.Q<Foldout>("ParamsFoldout");
-        _timeTextField = root.Q<TextField>("TimeTextField");
-        _updateElementButton = root.Q<Button>("UpdateElementButton");
+        _typeTextField = _editSelectedElement.Q<TextField>("TypeTextField");
+        _nameTextField = _editSelectedElement.Q<TextField>("NameTextField");
+        _descriptionTextField = _editSelectedElement.Q<TextField>("DescriptionTextField");
+        _paramsFoldout = _editSelectedElement.Q<Foldout>("ParamsFoldout");
+        _timeTextField = _editSelectedElement.Q<TextField>("TimeTextField");
+        _updateElementButton = _editSelectedElement.Q<Button>("UpdateElementButton");
         
         _plot = plot;
         _elementsListView.makeItem = MakeElementListItem;
@@ -310,120 +309,131 @@ public static class ViewActionScript
             switch (paramField)
             {
                 case TextField textField:
-                    {
-                        string key = textField.label;
-                        string value = textField.value;
-                        if (_currentElement.Params.TryGetValue(key, out object existingValue))
-                        {
-                            switch (existingValue)
-                            {
-                                case Element existingElement:
-                                    {
-                                        var element = _plot.Elements.FirstOrDefault(e => e.Name == value);
-                                        if (element != null)
-                                        {
-                                            Binder.Unbind(_currentElement, existingElement);
-                                            Binder.Bind(_currentElement, element);
-                                        }
-                                    }
-                                    break;
-                                case null:
-                                    {
-                                        var element = _plot.Elements.FirstOrDefault(e => e.Name == value);
-                                        if (element != null)
-                                        {
-                                            Binder.Bind(_currentElement, element);
-                                        }
-                                    }
-                                    break;
-                                case List<string>:
-                                    {
-                                        List<string> stringList = value
-                                            .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                                            .Select(s => s.Trim())
-                                            .ToList();
-                                        _currentElement.Params[key] = stringList;
-                                    }
-                                    break;
-                                default:
-                                    _currentElement.Params[key] = value;
-                                    break;
-                            }
-                        }
-                    }
+                    UpdateSelectedElementByTextField(textField);
                     break;
                 case ListView listView:
-                    {
-                        string key = listView.headerTitle;
-                        if (_currentElement.Params.TryGetValue(key, out object existingValue))
-                        {
-                            switch (existingValue)
-                            {
-                                case List<IElement> existingElements:
-                                    {
-                                        List<string> elementNames = listView.itemsSource
-                                            .Cast<string>()
-                                            .ToList();
-                                        List<IElement> newElements = _plot.Elements
-                                            .Where(e => elementNames.Contains(e.Name))
-                                            .ToList();
-                                        foreach (var oldElem in existingElements.ToList()
-                                            .Where(oldElem => !newElements.Contains(oldElem)))
-                                        {
-                                            Binder.Unbind(_currentElement, oldElem);
-                                        }
-                                        foreach (var newElem in newElements
-                                            .Where(newElem => !existingElements.Contains(newElem)))
-                                        {
-                                            Binder.Bind(_currentElement, newElem);
-                                        }
-                                    }
-                                    break;
-                                case List<Relation> existingRelations:
-                                    {
-                                        List<string> relationStrings = listView.itemsSource
-                                            .Cast<string>()
-                                            .ToList();
-                                        List<(IElement element, double value)> newRelations = relationStrings
-                                            .Select(rs =>
-                                            {
-                                                int startIdx = rs.LastIndexOf('(');
-                                                int endIdx = rs.LastIndexOf(')');
-                                                if (startIdx < 0 || endIdx < 0 || endIdx <= startIdx)
-                                                    return (_currentElement, 0);
-                                                string name = rs[..startIdx].Trim();
-                                                string valueStr = rs
-                                                    .Substring(startIdx + 1, endIdx - startIdx - 1)
-                                                    .Trim();
-                                                if (!double.TryParse(valueStr, out double value))
-                                                    return (_currentElement, 0);
-                                                var element = _plot.Elements
-                                                    .FirstOrDefault(e => e.Name == name);
-                                                return element == null ? 
-                                                    (_currentElement, 0) : (element, value);
-                                            })
-                                            .Where(t => t != (_currentElement, 0))
-                                            .ToList();
-                                        foreach (var oldRel in existingRelations.ToList()
-                                            .Where(oldRel => newRelations
-                                                .All(nr => nr.Item1 != oldRel.Character)))
-                                        {
-                                            Binder.Unbind(_currentElement, oldRel.Character);
-                                        }
-                                        foreach (var newRel in newRelations)
-                                        {
-                                            Binder.Bind(_currentElement, newRel.Item1, newRel.Item2);
-                                        }
-                                    }
-                                    break;
-                            }
-                        }
-                    }
+                    UpdateSelectedElementByListView(listView);
                     break;
             }
         }
         _elementsListView.RefreshItems();
     }
+    
+    /// <summary>
+    /// Обновление параметров выбранного элемента, заданных с помощью TextField
+    /// </summary>
+    /// <param name="textField">TextField с параметром</param>
+    private static void UpdateSelectedElementByTextField(TextField textField)
+    {
+        string key = textField.label;
+        string value = textField.value;
+        if (!_currentElement.Params.TryGetValue(key, out object existingValue)) return;
+        switch (existingValue)
+        {
+            case Element existingElement:
+                {
+                    var element = _plot.Elements.FirstOrDefault(e => e.Name == value);
+                    if (element != null)
+                    {
+                        Binder.Unbind(_currentElement, existingElement);
+                        Binder.Bind(_currentElement, element);
+                    }
+                }
+                break;
+            case null:
+                {
+                    var element = _plot.Elements.FirstOrDefault(e => e.Name == value);
+                    if (element != null)
+                    {
+                        Binder.Bind(_currentElement, element);
+                    }
+                }
+                break;
+            case List<string>:
+                {
+                    List<string> stringList = value
+                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(s => s.Trim())
+                        .ToList();
+                    _currentElement.Params[key] = stringList;
+                }
+                break;
+            default:
+                _currentElement.Params[key] = value;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Обновление параметров выбранного элемента, заданных с помощью ListView
+    /// </summary>
+    /// <param name="listView">ListView с параметром</param>
+    private static void UpdateSelectedElementByListView(ListView listView)
+    {
+        string key = listView.headerTitle;
+        if (!_currentElement.Params.TryGetValue(key, out object existingValue)) return;
+        switch (existingValue)
+        {
+            case List<IElement> existingElements:
+                {
+                    List<string> elementNames = listView.itemsSource
+                        .Cast<string>()
+                        .ToList();
+                    List<IElement> newElements = _plot.Elements
+                        .Where(e => elementNames.Contains(e.Name))
+                        .ToList();
+                    foreach (var oldElem in existingElements.ToList()
+                        .Where(oldElem => !newElements.Contains(oldElem)))
+                    {
+                        Binder.Unbind(_currentElement, oldElem);
+                    }
+                    foreach (var newElem in newElements
+                        .Where(newElem => !existingElements.Contains(newElem)))
+                    {
+                        Binder.Bind(_currentElement, newElem);
+                    }
+                }
+                break;
+            case List<Relation> existingRelations:
+                {
+                    List<string> relationStrings = listView.itemsSource
+                        .Cast<string>()
+                        .ToList();
+                    List<(IElement element, double value)> newRelations = relationStrings
+                        .Select(rs =>
+                        {
+                            int startIdx = rs.LastIndexOf('(');
+                            int endIdx = rs.LastIndexOf(')');
+                            if (startIdx < 0 || endIdx < 0 || endIdx <= startIdx)
+                                return (_currentElement, 0);
+                            string name = rs[..startIdx].Trim();
+                            string valueStr = rs
+                                .Substring(startIdx + 1, endIdx - startIdx - 1)
+                                .Trim();
+                            if (!double.TryParse(valueStr, out double value))
+                                return (_currentElement, 0);
+                            var element = _plot.Elements
+                                .FirstOrDefault(e => e.Name == name);
+                            return element == null ? 
+                                (_currentElement, 0) : (element, value);
+                        })
+                        .Where(t => t != (_currentElement, 0))
+                        .ToList();
+                    foreach (var oldRel in existingRelations.ToList()
+                        .Where(oldRel => newRelations
+                            .All(nr => nr.Item1 != oldRel.Character)))
+                    {
+                        Binder.Unbind(_currentElement, oldRel.Character);
+                    }
+                    foreach (var newRel in newRelations)
+                    {
+                        Binder.Bind(_currentElement, newRel.Item1, newRel.Item2);
+                    }
+                }
+                break;
+        }
+    }
+
 
     /// <summary>
     /// Создание текстового поля с заданной меткой и значением
@@ -563,12 +573,8 @@ public static class ViewActionScript
         var items = listView.itemsSource;
         if (items == null || index >= items.Count) return;
         if (items[index] is not IElement element) return;
-        foreach (var e in _plot.Elements.ToList())
-        {
-            Binder.Unbind(e, element);
-        }
-        if (_plot.Elements.Contains(element))
-            _plot.Elements.Remove(element);
+        
+        _plot.Remove(element);
         
         ApplyFilters();
         

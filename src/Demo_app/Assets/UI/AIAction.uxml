@@ -1,0 +1,45 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="EditSelectedElement" src="project://database/Assets/UI/EditSelectedElement.uxml?fileID=9197481963319205126&amp;guid=abaa16729a5c73d219a73d9731163b58&amp;type=3#EditSelectedElement" />
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
+    <ui:ScrollView name="AIAction" horizontal-scroller-visibility="Hidden" style="flex-grow: 1;">
+        <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement name="GenerationSettings" style="flex-grow: 1; max-width: 50%;">
+                <ui:DropdownField label="Text Generator" name="SelectTextGeneratorDropdown" class="Dropdown" />
+                <ui:GroupBox text="Text Generator Settings" name="TextGeneratorGroupBox" class="GroupBox">
+                    <ui:TextField label="Name" name="NameTextGeneratorTextField" class="TextField" />
+                    <ui:TextField label="Endpoint" name="EndpointTextGeneratorTextField" class="TextField" />
+                    <ui:RadioButtonGroup label="API Key" name="ApiKeyTextGeneratorRadioButtonGroup" style="flex-direction: column;">
+                        <ui:RadioButton name="PublicApiKeyTextGeneratorRadioButton" class="RadioButton" style="flex-direction: row;">
+                            <ui:TextField label="Public" name="PublicApiKeyTextGeneratorTextField" password="true" class="TextField" style="flex-grow: 1;" />
+                        </ui:RadioButton>
+                        <ui:RadioButton name="EnvApiKeyTextGeneratorRadioButton" class="RadioButton" style="flex-direction: row;">
+                            <ui:TextField label="Env" name="EnvApiKeyTextGeneratorTextField" class="TextField" style="flex-grow: 1;" />
+                        </ui:RadioButton>
+                    </ui:RadioButtonGroup>
+                    <ui:TextField label="Model" name="ModelTextGeneratorTextField" class="TextField" />
+                    <ui:Toggle label="Use Structured Output" name="StructuredOutputTextGeneratorToggle" class="Toggle" style="flex-direction: row-reverse; align-self: flex-start;" />
+                </ui:GroupBox>
+                <ui:Button text="Select System Prompt" name="SelectSystemPromptButton" class="Button" />
+                <ui:Label text="System Prompt: " name="SelectedSystemPromptPathLabel" />
+                <ui:Toggle label="Use AI Priority" name="AIPriorityToggle" class="Toggle" style="flex-direction: row-reverse; align-self: flex-start;" />
+                <ui:GroupBox name="GenerationSettingsGroupBox" class="GroupBox">
+                    <ui:RadioButtonGroup label="Based on" name="BasedOnGenerationRadioButtonGroup" style="flex-direction: column;">
+                        <ui:RadioButton name="BasedOnNewElementGenerationRadioButton" class="RadioButton" style="flex-direction: row;">
+                            <ui:DropdownField label="New element" name="NewElementTypeDropdown" class="Dropdown" style="flex-grow: 1;" />
+                        </ui:RadioButton>
+                        <ui:RadioButton name="BasedOnExistingElementGenerationRadioButton" class="RadioButton" style="flex-direction: row;">
+                            <ui:DropdownField label="Dropdown" name="ExistingElementDropdown" class="Dropdown" style="flex-grow: 1;" />
+                        </ui:RadioButton>
+                    </ui:RadioButtonGroup>
+                </ui:GroupBox>
+                <ui:Button text="Generate" name="AIGenerateButton" class="Button" style="background_color: --nord-green;">
+                    <Bindings>
+                        <ui:DataBinding property="style.backgroundColor" data-source-path="colors[10]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
+                        <ui:DataBinding property="style.color" data-source-path="colors[0]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
+                    </Bindings>
+                </ui:Button>
+            </ui:VisualElement>
+            <ui:Instance template="EditSelectedElement" name="EditGeneratedElement" style="flex-grow: 1;" />
+        </ui:VisualElement>
+    </ui:ScrollView>
+</ui:UXML>
