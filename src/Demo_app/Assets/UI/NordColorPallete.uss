@@ -132,3 +132,13 @@
 .Toggle > .unity-toggle__input {
     flex-grow: 0;
 }
+
+.PositiveButton {
+    background-color: var(--nord-green);
+    color: var(--nord-dark);
+}
+
+.NegativeButton {
+    background-color: var(--nord-red);
+    color: var(--nord-dark);
+}

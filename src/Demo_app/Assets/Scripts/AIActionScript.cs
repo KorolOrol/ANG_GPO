@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using AIGenerator;
 using AIGenerator.TextGenerator;
 using BaseClasses.Model;
+using UnityEditor;
 using UnityEngine.UIElements;
 
 public static class AIActionScript
@@ -17,6 +19,8 @@ public static class AIActionScript
     private static TextField _envApiKeyTextGeneratorTextField;
     private static TextField _modelTextGeneratorTextField;
     private static Toggle _structuredOutputTextGeneratorToggle;
+    private static Button _saveTextGeneratorButton;
+    private static Button _deleteTextGeneratorButton;
     private static Button _selectSystemPromptButton;
     private static Label _selectedSystemPromptPathLabel;
     private static Toggle _aiPriorityToggle;
@@ -58,8 +62,9 @@ public static class AIActionScript
     /// </summary>
     private static Button _updateElementButton;
     
-    private static List<OpenAIGenerator> _textGenerators = new List<OpenAIGenerator>();
+    private readonly static Dictionary<string, OpenAIGenerator> TextGenerators = new Dictionary<string, OpenAIGenerator>();
     private static LlmAiGenerator _aiGenerator;
+    private static string _selectedSystemPromptPath;
     private static Element _generatedElement;
     
     public static void Initiate(VisualElement root, Plot plot)
@@ -75,13 +80,16 @@ public static class AIActionScript
         _envApiKeyTextGeneratorTextField = root.Q<TextField>("EnvApiKeyTextGeneratorTextField");
         _modelTextGeneratorTextField = root.Q<TextField>("ModelTextGeneratorTextField");
         _structuredOutputTextGeneratorToggle = root.Q<Toggle>("StructuredOutputTextGeneratorToggle");
+        _saveTextGeneratorButton = root.Q<Button>("SaveTextGeneratorButton");
+        _deleteTextGeneratorButton = root.Q<Button>("DeleteTextGeneratorButton");
         _selectSystemPromptButton = root.Q<Button>("SelectSystemPromptButton");
         _selectedSystemPromptPathLabel = root.Q<Label>("SelectedSystemPromptPathLabel");
         _aiPriorityToggle = root.Q<Toggle>("AIPriorityToggle");
         _basedOnGenerationRadioButtonGroup = root.Q<RadioButtonGroup>("BasedOnGenerationRadioButtonGroup");
         _basedOnNewElementGenerationRadioButton = root.Q<RadioButton>("BasedOnNewElementGenerationRadioButton");
         _newElementTypeDropdown = root.Q<DropdownField>("NewElementTypeDropdown");
-        _basedOnExistingElementGenerationRadioButton = root.Q<RadioButton>("BasedOnExistingElementGenerationRadioButton");
+        _basedOnExistingElementGenerationRadioButton = 
+            root.Q<RadioButton>("BasedOnExistingElementGenerationRadioButton");
         _existingElementDropdown = root.Q<DropdownField>("ExistingElementDropdown");
         _aiGenerateButton = root.Q<Button>("AIGenerateButton");
         _editGeneratedElement = root.Q<VisualElement>("EditGeneratedElement");
@@ -91,5 +99,113 @@ public static class AIActionScript
         _paramsFoldout = _editGeneratedElement.Q<Foldout>("ParamsFoldout");
         _timeTextField = _editGeneratedElement.Q<TextField>("TimeTextField");
         _updateElementButton = _editGeneratedElement.Q<Button>("UpdateElementButton");
+        
+        _selectTextGeneratorDropdown.choices = new List<string>(TextGenerators.Keys).Append("New").ToList();
+        _selectTextGeneratorDropdown.RegisterValueChangedCallback(SelectTextGeneratorDropdownOnChange);
+        
+        _publicApiKeyTextGeneratorRadioButton.RegisterCallback<ChangeEvent<bool>>(evt =>
+        {
+            if (!evt.newValue) return;
+            _publicApiKeyTextGeneratorTextField.SetEnabled(true);
+            _envApiKeyTextGeneratorTextField.SetEnabled(false);
+        });
+        _envApiKeyTextGeneratorRadioButton.RegisterCallback<ChangeEvent<bool>>(evt =>
+        {
+            if (!evt.newValue) return;
+            _publicApiKeyTextGeneratorTextField.SetEnabled(false);
+            _envApiKeyTextGeneratorTextField.SetEnabled(true);
+        });
+        
+        _saveTextGeneratorButton.clicked += OnSaveTextGeneratorButtonOnClicked;
+        _deleteTextGeneratorButton.clicked += OnDeleteTextGeneratorButtonOnClicked;
+        
+        _selectSystemPromptButton.clicked += () =>
+        {
+            string path = EditorUtility.OpenFilePanel("Select System Prompt File", "", "");
+            if (string.IsNullOrWhiteSpace(path)) return;
+            _selectedSystemPromptPath = path;
+            _selectedSystemPromptPathLabel.text = "System Prompt: " + path;
+        };
+    }
+
+    private static void OnSaveTextGeneratorButtonOnClicked()
+    {
+        if (_selectTextGeneratorDropdown.value == "New")
+        {
+            string endpoint = _endpointTextGeneratorTextField.value;
+            string model = _modelTextGeneratorTextField.value;
+            bool useStructuredOutput = _structuredOutputTextGeneratorToggle.value;
+            string name = string.IsNullOrWhiteSpace(_nameTextGeneratorTextField.value)
+                ? _nameTextGeneratorTextField.value
+                : "New " + endpoint + " " + model + (useStructuredOutput ? " Structured" : " Unstructured");
+            OpenAIGenerator generator = null;
+            if (_publicApiKeyTextGeneratorRadioButton.value)
+            {
+                generator = new OpenAIGenerator { Endpoint = endpoint, ApiKey = _publicApiKeyTextGeneratorTextField.value, Model = model, UseStructuredOutput = useStructuredOutput };
+            }
+            else if (_envApiKeyTextGeneratorRadioButton.value)
+            {
+                generator = new OpenAIGenerator(_envApiKeyTextGeneratorTextField.value, endpoint) { Model = model, UseStructuredOutput = useStructuredOutput };
+            }
+            TextGenerators.Add(name, generator);
+            _selectTextGeneratorDropdown.choices.Add(name);
+        }
+        else
+        {
+            var generator = TextGenerators[_selectTextGeneratorDropdown.value];
+            generator.Endpoint = _endpointTextGeneratorTextField.value;
+            generator.Model = _modelTextGeneratorTextField.value;
+            generator.UseStructuredOutput = _structuredOutputTextGeneratorToggle.value;
+            switch (_publicApiKeyTextGeneratorRadioButton.value)
+            {
+                case false when !_envApiKeyTextGeneratorRadioButton.value:
+                    return;
+                case true:
+                    generator.ApiKey = _publicApiKeyTextGeneratorTextField.value;
+                    break;
+                default:
+                    {
+                        if (_envApiKeyTextGeneratorRadioButton.value)
+                        {
+                            generator = new OpenAIGenerator(_envApiKeyTextGeneratorTextField.value, generator.Endpoint) { Model = generator.Model, UseStructuredOutput = generator.UseStructuredOutput };
+                            TextGenerators[_selectTextGeneratorDropdown.value] = generator;
+                        }
+                        break;
+                    }
+            }
+        }
+    }
+
+    private static void OnDeleteTextGeneratorButtonOnClicked()
+    {
+        if (_selectTextGeneratorDropdown.value == "New") return;
+        TextGenerators.Remove(_selectTextGeneratorDropdown.value);
+        _selectTextGeneratorDropdown.choices.Remove(_selectTextGeneratorDropdown.value);
+        _selectTextGeneratorDropdown.value = "New";
+    }
+
+    private static void SelectTextGeneratorDropdownOnChange(ChangeEvent<string> evt)
+    {
+        if (evt.newValue == "New")
+        {
+            _nameTextGeneratorTextField.value = "";
+            _endpointTextGeneratorTextField.value = "";
+            _publicApiKeyTextGeneratorTextField.value = "";
+            _envApiKeyTextGeneratorTextField.value = "";
+            _modelTextGeneratorTextField.value = "";
+            _structuredOutputTextGeneratorToggle.value = false;
+        }
+        else
+        {
+            var generator = TextGenerators[evt.newValue];
+            _nameTextGeneratorTextField.value = evt.newValue;
+            _endpointTextGeneratorTextField.value = generator.Endpoint;
+            _publicApiKeyTextGeneratorRadioButton.value = false;
+            _publicApiKeyTextGeneratorTextField.value = "";
+            _envApiKeyTextGeneratorRadioButton.value = false;
+            _envApiKeyTextGeneratorTextField.value = "";
+            _modelTextGeneratorTextField.value = generator.Model;
+            _structuredOutputTextGeneratorToggle.value = generator.UseStructuredOutput;
+        }
     }
 }

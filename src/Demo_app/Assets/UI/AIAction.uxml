@@ -18,9 +18,11 @@
                     </ui:RadioButtonGroup>
                     <ui:TextField label="Model" name="ModelTextGeneratorTextField" class="TextField" />
                     <ui:Toggle label="Use Structured Output" name="StructuredOutputTextGeneratorToggle" class="Toggle" style="flex-direction: row-reverse; align-self: flex-start;" />
+                    <ui:Button text="Save" name="SaveTextGeneratorButton" class="Button PositiveButton" />
+                    <ui:Button text="Delete" name="DeleteTextGeneratorButton" class="Button NegativeButton" />
                 </ui:GroupBox>
                 <ui:Button text="Select System Prompt" name="SelectSystemPromptButton" class="Button" />
-                <ui:Label text="System Prompt: " name="SelectedSystemPromptPathLabel" />
+                <ui:Label text="System Prompt: " name="SelectedSystemPromptPathLabel" style="white-space: normal;" />
                 <ui:Toggle label="Use AI Priority" name="AIPriorityToggle" class="Toggle" style="flex-direction: row-reverse; align-self: flex-start;" />
                 <ui:GroupBox name="GenerationSettingsGroupBox" class="GroupBox">
                     <ui:RadioButtonGroup label="Based on" name="BasedOnGenerationRadioButtonGroup" style="flex-direction: column;">
@@ -32,7 +34,7 @@
                         </ui:RadioButton>
                     </ui:RadioButtonGroup>
                 </ui:GroupBox>
-                <ui:Button text="Generate" name="AIGenerateButton" class="Button" style="background_color: --nord-green;">
+                <ui:Button text="Generate" name="AIGenerateButton" class="Button PositiveButton">
                     <Bindings>
                         <ui:DataBinding property="style.backgroundColor" data-source-path="colors[10]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
                         <ui:DataBinding property="style.color" data-source-path="colors[0]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
