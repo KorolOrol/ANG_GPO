@@ -1,10 +1,8 @@
 using UnityEngine;
-using static UnityEditor.FilePathAttribute;
-
 public class MapManager : MonoBehaviour
 {
-    public GameObject worldMap;              // объект с основной картой
-    public GameObject locationMap;           // объект с картой локации
+    public GameObject worldMap;              // Г®ГЎГєГҐГЄГІ Г± Г®Г±Г­Г®ГўГ­Г®Г© ГЄГ Г°ГІГ®Г©
+    public GameObject locationMap;           // Г®ГЎГєГҐГЄГІ Г± ГЄГ Г°ГІГ®Г© Г«Г®ГЄГ Г¶ГЁГЁ
     public LocationMapGenerator locationGenerator;
 
     private Location currentLocation;
