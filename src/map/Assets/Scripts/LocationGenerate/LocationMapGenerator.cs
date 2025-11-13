@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class LocationMapGenerator : MonoBehaviour
@@ -34,6 +35,6 @@ public class LocationMapGenerator : MonoBehaviour
 
     public void LoadLocationMap(Location location)
     {
-        // Загрузи сохранённую карту (если используешь сериализацию)
+        throw new NotImplementedException("Method is not realized");
     }
 }

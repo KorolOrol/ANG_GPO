@@ -1,0 +1,22 @@
+✓ переименовать негров рабов? ✓
+
+✓ LocationMapGenerator Неготовый метод либо убрать, либо написать NotImplementedException ✓
+
+✓ Посмотреть че за файл блять MapZoom и понять зачем он нужен ✓
+
+✓ MapGenerator подумать над if else и switch case ✓
+
+✓ Удалить туду ✓
+
+Посмотреть че за файл блять LocationGenerate/Location и понять зачем он нужен
+
+Посмотреть че за файл блять LocationGenerate/MapManager и понять зачем он нужен
+
+Посмотреть че за файл блять LocationPlacement/LocationData и понять зачем он нужен
+
+В целом посмотреть на файлы LocationPlacement
+
+Посмотреть че за файл блять LocationGenerate/MapZoom и понять зачем он нужен 
+
+
+

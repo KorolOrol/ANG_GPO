@@ -4,32 +4,32 @@ using System.Collections.Generic;
 [ExecuteAlways]
 public class MapZoom : MonoBehaviour
 {
-    [Header("Основной Plane")]
+    [Header("РћСЃРЅРѕРІРЅРѕР№ Plane")]
     public Renderer sourceRenderer;
     public int mainMapWidth = 256;
     public int mainMapHeight = 256;
 
-    [Header("Настройки приближения")]
+    [Header("РќР°СЃС‚СЂРѕР№РєРё РїСЂРёР±Р»РёР¶РµРЅРёСЏ")]
     public Vector2Int coordinate;
     public int zoomSize = 32;
     public int zoomScale = 4;
-    [Tooltip("Сколько маленьких пикселей на 1 исходный")]
+    [Tooltip("РЎРєРѕР»СЊРєРѕ РјР°Р»РµРЅСЊРєРёС… РїРёРєСЃРµР»РµР№ РЅР° 1 РёСЃС…РѕРґРЅС‹Р№")]
     public int subdivisions = 2;
 
-    [Header("Префабы построек")]
+    [Header("РџСЂРµС„Р°Р±С‹ РїРѕСЃС‚СЂРѕРµРє")]
     public GameObject buildingPrefab;
     public GameObject mainBuildingPrefab;
 
-    [Header("Второй уровень приближения")]
+    [Header("Р’С‚РѕСЂРѕР№ СѓСЂРѕРІРµРЅСЊ РїСЂРёР±Р»РёР¶РµРЅРёСЏ")]
     public bool useSecondZoom = false;
     public Vector2Int secondZoomOffset;
     public int secondZoomSize = 16;
     public int secondZoomScale = 2;
 
-    [Header("Разброс цвета")]
+    [Header("Р Р°Р·Р±СЂРѕСЃ С†РІРµС‚Р°")]
     public float maxVariation = 0.1f;
 
-    [Header("Параметры города")]
+    [Header("РџР°СЂР°РјРµС‚СЂС‹ РіРѕСЂРѕРґР°")]
     public int cityRadius = 5;
     public float cityNoiseScale = 0.2f;
     public float cityNoiseIntensity = 0.5f;
@@ -38,10 +38,10 @@ public class MapZoom : MonoBehaviour
     public Color cityWallColor = new Color(0.3f, 0.3f, 0.3f);
     public Color cityRoadColor = Color.grey;
 
-    [Header("Маркеры")]
+    [Header("РњР°СЂРєРµСЂС‹")]
     public GameObject locationPrefab;
 
-    [Header("Визуализация")]
+    [Header("Р’РёР·СѓР°Р»РёР·Р°С†РёСЏ")]
     public Renderer targetRenderer;
     public bool updateZoom = false;
 
@@ -254,7 +254,7 @@ public class MapZoom : MonoBehaviour
         if (useSecondZoom)
         {
             int sz = secondZoomSize * 2 + 1;
-            // получаем базовую обрезанную текстуру
+            // РїРѕР»СѓС‡Р°РµРј Р±Р°Р·РѕРІСѓСЋ РѕР±СЂРµР·Р°РЅРЅСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ
             Color[] basePixels = new Color[sz * sz];
             int center = subSize / 2;
 
@@ -269,14 +269,14 @@ public class MapZoom : MonoBehaviour
                         basePixels[y * sz + x] = Color.clear;
                 }
 
-            // теперь разбиваем каждый пиксель на secondZoomScale? мелких
+            // С‚РµРїРµСЂСЊ СЂР°Р·Р±РёРІР°РµРј РєР°Р¶РґС‹Р№ РїРёРєСЃРµР»СЊ РЅР° secondZoomScale? РјРµР»РєРёС…
             int outSize = sz * secondZoomScale;
             Color[] outPixels = new Color[outSize * outSize];
             for (int y = 0; y < sz; y++)
                 for (int x = 0; x < sz; x++)
                 {
                     Color c = basePixels[y * sz + x];
-                    // для каждого субпикселя
+                    // РґР»СЏ РєР°Р¶РґРѕРіРѕ СЃСѓР±РїРёРєСЃРµР»СЏ
                     for (int sy = 0; sy < secondZoomScale; sy++)
                         for (int sx = 0; sx < secondZoomScale; sx++)
                         {
@@ -287,7 +287,7 @@ public class MapZoom : MonoBehaviour
                         }
                 }
 
-            // создаём и заполняем итоговую текстуру
+            // СЃРѕР·РґР°С‘Рј Рё Р·Р°РїРѕР»РЅСЏРµРј РёС‚РѕРіРѕРІСѓСЋ С‚РµРєСЃС‚СѓСЂСѓ
             Texture2D finalCropped = new Texture2D(outSize, outSize) { filterMode = FilterMode.Point };
             finalCropped.SetPixels(outPixels);
             finalCropped.Apply();
@@ -349,11 +349,11 @@ public class MapZoom : MonoBehaviour
                 int subSize = baseSize * subdivisions;
                 int sz = secondZoomSize * 2 + 1;
 
-                // Позиция объекта в субпикселях
+                // РџРѕР·РёС†РёСЏ РѕР±СЉРµРєС‚Р° РІ СЃСѓР±РїРёРєСЃРµР»СЏС…
                 float subX = (mf.x - (coordinate.x - zoomSize)) * subdivisions;
                 float subY = (mf.y - (coordinate.y - zoomSize)) * subdivisions;
 
-                // Центр второго зума в субпикселях
+                // Р¦РµРЅС‚СЂ РІС‚РѕСЂРѕРіРѕ Р·СѓРјР° РІ СЃСѓР±РїРёРєСЃРµР»СЏС…
                 float secondCenterX = subSize / 2 + secondZoomOffset.x;
                 float secondCenterY = subSize / 2 + secondZoomOffset.y;
 
