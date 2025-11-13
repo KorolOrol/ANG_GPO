@@ -5,20 +5,18 @@ using UnityEngine.UIElements;
 public class ModularBuildingGenerator : MonoBehaviour
 {
 
-    const float WALL_LENGTH = 2f;    // Длина стены (ось Z)
-    const float WALL_HEIGHT = 2f;    // Высота стены (ось Y)
-    const float WALL_THICKNESS = 0.5f; // Ширина стены (ось X)
+    const float WALL_LENGTH = 2f;    // Р”Р»РёРЅР° СЃС‚РµРЅС‹ (РѕСЃСЊ Z)
+    const float WALL_HEIGHT = 2f;    // Р’С‹СЃРѕС‚Р° СЃС‚РµРЅС‹ (РѕСЃСЊ Y)
+    const float WALL_THICKNESS = 0.5f; // РЁРёСЂРёРЅР° СЃС‚РµРЅС‹ (РѕСЃСЊ X)
 
-    [Header("Prefabs")]
+    [Header("Prefabs")] // РџСЂРµС„Р°Р±С‹
     public GameObject roofPrefab;
-
     public GameObject wallPrefab;
     public GameObject windowPrefab;
     public GameObject doorPrefab;
-
     public GameObject floorPrefab;
 
-    [Header("Generation Settings")]
+    [Header("Generation Settings")] // РќР°СЃС‚СЂРѕР№РєРё РіРµРЅРµСЂР°С†РёРё
 
     public Vector2 minMaxSize = new Vector2(2, 11);
 
@@ -42,6 +40,9 @@ public class ModularBuildingGenerator : MonoBehaviour
     private GameObject westWallGroup;
     private GameObject eastWallGroup;
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ РєСЂС‹С€Рё
+    /// </summary>
     void CreateRoof()
     {
         GameObject roofGroup = new GameObject("Roof");
@@ -67,6 +68,9 @@ public class ModularBuildingGenerator : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ С„СѓРЅРґР°РјРµРЅС‚Р°
+    /// </summary>
     void CreateFoundation()
     {
         GameObject foundationGroup = new GameObject("Foundation");
@@ -92,6 +96,9 @@ public class ModularBuildingGenerator : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ Р·РґР°РЅРёСЏ
+    /// </summary>
     public void GenerateBuilding()
     {
         if (currentBuilding != null)
@@ -99,10 +106,8 @@ public class ModularBuildingGenerator : MonoBehaviour
             DestroyImmediate(currentBuilding.gameObject);
         }
 
-        // Создаем контейнер для здания
         CreateGroups();
 
-        // Генерируем параметры
         floorsCount = Random.Range(minFloors, maxFloors + 1);
         buildingSize = new Vector3(
             (int)(Random.Range(minMaxSize.x, minMaxSize.y)),
@@ -115,6 +120,9 @@ public class ModularBuildingGenerator : MonoBehaviour
         CreateRoof();
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ С‚РµСЃС‚РѕРІРѕРіРѕ Р·РґР°РЅРёСЏ (СЃ Р·Р°РґР°РЅРёРµРј РµРіРѕ РїР°СЂР°РјРµС‚СЂРѕРІ)
+    /// </summary>
     public void TestGenerateBuilding()
     {
         if (currentBuilding != null)
@@ -122,10 +130,8 @@ public class ModularBuildingGenerator : MonoBehaviour
             DestroyImmediate(currentBuilding.gameObject);
         }
 
-        // Создаем контейнер для здания
         CreateGroups();
 
-        // Генерируем параметры
         floorsCount = 1;
         buildingSize = new Vector3(
             (float)TestX,
@@ -138,6 +144,9 @@ public class ModularBuildingGenerator : MonoBehaviour
         CreateRoof();
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°С‘Рј РіСЂСѓРїРїС‹ РґР»СЏ СѓРґРѕР±СЃС‚РІР°
+    /// </summary>
     void CreateGroups()
     {
         currentBuilding = new GameObject("Generated Building").transform;
@@ -153,6 +162,10 @@ public class ModularBuildingGenerator : MonoBehaviour
         eastWallGroup.transform.SetParent(currentBuilding);
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ СЌС‚Р°Р¶Р°
+    /// </summary>
+    /// <param name="floorNumber"></param>
     void CreateFloor(int floorNumber)
     {
         float yPos = floorNumber * wallHeight + 0.2f;
@@ -182,10 +195,13 @@ public class ModularBuildingGenerator : MonoBehaviour
             );
         }
 
-        // Генерация стен по периметру
+        // Р“РµРЅРµСЂР°С†РёСЏ СЃС‚РµРЅ РїРѕ РїРµСЂРёРјРµС‚СЂСѓ
         CreateWallRing(new Vector3(0, yPos, 0), buildingSize, floorNumber);
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ СЌС‚Р°Р¶РµР№
+    /// </summary>
     void CreateFloors()
     {
         for (int floor = 0; floor < floorsCount; floor++)
@@ -194,21 +210,35 @@ public class ModularBuildingGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ СЃС‚РµРЅ РїРѕ РІСЃРµРј СЃС‚РѕСЂРѕРЅР°Рј СЃРІРµС‚Р° (РєРѕР»СЊС†Рѕ)
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="size"></param>
+    /// <param name="floorNumber"></param>
     void CreateWallRing(Vector3 position, Vector3 size, int floorNumber)
     {
-        // Рассчитываем позиции для стен
+        // Р Р°СЃСЃС‡РёС‚С‹РІР°РµРј РїРѕР·РёС†РёРё РґР»СЏ СЃС‚РµРЅ
         float X = -buildingSize.x * 2;
         float Z = -buildingSize.z * 2;
 
         Debug.Log($"X: {buildingSize.x} | Y: {buildingSize.y} | Z: {buildingSize.z}");
 
-        // Создаем стены для каждой стороны
-        CreateWallSegment(new Vector3(X, position.y, Z), 180, size.x, floorNumber, northWallGroup.transform);   // Северная
-        CreateWallSegment(new Vector3(X + 2, position.y, 0), 0, size.x, floorNumber, southWallGroup.transform);   // Южная
-        CreateWallSegment(new Vector3(0, position.y, Z + 2), -90, size.z, floorNumber, westWallGroup.transform);  // Западная
-        CreateWallSegment(new Vector3(X, position.y, Z), 90, size.z, floorNumber, eastWallGroup.transform);   // Восточная
+        // РЎРѕР·РґР°РµРј СЃС‚РµРЅС‹ РґР»СЏ РєР°Р¶РґРѕР№ СЃС‚РѕСЂРѕРЅС‹
+        CreateWallSegment(new Vector3(X, position.y, Z), 180, size.x, floorNumber, northWallGroup.transform);   // РЎРµРІРµСЂРЅР°СЏ
+        CreateWallSegment(new Vector3(X + 2, position.y, 0), 0, size.x, floorNumber, southWallGroup.transform);   // Р®Р¶РЅР°СЏ
+        CreateWallSegment(new Vector3(0, position.y, Z + 2), -90, size.z, floorNumber, westWallGroup.transform);  // Р—Р°РїР°РґРЅР°СЏ
+        CreateWallSegment(new Vector3(X, position.y, Z), 90, size.z, floorNumber, eastWallGroup.transform);   // Р’РѕСЃС‚РѕС‡РЅР°СЏ
     }
 
+    /// <summary>
+    /// РЎРѕР·РґР°РЅРёРµ СЃС‚РµРЅС‹ РѕРґРЅРѕР№ СЃС‚РѕСЂРѕРЅС‹ СЃРІРµС‚Р°
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="rotation"></param>
+    /// <param name="length"></param>
+    /// <param name="floorNumber"></param>
+    /// <param name="group"></param>
     void CreateWallSegment(Vector3 position, float rotation, float length, int floorNumber, Transform group)
     {
         int wallsCount = Mathf.CeilToInt(length);
@@ -230,7 +260,7 @@ public class ModularBuildingGenerator : MonoBehaviour
                 {
                     prefabOfWallDoorWindow = windowPrefab;
                 }
-                else // Выбор между стеной с окном и без
+                else // Р’С‹Р±РѕСЂ РјРµР¶РґСѓ СЃС‚РµРЅРѕР№ СЃ РѕРєРЅРѕРј Рё Р±РµР·
                 {
                     prefabOfWallDoorWindow = wallPrefab;
                 }
@@ -263,7 +293,7 @@ public class ModularBuildingGenerator : MonoBehaviour
                 {
                     prefabOfWallDoorWindow = windowPrefab;
                 }
-                else // Выбор между стеной с окном и без
+                else // Р’С‹Р±РѕСЂ РјРµР¶РґСѓ СЃС‚РµРЅРѕР№ СЃ РѕРєРЅРѕРј Рё Р±РµР·
                 {
                     prefabOfWallDoorWindow = wallPrefab;
                 }
@@ -282,6 +312,9 @@ public class ModularBuildingGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// РЈР±СЂР°С‚СЊ РїСЂРµРґС‹РґСѓС‰РµРµ СЃРіРµРЅРµСЂРёСЂРѕРІР°РЅРЅРѕРµ Р·РґР°РЅРёРµ
+    /// </summary>
     public void DestroyBuilding()
     {
         if (currentBuilding != null)

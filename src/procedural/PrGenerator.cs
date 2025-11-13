@@ -1,4 +1,6 @@
-﻿using System;
+using BaseClasses.Enum;
+using BaseClasses.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -634,6 +636,44 @@ public class PrGenerator
 
             character.Relations.Add(opponent.ID, Math.Round(finalRelation, 3));
         }
+    }
+
+    #endregion
+
+    #region [Translate To BaseClass]
+
+    public static Element Translate(PrCharacter character)
+    {
+        string baseName = "";
+        string description = "";
+
+        if (character.Name != null) { baseName = character.Name; }
+
+        if (character.Surname != null) { baseName += " " + character.Surname; }
+
+        if (character.Description != null) { description = character.Description; }
+
+        Dictionary<string, object> baseParams = new Dictionary<string, object>();
+
+        List<string> traits = new List<string>();
+        List<string> phobias = new List<string>();
+
+        foreach (var trait in character.Traits)
+        {
+            traits.Add(trait.Title);
+        }
+
+        foreach (var phobia in character.Phobias)
+        {
+            phobias.Add(phobia.Title);
+        }
+
+        baseParams.Add("Черты характера", traits);
+        baseParams.Add("Фобии", phobias);
+
+        Element baseCharacter = new Element(ElemType.Character, baseName, description, baseParams);
+
+        return baseCharacter;
     }
 
     #endregion

@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
 
 public class PrCharacter
 {
@@ -30,9 +28,6 @@ public class PrCharacter
     public Dictionary<int, double> Relations = new Dictionary<int, double>();
     public List<Trait> Traits = new List<Trait>();
     public List<Trait> Phobias = new List<Trait>();
-
-    /*public List<Item> Items = new List<Item>();*/
-    /*public List<Event> Events = new List<Event>;*/
 
     #endregion
 
@@ -144,6 +139,9 @@ public class PrCharacter
         }
     }
 
+    /// <summary>
+    /// Выводит отношения персонажа
+    /// </summary>
     public void WriteRelations()
     {
         foreach (var relation in Relations)
@@ -155,7 +153,7 @@ public class PrCharacter
 
     #endregion
 
-    #region [Construstors] // TODO: DO
+    #region [Construstors]
 
     public PrCharacter()
     {
@@ -174,18 +172,6 @@ public class PrCharacter
         GlobalData.PrCharactersCreated++;
         GlobalData.Characters.Add(this);
     }
-
-/*    public PrCharacter(string name, string surname, int age, bool gender)
-    {
-        this.Name = name;
-        this.Surname = surname;
-        this.Age = age;
-        this.Gender = gender;
-        this.ID = GlobalData.PrCharactersCreated;
-
-        GlobalData.PrCharactersCreated++;
-        GlobalData.Characters.Add(this);
-    }*/
 
     public PrCharacter(string name, string surname = "", int age = 0, bool? gender = null)
     {
@@ -211,38 +197,4 @@ public class PrCharacter
 
     #endregion
 
-    #region [Translate To BaseClass]
-
-/*    public Element Translate(PrCharacter character)
-    {
-        string baseName = character.Name;
-        string description = "";
-
-        if (character.Surname != null) { baseName += " " + character.Surname; }
-
-        if (character.Description != null) { description = character.Description; }
-
-        Dictionary<string, object> baseParams = new Dictionary<string, object>();
-
-        List<string> traits = new List<string>();
-        List<string> phobias = new List<string>();
-
-        foreach (var trait in character.Traits)
-        {
-            traits.Add(trait.Title);
-        }
-
-        foreach (var phobia in character.Phobias)
-        {
-            phobias.Add(phobia.Title);
-        }
-        baseParams.Add("Черты характера", traits);
-        baseParams.Add("Фобии", phobias);
-
-        Element baseCharacter = new Element(ElemType.Character, baseName, description);
-
-        return baseCharacter;
-    }*/
-
-    #endregion
 }

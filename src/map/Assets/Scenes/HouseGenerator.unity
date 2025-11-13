@@ -517,11 +517,11 @@ MonoBehaviour:
   windowPrefab: {fileID: 7251327134584261317, guid: 79ed376eb71296342aa404aa18a9ce99, type: 3}
   doorPrefab: {fileID: 7269610192261184709, guid: 812b97db9fd9a4a40b6fd8d25dab40aa, type: 3}
   floorPrefab: {fileID: 6148488541838128440, guid: e4e9b82ef117c4b45832c3c10ed362b3, type: 3}
-  minMaxSize: {x: 2, y: 100}
+  minMaxSize: {x: 2, y: 10}
   minFloors: 2
   maxFloors: 5
-  TestX: 11
-  TestZ: 11
+  TestX: 4
+  TestZ: 4
 --- !u!1 &1028574897
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,7 +815,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1408421283}
   m_Layer: 0
-  m_Name: BuildingExample (1)
+  m_Name: BuildingExample2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
