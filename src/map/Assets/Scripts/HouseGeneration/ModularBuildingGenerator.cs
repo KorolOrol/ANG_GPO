@@ -165,7 +165,7 @@ public class ModularBuildingGenerator : MonoBehaviour
     /// <summary>
     /// Создание этажа
     /// </summary>
-    /// <param name="floorNumber"></param>
+    /// <param name="floorNumber">Номер этажа</param>
     void CreateFloor(int floorNumber)
     {
         float yPos = floorNumber * wallHeight + 0.2f;
@@ -213,9 +213,9 @@ public class ModularBuildingGenerator : MonoBehaviour
     /// <summary>
     /// Создание стен по всем сторонам света (кольцо)
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="size"></param>
-    /// <param name="floorNumber"></param>
+    /// <param name="position">Позиция здания</param>
+    /// <param name="size">Размер здания</param>
+    /// <param name="floorNumber">Номер этажа</param>
     void CreateWallRing(Vector3 position, Vector3 size, int floorNumber)
     {
         // Рассчитываем позиции для стен
@@ -234,11 +234,11 @@ public class ModularBuildingGenerator : MonoBehaviour
     /// <summary>
     /// Создание стены одной стороны света
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="rotation"></param>
-    /// <param name="length"></param>
-    /// <param name="floorNumber"></param>
-    /// <param name="group"></param>
+    /// <param name="position">Позиция здания</param>
+    /// <param name="rotation">Поворот стены (какая сторона света)</param>
+    /// <param name="length">Длина стены</param>
+    /// <param name="floorNumber">Номер этажа</param>
+    /// <param name="group">Группа стены</param>
     void CreateWallSegment(Vector3 position, float rotation, float length, int floorNumber, Transform group)
     {
         int wallsCount = Mathf.CeilToInt(length);
