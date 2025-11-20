@@ -14,8 +14,8 @@ public class LocationMapGenerator : MonoBehaviour
     {
         Texture2D tex = new Texture2D(width, height);
 
-        float offsetX = Random.Range(0f, 1000f);
-        float offsetY = Random.Range(0f, 1000f);
+        float offsetX = UnityEngine.Random.Range(0f, 1000f);
+        float offsetY = UnityEngine.Random.Range(0f, 1000f);
 
         for (int y = 0; y < height; y++)
         {
