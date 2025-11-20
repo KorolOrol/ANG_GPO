@@ -65,37 +65,37 @@ public class PrGenerator
     /// Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы. Дополнительные черты при необходимости генерятся по логике
     /// </summary>
     /// <param name="traits_count"></param>
-    /// <param name="mama"></param>
-    /// <param name="papa"></param>
+    /// <param name="motherPrCharacter"></param>
+    /// <param name="fatherPrCharacter"></param>
     /// <param name="name"></param>
-    public static void CreateByTwoParentsHalfRandomTraits(PrCharacter character, int traits_count, PrCharacter mama, PrCharacter papa, string name)
+    public static void CreateByTwoParentsHalfRandomTraits(PrCharacter character, int traits_count, PrCharacter motherPrCharacter, PrCharacter fatherPrCharacter, string name)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
         {
             Console.WriteLine("Недостаточно черт в базе данных для CreateByTwoParentsHalfRandom");
         }
-        if (mama.Traits == null || papa.Traits == null)
+        if (motherPrCharacter.Traits == null || fatherPrCharacter.Traits == null)
         {
             Console.WriteLine("У Мамы и/или Папы нет черт");
         }
-        else if (traits_count == (mama.Traits.Count + papa.Traits.Count) / 2)
+        else if (traits_count == (motherPrCharacter.Traits.Count + fatherPrCharacter.Traits.Count) / 2)
         {
-            CreateByTwoParentsHalfTraits(character, mama, papa, name);
+            CreateByTwoParentsHalfTraits(character, motherPrCharacter, fatherPrCharacter, name);
         }
 
-        else if (traits_count > (mama.Traits.Count + papa.Traits.Count) / 2)
+        else if (traits_count > (motherPrCharacter.Traits.Count + fatherPrCharacter.Traits.Count) / 2)
         {
 
             Random rand = new Random();
 
             character.Name = name;
-            character.Surname = papa.Surname;
+            character.Surname = fatherPrCharacter.Surname;
 
             character.Gender = rand.NextDouble() >= 0.5;
 
             List<Trait> combined_traits = new List<Trait> { };
-            combined_traits.AddRange(mama.Traits);
-            combined_traits.AddRange(papa.Traits);
+            combined_traits.AddRange(motherPrCharacter.Traits);
+            combined_traits.AddRange(fatherPrCharacter.Traits);
 
             int cmb_traits_count = (combined_traits.Count) / 2;
 
@@ -128,13 +128,13 @@ public class PrGenerator
             }
         }
 
-        else if (traits_count < (mama.Traits.Count + papa.Traits.Count) / 2)
+        else if (traits_count < (motherPrCharacter.Traits.Count + fatherPrCharacter.Traits.Count) / 2)
         {
             character.Name = name;
 
             List<Trait> combined_traits = new List<Trait> { };
-            combined_traits.AddRange(mama.Traits);
-            combined_traits.AddRange(papa.Traits);
+            combined_traits.AddRange(motherPrCharacter.Traits);
+            combined_traits.AddRange(fatherPrCharacter.Traits);
 
             int cmb_traits_count = (combined_traits.Count) / 2;
 
@@ -158,8 +158,8 @@ public class PrGenerator
             }
         }
 
-        character.MotherID = mama.ID;
-        character.FatherID = papa.ID;
+        character.MotherID = motherPrCharacter.ID;
+        character.FatherID = fatherPrCharacter.ID;
     }
 
     /// <summary>
