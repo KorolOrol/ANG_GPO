@@ -3,7 +3,7 @@
     <ui:ScrollView>
         <ui:TextField label="Type" name="TypeTextField" enabled="true" readonly="true" class="TextField" />
         <ui:TextField label="Name" name="NameTextField" class="TextField" />
-        <ui:TextField label="Description" name="DescriptionTextField" multiline="true" vertical-scroller-visibility="Auto" class="TextField" />
+        <ui:TextField label="Description" name="DescriptionTextField" multiline="true" vertical-scroller-visibility="Auto" class="TextField" style="white-space: normal;" />
         <ui:Foldout text="Params" name="ParamsFoldout" class="Foldout" />
         <ui:TextField label="Time" name="TimeTextField" readonly="true" class="TextField" />
         <ui:Button text="Update" name="UpdateElementButton" class="Button" />

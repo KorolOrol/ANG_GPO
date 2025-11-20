@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BaseClasses.Enum;
 using BaseClasses.Model;
@@ -11,11 +12,13 @@ public class MainWindowScript : MonoBehaviour
     private Dictionary<Button, VisualElement> _actions;
     private VisualElement _currentAction;
     private readonly static Plot Plot = new Plot();
+
+    public event Action UpdateActionEvent;
     
     /// <summary>
     /// Инициализация главного окна и установка обработчиков кнопок.
     /// </summary>
-    void OnEnable()
+    private void OnEnable()
     {
         var uiDocument = GetComponent<UIDocument>();
         _root = uiDocument.rootVisualElement;
@@ -26,7 +29,7 @@ public class MainWindowScript : MonoBehaviour
             { _root.Q<Button>("AIActionButton"), _root.Q<VisualElement>("AIAction") }
         };
 
-        foreach (var pair in _actions)
+        foreach (KeyValuePair<Button, VisualElement> pair in _actions)
         {
             pair.Key.clicked += () => OnActionButtonClicked(pair.Key);
         }
@@ -42,6 +45,9 @@ public class MainWindowScript : MonoBehaviour
         Binder.Bind(Plot.Elements[0], Plot.Elements[4], 50);
         
         ViewActionScript.Initiate(_root, Plot);
+        UpdateActionEvent += ViewActionScript.GetUpdateElementsListAction();
+        AIActionScript.Initiate(_root, Plot);
+        UpdateActionEvent += AIActionScript.GetUpdateExistingElementsListAction();
     }
 
     /// <summary>
@@ -57,5 +63,6 @@ public class MainWindowScript : MonoBehaviour
 
         _currentAction = _actions[button];
         _currentAction.style.display = DisplayStyle.Flex;
+        UpdateActionEvent?.Invoke();
     }
 }

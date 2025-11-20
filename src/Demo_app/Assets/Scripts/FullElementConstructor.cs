@@ -6,7 +6,7 @@ using BaseClasses.Model;
 
 public static class FullElementConstructor
 {
-    public static Element CreateFullElement(ElemType type, string name)
+    public static Element CreateFullElement(ElemType type)
     {
         Dictionary<string, object> @params = new Dictionary<string, object>();
         switch (type)
@@ -45,7 +45,14 @@ public static class FullElementConstructor
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }
-        var element = new Element(type, name, @params:@params);
+        var element = new Element(type, @params:@params);
+        return element;
+    }
+    
+    public static Element CreateFullElement(ElemType type, string name)
+    {
+        var element = CreateFullElement(type);
+        element.Name = name;
         return element;
     }
 }

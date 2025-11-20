@@ -10,10 +10,10 @@
                     <ui:TextField label="Endpoint" name="EndpointTextGeneratorTextField" class="TextField" />
                     <ui:RadioButtonGroup label="API Key" name="ApiKeyTextGeneratorRadioButtonGroup" style="flex-direction: column;">
                         <ui:RadioButton name="PublicApiKeyTextGeneratorRadioButton" class="RadioButton" style="flex-direction: row;">
-                            <ui:TextField label="Public" name="PublicApiKeyTextGeneratorTextField" password="true" class="TextField" style="flex-grow: 1;" />
+                            <ui:TextField label="Public" name="PublicApiKeyTextGeneratorTextField" password="true" enabled="false" class="TextField" style="flex-grow: 1;" />
                         </ui:RadioButton>
                         <ui:RadioButton name="EnvApiKeyTextGeneratorRadioButton" class="RadioButton" style="flex-direction: row;">
-                            <ui:TextField label="Env" name="EnvApiKeyTextGeneratorTextField" class="TextField" style="flex-grow: 1;" />
+                            <ui:TextField label="Env" name="EnvApiKeyTextGeneratorTextField" enabled="false" class="TextField" style="flex-grow: 1;" />
                         </ui:RadioButton>
                     </ui:RadioButtonGroup>
                     <ui:TextField label="Model" name="ModelTextGeneratorTextField" class="TextField" />
@@ -27,10 +27,10 @@
                 <ui:GroupBox name="GenerationSettingsGroupBox" class="GroupBox">
                     <ui:RadioButtonGroup label="Based on" name="BasedOnGenerationRadioButtonGroup" style="flex-direction: column;">
                         <ui:RadioButton name="BasedOnNewElementGenerationRadioButton" class="RadioButton" style="flex-direction: row;">
-                            <ui:DropdownField label="New element" name="NewElementTypeDropdown" class="Dropdown" style="flex-grow: 1;" />
+                            <ui:DropdownField label="New element" name="NewElementTypeDropdown" enabled="false" class="Dropdown" style="flex-grow: 1;" />
                         </ui:RadioButton>
                         <ui:RadioButton name="BasedOnExistingElementGenerationRadioButton" class="RadioButton" style="flex-direction: row;">
-                            <ui:DropdownField label="Dropdown" name="ExistingElementDropdown" class="Dropdown" style="flex-grow: 1;" />
+                            <ui:DropdownField label="Element" name="ExistingElementDropdown" enabled="false" class="Dropdown" style="flex-grow: 1;" />
                         </ui:RadioButton>
                     </ui:RadioButtonGroup>
                 </ui:GroupBox>
