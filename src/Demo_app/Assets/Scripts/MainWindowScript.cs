@@ -6,13 +6,34 @@ using BaseClasses.Services;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// Скрипт главного окна приложения.
+/// </summary>
 public class MainWindowScript : MonoBehaviour
 {
+    /// <summary>
+    /// Корневой элемент UI.
+    /// </summary>
     private VisualElement _root;
+    
+    /// <summary>
+    /// Словарь кнопок действий и соответствующих им визуальных элементов.
+    /// </summary>
     private Dictionary<Button, VisualElement> _actions;
+    
+    /// <summary>
+    /// Текущий отображаемый визуальный элемент действия.
+    /// </summary>
     private VisualElement _currentAction;
+    
+    /// <summary>
+    /// Сюжет приложения.
+    /// </summary>
     private readonly static Plot Plot = new Plot();
 
+    /// <summary>
+    /// Событие обновления элементов действия.
+    /// </summary>
     public event Action UpdateActionEvent;
     
     /// <summary>

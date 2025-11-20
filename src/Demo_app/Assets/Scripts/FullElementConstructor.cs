@@ -4,8 +4,17 @@ using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 
+/// <summary>
+/// Конструктор полных элементов сюжета.
+/// </summary>
 public static class FullElementConstructor
 {
+    /// <summary>
+    /// Создает полный элемент сюжета заданного типа с инициализированными параметрами.
+    /// </summary>
+    /// <param name="type">Тип элемента сюжета.</param>
+    /// <returns>Полный элемент сюжета.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Выбрасывается, если тип элемента не поддерживается.</exception>
     public static Element CreateFullElement(ElemType type)
     {
         Dictionary<string, object> @params = new Dictionary<string, object>();
@@ -49,6 +58,12 @@ public static class FullElementConstructor
         return element;
     }
     
+    /// <summary>
+    /// Создает полный элемент сюжета заданного типа с указанным именем и инициализированными параметрами.
+    /// </summary>
+    /// <param name="type">Тип элемента сюжета.</param>
+    /// <param name="name">Имя элемента сюжета.</param>
+    /// <returns>Полный элемент сюжета.</returns>
     public static Element CreateFullElement(ElemType type, string name)
     {
         var element = CreateFullElement(type);

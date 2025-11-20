@@ -114,6 +114,11 @@ public static class AIActionScript
     /// Кнопка для запуска генерации ИИ.
     /// </summary>
     private static Button _aiGenerateButton;
+
+    /// <summary>
+    /// Метка для отображения состояния генерации.
+    /// </summary>
+    private static Label _generatingLabel;
     
     /// <summary>
     /// Элемент визуального интерфейса для редактирования сгенерированного элемента.
@@ -175,6 +180,7 @@ public static class AIActionScript
             root.Q<RadioButton>("BasedOnExistingElementGenerationRadioButton");
         _existingElementDropdown = root.Q<DropdownField>("ExistingElementDropdown");
         _aiGenerateButton = root.Q<Button>("AIGenerateButton");
+        _generatingLabel = root.Q<Label>("GeneratingLabel");
         _editGeneratedElement = root.Q<VisualElement>("EditGeneratedElement");
 
         _editSelectedElementController = new EditSelectedElementController(_editGeneratedElement, plot);
@@ -225,6 +231,10 @@ public static class AIActionScript
         _aiGenerateButton.clicked += async () => await OnAIGenerateButtonOnClicked();
     }
     
+    /// <summary>
+    /// Получение действия для обновления списка существующих элементов.
+    /// </summary>
+    /// <returns>Действие обновления списка.</returns>
     public static Action GetUpdateExistingElementsListAction()
     {
         return () =>
@@ -377,7 +387,9 @@ public static class AIActionScript
             return;
         }
 
+        _generatingLabel.style.display = DisplayStyle.Flex;
         _generatedElement = (Element)await _aiGenerator.GenerateAsync(_plot, baseElement);
+        _generatingLabel.style.display = DisplayStyle.None;
         _editSelectedElementController.SelectedElement = _generatedElement;
     }
 }

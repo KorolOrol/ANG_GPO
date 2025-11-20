@@ -8,6 +8,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+/// <summary>
+/// Скрипт для управления отображением и редактированием элементов сюжета.
+/// </summary>
 public static class ViewActionScript
 {
     /// <summary>
@@ -109,6 +112,10 @@ public static class ViewActionScript
         _deleteElementButton.clicked += () => ElementsListViewOnRemove(_elementsListView);
     }
     
+    /// <summary>
+    /// Получение действия для обновления списка элементов
+    /// </summary>
+    /// <returns>Действие обновления списка элементов</returns>
     public static Action GetUpdateElementsListAction()
     {
         return ApplyFilters;
@@ -284,6 +291,9 @@ public static class ViewActionScript
         ElementsListViewSelectedIndicesChanged(new[] { newIndex });
     };
     
+    /// <summary>
+    /// Показать или скрыть панель редактирования выбранного элемента
+    /// </summary>
     private readonly static Action ShowEditSelectedElement = () =>
     {
         _editSelectedElement.style.display = _currentElement == null ? DisplayStyle.None : DisplayStyle.Flex;
