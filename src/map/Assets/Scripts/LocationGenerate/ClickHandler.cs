@@ -7,5 +7,6 @@ public class LocationClickHandler : MonoBehaviour
     private void OnMouseDown()
     {
         mapManager.OpenLocation(location);
+        Debug.Log("PuPuPu");
     }
 }

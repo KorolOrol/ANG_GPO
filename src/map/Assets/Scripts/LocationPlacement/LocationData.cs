@@ -2,27 +2,32 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Р”Р°РЅРЅС‹Рµ Р»РѕРєР°С†РёРё РґР»СЏ РіРµРЅРµСЂР°С†РёРё РєР°СЂС‚С‹ РјРёСЂР°
+/// </summary>
 [Serializable]
 public class LocationData
 {
-    public string Id;            // например "forest1"
-    public string Biome;         // например "Forest"
+    public string Id;            // "forest1"
+    public string Biome;         // "Forest"
 
     [Header("Roads from this location")]
     public List<RoadConnection> Roads = new List<RoadConnection>();
 
-    // Эти поля нужны внутренне, их не показываем в инспекторе
     [NonSerialized] public Dictionary<LocationData, float> DesiredRoads = new();
     [NonSerialized] public List<ChunkManager.Chunk> CandidateChunks = new();
     [NonSerialized] public ChunkManager.Chunk AssignedChunk;
 }
 
+/// <summary>
+/// РћРїРёСЃР°РЅРёРµ РґРѕСЂРѕР¶РЅРѕРіРѕ СЃРѕРµРґРёРЅРµРЅРёСЏ РјРµР¶РґСѓ РґРІСѓРјСЏ Р»РѕРєР°С†РёСЏРјРё
+/// </summary>
 [Serializable]
 public class RoadConnection
 {
-    [Tooltip("Target location – выберите из списка выше")]
+    [Tooltip("Target location вЂ“ РІС‹Р±РµСЂРёС‚Рµ РёР· СЃРїРёСЃРєР° РЅРёР¶Рµ")]
     public LocationData target;
 
-    [Tooltip("Желаемая длина дороги в единицах карты")]
+    [Tooltip("Р–РµР»Р°РµРјР°СЏ РґР»РёРЅР° РґРѕСЂРѕРіРё РІ РµРґРёРЅРёС†Р°С… РєР°СЂС‚С‹")]
     public float distance;
 }

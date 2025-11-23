@@ -5,14 +5,20 @@ public class ChunkManager
 {
     public class Chunk
     {
-        public Vector2Int start, end;      // диапазон пикселей на карте
-        public Vector2 center;         // центр чанка (в координатах массива)
-        public string biome;          // доминирующий биом
+        public Vector2Int start, end;
+        public Vector2 center;
+        public string biome;
     }
 
     private int mapW, mapH, chunkSize;
     private List<Chunk> allChunks = new List<Chunk>();
 
+    /// <summary>
+    /// Инициализирует менеджер чанков с заданными размерами карты и чанков
+    /// </summary>
+    /// <param name="mapWidth">Ширина карты в тайлах</param>
+    /// <param name="mapHeight">Высота карты в тайлах</param>
+    /// <param name="chunkSize">Размер чанка в тайлах</param>
     public ChunkManager(int mapWidth, int mapHeight, int chunkSize)
     {
         this.mapW = mapWidth;
@@ -21,6 +27,9 @@ public class ChunkManager
         GenerateChunks();
     }
 
+    /// <summary>
+    /// Разделяет карту на чанки заданного размера
+    /// </summary>
     private void GenerateChunks()
     {
         int cols = Mathf.CeilToInt((float)mapW / chunkSize);
@@ -41,7 +50,11 @@ public class ChunkManager
             }
     }
 
-    // Строит словарь: biomestring → список чанков этого биома
+    /// <summary>
+    /// Строит словарь: biomestring → список чанков этого биома
+    /// </summary>
+    /// <param name="biomeMap">Двумерный массив с информацией о биомах для каждого тайла</param>
+    /// <returns>Словарь, группирующий чанки по типам биомов</returns>
     public Dictionary<string, List<Chunk>> GetChunksByBiome(string[,] biomeMap)
     {
         var dict = new Dictionary<string, List<Chunk>>();

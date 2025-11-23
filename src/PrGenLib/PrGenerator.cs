@@ -4,14 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Генератор персонажей с различными стратегиями создания черт и фобий
+/// </summary>
 public class PrGenerator
 {
-    #region [Create PrCharacter Traits from Zero]  // TODO: Add more ways to generation
+    #region [Create PrCharacter Traits from Zero]
 
     /// <summary>
-    /// Генерация черт персонажа через обычный рандом
+    /// Генерирует черты персонажа через полный случайный выбор без проверки совместимости
     /// </summary>
-    /// <param name="traits_count"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="traits_count">Количество черт для генерации</param>
     public static void CreateByChaoticRandomTraits(PrCharacter character, int traits_count)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
@@ -30,9 +34,10 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Генерация черт персонажа с помощью логики. Все черты совместимы друг с другом
+    /// Генерирует черты персонажа с проверкой совместимости между чертами
     /// </summary>
-    /// <param name="traits_count"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="traits_count">Количество черт для генерации</param>
     public static void CreateByLogicRandomTraits(PrCharacter character, int traits_count)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
@@ -62,12 +67,13 @@ public class PrGenerator
     #region [Create PrCharacter Traits from Parents]
 
     /// <summary>
-    /// Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы. Дополнительные черты при необходимости генерятся по логике
+    /// Генерирует черты персонажа от двух родителей с наследованием половины черт и дополнением при необходимости
     /// </summary>
-    /// <param name="traits_count"></param>
-    /// <param name="motherPrCharacter"></param>
-    /// <param name="fatherPrCharacter"></param>
-    /// <param name="name"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="traits_count">Общее количество черт для генерации</param>
+    /// <param name="motherPrCharacter">Персонаж-мать для наследования черт</param>
+    /// <param name="fatherPrCharacter">Персонаж-отец для наследования черт</param>
+    /// <param name="name">Имя создаваемого персонажа</param>
     public static void CreateByTwoParentsHalfRandomTraits(PrCharacter character, int traits_count, PrCharacter motherPrCharacter, PrCharacter fatherPrCharacter, string name)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
@@ -163,11 +169,12 @@ public class PrGenerator
     }
 
     /// <summary>
-    ///  Генерация черт персонажа с помощью двух родителей. Берётся половина рандомных черт от мамы и папы
+    /// Генерирует черты персонажа строго как половину черт от двух родителей
     /// </summary>
-    /// <param name="mama"></param>
-    /// <param name="papa"></param>
-    /// <param name="name"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="mama">Персонаж-мать для наследования черт</param>
+    /// <param name="papa">Персонаж-отец для наследования черт</param>
+    /// <param name="name">Имя создаваемого персонажа</param>
     public static void CreateByTwoParentsHalfTraits(PrCharacter character, PrCharacter mama, PrCharacter papa, string name)
     {
         if (mama.Traits == null || papa.Traits == null)
@@ -209,13 +216,14 @@ public class PrGenerator
     }
 
     /// <summary>
-    ///  Генерация черт персонажа с помощью двух родителей. Берутся черты с большой склонностью. Дополнительные черты при необходимости генерятся по логике
+    /// Генерирует черты персонажа от родителей с приоритетом черт с высокой склонностью и дополнением при необходимости
     /// </summary>
-    /// <param name="traits_count"></param>
-    /// <param name="mama"></param>
-    /// <param name="papa"></param>
-    /// <param name="name"></param>
-    public static void CreateByTwoParentsLogicRandomTraits(PrCharacter character, int traits_count, PrCharacter mama, PrCharacter papa, string name) // Разветвление добавить (конструктор)
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="traits_count">Общее количество черт для генерации</param>
+    /// <param name="mama">Персонаж-мать для наследования черт</param>
+    /// <param name="papa">Персонаж-отец для наследования черт</param>
+    /// <param name="name">Имя создаваемого персонажа</param>
+    public static void CreateByTwoParentsLogicRandomTraits(PrCharacter character, int traits_count, PrCharacter mama, PrCharacter papa, string name)
     {
         character.Name = name;
 
@@ -264,11 +272,12 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Генерация черт персонажа с помощью двух родителей. Берутся черты с большой склонностью
+    /// Генерирует черты персонажа строго от родителей с приоритетом черт с высокой склонностью
     /// </summary>
-    /// <param name="mama"></param>
-    /// <param name="papa"></param>
-    /// <param name="name"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="mama">Персонаж-мать для наследования черт</param>
+    /// <param name="papa">Персонаж-отец для наследования черт</param>
+    /// <param name="name">Имя создаваемого персонажа</param>
     public static void CreateByTwoParentsLogicTraits(PrCharacter character, PrCharacter mama, PrCharacter papa, string name)
     {
         if (mama.Traits == null || papa.Traits == null)
@@ -313,10 +322,11 @@ public class PrGenerator
     #region [Create PrCharacter Traits from Input traits]
 
     /// <summary>
-    /// Генерация черт персонажа с помощью одной введённой черты. Использует логику
+    /// Генерирует черты персонажа на основе одной начальной черты с последующим логическим дополнением
     /// </summary>
-    /// <param name="trait_name"></param>
-    /// <param name="traits_count"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="trait_name">Название начальной черты</param>
+    /// <param name="traits_count">Общее количество черт для генерации</param>
     public static void CreateByInputTrait(PrCharacter character, string trait_name, int traits_count)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
@@ -349,10 +359,11 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Генерация черт персонажа с помощью введённого списка черт. Использует логику
+    /// Генерирует черты персонажа на основе списка начальных черт с последующим логическим дополнением
     /// </summary>
-    /// <param name="traits_names"></param>
-    /// <param name="traits_count"></param>
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="traits_names">Список названий начальных черт</param>
+    /// <param name="traits_count">Общее количество черт для генерации</param>
     public static void CreateByInputTraits(PrCharacter character, List<string> traits_names, int traits_count)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
@@ -387,15 +398,15 @@ public class PrGenerator
         }
     }
 
-
     #endregion
 
     #region [Create PrCharacter Phobias from Zero]
 
     /// <summary>
-    /// Генерация фобий персонажа через обычный рандом
+    /// Генерирует фобии персонажа через полный случайный выбор
     /// </summary>
-    /// <param name="phobias_count"></param>
+    /// <param name="character">Целевой персонаж для добавления фобий</param>
+    /// <param name="phobias_count">Количество фобий для генерации</param>
     public static void CreateByChaoticRandomPhobias(PrCharacter character, int phobias_count)
     {
         if (GlobalData._MaxPossiblePhobias < phobias_count)
@@ -418,11 +429,13 @@ public class PrGenerator
     #region [Deprecated methods]
 
     /// <summary>
-    /// Проверяет черту по всем якорям.
+    /// Проверяет совместимость черты по указанному якорю со всеми текущими чертами персонажа
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="anchor"></param>
-    /// <returns></returns>
+    /// <param name="character">Персонаж для проверки совместимости</param>
+    /// <param name="id">Идентификатор проверяемой черты</param>
+    /// <param name="anchor">Значение якоря для проверки</param>
+    /// <returns>True если черта совместима по якорю</returns>
+    [Obsolete("Метод устарел, используйте CheckTabl")]
     public static bool CheckTablAnchor(PrCharacter character, int id, int anchor)
     {
         foreach (Trait a in character.Traits)
@@ -430,24 +443,21 @@ public class PrGenerator
 
             if (GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), id] == 0 || GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), id] != anchor)
             {
-                /*Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
                 return false;
             }
-
-            /*Console.WriteLine("Черта {0} совместима с чертой {1}", a.title, GlobalData.traits_list[id].title);*/
         }
 
-        /*Console.WriteLine("");*/
         return true;
     }
 
     /// <summary>
-    /// Проверяет возможность создания персонажа с введённым якорем.
+    /// Проверяет возможность создания персонажа с указанным якорем и количеством черт
     /// </summary>
-    /// <param name="anchor"></param>
-    /// <param name="traits_count"></param>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="anchor">Значение якоря для проверки</param>
+    /// <param name="traits_count">Требуемое количество черт</param>
+    /// <param name="id">Идентификатор черты для проверки</param>
+    /// <returns>True если создание возможно</returns>
+    [Obsolete("Метод устарел")]
     public static bool CheckAnchorPossibility(int anchor, int traits_count, int id)
     {
         int cnt = 0;
@@ -470,13 +480,13 @@ public class PrGenerator
         return true;
     }
 
-
     /// <summary>
-    /// Создание персонажа через "якорь". Якорь - число от 0 до 3. Чем якорь больше, тем персонаж будет интереснее (сомнительнее)
+    /// Создает персонажа через систему якорей (устаревший метод)
     /// </summary>
-    /// <param name="traits_count"></param>
-    /// <param name="anchor"></param>
-    [Obsolete("CreateByAnchorLogic is deprecated, please use CreateByAnchorLogic instead."/*, true*/)]
+    /// <param name="character">Целевой персонаж для добавления черт</param>
+    /// <param name="traits_count">Количество черт для генерации</param>
+    /// <param name="anchor">Значение якоря для фильтрации черт</param>
+    [Obsolete("CreateByAnchorLogic is deprecated, please use CreateByLogicRandomTraits instead.")]
     public static void CreateByAnchorLogic(PrCharacter character, int traits_count, int anchor)
     {
         if (GlobalData._MaxPossibleTraits < traits_count)
@@ -506,10 +516,10 @@ public class PrGenerator
     #region [Additional methods]
 
     /// <summary>
-    /// Сортирует лист черт от наибольшей склонности к наименьшей
+    /// Сортирует список черт по убыванию значения склонности (Affection)
     /// </summary>
-    /// <param name="traits"></param>
-    /// <returns></returns>
+    /// <param name="traits">Список черт для сортировки</param>
+    /// <returns>Отсортированный список черт</returns>
     private static List<Trait> SortListByAff(List<Trait> traits)
     {
 
@@ -538,21 +548,19 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Проверяет, можно ли добавить черту по её айди в лист черт (совместимость)
+    /// Проверяет совместимость черты со всеми текущими чертами персонажа
     /// </summary>
-    /// <param name="i"></param>
-    /// <returns></returns>
+    /// <param name="character">Персонаж для проверки совместимости</param>
+    /// <param name="i">Идентификатор проверяемой черты</param>
+    /// <returns>True если черта совместима со всеми текущими чертами</returns>
     private static bool CheckTabl(PrCharacter character, int i)
     {
         foreach (Trait a in character.Traits)
         {
             if (GlobalData.tabl[GlobalData.TraitsList.IndexOf(a), i] == 0)
             {
-                // Console.WriteLine("Черта {0} НЕ совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
                 return false;
             }
-
-            // Console.WriteLine("Черта {0} совместима с чертой {1}", a.Title, GlobalData.TraitsList[i].Title);
         }
 
         Console.WriteLine("");
@@ -560,10 +568,10 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Проверяет имя черты в листе черт. Возвращает черту с совпадением имени
+    /// Находит черту по названию в глобальном списке черт
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
+    /// <param name="name">Название искомой черты</param>
+    /// <returns>Найденная черта или null если не найдена</returns>
     private static Trait CheckTraitInList(string name)
     {
         foreach (Trait a in GlobalData.TraitsList)
@@ -577,8 +585,9 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Создаёт описание персонажа по его чертам и фобиям
+    /// Создает описание персонажа на основе его черт и фобий
     /// </summary>
+    /// <param name="character">Персонаж для создания описания</param>
     public static void CreateDesc(PrCharacter character)
     {
         foreach (var trait in character.Traits)
@@ -606,9 +615,10 @@ public class PrGenerator
     }
 
     /// <summary>
-    /// Добавляет в словарь отношений значение, зависящее от черт оппонента
+    /// Рассчитывает отношение персонажа к оппоненту на основе их черт
     /// </summary>
-    /// <param name="a"></param>
+    /// <param name="character">Основной персонаж</param>
+    /// <param name="opponent">Персонаж-оппонент для расчета отношений</param>
     public static void GetRelations(PrCharacter character, PrCharacter opponent)
     {
         if (opponent == null)
@@ -642,6 +652,11 @@ public class PrGenerator
 
     #region [Translate To BaseClass]
 
+    /// <summary>
+    /// Преобразует PrCharacter в базовый класс Element для системы хранения
+    /// </summary>
+    /// <param name="character">Исходный персонаж для преобразования</param>
+    /// <returns>Элемент базового класса с данными персонажа</returns>
     public static Element Translate(PrCharacter character)
     {
         string baseName = "";

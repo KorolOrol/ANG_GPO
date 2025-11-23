@@ -2,10 +2,19 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Оптимизатор размещения локаций на карте мира
+/// </summary>
 public static class PlacementOptimizer
 {
-    // locations � ������ LocationData
-    // biomeMap � ������ ��� �� ��������, �� �� ���������� �������
+    /// <summary>
+    /// Оптимизирует размещение локаций на карте с учетом биомов и дорожных соединений
+    /// </summary>
+    /// <param name="locations">Список локаций для размещения</param>
+    /// <param name="biomeMap">Карта биомов игрового мира</param>
+    /// <param name="chunkSize">Размер чанка для разбиения карты</param>
+    /// <param name="iterations">Количество итераций оптимизации</param>
+    /// <returns>Список локаций с назначенными позициями на карте</returns>
     public static List<LocationData> Optimize(
         List<LocationData> locations,
         string[,] biomeMap,
@@ -15,7 +24,7 @@ public static class PlacementOptimizer
         int w = biomeMap.GetLength(0), h = biomeMap.GetLength(1);
         var cm = new ChunkManager(w, h, chunkSize);
         var chunksByBiome = cm.GetChunksByBiome(biomeMap);
-        // 0) ��������� DesiredRoads �� �������������� ������ Roads
+
         foreach (var loc in locations)
         {
             loc.DesiredRoads.Clear();
@@ -26,13 +35,12 @@ public static class PlacementOptimizer
             }
         }
 
-        // 1. ������ ����������
         foreach (var loc in locations)
             if (chunksByBiome.ContainsKey(loc.Biome))
                 loc.CandidateChunks = new List<ChunkManager.Chunk>(chunksByBiome[loc.Biome]);
 
         var rnd = new System.Random();
-        // 2. ��������� �������������
+
         foreach (var loc in locations)
         {
             var c = loc.CandidateChunks;
@@ -40,7 +48,7 @@ public static class PlacementOptimizer
         }
 
         float bestE = ComputeTotalEnergy(locations);
-        // 3. Hill-climbing / annealing
+
         for (int it = 0; it < iterations; it++)
         {
             int i = rnd.Next(locations.Count);
@@ -57,6 +65,11 @@ public static class PlacementOptimizer
         return locations;
     }
 
+    /// <summary>
+    /// Вычисляет общую энергию системы (суммарное отклонение длин дорог от желаемых)
+    /// </summary>
+    /// <param name="locs">Список всех размещаемых локаций</param>
+    /// <returns>Общее значение энергии системы</returns>
     private static float ComputeTotalEnergy(List<LocationData> locs)
     {
         float E = 0;
@@ -70,6 +83,12 @@ public static class PlacementOptimizer
         return E;
     }
 
+    /// <summary>
+    /// Вычисляет локальную энергию для конкретной локации
+    /// </summary>
+    /// <param name="loc">Локация для расчета энергии</param>
+    /// <param name="all">Все локации системы</param>
+    /// <returns>Значение локальной энергии для указанной локации</returns>
     private static float ComputeLocalEnergy(LocationData loc, List<LocationData> all)
     {
         float E = 0;
@@ -79,7 +98,6 @@ public static class PlacementOptimizer
             float d = Vector2.Distance(loc.AssignedChunk.center, other.AssignedChunk.center);
             E += Mathf.Abs(d - target);
         }
-        // ���� ����, ��� loc � � ��������� DesiredRoads
         foreach (var other in all)
             if (other.DesiredRoads.ContainsKey(loc))
             {

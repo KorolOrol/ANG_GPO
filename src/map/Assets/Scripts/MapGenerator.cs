@@ -32,7 +32,9 @@ public class MapGenerator : MonoBehaviour
     public float objectSpawnChance;
     public float minDistanceBetweenObjects = 5f;
 
-    // Новое свойство: если true – смещение для биомного шума будет случайным, что даёт разные биомы при каждом запуске.
+    /// <summary>
+    /// Если включено - смещение для биомного шума будет случайным при каждом запуске
+    /// </summary>
     public bool randomizeBiomeNoise = true;
 
     private List<Vector2> objectPositions = new List<Vector2>();
@@ -40,24 +42,24 @@ public class MapGenerator : MonoBehaviour
     public GameObject objectPrefab;
 
     private Color[] colourMap;
-    private const float maxRoadDistance = 50f; // Максимальное расстояние для создания дороги
+    private const float maxRoadDistance = 50f;
 
+    /// <summary>
+    /// Генерирует карту с объектами, дорогами и биомами
+    /// </summary>
     public void GenerateMap()
     {
         DeletePreviousObjects();
 
-        // Генерация основного шума высот
         noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
         Debug.Log($"NoiseMap generated. Size: {noiseMap.GetLength(0)}x{noiseMap.GetLength(1)}");
 
-        // Генерация дополнительного шума для биомов через компонент BiomeGenerator
         BiomeGenerator biomeGen = FindObjectOfType<BiomeGenerator>();
         if (biomeGen == null)
         {
             Debug.LogError("BiomeGenerator не найден в сцене!");
             return;
         }
-        // Если включена случайность, обновляем смещение для биомного шума
         if (randomizeBiomeNoise)
         {
             biomeGen.offset = new Vector2(Random.Range(-10000f, 10000f), Random.Range(-10000f, 10000f));
@@ -71,7 +73,6 @@ public class MapGenerator : MonoBehaviour
             {
                 float currentHeight = noiseMap[x, y];
                 float currentBiomeNoise = biomeNoiseMap[x, y];
-                // Вычисляем биом с учётом высоты и дополнительного шума
                 string biome = GetBiome(currentHeight, currentBiomeNoise);
 
                 if (currentHeight >= objectHeightThresholdMin && currentHeight <= objectHeightThresholdMax && Random.value < objectSpawnChance)
@@ -80,22 +81,17 @@ public class MapGenerator : MonoBehaviour
 
                     if (IsFarEnoughFromOtherObjects(newObjectPosition))
                     {
-                        // Передаём вычисленный биом в метод создания объекта
                         CreateObject(newObjectPosition, currentHeight, biome);
                         colourMap[y * mapWidth + x] = Color.black;
                         objectPositions.Add(newObjectPosition);
-
-                        /* Debug.Log($"Object created at position: {newObjectPosition}"); */
                     }
                     else
                     {
-                        // Вместо старой ApplyRegionColour используем новый метод для цвета по биому
                         colourMap[y * mapWidth + x] = GetColorForBiome(biome);
                     }
                 }
                 else
                 {
-                    // Применяем цвет с учётом вычисленного биома
                     colourMap[y * mapWidth + x] = GetColorForBiome(biome);
                 }
             }
@@ -118,12 +114,16 @@ public class MapGenerator : MonoBehaviour
         objectPositions.Clear();
     }
 
-    // Новый метод для определения биома по высоте и дополнительному шуму
+    /// <summary>
+    /// Определяет тип биома на основе высоты и дополнительного шума
+    /// </summary>
+    /// <param name="height">Высота точки на карте</param>
+    /// <param name="biomeNoise">Дополнительный шум для вариативности биомов</param>
+    /// <returns>Название биома для указанной точки</returns>
     private string GetBiome(float height, float biomeNoise)
     {
         if (height <= 0.4f)
         {
-            // Для низких высот можно варьировать тип воды или болота
             return (biomeNoise < 0.5f) ? "Water" : "Deep Water";
         }
         else if (height <= 0.44f)
@@ -132,12 +132,10 @@ public class MapGenerator : MonoBehaviour
         }
         else if (height <= 0.6f)
         {
-            // Используем биомный шум для выбора между лугом и лесом
             return (biomeNoise < 0.5f) ? "Grassland" : "Forest";
         }
         else if (height <= 0.69f)
         {
-            // Дополнительное разделение для леса или, например, джунглей
             return (biomeNoise < 0.5f) ? "Forest" : "Jungle";
         }
         else if (height <= 0.8f)
@@ -158,7 +156,11 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    // Новый метод для получения цвета для вычисленного биома
+    /// <summary>
+    /// Возвращает цвет для отображения указанного биома на карте
+    /// </summary>
+    /// <param name="biome">Название биома</param>
+    /// <returns>Цвет для визуализации биома</returns>
     private Color GetColorForBiome(string biome)
     {
         switch (biome)
@@ -177,6 +179,9 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Рисует дороги между ближайшими объектами на карте
+    /// </summary>
     private void DrawRoadBetweenClosestObjects()
     {
         if (objectPositions.Count < 2) return;
@@ -209,7 +214,6 @@ public class MapGenerator : MonoBehaviour
 
                 if (!connectedPairs.Contains(pair) && !connectedPairs.Contains(reversePair))
                 {
-                    /* Debug.Log($"Drawing road between {objectPositions[i]} and {closestObject}, Distance: {closestDistance}"); */
                     DrawRoad(objectPositions[i], closestObject);
                     connectedPairs.Add(pair);
                 }
@@ -217,6 +221,11 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Рисует дорогу между двумя точками на карте
+    /// </summary>
+    /// <param name="start">Начальная точка дороги</param>
+    /// <param name="end">Конечная точка дороги</param>
     private void DrawRoad(Vector2 start, Vector2 end)
     {
         List<Vector2> path = FindPath(start, end);
@@ -236,6 +245,12 @@ public class MapGenerator : MonoBehaviour
         display.DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
     }
 
+    /// <summary>
+    /// Находит путь между двумя точками с использованием алгоритма A*
+    /// </summary>
+    /// <param name="start">Начальная точка пути</param>
+    /// <param name="end">Конечная точка пути</param>
+    /// <returns>Список точек, составляющих найденный путь</returns>
     private List<Vector2> FindPath(Vector2 start, Vector2 end)
     {
         List<Vector2> openSet = new List<Vector2> { start };
@@ -296,6 +311,11 @@ public class MapGenerator : MonoBehaviour
         return new List<Vector2>();
     }
 
+    /// <summary>
+    /// Возвращает список соседних клеток для указанной позиции
+    /// </summary>
+    /// <param name="cell">Позиция для поиска соседей</param>
+    /// <returns>Список доступных соседних позиций</returns>
     private List<Vector2> GetNeighbors(Vector2 cell)
     {
         List<Vector2> neighbors = new List<Vector2>();
@@ -330,6 +350,11 @@ public class MapGenerator : MonoBehaviour
         return neighbors;
     }
 
+    /// <summary>
+    /// Вычисляет стоимость перемещения по указанной позиции на основе рельефа
+    /// </summary>
+    /// <param name="position">Позиция для оценки стоимости</param>
+    /// <returns>Коэффициент стоимости перемещения</returns>
     private float GetTerrainCost(Vector2 position)
     {
         float height = noiseMap[Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)];
@@ -342,24 +367,27 @@ public class MapGenerator : MonoBehaviour
             return 1f;
     }
 
-    // Обновленный метод CreateObject – теперь принимает вычисленный биом
+    /// <summary>
+    /// Создает объект на карте в указанной позиции с учетом биома
+    /// </summary>
+    /// <param name="position">Позиция для создания объекта</param>
+    /// <param name="height">Высота точки размещения</param>
+    /// <param name="biome">Тип биома в точке размещения</param>
     private void CreateObject(Vector2 position, float height, string biome)
     {
         string objectName;
 
-        // Если биом горный, создаём пещеры или интересные места
         if (biome == "MountainBase" || biome == "MountainMid" || biome == "MountainHigh" || biome == "MountainPeak")
         {
             objectName = (Random.value < 0.5f) ? "Cave" : "Interest Place";
         }
         else
         {
-            // Для остальных биомов создаём города или точки интереса
             switch (biome)
             {
                 case "Water":
                 case "Deep Water":
-                    return; // Не создаём объекты на воде
+                    return;
                 case "Sand":
                     objectName = "Port";
                     break;
@@ -371,7 +399,7 @@ public class MapGenerator : MonoBehaviour
                     objectName = "Forest City";
                     break;
                 default:
-                    return; // На неизвестных биомах объекты не создаются
+                    return;
             }
         }
 
@@ -398,6 +426,9 @@ public class MapGenerator : MonoBehaviour
         CreateNameLabel(obj, objectName);
     }
 
+    /// <summary>
+    /// Удаляет все ранее сгенерированные объекты сцены
+    /// </summary>
     private void DeletePreviousObjects()
     {
         GameObject[] previousObjects = GameObject.FindGameObjectsWithTag("GeneratedObject");
@@ -417,31 +448,36 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Создает текстовую метку с именем для игрового объекта
+    /// </summary>
+    /// <param name="parentObject">Родительский объект для метки</param>
+    /// <param name="objectName">Текст для отображения в метке</param>
     private void CreateNameLabel(GameObject parentObject, string objectName)
     {
         GameObject textObject = new GameObject("NameLabel");
         textObject.transform.SetParent(parentObject.transform);
 
         TextMeshPro textMesh = textObject.AddComponent<TextMeshPro>();
-        textMesh.text = objectName; // Устанавливаем имя объекта
-        textMesh.fontSize = 500; // Размер текста
+        textMesh.text = objectName;
+        textMesh.fontSize = 500;
         textMesh.color = Color.black;
-        textMesh.alignment = TextAlignmentOptions.Center; // Центрируем текст
+        textMesh.alignment = TextAlignmentOptions.Center;
         textMesh.horizontalMapping = TextureMappingOptions.Line;
         textMesh.verticalMapping = TextureMappingOptions.MatchAspect;
 
-        // Устанавливаем жирный шрифт
         textMesh.fontStyle = FontStyles.Bold;
 
-        // Позиционируем текст над объектом
-        textObject.transform.localPosition = new Vector3(-2f, 0, 2f); // Над объектом на высоте 2
-        textObject.transform.localRotation = Quaternion.Euler(180, 0, 90); // Поворот текста на 90 градусов по X
+        textObject.transform.localPosition = new Vector3(-2f, 0, 2f);
+        textObject.transform.localRotation = Quaternion.Euler(180, 0, 90);
 
-        // Устанавливаем размер текстового поля, чтобы оно было достаточно широким
         RectTransform rectTransform = textObject.GetComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(500, 20); // Увеличиваем ширину текста
+        rectTransform.sizeDelta = new Vector2(500, 20);
     }
 
+    /// <summary>
+    /// Проверяет корректность параметров в редакторе Unity
+    /// </summary>
     private void OnValidate()
     {
         if (Application.isPlaying)
@@ -456,6 +492,11 @@ public class MapGenerator : MonoBehaviour
         octaves = Mathf.Max(1, octaves);
     }
 
+    /// <summary>
+    /// Проверяет достаточность расстояния от новой позиции до существующих объектов
+    /// </summary>
+    /// <param name="newPosition">Новая позиция для проверки</param>
+    /// <returns>True если позиция достаточно удалена от других объектов</returns>
     private bool IsFarEnoughFromOtherObjects(Vector2 newPosition)
     {
         foreach (Vector2 pos in objectPositions)
@@ -467,19 +508,22 @@ public class MapGenerator : MonoBehaviour
         }
         return true;
     }
+
+    /// <summary>
+    /// Очищает карту, удаляя все сгенерированные объекты
+    /// </summary>
     public void ClearMap()
     {
-        // Удаляем все объекты с тегом "GeneratedObject"
         foreach (var obj in GameObject.FindGameObjectsWithTag("GeneratedObject"))
         {
             DestroyImmediate(obj);
         }
     }
-
-
-    // Старая версия GetBiome удалена – используется новая версия с двумя параметрами
 }
 
+/// <summary>
+/// Описание типа террейна для генерации карты
+/// </summary>
 [System.Serializable]
 public struct TerrainType
 {
