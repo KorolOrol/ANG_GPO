@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro; // Обязательно для TextMeshPro
+using TMPro; // РћР±СЏР·Р°С‚РµР»СЊРЅРѕ РґР»СЏ TextMeshPro
 
 
-// Данный скрипт нужен для появления инфы о локации при клике на неё
+// Р”Р°РЅРЅС‹Р№ СЃРєСЂРёРїС‚ РЅСѓР¶РµРЅ РґР»СЏ РїРѕСЏРІР»РµРЅРёСЏ РёРЅС„С‹ Рѕ Р»РѕРєР°С†РёРё РїСЂРё РєР»РёРєРµ РЅР° РЅРµС‘
 
 public class ObjectNameDisplay : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class ObjectNameDisplay : MonoBehaviour
 
     private void OnMouseDown()
     {
-        // Лог для проверки клика
+        // Р›РѕРі РґР»СЏ РїСЂРѕРІРµСЂРєРё РєР»РёРєР°
         Debug.Log($"Clicked on {gameObject.name} at position {transform.position}");
 
         if (currentNameDisplay != null)
@@ -28,7 +28,7 @@ public class ObjectNameDisplay : MonoBehaviour
 
         if (textComponent != null)
         {
-            textComponent.text = "Город"; // Задаем имя
+            textComponent.text = "Р“РѕСЂРѕРґ"; // Р—Р°РґР°РµРј РёРјСЏ
             Debug.Log("Text component found and name set.");
         }
         else
@@ -36,7 +36,7 @@ public class ObjectNameDisplay : MonoBehaviour
             Debug.LogWarning("Text component not found in prefab!");
         }
 
-        // Позиционирование текста
+        // РџРѕР·РёС†РёРѕРЅРёСЂРѕРІР°РЅРёРµ С‚РµРєСЃС‚Р°
         RectTransform rectTransform = currentNameDisplay.GetComponent<RectTransform>();
         if (rectTransform != null)
         {
