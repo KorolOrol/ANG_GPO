@@ -35,6 +35,6 @@ public class LocationMapGenerator : MonoBehaviour
 
     public void LoadLocationMap(Location location)
     {
-        throw new NotImplementedException("Method is not realized");
+        throw new NotImplementedException("Method is not implemented");
     }
 }
