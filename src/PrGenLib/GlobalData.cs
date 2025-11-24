@@ -2,11 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// Глобальные данные для системы генерации персонажей
+/// </summary>
 public class GlobalData
 {
     public const int _MaxPossibleTraits = 10;
     public const int _MaxPossiblePhobias = 3;
 
+    /// <summary>
+    /// Таблица совместимости черт характеров (0 - несовместимы, 1-3 уровни совместимости)
+    /// </summary>
     public static int[,] tabl = new int[,]
     {
         {0, 0, 3, 2, 3, 2, 2, 2, 3, 1, 2, 1, 1, 3, 2, 2, 0, 3, 3, 1, 2, 3, 1, 1, 1, 3, 3, 2, 1, 2, 1, 2, 0, 3, 1, 1, 3, 3, 1, 1, 2},
@@ -52,6 +58,9 @@ public class GlobalData
         {2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 2, 1, 3, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1, 3, 2, 1, 2, 2, 3, 2, 1, 3, 3, 1, 0, 0},
     };
 
+    /// <summary>
+    /// Таблица отношений между чертами харакетра персонажей (1 - положительное, 0 - нейтральное, -1 - отрицательное)
+    /// </summary>
     public static int[,] relations_tabl = new int[,]
     {
         {1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   0,  -1,   1,  -1,   0,  -1,   1,  -1,   1,  -1,   1,  -1,  -1,  -1,  -1,  -1,  -1,  -1,   0,  -1,   0,   1,  -1},
@@ -97,6 +106,9 @@ public class GlobalData
         {1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   1,  -1,   0,  -1,   1,  -1,   0,  -1,   1,  -1,   1,  -1,   1,  -1,  -1,  -1,   0,  -1,  -1,  -1,   0,  -1,   0,  -1,   1},
     };
 
+    /// <summary>
+    /// Список всех доступных черт характера с описаниями
+    /// </summary>
     public static List<Trait> TraitsList = new List<Trait>()
     {
         new Trait("Амбициозный", new List<string> // Ambitious
@@ -402,6 +414,9 @@ public class GlobalData
         }),
     };
 
+    /// <summary>
+    /// Список всех доступных фобий с описаниями
+    /// </summary>
     public static List<Trait> PhobiasList = new List<Trait>
     {
         new Trait("Аквафобия", "Боится водных пространств и глубины."), // Aquaphobia
@@ -427,6 +442,11 @@ public class GlobalData
         new Trait("Трипофобия", "Боится скопления отверстий."), // Trypophobia
     };
 
+    /// <summary>
+    /// Определяет родственную связь между двумя персонажами (требует доработки)
+    /// </summary>
+    /// <param name="subject">Основной персонаж для проверки родства</param>
+    /// <param name="komu">Персонаж, по отношению к которому проверяется родство</param>
     public static void getKinship(PrCharacter subject, PrCharacter komu) // TO DO: Poumney napisat!
     {
         if (subject.Gender == true)
@@ -452,12 +472,9 @@ public class GlobalData
         Console.WriteLine("-");
     }
 
-    /*    public static PrCharacter findParent(PrCharacter subject, bool gender)
-        {
-            PrCharacter parent = 
-            return parent;
-        }*/
-
+    /// <summary>
+    /// Выводит всех созданных персонажей в консоль
+    /// </summary>
     public static void printAllPrCharacters()
     {
         foreach (var PrCharacter in Characters)
@@ -466,6 +483,11 @@ public class GlobalData
         }
     }
 
+    /// <summary>
+    /// Проверяет и преобразует строковое представление пола в логическое значение
+    /// </summary>
+    /// <param name="input_gender">Строка с указанием пола</param>
+    /// <returns>True для мужского, False для женского, null если пол не распознан</returns>
     public static bool? checkGender(string input_gender)
     {
         List<string> Males = new List<string> { "Male", "M", "Мужчина", "М", "1", "True" };
@@ -482,7 +504,13 @@ public class GlobalData
         return null;
     }
 
+    /// <summary>
+    /// Счетчик созданных персонажей в системе
+    /// </summary>
     public static int PrCharactersCreated = 0;
 
+    /// <summary>
+    /// Список всех созданных персонажей
+    /// </summary>
     public static List<PrCharacter> Characters = new List<PrCharacter>();
 }
