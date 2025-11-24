@@ -2,6 +2,7 @@ using BaseClasses.Enum;
 using BaseClasses.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 public class PrGenerator
@@ -655,17 +656,17 @@ public class PrGenerator
 
         Dictionary<string, object> baseParams = new Dictionary<string, object>();
 
-        List<string> traits = new List<string>();
-        List<string> phobias = new List<string>();
+        Dictionary<string, double> traits = new Dictionary<string, double>();
+        Dictionary<string, double> phobias = new Dictionary<string, double>();
 
         foreach (var trait in character.Traits)
         {
-            traits.Add(trait.Title);
+            traits.Add(trait.Title, trait.Affection);
         }
 
         foreach (var phobia in character.Phobias)
         {
-            phobias.Add(phobia.Title);
+            phobias.Add(phobia.Title, phobia.Affection);
         }
 
         baseParams.Add("Черты характера", traits);
