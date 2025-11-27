@@ -648,15 +648,131 @@ public class PrGenerator
         }
     }
 
+    /// <summary>
+    /// Возвращает список черт характера персонажа в формате List<string>, используя affection
+    /// </summary>
+    /// <param name="character">PrCharacter</param>
+    /// <returns>List<string> of Traits</returns>
+    public static List<string> GetAllTraitsWithAffDesc(List<Trait> traits)
+    {
+
+        List<string> listWithAff = new List<string>();
+
+        foreach (var trait in traits)
+        {
+            if (trait.Affection <= 0.20)
+            {
+                listWithAff.Add($"чуток {trait.Title}");
+            }
+            else if (trait.Affection <= 0.4)
+            {
+                listWithAff.Add($"слегка {trait.Title}");
+            }
+            else if (trait.Affection <= 0.6)
+            {
+                listWithAff.Add($"довольно {trait.Title}");
+            }
+            else if (trait.Affection <= 0.8)
+            {
+                listWithAff.Add($"максимально {trait.Title}");
+            }
+            else if (trait.Affection <= 1)
+            {
+                listWithAff.Add($"чрезвычайно {trait.Title}");
+            }
+        }
+
+        return listWithAff;
+    }
+
+    /// <summary>
+    /// Возвращает список фобий персонажа в формате List<string>, используя affection
+    /// </summary>
+    /// <param name="character">PrCharacter</param>
+    /// <returns>List<string> of Phobias</returns>
+    public static List<string> GetAllPhobiasWithAffDesc(List<Trait> phobias)
+    {
+
+        List<string> listWithAff = new List<string>();
+
+        foreach (var phobia in phobias)
+        {
+            if (phobia.Affection <= 0.20)
+            {
+                listWithAff.Add($"минимально слабая {phobia.Title}");
+            }
+            else if (phobia.Affection <= 0.4)
+            {
+                listWithAff.Add($"слегка слабая {phobia.Title}");
+            }
+            else if (phobia.Affection <= 0.6)
+            {
+                listWithAff.Add($"в меру {phobia.Title}");
+            }
+            else if (phobia.Affection <= 0.8)
+            {
+                listWithAff.Add($"максимально сильная {phobia.Title}");
+            }
+            else if (phobia.Affection <= 1)
+            {
+                listWithAff.Add($"чрезвычайно сильная {phobia.Title}");
+            }
+        }
+
+        return listWithAff;
+    }
+
+    /// <summary>
+    /// Возвращает список отношений персонажа к другим
+    /// </summary>
+    /// <param name="character">PrCharacter</param>
+    /// <returns>List<string> of Relations</returns>
+    public static List<string> GetAllRelationsWithDesc(PrCharacter character)
+    {
+
+        List<string> listWithAff = new List<string>();
+
+        foreach (var relation in character.Relations)
+        {
+            PrCharacter opponent = GlobalData.Characters[relation.Key];
+
+            if (relation.Value <= -5.0)
+            {
+                listWithAff.Add($"Ужасное отношение к {opponent.Name}");
+            }
+            else if (relation.Value <= -3.0)
+            {
+                listWithAff.Add($"Плохое отношение к {opponent.Name}");
+            }
+            else if (relation.Value <= -1.0)
+            {
+                listWithAff.Add($"Ненормальное отношение к {opponent.Name}");
+            }
+            else if (relation.Value >= 5.0)
+            {
+                listWithAff.Add($"Прекрасное отношение к {opponent.Name}");
+            }
+            else if (relation.Value >= 3.0)
+            {
+                listWithAff.Add($"Хорошое отношение к {opponent.Name}");
+            }
+            else if (relation.Value >= 1.0)
+            {
+                listWithAff.Add($"Нормальное отношение к {opponent.Name}");
+            }
+            else
+            {
+                listWithAff.Add($"Нейтральное отношение с {opponent.Name}");
+            }
+        }
+
+        return listWithAff;
+    }
+
     #endregion
 
     #region [Translate To BaseClass]
 
-    /// <summary>
-    /// Преобразует PrCharacter в базовый класс Element для системы хранения
-    /// </summary>
-    /// <param name="character">Исходный персонаж для преобразования</param>
-    /// <returns>Элемент базового класса с данными персонажа</returns>
     public static Element Translate(PrCharacter character)
     {
         string baseName = "";
@@ -670,21 +786,17 @@ public class PrGenerator
 
         Dictionary<string, object> baseParams = new Dictionary<string, object>();
 
-        Dictionary<string, double> traits = new Dictionary<string, double>();
-        Dictionary<string, double> phobias = new Dictionary<string, double>();
+        List<string> traits = new List<string>();
+        List<string> phobias = new List<string>();
+        List<string> relations = new List<string>();
 
-        foreach (var trait in character.Traits)
-        {
-            traits.Add(trait.Title, trait.Affection);
-        }
-
-        foreach (var phobia in character.Phobias)
-        {
-            phobias.Add(phobia.Title, phobia.Affection);
-        }
+        traits = GetAllTraitsWithAffDesc(character.Traits);
+        phobias = GetAllPhobiasWithAffDesc(character.Phobias);
+        relations = GetAllRelationsWithDesc(character);
 
         baseParams.Add("Черты характера", traits);
         baseParams.Add("Фобии", phobias);
+        baseParams.Add("Отношения", relations);
 
         Element baseCharacter = new Element(ElemType.Character, baseName, description, baseParams);
 

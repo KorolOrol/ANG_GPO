@@ -18,6 +18,9 @@ internal class Program
 
         PrCharacter Pain = new PrCharacter("Пейн", "Фуфил", 25, true);
         PrGenerator.CreateByLogicRandomTraits(Pain, 4);
+        PrGenerator.CreateByChaoticRandomPhobias(Pain, 2);
+        PrGenerator.CreateDesc(Pain);
+        PrGenerator.GetRelations(Pain, Tony);
 
         Element Test = PrGenerator.Translate(Pain);
         Console.WriteLine(Test);
