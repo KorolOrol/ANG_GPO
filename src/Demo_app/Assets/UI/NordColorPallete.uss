@@ -92,6 +92,15 @@
     color: var(--nord-white);
 }
 
+.Slider {
+}
+
+.Slider > .unity-base-field__label {
+    min-width: auto;
+    width: 30%;
+    color: var(--nord-gray);
+}
+
 .unity-foldout__checkmark {
     background-image: url("project://database/Assets/Icons/ArrowDropDown.svg?fileID=7388822144124034973&guid=9d40353fc8a260299a4285bfa38d5346&type=3#ArrowDropDown");
     -unity-background-image-tint-color: var(--nord-gray);
@@ -140,5 +149,22 @@
 
 .NegativeButton {
     background-color: var(--nord-red);
+    color: var(--nord-dark);
+}
+
+.DescriptionTextField {
+    white-space: normal;
+    max-height: 200px;
+    flex-direction: column;
+}
+
+.DescriptionTextField > .unity-base-field__label {
+    min-width: auto;
+    color: var(--nord-gray);
+}
+
+.DescriptionTextField > .unity-base-field__input {
+    background-color: var(--nord-white);
+    border-width: 0;
     color: var(--nord-dark);
 }

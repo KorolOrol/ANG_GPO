@@ -22,6 +22,8 @@ public class MainWindowScript : MonoBehaviour
     /// Словарь кнопок действий и соответствующих им визуальных элементов.
     /// </summary>
     private Dictionary<Button, VisualElement> _actions;
+
+    private List<IAction> _actionControllers;
     
     /// <summary>
     /// Текущий отображаемый визуальный элемент действия.
@@ -84,7 +86,14 @@ public class MainWindowScript : MonoBehaviour
         _actions = new Dictionary<Button, VisualElement>
         {
             { _root.Q<Button>("ViewActionButton"), _root.Q<VisualElement>("ViewAction") },
-            { _root.Q<Button>("AIActionButton"), _root.Q<VisualElement>("AIAction") }
+            { _root.Q<Button>("AIActionButton"), _root.Q<VisualElement>("AIAction") },
+            { _root.Q<Button>("ProceduralActionButton"), _root.Q<VisualElement>("ProceduralAction") }
+        };
+
+        _actionControllers = new List<IAction>
+        {
+            new ViewActionController(),
+            new AIActionController()
         };
 
         foreach (KeyValuePair<Button, VisualElement> pair in _actions)
@@ -102,10 +111,11 @@ public class MainWindowScript : MonoBehaviour
         Binder.Bind(_plot.Elements[0], _plot.Elements[3]);
         Binder.Bind(_plot.Elements[0], _plot.Elements[4], 50);
         
-        ViewActionScript.Initiate(_root, _plot);
-        UpdateActionEvent += ViewActionScript.GetUpdateElementsListAction();
-        AIActionScript.Initiate(_root, _plot);
-        UpdateActionEvent += AIActionScript.GetUpdateExistingElementsListAction();
+        foreach (var controller in _actionControllers)
+        {
+            controller.Initiate(_root, _plot);
+            UpdateActionEvent += controller.GetUpdateAction();
+        }
     }
 
     /// <summary>
@@ -125,9 +135,10 @@ public class MainWindowScript : MonoBehaviour
     private void OnNewButtonClicked()
     {
         _plot = new Plot();
-        ViewActionScript.Initiate(_root, _plot);
-        UpdateActionEvent?.Invoke();
-        AIActionScript.Initiate(_root, _plot);
+        foreach (var controller in _actionControllers)
+        {
+            controller.Initiate(_root, _plot);
+        }
         UpdateActionEvent?.Invoke();
     }
     
@@ -140,9 +151,10 @@ public class MainWindowScript : MonoBehaviour
         if (path.Length == 0) return;
         _dbm = new DataBaseManager(path);
         _plot = _dbm.ReadPlot();
-        ViewActionScript.Initiate(_root, _plot);
-        UpdateActionEvent?.Invoke();
-        AIActionScript.Initiate(_root, _plot);
+        foreach (var controller in _actionControllers)
+        {
+            controller.Initiate(_root, _plot);
+        }
         UpdateActionEvent?.Invoke();
     }
     

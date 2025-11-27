@@ -13,154 +13,154 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Скрипт для действия с ИИ в пользовательском интерфейсе.
 /// </summary>
-public static class AIActionScript
+public class AIActionController : IAction
 {
     /// <summary>
     /// Ссылка на текущий сюжет.
     /// </summary>
-    private static Plot _plot;
+    private Plot _plot;
     
     /// <summary>
     /// Выпадающий список для выбора текстового генератора.
     /// </summary>
-    private static DropdownField _selectTextGeneratorDropdown;
+    private DropdownField _selectTextGeneratorDropdown;
     
     /// <summary>
     /// Текстовое поле для имени текстового генератора.
     /// </summary>
-    private static TextField _nameTextGeneratorTextField;
+    private TextField _nameTextGeneratorTextField;
     
     /// <summary>
     /// Текстовое поле для конечной точки текстового генератора.
     /// </summary>
-    private static TextField _endpointTextGeneratorTextField;
+    private TextField _endpointTextGeneratorTextField;
     
     /// <summary>
     /// Радиокнопка для выбора публичного API ключа текстового генератора.
     /// </summary>
-    private static RadioButton _publicApiKeyTextGeneratorRadioButton;
+    private RadioButton _publicApiKeyTextGeneratorRadioButton;
     
     /// <summary>
     /// Текстовое поле для публичного API ключа текстового генератора.
     /// </summary>
-    private static TextField _publicApiKeyTextGeneratorTextField;
+    private TextField _publicApiKeyTextGeneratorTextField;
     
     /// <summary>
     /// Радиокнопка для выбора переменной окружения API ключа текстового генератора.
     /// </summary>
-    private static RadioButton _envApiKeyTextGeneratorRadioButton;
+    private RadioButton _envApiKeyTextGeneratorRadioButton;
     
     /// <summary>
     /// Текстовое поле для переменной окружения API ключа текстового генератора.
     /// </summary>
-    private static TextField _envApiKeyTextGeneratorTextField;
+    private TextField _envApiKeyTextGeneratorTextField;
     
     /// <summary>
     /// Текстовое поле для модели текстового генератора.
     /// </summary>
-    private static TextField _modelTextGeneratorTextField;
+    private TextField _modelTextGeneratorTextField;
     
     /// <summary>
     /// Переключатель для структурированного вывода текстового генератора.
     /// </summary>
-    private static Toggle _structuredOutputTextGeneratorToggle;
+    private Toggle _structuredOutputTextGeneratorToggle;
     
     /// <summary>
     /// Кнопка для сохранения текстового генератора.
     /// </summary>
-    private static Button _saveTextGeneratorButton;
+    private Button _saveTextGeneratorButton;
     
     /// <summary>
     /// Кнопка для удаления текстового генератора.
     /// </summary>
-    private static Button _deleteTextGeneratorButton;
+    private Button _deleteTextGeneratorButton;
     
     /// <summary>
     /// Кнопка для выбора файла системного запроса.
     /// </summary>
-    private static Button _selectSystemPromptButton;
+    private Button _selectSystemPromptButton;
     
     /// <summary>
     /// Метка для отображения выбранного пути системного запроса.
     /// </summary>
-    private static Label _selectedSystemPromptPathLabel;
+    private Label _selectedSystemPromptPathLabel;
     
     /// <summary>
     /// Переключатель для приоритета ИИ.
     /// </summary>
-    private static Toggle _aiPriorityToggle;
+    private Toggle _aiPriorityToggle;
     
     /// <summary>
     /// Радиокнопка для генерации на основе нового элемента.
     /// </summary>
-    private static RadioButton _basedOnNewElementGenerationRadioButton;
+    private RadioButton _basedOnNewElementGenerationRadioButton;
     
     /// <summary>
     /// Выпадающий список для выбора типа нового элемента.
     /// </summary>
-    private static DropdownField _newElementTypeDropdown;
+    private DropdownField _newElementTypeDropdown;
     
     /// <summary>
     /// Радиокнопка для генерации на основе существующего элемента.
     /// </summary>
-    private static RadioButton _basedOnExistingElementGenerationRadioButton;
+    private RadioButton _basedOnExistingElementGenerationRadioButton;
     
     /// <summary>
     /// Выпадающий список для выбора существующего элемента.
     /// </summary>
-    private static DropdownField _existingElementDropdown;
+    private DropdownField _existingElementDropdown;
     
     /// <summary>
     /// Кнопка для запуска генерации ИИ.
     /// </summary>
-    private static Button _aiGenerateButton;
+    private Button _aiGenerateButton;
 
     /// <summary>
     /// Метка для отображения состояния генерации.
     /// </summary>
-    private static Label _generatingLabel;
+    private Label _generatingLabel;
     
     /// <summary>
     /// Элемент визуального интерфейса для редактирования сгенерированного элемента.
     /// </summary>
-    private static VisualElement _editGeneratedElement;
+    private VisualElement _editGeneratedElement;
     
     /// <summary>
     /// Контроллер для редактирования выбранного элемента.
     /// </summary>
-    private static EditSelectedElementController _editSelectedElementController;
+    private EditSelectedElementController _editSelectedElementController;
 
     /// <summary>
     /// Словарь текстовых генераторов.
     /// </summary>
-    private readonly static Dictionary<string, OpenAIGenerator> TextGenerators = new Dictionary<string, OpenAIGenerator>();
+    private readonly Dictionary<string, OpenAIGenerator> _textGenerators = new Dictionary<string, OpenAIGenerator>();
     
     /// <summary>
     /// Генератор ИИ.
     /// </summary>
-    private static LlmAiGenerator _aiGenerator;
+    private LlmAiGenerator _aiGenerator;
     
     /// <summary>
     /// Путь к выбранному файлу системного запроса.
     /// </summary>
-    private static string _selectedSystemPromptPath;
+    private string _selectedSystemPromptPath;
     
     /// <summary>
     /// Сгенерированный элемент.
     /// </summary>
-    private static Element _generatedElement;
+    private Element _generatedElement;
     
     /// <summary>
     /// Флаг инициализации визуальных элементов.
     /// </summary>
-    private static bool _isVisualElementsInitiated;
+    private bool _isVisualElementsInitiated;
 
     /// <summary>
     /// Инициализация скрипта действия с ИИ.
     /// </summary>
     /// <param name="root">Корневой элемент визуального интерфейса.</param>
     /// <param name="plot">Текущий сюжет.</param>
-    public static void Initiate(VisualElement root, Plot plot)
+    public void Initiate(VisualElement root, Plot plot)
     {
         InitiateVisualElements(root);
         _plot = plot;
@@ -173,7 +173,7 @@ public static class AIActionScript
     /// Инициализация визуальных элементов UI и их действий.
     /// </summary>
     /// <param name="root">Корневой элемент визуального интерфейса.</param>
-    private static void InitiateVisualElements(VisualElement root)
+    private void InitiateVisualElements(VisualElement root)
     {
         if (_isVisualElementsInitiated) return;
         _isVisualElementsInitiated = true;
@@ -203,7 +203,7 @@ public static class AIActionScript
         _generatingLabel = root.Q<Label>("GeneratingLabel");
         _editGeneratedElement = root.Q<VisualElement>("EditGeneratedElement");
         
-        _selectTextGeneratorDropdown.choices = new List<string>(TextGenerators.Keys).Append("New").ToList();
+        _selectTextGeneratorDropdown.choices = new List<string>(_textGenerators.Keys).Append("New").ToList();
         _selectTextGeneratorDropdown.RegisterValueChangedCallback(SelectTextGeneratorDropdownOnChange);
         
         _publicApiKeyTextGeneratorRadioButton.RegisterCallback<ChangeEvent<bool>>(evt =>
@@ -243,7 +243,7 @@ public static class AIActionScript
             _existingElementDropdown.SetEnabled(true);
         });
         
-        _newElementTypeDropdown.choices = System.Enum.GetNames(typeof(ElemType)).ToList();
+        _newElementTypeDropdown.choices = Enum.GetNames(typeof(ElemType)).ToList();
         
         _aiGenerateButton.clicked += async () => await OnAIGenerateButtonOnClicked();
     }
@@ -252,7 +252,7 @@ public static class AIActionScript
     /// Получение действия для обновления списка существующих элементов.
     /// </summary>
     /// <returns>Действие обновления списка.</returns>
-    public static Action GetUpdateExistingElementsListAction()
+    public Action GetUpdateAction()
     {
         return () =>
         {
@@ -263,7 +263,7 @@ public static class AIActionScript
     /// <summary>
     /// Обработчик нажатия кнопки сохранения текстового генератора.
     /// </summary>
-    private static void OnSaveTextGeneratorButtonOnClicked()
+    private void OnSaveTextGeneratorButtonOnClicked()
     {
         if (_selectTextGeneratorDropdown.value == "New")
         {
@@ -282,13 +282,13 @@ public static class AIActionScript
             {
                 generator = new OpenAIGenerator(_envApiKeyTextGeneratorTextField.value, endpoint) { Model = model, UseStructuredOutput = useStructuredOutput };
             }
-            TextGenerators.Add(name, generator);
+            _textGenerators.Add(name, generator);
             _selectTextGeneratorDropdown.choices.Add(name);
             _selectTextGeneratorDropdown.value = name;
         }
         else
         {
-            var generator = TextGenerators[_selectTextGeneratorDropdown.value];
+            var generator = _textGenerators[_selectTextGeneratorDropdown.value];
             generator.Endpoint = _endpointTextGeneratorTextField.value;
             generator.Model = _modelTextGeneratorTextField.value;
             generator.UseStructuredOutput = _structuredOutputTextGeneratorToggle.value;
@@ -309,7 +309,7 @@ public static class AIActionScript
                                 Model = generator.Model, 
                                 UseStructuredOutput = generator.UseStructuredOutput
                             };
-                            TextGenerators[_selectTextGeneratorDropdown.value] = generator;
+                            _textGenerators[_selectTextGeneratorDropdown.value] = generator;
                         }
                         break;
                     }
@@ -320,10 +320,10 @@ public static class AIActionScript
     /// <summary>
     /// Обработчик нажатия кнопки удаления текстового генератора.
     /// </summary>
-    private static void OnDeleteTextGeneratorButtonOnClicked()
+    private void OnDeleteTextGeneratorButtonOnClicked()
     {
         if (_selectTextGeneratorDropdown.value == "New") return;
-        TextGenerators.Remove(_selectTextGeneratorDropdown.value);
+        _textGenerators.Remove(_selectTextGeneratorDropdown.value);
         _selectTextGeneratorDropdown.choices.Remove(_selectTextGeneratorDropdown.value);
         _selectTextGeneratorDropdown.value = "New";
     }
@@ -332,7 +332,7 @@ public static class AIActionScript
     /// Обработчик изменения выбора в выпадающем списке текстового генератора.
     /// </summary>
     /// <param name="evt">Событие изменения.</param>
-    private static void SelectTextGeneratorDropdownOnChange(ChangeEvent<string> evt)
+    private void SelectTextGeneratorDropdownOnChange(ChangeEvent<string> evt)
     {
         if (evt.newValue == "New")
         {
@@ -345,7 +345,7 @@ public static class AIActionScript
         }
         else
         {
-            var generator = TextGenerators[evt.newValue];
+            var generator = _textGenerators[evt.newValue];
             _nameTextGeneratorTextField.value = evt.newValue;
             _endpointTextGeneratorTextField.value = generator.Endpoint;
             _publicApiKeyTextGeneratorRadioButton.value = false;
@@ -360,31 +360,29 @@ public static class AIActionScript
     /// <summary>
     /// Обработчик нажатия кнопки генерации ИИ.
     /// </summary>
-    async private static Task OnAIGenerateButtonOnClicked()
+    async private Task OnAIGenerateButtonOnClicked()
     {
-        if (_aiGenerator == null)
+        if (_selectTextGeneratorDropdown.value == "New")
         {
-            if (_selectTextGeneratorDropdown.value == "New")
-            {
-                Debug.LogError("Select or create a text generator first.");
-                return;
-            }
-            if (string.IsNullOrEmpty(_selectedSystemPromptPath))
-            {
-                Debug.LogError("Select a system prompt file first.");
-                return;
-            }
-            _aiGenerator = new LlmAiGenerator(_selectedSystemPromptPath);
+            Debug.LogError("Select or create a text generator first.");
+            return;
+        }
+        if (string.IsNullOrEmpty(_selectedSystemPromptPath))
+        {
+            Debug.LogError("Select a system prompt file first.");
+            return;
         }
         
-        _aiGenerator.TextAiGenerator = TextGenerators[_selectTextGeneratorDropdown.value];
+        _aiGenerator ??= new LlmAiGenerator(_selectedSystemPromptPath);
+        
+        _aiGenerator.TextAiGenerator = _textGenerators[_selectTextGeneratorDropdown.value];
         _aiGenerator.UseStructuredOutput = _structuredOutputTextGeneratorToggle.value;
         _aiGenerator.AIPriority = _aiPriorityToggle.value;
 
         Element baseElement = null;
         if (_basedOnNewElementGenerationRadioButton.value)
         {
-            ElemType type = (ElemType)System.Enum.Parse(typeof(ElemType), _newElementTypeDropdown.value);
+            var type = (ElemType)Enum.Parse(typeof(ElemType), _newElementTypeDropdown.value);
             baseElement = FullElementConstructor.CreateFullElement(type);
         }
         else if (_basedOnExistingElementGenerationRadioButton.value)

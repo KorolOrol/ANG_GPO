@@ -1,6 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:Template name="ViewAction" src="project://database/Assets/UI/ViewAction.uxml?fileID=9197481963319205126&amp;guid=f54391fdd0805d710bee515d02420c8b&amp;type=3#ViewAction" />
     <ui:Template name="AIAction" src="project://database/Assets/UI/AIAction.uxml?fileID=9197481963319205126&amp;guid=33985b19da690ff9991e938b9c8fd340&amp;type=3#AIAction" />
+    <ui:Template name="ProceduralAction" src="project://database/Assets/UI/ProceduralAction.uxml?fileID=9197481963319205126&amp;guid=b06dd1fee22ff09d6849797efcb7bff1&amp;type=3#ProceduralAction" />
     <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
     <ui:VisualElement name="MainWindow" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0);">
         <ui:VisualElement name="Header" style="flex-grow: 0; left: 0; top: 0; right: 0; height: 30px; flex-direction: row;">
@@ -36,6 +37,9 @@
                 <ui:Button name="AIActionButton" class="Button">
                     <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/AIAction.svg?fileID=7388822144124034973&amp;guid=0a8a6f1c4ec86f4dd84e234d039b7d32&amp;type=3#AIAction&quot;);" />
                 </ui:Button>
+                <ui:Button name="ProceduralActionButton" class="Button">
+                    <ui:VisualElement class="ButtonIcon" style="background-image: url(&quot;project://database/Assets/Icons/ProceduralActionIcon.svg?fileID=7388822144124034973&amp;guid=29f2bd44bcd447d038b6e8b3946b4d27&amp;type=3#ProceduralActionIcon&quot;);" />
+                </ui:Button>
                 <Bindings>
                     <ui:DataBinding property="style.backgroundColor" data-source-path="colors[1]" data-source="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" binding-mode="ToTarget" />
                 </Bindings>
@@ -43,6 +47,7 @@
             <ui:VisualElement name="ActionArea" style="flex-grow: 1;">
                 <ui:Instance template="ViewAction" enabled="true" name="ViewAction" style="flex-grow: 1; display: none; visibility: visible;" />
                 <ui:Instance template="AIAction" name="AIAction" style="display: none;" />
+                <ui:Instance template="ProceduralAction" name="ProceduralAction" style="display: none;" />
             </ui:VisualElement>
         </ui:VisualElement>
         <Bindings>

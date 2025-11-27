@@ -11,79 +11,79 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Скрипт для управления отображением и редактированием элементов сюжета.
 /// </summary>
-public static class ViewActionScript
+public class ViewActionController : IAction
 {
     /// <summary>
     /// Список всех элементов для отображения и редактирования
     /// </summary>
-    private static Plot _plot;
+    private Plot _plot;
     
     /// <summary>
     /// Текущий выбранный элемент для редактирования
     /// </summary>
-    private static Element _currentElement;
+    private Element _currentElement;
     
     /// <summary>
     /// Список элементов для редактирования
     /// </summary>
-    private static ListView _elementsListView;
+    private ListView _elementsListView;
 
     /// <summary>
     /// Выпадающий список для фильтрации по типу элемента
     /// </summary>
-    private static DropdownField _filterDropdown;
+    private DropdownField _filterDropdown;
     
     /// <summary>
     /// Текстовое поле для фильтрации списка элементов
     /// </summary>
-    private static TextField _searchTextField;
+    private TextField _searchTextField;
     
     /// <summary>
     /// Кнопки добавления новых персонажей
     /// </summary>
-    private static Button _addCharacterButton;
+    private Button _addCharacterButton;
     
     /// <summary>
     /// Кнопки добавления новых предметов
     /// </summary>
-    private static Button _addItemButton;
+    private Button _addItemButton;
     
     /// <summary>
     /// Кнопки добавления новых локаций
     /// </summary>
-    private static Button _addLocationButton;
+    private Button _addLocationButton;
     
     /// <summary>
     /// Кнопки добавления новых событий
     /// </summary>
-    private static Button _addEventButton;
+    private Button _addEventButton;
     
     /// <summary>
     /// Кнопка удаления выбранного элемента
     /// </summary>
-    private static Button _deleteElementButton;
+    private Button _deleteElementButton;
     
     /// <summary>
     /// Панель редактирования выбранного элемента
     /// </summary>
-    private static VisualElement _editSelectedElement;
+    private VisualElement _editSelectedElement;
     
     /// <summary>
     /// Контроллер панели редактирования выбранного элемента
     /// </summary>
-    private static EditSelectedElementController _editSelectedElementController;
+    private EditSelectedElementController _editSelectedElementController;
     
     /// <summary>
     /// Флаг инициализации визуальных элементов
     /// </summary>
-    private static bool _isVisualElementsInitiated;
+    private bool _isVisualElementsInitiated;
     
     /// <summary>
     /// Привязка элементов к списку в UI
     /// </summary>
     /// <param name="root">Корневой элемент UI</param>
     /// <param name="plot">Сюжет с элементами</param>
-    public static void Initiate(VisualElement root, Plot plot)
+    public void Initiate(VisualElement root, Plot plot)
     {
         InitiateVisualElements(root);
         _plot = plot;
@@ -98,7 +98,7 @@ public static class ViewActionScript
     /// Инициализация визуальных элементов UI
     /// </summary>
     /// <param name="root">Корневой элемент UI</param>
-    private static void InitiateVisualElements(VisualElement root)
+    private void InitiateVisualElements(VisualElement root)
     {
         if (_isVisualElementsInitiated) return;
         _isVisualElementsInitiated = true;
@@ -132,7 +132,7 @@ public static class ViewActionScript
     /// Получение действия для обновления списка элементов
     /// </summary>
     /// <returns>Действие обновления списка элементов</returns>
-    public static Action GetUpdateElementsListAction()
+    public Action GetUpdateAction()
     {
         return ApplyFilters;
     }
@@ -142,7 +142,7 @@ public static class ViewActionScript
     /// </summary>
     /// <param name="element">Искомый элемент</param>
     /// <returns>Индекс элемента или -1, если не найден</returns>
-    private static int FindIndexInItems(object element)
+    private int FindIndexInItems(object element)
     {
         if (_elementsListView.itemsSource is not List<IElement> items) return -1;
         for (int i = 0; i < items.Count; i++)
@@ -157,7 +157,7 @@ public static class ViewActionScript
     /// Обработчик изменения выбранных индексов в списке элементов
     /// </summary>
     /// <param name="indices">Выбранные индексы</param>
-    private static void ElementsListViewSelectedIndicesChanged(IEnumerable<int> indices)
+    private void ElementsListViewSelectedIndicesChanged(IEnumerable<int> indices)
     {
         int index = -1;
         foreach (int i in indices)
@@ -186,7 +186,7 @@ public static class ViewActionScript
     /// </summary>
     /// <param name="elemType">Тип нового элемента</param>
     /// <returns>Действие добавления элемента</returns>
-    private static Action AddElementListItem(ElemType elemType)
+    private Action AddElementListItem(ElemType elemType)
     {
         return () =>
         {
@@ -204,7 +204,7 @@ public static class ViewActionScript
     /// <summary>
     /// Применение фильтров к списку элементов
     /// </summary>
-    private static void ApplyFilters()
+    private void ApplyFilters()
     {
         List<IElement> items = _plot.Elements;
         
@@ -233,17 +233,17 @@ public static class ViewActionScript
     /// <summary>
     /// Создание элемента списка для отображения в ListView
     /// </summary>
-    private readonly static Func<VisualElement> MakeElementListItem = () =>
+    private VisualElement MakeElementListItem()
     {
         var elementAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
         var element = elementAsset.CloneTree();
         return element;
-    };
+    }
 
     /// <summary>
     /// Привязка данных элемента к элементу списка в UI
     /// </summary>
-    private readonly static Action<VisualElement, int> BindElementListItem = (e, i) =>
+    private void BindElementListItem(VisualElement e, int i)
     {
         var labelUI = e.Q<Label>("ElementName");
         var iconUI = e.Q<VisualElement>("ElementIcon");
@@ -267,12 +267,12 @@ public static class ViewActionScript
         };
         labelUI.text = element.Name;
         iconUI.style.backgroundImage = new StyleBackground(vectorImage);
-    };
+    }
 
     /// <summary>
     /// Обработчик добавления нового элемента в список элементов
     /// </summary>
-    private readonly static Action<BaseListView> ElementsListViewOnAdd = listView =>
+    private void ElementsListViewOnAdd(BaseListView listView)
     {
         var newElement = FullElementConstructor.CreateFullElement(ElemType.Character, "New Character");
         _plot.Add(newElement);
@@ -283,12 +283,12 @@ public static class ViewActionScript
         {
             listView.ScrollToItem(index);
         }
-    };
+    }
 
     /// <summary>
     /// Обработчик удаления выбранного элемента из списка элементов
     /// </summary>
-    private readonly static Action<BaseListView> ElementsListViewOnRemove = listView =>
+    private void ElementsListViewOnRemove(BaseListView listView)
     {
         int index = listView.selectedIndex;
         if (index == -1) index = listView.itemsSource.Count - 1;
@@ -305,13 +305,13 @@ public static class ViewActionScript
         int newIndex = Math.Min(newItems.Count - 1, index);
         listView.ScrollToItem(newIndex);
         ElementsListViewSelectedIndicesChanged(new[] { newIndex });
-    };
+    }
     
     /// <summary>
     /// Показать или скрыть панель редактирования выбранного элемента
     /// </summary>
-    private readonly static Action ShowEditSelectedElement = () =>
+    private void ShowEditSelectedElement()
     {
         _editSelectedElement.style.display = _currentElement == null ? DisplayStyle.None : DisplayStyle.Flex;
-    };
+    }
 }
