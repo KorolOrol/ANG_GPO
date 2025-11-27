@@ -129,7 +129,7 @@ public static class AIActionScript
     /// Контроллер для редактирования выбранного элемента.
     /// </summary>
     private static EditSelectedElementController _editSelectedElementController;
-    
+
     /// <summary>
     /// Словарь текстовых генераторов.
     /// </summary>
@@ -151,13 +151,33 @@ public static class AIActionScript
     private static Element _generatedElement;
     
     /// <summary>
+    /// Флаг инициализации визуальных элементов.
+    /// </summary>
+    private static bool _isVisualElementsInitiated;
+
+    /// <summary>
     /// Инициализация скрипта действия с ИИ.
     /// </summary>
     /// <param name="root">Корневой элемент визуального интерфейса.</param>
     /// <param name="plot">Текущий сюжет.</param>
     public static void Initiate(VisualElement root, Plot plot)
     {
+        InitiateVisualElements(root);
         _plot = plot;
+        _editSelectedElementController = new EditSelectedElementController(_editGeneratedElement, plot);
+        
+        _existingElementDropdown.choices = _plot.Elements.Select(e => e.ToString()).ToList();
+    }
+    
+    /// <summary>
+    /// Инициализация визуальных элементов UI и их действий.
+    /// </summary>
+    /// <param name="root">Корневой элемент визуального интерфейса.</param>
+    private static void InitiateVisualElements(VisualElement root)
+    {
+        if (_isVisualElementsInitiated) return;
+        _isVisualElementsInitiated = true;
+        
         _selectTextGeneratorDropdown = root.Q<DropdownField>("SelectTextGeneratorDropdown");
         _nameTextGeneratorTextField = root.Q<TextField>("NameTextGeneratorTextField");
         _endpointTextGeneratorTextField = root.Q<TextField>("EndpointTextGeneratorTextField");
@@ -176,14 +196,12 @@ public static class AIActionScript
         root.Q<RadioButtonGroup>("BasedOnGenerationRadioButtonGroup");
         _basedOnNewElementGenerationRadioButton = root.Q<RadioButton>("BasedOnNewElementGenerationRadioButton");
         _newElementTypeDropdown = root.Q<DropdownField>("NewElementTypeDropdown");
-        _basedOnExistingElementGenerationRadioButton = 
+        _basedOnExistingElementGenerationRadioButton =
             root.Q<RadioButton>("BasedOnExistingElementGenerationRadioButton");
         _existingElementDropdown = root.Q<DropdownField>("ExistingElementDropdown");
         _aiGenerateButton = root.Q<Button>("AIGenerateButton");
         _generatingLabel = root.Q<Label>("GeneratingLabel");
         _editGeneratedElement = root.Q<VisualElement>("EditGeneratedElement");
-
-        _editSelectedElementController = new EditSelectedElementController(_editGeneratedElement, plot);
         
         _selectTextGeneratorDropdown.choices = new List<string>(TextGenerators.Keys).Append("New").ToList();
         _selectTextGeneratorDropdown.RegisterValueChangedCallback(SelectTextGeneratorDropdownOnChange);
@@ -226,11 +244,10 @@ public static class AIActionScript
         });
         
         _newElementTypeDropdown.choices = System.Enum.GetNames(typeof(ElemType)).ToList();
-        _existingElementDropdown.choices = _plot.Elements.Select(e => e.ToString()).ToList();
         
         _aiGenerateButton.clicked += async () => await OnAIGenerateButtonOnClicked();
     }
-    
+
     /// <summary>
     /// Получение действия для обновления списка существующих элементов.
     /// </summary>

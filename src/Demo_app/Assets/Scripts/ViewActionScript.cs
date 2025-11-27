@@ -74,12 +74,34 @@ public static class ViewActionScript
     private static EditSelectedElementController _editSelectedElementController;
     
     /// <summary>
+    /// Флаг инициализации визуальных элементов
+    /// </summary>
+    private static bool _isVisualElementsInitiated;
+    
+    /// <summary>
     /// Привязка элементов к списку в UI
     /// </summary>
     /// <param name="root">Корневой элемент UI</param>
     /// <param name="plot">Сюжет с элементами</param>
     public static void Initiate(VisualElement root, Plot plot)
     {
+        InitiateVisualElements(root);
+        _plot = plot;
+        _editSelectedElementController = new EditSelectedElementController(_editSelectedElement, _plot);
+        _editSelectedElementController.BeforeLoadSelectedElement += ShowEditSelectedElement;
+        _editSelectedElementController.AfterUpdateSelectedElement += () => _elementsListView.RefreshItems();
+        
+        _elementsListView.itemsSource = _plot.Elements;
+    }
+    
+    /// <summary>
+    /// Инициализация визуальных элементов UI
+    /// </summary>
+    /// <param name="root">Корневой элемент UI</param>
+    private static void InitiateVisualElements(VisualElement root)
+    {
+        if (_isVisualElementsInitiated) return;
+        _isVisualElementsInitiated = true;
         _elementsListView = root.Q<ListView>("ElementsListView");
         _filterDropdown = root.Q<DropdownField>("FilterDropdown");
         _searchTextField = root.Q<TextField>("SearchTextField");
@@ -89,19 +111,13 @@ public static class ViewActionScript
         _addEventButton = root.Q<Button>("AddEventButton");
         _deleteElementButton = root.Q<Button>("DeleteElementButton");
         _editSelectedElement = root.Q<VisualElement>("EditSelectedElement");
-        _editSelectedElementController = new EditSelectedElementController(_editSelectedElement, plot);
         
-        _editSelectedElementController.BeforeLoadSelectedElement += ShowEditSelectedElement;
-        _editSelectedElementController.AfterUpdateSelectedElement += () => _elementsListView.RefreshItems();
-        
-        _plot = plot;
         _elementsListView.makeItem = MakeElementListItem;
         _elementsListView.bindItem = BindElementListItem;
         _elementsListView.onAdd = ElementsListViewOnAdd;
         _elementsListView.onRemove = ElementsListViewOnRemove;
-        _elementsListView.itemsSource = _plot.Elements;
         _elementsListView.selectedIndicesChanged += ElementsListViewSelectedIndicesChanged;
-
+        
         _filterDropdown.RegisterValueChangedCallback(_ => ApplyFilters());
         _searchTextField.RegisterValueChangedCallback(_ => ApplyFilters());
 
