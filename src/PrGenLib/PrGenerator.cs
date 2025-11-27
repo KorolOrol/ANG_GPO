@@ -720,53 +720,7 @@ public class PrGenerator
         }
 
         return listWithAff;
-    }
 
-    /// <summary>
-    /// Возвращает список отношений персонажа к другим
-    /// </summary>
-    /// <param name="character">PrCharacter</param>
-    /// <returns>List<string> of Relations</returns>
-    public static List<string> GetAllRelationsWithDesc(PrCharacter character)
-    {
-
-        List<string> listWithAff = new List<string>();
-
-        foreach (var relation in character.Relations)
-        {
-            PrCharacter opponent = GlobalData.Characters[relation.Key];
-
-            if (relation.Value <= -5.0)
-            {
-                listWithAff.Add($"Ужасное отношение к {opponent.Name}");
-            }
-            else if (relation.Value <= -3.0)
-            {
-                listWithAff.Add($"Плохое отношение к {opponent.Name}");
-            }
-            else if (relation.Value <= -1.0)
-            {
-                listWithAff.Add($"Ненормальное отношение к {opponent.Name}");
-            }
-            else if (relation.Value >= 5.0)
-            {
-                listWithAff.Add($"Прекрасное отношение к {opponent.Name}");
-            }
-            else if (relation.Value >= 3.0)
-            {
-                listWithAff.Add($"Хорошое отношение к {opponent.Name}");
-            }
-            else if (relation.Value >= 1.0)
-            {
-                listWithAff.Add($"Нормальное отношение к {opponent.Name}");
-            }
-            else
-            {
-                listWithAff.Add($"Нейтральное отношение с {opponent.Name}");
-            }
-        }
-
-        return listWithAff;
     }
 
     #endregion
@@ -788,15 +742,12 @@ public class PrGenerator
 
         List<string> traits = new List<string>();
         List<string> phobias = new List<string>();
-        List<string> relations = new List<string>();
 
         traits = GetAllTraitsWithAffDesc(character.Traits);
         phobias = GetAllPhobiasWithAffDesc(character.Phobias);
-        relations = GetAllRelationsWithDesc(character);
 
-        baseParams.Add("Черты характера", traits);
-        baseParams.Add("Фобии", phobias);
-        baseParams.Add("Отношения", relations);
+        baseParams.Add("Traits", traits);
+        baseParams.Add("Phobias", phobias);
 
         Element baseCharacter = new Element(ElemType.Character, baseName, description, baseParams);
 
