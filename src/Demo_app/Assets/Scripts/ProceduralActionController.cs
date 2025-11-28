@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Контроллер для процедурной генерации персонажей.
 /// </summary>
-public class ProceduralActionController : IAction
+public class ProceduralActionController : IActionController
 {
     /// <summary>
     /// Ссылка на текущий сюжет.

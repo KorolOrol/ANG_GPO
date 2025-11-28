@@ -23,7 +23,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private Dictionary<Button, VisualElement> _actions;
 
-    private List<IAction> _actionControllers;
+    private List<IActionController> _actionControllers;
     
     /// <summary>
     /// Текущий отображаемый визуальный элемент действия.
@@ -87,13 +87,16 @@ public class MainWindowScript : MonoBehaviour
         {
             { _root.Q<Button>("ViewActionButton"), _root.Q<VisualElement>("ViewAction") },
             { _root.Q<Button>("AIActionButton"), _root.Q<VisualElement>("AIAction") },
-            { _root.Q<Button>("ProceduralActionButton"), _root.Q<VisualElement>("ProceduralAction") }
+            { _root.Q<Button>("ProceduralActionButton"), _root.Q<VisualElement>("ProceduralAction") },
+            { _root.Q<Button>("MapActionButton"), _root.Q<VisualElement>("MapAction") }
         };
 
-        _actionControllers = new List<IAction>
+        _actionControllers = new List<IActionController>
         {
             new ViewActionController(),
-            new AIActionController()
+            new AIActionController(),
+            new ProceduralActionController(),
+            new MapActionController()
         };
 
         foreach (KeyValuePair<Button, VisualElement> pair in _actions)

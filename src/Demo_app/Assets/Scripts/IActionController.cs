@@ -2,7 +2,7 @@ using System;
 using BaseClasses.Model;
 using UnityEngine.UIElements;
 
-public interface IAction
+public interface IActionController
 {
     public void Initiate(VisualElement root, Plot plot);
 

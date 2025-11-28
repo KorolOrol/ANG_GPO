@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Скрипт для управления отображением и редактированием элементов сюжета.
 /// </summary>
-public class ViewActionController : IAction
+public class ViewActionController : IActionController
 {
     /// <summary>
     /// Список всех элементов для отображения и редактирования
@@ -176,7 +176,6 @@ public class ViewActionController : IAction
             _currentElement = null;
             return;
         }
-        Debug.Log($"{elem.Name}, {elem.Type}");
         _currentElement = (Element)elem;
         _editSelectedElementController.SelectedElement = _currentElement;
     }

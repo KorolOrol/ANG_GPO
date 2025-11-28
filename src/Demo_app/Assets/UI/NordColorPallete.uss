@@ -101,6 +101,11 @@
     color: var(--nord-gray);
 }
 
+.Slider > .unity-base-slider__input > .unity-base-slider__text-field {
+    background-color: var(--nord-white);
+    color: var(--nord-dark);
+}
+
 .unity-foldout__checkmark {
     background-image: url("project://database/Assets/Icons/ArrowDropDown.svg?fileID=7388822144124034973&guid=9d40353fc8a260299a4285bfa38d5346&type=3#ArrowDropDown");
     -unity-background-image-tint-color: var(--nord-gray);

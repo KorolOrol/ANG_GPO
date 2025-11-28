@@ -68,7 +68,8 @@
     <Compile Include="Assets/Scripts/AIActionController.cs" />
     <Compile Include="Assets/Scripts/ProceduralActionController.cs" />
     <Compile Include="Assets/Scripts/ViewActionController.cs" />
-    <Compile Include="Assets/Scripts/IAction.cs" />
+    <Compile Include="Assets/Scripts/IActionController.cs" />
+    <Compile Include="Assets/Scripts/MapActionController.cs" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/lib/netstandard2.1/System.ComponentModel.Annotations.xml" />
     <None Include="Assets/Packages/System.Text.Json.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/System.Memory.Data.1.0.2/lib/netstandard2.0/System.Memory.Data.xml" />
@@ -99,6 +100,7 @@
     <None Include="Assets/Packages/OpenAI.2.0.0/lib/netstandard2.0/OpenAI.xml" />
     <None Include="Assets/Packages/Microsoft.Extensions.Options.3.1.10/lib/netstandard2.0/Microsoft.Extensions.Options.xml" />
     <None Include="Assets/UI/ElementListItem.uxml" />
+    <None Include="Assets/UI/MapAction.uxml" />
     <None Include="Assets/Packages/Microsoft.NET.StringTools.17.11.4/notices/THIRDPARTYNOTICES.txt" />
     <None Include="Assets/Packages/System.Collections.Immutable.8.0.0/lib/netstandard2.0/System.Collections.Immutable.xml" />
     <None Include="Assets/Packages/System.Diagnostics.DiagnosticSource.6.0.1/useSharedDesignerContext.txt" />

@@ -13,7 +13,7 @@ using UnityEngine.UIElements;
 /// <summary>
 /// Скрипт для действия с ИИ в пользовательском интерфейсе.
 /// </summary>
-public class AIActionController : IAction
+public class AIActionController : IActionController
 {
     /// <summary>
     /// Ссылка на текущий сюжет.
