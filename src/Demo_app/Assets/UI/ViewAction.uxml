@@ -1,0 +1,33 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:Template name="EditSelectedElement" src="project://database/Assets/UI/EditSelectedElement.uxml?fileID=9197481963319205126&amp;guid=abaa16729a5c73d219a73d9731163b58&amp;type=3#EditSelectedElement" />
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
+    <ui:VisualElement name="ViewAction" content-container="ElementsList" style="flex-grow: 1; flex-direction: row; right: 0; bottom: 0; left: 0; top: 0;">
+        <ui:VisualElement name="ElementsView" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement name="ElementsFilter" style="flex-grow: 1; width: 30%;">
+                <ui:DropdownField label="Filter" name="FilterDropdown" choices="All elements,Character,Item,Location,Event" index="0" class="Dropdown" />
+                <ui:TextField label="Search" name="SearchTextField" class="TextField" />
+                <ui:ListView name="ElementsListView" item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" show-add-remove-footer="false" allow-add="true" fixed-item-height="50" class="ListView" style="flex-grow: 1;" />
+                <ui:VisualElement name="AddElementsBar" style="flex-grow: 0; height: 50px; flex-direction: row; align-content: stretch; justify-content: space-around; align-items: stretch;">
+                    <ui:Button name="AddCharacterButton" class="Button">
+                        <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icons/AddCharacterItem.svg?fileID=7388822144124034973&amp;guid=f36362bd0e273c67e8f2ae81c91f5026&amp;type=3#AddCharacterItem&quot;); width: 48px; height: 48px;" />
+                    </ui:Button>
+                    <ui:Button name="AddItemButton" class="Button">
+                        <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icons/AddItemIcon.svg?fileID=7388822144124034973&amp;guid=d964a4ca7bc9f754b96198b3a024abc2&amp;type=3#AddItemIcon&quot;); width: 48px; height: 48px;" />
+                    </ui:Button>
+                    <ui:Button name="AddLocationButton" class="Button">
+                        <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; width: 48px; height: 48px; background-image: url(&quot;project://database/Assets/Icons/AddLocationIcon.svg?fileID=7388822144124034973&amp;guid=ea79a32da73391b6c8bc1581e907506e&amp;type=3#AddLocationIcon&quot;);" />
+                    </ui:Button>
+                    <ui:Button name="AddEventButton" class="Button">
+                        <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icons/AddEventIcon.svg?fileID=7388822144124034973&amp;guid=d24a87880b39145e9824a9ca75fce51e&amp;type=3#AddEventIcon&quot;); width: 48px; height: 48px;" />
+                    </ui:Button>
+                    <ui:Button name="DeleteElementButton" class="Button">
+                        <ui:VisualElement class="ButtonIcon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/Icons/DeleteIcon.svg?fileID=7388822144124034973&amp;guid=8c5d7eb9f2901265b923c9fd533e7524&amp;type=3#DeleteIcon&quot;); width: 48px; height: 48px;" />
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="SelectedElement" style="flex-grow: 1; width: 60%; display: flex;">
+                <ui:Instance template="EditSelectedElement" enabled="true" name="EditSelectedElement" style="display: none; visibility: visible;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

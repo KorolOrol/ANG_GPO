@@ -1,0 +1,27 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+        <ui:ScrollView style="flex-grow: 1; max-width: 40%;">
+            <ui:GroupBox text="Map Settings" class="GroupBox">
+                <ui:Slider label="Width" value="0" high-value="100" name="WidthSlider" show-input-field="true" class="Slider" />
+                <ui:Slider label="Slider" value="0" high-value="100" name="HeightSlider" show-input-field="true" class="Slider" />
+                <ui:TextField label="Chunk Size" name="ChunkSizeTextField" class="TextField" />
+            </ui:GroupBox>
+            <ui:GroupBox text="Noize &amp; Biome" class="GroupBox">
+                <ui:TextField label="Seed" name="SeedTextField" class="TextField" />
+                <ui:TextField label="Noize Scale" name="NoizeScaleTextField" class="TextField" />
+                <ui:TextField label="Octaves" name="OctavesTextField" class="TextField" />
+                <ui:Slider label="Persistance" value="0" high-value="100" name="PersistanceSlider" show-input-field="true" class="Slider" />
+                <ui:Slider label="Slider" value="0" high-value="100" name="LacunaritySlider" show-input-field="true" fill="false" class="Slider" />
+                <ui:GroupBox text="Noize Offset" class="GroupBox" style="flex-direction: column;">
+                    <ui:TextField label="X" name="NoizeOffsetXTextField" class="TextField" />
+                    <ui:TextField label="Y" name="NoizeOffsetYTextField" class="TextField" />
+                </ui:GroupBox>
+            </ui:GroupBox>
+            <ui:GroupBox text="Locations" class="GroupBox" style="height: 300px;">
+                <ui:ListView item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" name="LocationsListView" class="ListView" style="flex-grow: 1;" />
+            </ui:GroupBox>
+        </ui:ScrollView>
+        <ui:VisualElement name="MapViewVisualElement" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>

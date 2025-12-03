@@ -17,6 +17,7 @@ namespace BaseClasses.Services
         /// </summary>
         /// <param name="baseElement">Базовый элемент</param>
         /// <param name="mergedElement">Объединяемый элемент</param>
+        /// <param name="basePriority">Приоритет базового элемента</param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
         public static void Merge(IElement baseElement, IElement mergedElement, bool basePriority = true)
@@ -37,7 +38,8 @@ namespace BaseClasses.Services
                 baseElement.Description = mergedElement.Description;
             }
 
-            foreach (KeyValuePair<string, object> kvp in mergedElement.Params)
+            foreach (KeyValuePair<string, object> kvp in 
+                mergedElement.Params.ToDictionary(pair => pair.Key, pair => pair.Value))
             {
                 switch (kvp.Value)
                 {
@@ -67,9 +69,8 @@ namespace BaseClasses.Services
                         break;
                     case IList values:
                         {
-                            if (!baseElement.Params.ContainsKey(kvp.Key))
+                            if (baseElement.Params.TryAdd(kvp.Key, values))
                             {
-                                baseElement.Params.Add(kvp.Key, values);
                                 break;
                             }
                             foreach (var value in values.Cast<object>().ToList())
@@ -81,9 +82,8 @@ namespace BaseClasses.Services
                         break;
                     case object value:
                         {
-                            if (!baseElement.Params.ContainsKey(kvp.Key))
+                            if (baseElement.Params.TryAdd(kvp.Key, value))
                             {
-                                baseElement.Params.Add(kvp.Key, value);
                             }
                             else if (baseElement.Params[kvp.Key] is null ||
                                 (baseElement.Params[kvp.Key] is string s &&

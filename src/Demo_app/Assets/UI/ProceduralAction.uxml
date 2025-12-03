@@ -1,0 +1,33 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="EditSelectedElement" src="project://database/Assets/UI/EditSelectedElement.uxml?fileID=9197481963319205126&amp;guid=abaa16729a5c73d219a73d9731163b58&amp;type=3#EditSelectedElement" />
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
+    <ui:ScrollView style="flex-grow: 1;">
+        <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement style="flex-grow: 1; max-width: 50%;">
+                <ui:GroupBox text="Procedural Character Generation" class="GroupBox">
+                    <ui:TextField label="Name" name="NameTextField" class="TextField" />
+                    <ui:Slider label="Max Traits" value="0" high-value="10" name="MaxTraitsSlider" class="Slider" />
+                    <ui:Slider label="Max Phobias" value="0" high-value="10" name="MaxPhobiasSlider" class="Slider" />
+                </ui:GroupBox>
+                <ui:GroupBox text="Optional" class="GroupBox">
+                    <ui:TextField label="Surname" name="SurnameTextField" class="TextField" />
+                    <ui:TextField label="Age" name="AgeTextField" keyboard-type="NumberPad" class="TextField" />
+                    <ui:TextField label="Description" name="DescriptionTextField" multiline="true" vertical-scroller-visibility="Auto" class="DescriptionTextField" />
+                    <ui:DropdownField label="Mother" name="MotherDropdown" class="Dropdown" />
+                    <ui:DropdownField label="Father" name="FatherDropdown" class="Dropdown" />
+                    <ui:DropdownField label="Relation" name="RelationToCharacterDropdown" class="Dropdown" />
+                    <ui:TextField label="Value" name="RelationValueTextField" keyboard-type="NumberPad" auto-correction="true" class="TextField" />
+                </ui:GroupBox>
+                <ui:GroupBox text="Generation Mode" class="GroupBox">
+                    <ui:DropdownField label="Mode" name="GenerationModeDropdown" class="Dropdown" />
+                    <ui:Button text="Generate" name="GenerateButton" class="PositiveButton Button" />
+                </ui:GroupBox>
+            </ui:VisualElement>
+            <ui:VisualElement style="flex-grow: 1; max-width: 50%;">
+                <ui:GroupBox text="Procedural Character Info" class="GroupBox" style="flex-grow: 1;">
+                    <ui:Instance template="EditSelectedElement" />
+                </ui:GroupBox>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:ScrollView>
+</ui:UXML>

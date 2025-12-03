@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Interface;
@@ -252,7 +252,7 @@ namespace AIGenerator
         /// </summary>
         public void ParamsJsonToSystem()
         {
-            foreach (var kvp in Params)
+            foreach (var kvp in Params.ToDictionary(k => k.Key, v => v.Value))
             {
                 if (kvp.Value is JsonElement jsonElement)
                 {

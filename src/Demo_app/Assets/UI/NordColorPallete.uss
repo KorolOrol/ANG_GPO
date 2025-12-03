@@ -1,0 +1,175 @@
+:root {
+    --nord-dark: rgb(46, 52, 64);
+    --nord-semidark: rgb(59, 66, 82);
+    --nord-semilight: rgb(67, 76, 94);
+    --nord-light: rgb(76, 86, 106);
+    --nord-white: rgb(236, 239, 244);
+    --nord-darkwhite: rgb(229, 233, 240);
+    --nord-gray: rgb(216, 222, 233);
+    --nord-red: rgb(191, 97, 106);
+    --nord-orange: rgb(208, 135, 112);
+    --nord-yellow: rgb(235, 203, 139);
+    --nord-green: rgb(163, 190, 140);
+    --nord-purple: rgb(180, 142, 173);
+    color: var(--nord-gray);
+    font-size: 20px;
+    -unity-font-definition: url("project://database/Assets/Fonts/Nunito-Regular.ttf?fileID=12800000&guid=51d57c9009214d79e84cd21c3124d41d&type=3#Nunito-Regular");
+    -unity-font-style: normal;
+}
+
+.Button {
+    flex-grow: 0;
+    width: auto;
+    flex-shrink: 0;
+    border-top-width: 0;
+    border-right-width: 0;
+    border-bottom-width: 0;
+    border-left-width: 0;
+    color: var(--nord-white);
+    background-color: var(--nord-semidark);
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    margin-left: 4px;
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+    align-content: center;
+    align-items: center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.ButtonIcon {
+    flex-grow: 0;
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    margin-left: 4px;
+}
+
+.Dropdown {
+    width: auto;
+    min-width: auto;
+}
+
+.Dropdown > .unity-base-field__label {
+    min-width: auto;
+    width: 30%;
+    color: var(--nord-gray);
+}
+
+.Dropdown > .unity-base-field__input {
+    background-color: var(--nord-white);
+    border-width: 0;
+    color: var(--nord-dark);
+}
+
+.Dropdown > .unity-base-field:focus:enabled > .unity-base-field__label {
+    color: var(--nord-white);
+}
+
+.TextField {
+}
+
+.TextField > .unity-base-field__label {
+    min-width: auto;
+    width: 30%;
+    color: var(--nord-gray);
+}
+
+.TextField > .unity-base-field__input {
+    background-color: var(--nord-white);
+    border-width: 0;
+    color: var(--nord-dark);
+}
+
+.TextField > .unity-base-field:focus:enabled > .unity-base-field__label {
+    color: var(--nord-white);
+}
+
+.Slider {
+}
+
+.Slider > .unity-base-field__label {
+    min-width: auto;
+    width: 30%;
+    color: var(--nord-gray);
+}
+
+.Slider > .unity-base-slider__input > .unity-base-slider__text-field {
+    background-color: var(--nord-white);
+    color: var(--nord-dark);
+}
+
+.unity-foldout__checkmark {
+    background-image: url("project://database/Assets/Icons/ArrowDropDown.svg?fileID=7388822144124034973&guid=9d40353fc8a260299a4285bfa38d5346&type=3#ArrowDropDown");
+    -unity-background-image-tint-color: var(--nord-gray);
+}
+
+.Foldout {
+}
+
+.Foldout > .unity-foldout__toggle > .unity-toggle__input:focus:enabled > .unity-label {
+    color: var(--nord-white);
+}
+
+.ListView {
+}
+
+.unity-collection-view:focus:enabled .unity-collection-view__item--selected {
+    background-color: var(--nord-semidark);
+}
+
+.unity-collection-view__item--selected {
+    background-color: var(--nord-light);
+}
+
+.RadioButton {
+}
+
+.RadioButton > .unity-radio-button__input {
+    flex-grow: 0;
+}
+
+.GroupBox {
+    background-color: var(--nord-semidark);
+}
+
+.Toggle {
+}
+
+.Toggle > .unity-toggle__input {
+    flex-grow: 0;
+}
+
+.PositiveButton {
+    background-color: var(--nord-green);
+    color: var(--nord-dark);
+}
+
+.NegativeButton {
+    background-color: var(--nord-red);
+    color: var(--nord-dark);
+}
+
+.DescriptionTextField {
+    white-space: normal;
+    max-height: 200px;
+    flex-direction: column;
+}
+
+.DescriptionTextField > .unity-base-field__label {
+    min-width: auto;
+    color: var(--nord-gray);
+}
+
+.DescriptionTextField > .unity-base-field__input {
+    background-color: var(--nord-white);
+    border-width: 0;
+    color: var(--nord-dark);
+}
