@@ -185,8 +185,11 @@ namespace DataBase
                     Time = Convert.ToInt32(node.Properties["Time"])
                 };
                 FillParams(node, elem);
+
                 plot.Add(elem);
             }
+            
+            plot.Time = Connection.Nodes.Max(n => Convert.ToInt32(n.Properties["Time"]));
 
             foreach (var rel in Connection.Relations)
             {
@@ -225,7 +228,7 @@ namespace DataBase
         {
             if (element == null) { throw new ArgumentNullException(); }
 
-            foreach (var prop in elementNode.Properties.Keys)
+            foreach (var prop in elementNode.Properties.Keys.ToList())
             {
                 if (!sourceArray.Contains(prop))
                 {
@@ -386,7 +389,7 @@ namespace DataBase
             if (element == null) { throw new ArgumentNullException(); }
             if (centralNode == null) { throw new ArgumentNullException(); }
 
-            foreach (var param in element.Params.Keys)
+            foreach (var param in element.Params.Keys.ToList())
             {
                 Node newNode;
                 if (element.Params[param] is IEnumerable<IElement> elements)
