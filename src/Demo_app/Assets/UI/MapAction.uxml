@@ -2,6 +2,8 @@
     <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
     <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
         <ui:ScrollView style="flex-grow: 1; max-width: 40%;">
+            <ui:Button text="Generate" name="GenerateMapButton" emoji-fallback-support="true" class="Button PositiveButton" />
+            <ui:Button text="Clear Map" name="ClearMapButton" emoji-fallback-support="true" class="Button PositiveButton" />
             <ui:GroupBox text="Map Settings" class="GroupBox">
                 <ui:Slider label="Width" value="0" high-value="100" name="WidthSlider" show-input-field="true" class="Slider" />
                 <ui:Slider label="Slider" value="0" high-value="100" name="HeightSlider" show-input-field="true" class="Slider" />
@@ -24,4 +26,5 @@
         </ui:ScrollView>
         <ui:VisualElement name="MapViewVisualElement" style="flex-grow: 1;" />
     </ui:VisualElement>
+    <ui:VisualElement style="flex-grow: 1;" />
 </ui:UXML>
