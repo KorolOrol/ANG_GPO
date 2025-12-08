@@ -23,10 +23,19 @@ public class ModularBuildingGenerator : MonoBehaviour
     [Range(1, 5)] public int minFloors = 1;
     [Range(1, 5)] public int maxFloors = 2;
 
-    [Range(1, 11)] public int TestX = 2;
-    [Range(1, 11)] public int TestZ = 2;
+    [Header("Test Settings")] // Настройки тестовой генерации
+
+    [Range(1, 11)] public int SizeX = 2;
+    [Range(1, 11)] public int SizeZ = 2;
+
+    public int PosX = 0;
+    public int PosY = 0;
+    public int PosZ = 0;
+
+    [Range(1, 5)] public int floors = 1;
 
     private Vector3 buildingSize;
+    private Vector3 buildingPos = new Vector3(0, 0, 0);
     private int floorsCount;
 
     private float doorChance = 0.2f;
@@ -66,6 +75,12 @@ public class ModularBuildingGenerator : MonoBehaviour
             1,
             buildingSize.z
         );
+
+        roof.transform.position = new Vector3(
+            roofPosition.x + buildingPos.x,
+            roofPosition.y + buildingPos.y,
+            buildingPos.z
+        );
     }
 
     /// <summary>
@@ -94,6 +109,12 @@ public class ModularBuildingGenerator : MonoBehaviour
             0.4f,
             buildingSize.z
         );
+
+        foundation.transform.position = new Vector3(
+            foundationPosition.x + buildingPos.x,
+            0 + buildingPos.y,
+            buildingPos.z
+        );
     }
 
     /// <summary>
@@ -109,6 +130,7 @@ public class ModularBuildingGenerator : MonoBehaviour
         CreateGroups();
 
         floorsCount = Random.Range(minFloors, maxFloors + 1);
+
         buildingSize = new Vector3(
             (int)(Random.Range(minMaxSize.x, minMaxSize.y)),
             0,
@@ -123,20 +145,22 @@ public class ModularBuildingGenerator : MonoBehaviour
     /// <summary>
     /// Создание тестового здания (с заданием его параметров)
     /// </summary>
-    public void TestGenerateBuilding()
+    public void GenerateTestBuilding()
     {
-        if (currentBuilding != null)
-        {
-            DestroyImmediate(currentBuilding.gameObject);
-        }
-
         CreateGroups();
 
-        floorsCount = 1;
+        floorsCount = floors;
+
         buildingSize = new Vector3(
-            (float)TestX,
+            (float)SizeX,
             0,
-            (float)TestZ
+            (float)SizeZ
+        );
+
+        buildingPos = new Vector3(
+            (int)(PosX),
+            (int)(PosY),
+            (int)(PosZ)
         );
 
         CreateFoundation();
@@ -150,6 +174,12 @@ public class ModularBuildingGenerator : MonoBehaviour
     void CreateGroups()
     {
         currentBuilding = new GameObject("Generated Building").transform;
+
+        Vector3 desiredPivotOffset = new Vector3(
+            -SizeX + (float)PosX,
+            floors * 1f + ((0.5f + 0.2f) / 2f) + (float)PosY,
+            -SizeZ + (float)PosZ);
+        currentBuilding.transform.position = desiredPivotOffset;
 
         northWallGroup = new GameObject("North Wall");
         southWallGroup = new GameObject("South Wall");
@@ -192,6 +222,12 @@ public class ModularBuildingGenerator : MonoBehaviour
                 buildingSize.x,
                 0.4f,
                 buildingSize.z - 0.5f
+            );
+
+            floor.transform.position = new Vector3(
+                buildingPos.x,
+                floorPosition.y + buildingPos.y,
+                floorPosition.z + buildingPos.z
             );
         }
 
@@ -275,6 +311,12 @@ public class ModularBuildingGenerator : MonoBehaviour
                     Quaternion.Euler(0, rotation, 0),
                     group
                 );
+
+                wall.transform.position = new Vector3(
+                    wallPosition.x + buildingPos.x,
+                    wallPosition.y + buildingPos.y,
+                    wallPosition.z + buildingPos.z
+                );
             }
         }
         else
@@ -307,6 +349,12 @@ public class ModularBuildingGenerator : MonoBehaviour
                     wallPosition,
                     Quaternion.Euler(0, rotation, 0),
                     group
+                );
+
+                wall.transform.position = new Vector3(
+                    wallPosition.x + buildingPos.x,
+                    wallPosition.y + buildingPos.y,
+                    wallPosition.z + buildingPos.z
                 );
             }
         }

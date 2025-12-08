@@ -15,7 +15,7 @@ public class MapZoom : MonoBehaviour
 
     [Header("Настройки приближения")]
     public Vector2Int coordinate;
-    public int zoomSize = 150;
+    public int zoomSize = 25;
     public int zoomScale = 16;
     [Tooltip("Сколько маленьких пикселей на 1 исходный")]
     public int subdivisions = 2;
@@ -59,15 +59,115 @@ public class MapZoom : MonoBehaviour
     private Texture2D mainMapTexture;
     private Texture2D zoomedTexture;
 
+    public GameObject camerasController;
+    private CamerasController CC;
+
+    public ModularBuildingGenerator MBGPrefab;
+
+    private GameObject BuildsContainer;
+    private GameObject MapGenContainer;
+
+    private void Start()
+    {
+        CC = camerasController.GetComponent<CamerasController>();
+    }
+
     /// <summary>
     /// Обновляет приближенный вид карты при включенном флаге обновления
     /// </summary>
     private void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            HandleCityClick();
+        }
+
         if (updateZoom)
         {
             updateZoom = false;
             GenerateZoomedMap();
+        }
+    }
+
+    public void HandleBackClick()
+    {
+        if (MapGenContainer != null) MapGenContainer.SetActive(true);
+        if (sourceRenderer != null) sourceRenderer.gameObject.SetActive(true);
+        if (BuildsContainer != null) BuildsContainer.SetActive(true);
+
+        GameObject CityContainer = GameObject.Find("3DCityContainer");
+        DestroyImmediate(CityContainer);
+    }
+
+    private void HandleCityClick()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            GameObject hitObject = hit.collider.gameObject;
+            if (hitObject.CompareTag("GeneratedObject") && hitObject.name.Contains("City"))
+            {
+                CC.ChangeCamera();
+                Generate3DCity(hitObject);
+            }
+        }
+    }
+
+    private void Generate3DCity(GameObject cityObject)
+    {
+        // Находим контейнер с зданиями
+        Transform buildingsContainer = GameObject.Find("BuildingsContainer")?.transform;
+
+        if (GameObject.Find("3DCityContainer") != null)
+        {
+            Debug.LogWarning("3D city already exists!");
+            return;
+        }
+
+        // Создайте контейнер для 3D-зданий
+        GameObject container = new GameObject("3DCityContainer");
+
+        // Скрываем карту
+        GameObject mapGen = GameObject.Find("MapGenerator");
+        if (mapGen != null) MapGenContainer = mapGen; mapGen.SetActive(false);
+        if (sourceRenderer != null) sourceRenderer.gameObject.SetActive(false);
+        if (buildingsContainer != null) BuildsContainer = buildingsContainer.gameObject; buildingsContainer.gameObject.SetActive(false);
+
+        float cameraPosX = cityObject.transform.position.x - 200;
+        float cameraPosY = cityObject.transform.position.y + 400;
+        float cameraPosZ = cityObject.transform.position.z - 1000;
+
+        int buildingCNT = 1;
+
+        CC.CityCamera.transform.position = new Vector3(cameraPosX, cameraPosY, cameraPosZ);
+
+        // Генерируем 3D-здания
+        foreach (Transform building in buildingsContainer)
+        {
+            // Настройка параметров генератора
+            MBGPrefab.SizeX = (int)(building.localScale.x / 34.615f);
+            MBGPrefab.SizeZ = (int)(building.localScale.z / 34.615f);
+
+            MBGPrefab.floors = (int)building.localScale.y / 10;
+
+            MBGPrefab.PosX = (int)building.position.x + 2 * (MBGPrefab.SizeX / 2);
+            MBGPrefab.PosY = 45 + 15 * (MBGPrefab.floors - 1) - (1 * (MBGPrefab.floors - 1));
+            MBGPrefab.PosZ = (int)building.position.z;
+
+
+            MBGPrefab.GenerateTestBuilding();
+
+            GameObject builtHouse = GameObject.Find("Generated Building");
+            builtHouse.name = "Generated Building " + buildingCNT;
+            buildingCNT++;
+
+            builtHouse.transform.localScale = new Vector3(
+                15,
+                15,
+                15
+            );
+
+            builtHouse.transform.SetParent(container.transform);
         }
     }
 
@@ -103,7 +203,7 @@ public class MapZoom : MonoBehaviour
 
         var manual = FindObjectOfType<MapGeneratorManual>();
 
-        int baseSize = zoomSize * 2 + 1;
+        int baseSize = zoomSize * 2;
         int subSize = baseSize * subdivisions;
         Color[] subColors = new Color[subSize * subSize];
 
@@ -453,7 +553,7 @@ public class MapZoom : MonoBehaviour
         Vector3 fwd = tt.forward;
         Vector3 wp = c + r * ((u - 0.5f) * wS) + fwd * ((v - 0.5f) * wS);
 
-        GameObject building = Instantiate(buildingPrefab, wp + Vector3.up * 0.01f, Quaternion.identity, container);
+        GameObject building = Instantiate(buildingPrefab, wp + Vector3.up * 5f, Quaternion.identity, container);
         building.name = $"CityBuilding_{startX}_{startY}_{width}x{depth}";
 
         float cellWorldSize = 10f * tt.localScale.x / baseSize;

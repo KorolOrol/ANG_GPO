@@ -20,7 +20,7 @@ public class MBG_Editor : Editor
 
         if (GUILayout.Button("TestGenerate Building", GUILayout.Height(30)))
         {
-            MBG_Gen.TestGenerateBuilding();
+            MBG_Gen.GenerateTestBuilding();
         }
 
         if (GUILayout.Button("Clear"))
