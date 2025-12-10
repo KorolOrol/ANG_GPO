@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Model;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -89,7 +91,12 @@ public class ProceduralActionController : IActionController
     /// Сгенерированный персонаж.
     /// </summary>
     private Element _generatedCharacter;
-    
+
+    /// <summary>
+    /// Сгенерированный персонаж.
+    /// </summary>
+    private PrCharacter _generatedPrCharacter;
+
     /// <summary>
     /// Флаг инициализации визуальных элементов.
     /// </summary>
@@ -104,7 +111,7 @@ public class ProceduralActionController : IActionController
     {
         InitiateVisualElements(root);
         _plot = plot;
-        _editSelectedElementController = new EditSelectedElementController(_editGeneratedElement, plot);
+        _editSelectedElementController = new EditSelectedElementController(_editGeneratedElement, _plot);
         
         UpdateCharacterDropdowns();
     }
@@ -133,7 +140,7 @@ public class ProceduralActionController : IActionController
         _editGeneratedElement = root.Q<VisualElement>("EditGeneratedElement");
         
         // Инициализация режимов генерации
-        // _generationModeDropdown.choices = new[] { "Random", "Template-based", "Relation-based" }.ToList();
+        _generationModeDropdown.choices = new[] { "Chaotic", "Logic", "ByParentsChaotic", "ByParentsLogic" }.ToList();
         // _generationModeDropdown.value = "Random";
         
         // Обработчик кнопки генерации
@@ -173,34 +180,91 @@ public class ProceduralActionController : IActionController
             ? "Generated Character" 
             : _nameTextField.value;
         
-        int maxTraits = (int)_maxTraitsSlider.value;
-        int maxPhobias = (int)_maxPhobiasSlider.value;
+        int traitsCnt = (int)_maxTraitsSlider.value;
+        int phobiasCnt = (int)_maxPhobiasSlider.value;
         
-        Debug.Log($"Generating character: {name} with max {maxTraits} traits and {maxPhobias} phobias");
-        Debug.Log($"Mode: {_generationModeDropdown.value}");
+        Debug.Log($"Generating character: {name} with max {traitsCnt} traits and {phobiasCnt} phobias\n" +
+            $"Mode: {_generationModeDropdown.value}");
         
-        // TODO: Реализовать процедурную генерацию персонажа
-        _generatedCharacter = FullElementConstructor.CreateFullElement(ElemType.Character, name);
-        
-        // Применяем опциональные параметры
+        _generatedPrCharacter = new PrCharacter(name);
+
         if (!string.IsNullOrWhiteSpace(_surnameTextField.value))
         {
-            // TODO: Установить фамилию
+            _generatedPrCharacter.Surname = _surnameTextField.value;
         }
         
         if (!string.IsNullOrWhiteSpace(_ageTextField.value) && int.TryParse(_ageTextField.value, out int age))
         {
-            // TODO: Установить возраст
+            _generatedPrCharacter.Age = age;
         }
         
         if (!string.IsNullOrWhiteSpace(_descriptionTextField.value))
         {
-            _generatedCharacter.Description = _descriptionTextField.value;
+            _generatedPrCharacter.Description = _descriptionTextField.value;
         }
-        
+
+        if (!string.IsNullOrWhiteSpace(_fatherDropdown.value)) { _generatedPrCharacter.FatherID = Convert.ToInt32(_fatherDropdown.value); }
+
+        if (!string.IsNullOrWhiteSpace(_motherDropdown.value)) { _generatedPrCharacter.MotherID = Convert.ToInt32(_motherDropdown.value); }
+
+        if (_generationModeDropdown.value == "Chaotic")
+        {
+            PrGenerator.CreateByChaoticRandomTraits(_generatedPrCharacter, traitsCnt);
+        }
+
+        if (_generationModeDropdown.value == "Logic")
+        {
+            PrGenerator.CreateByLogicRandomTraits(_generatedPrCharacter, traitsCnt);
+        }
+
+        if (_generationModeDropdown.value == "ByParentsChaotic")
+        {
+            if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+            {
+                int motherId = _generatedPrCharacter.MotherID.Value;
+                int fatherId = _generatedPrCharacter.FatherID.Value;
+
+                if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
+                {
+                    PrCharacter mother = GlobalData.Characters[motherId];
+                    PrCharacter father = GlobalData.Characters[fatherId];
+
+                    if (traitsCnt != 0) { PrGenerator.CreateByTwoParentsHalfTraits(_generatedPrCharacter, mother, father, name); }
+
+                    PrGenerator.CreateByTwoParentsHalfRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
+                }
+            }
+        }
+
+        if (_generationModeDropdown.value == "ByParentsLogic")
+        {
+            if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+            {
+                int motherId = _generatedPrCharacter.MotherID.Value;
+                int fatherId = _generatedPrCharacter.FatherID.Value;
+
+                if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
+                {
+                    PrCharacter mother = GlobalData.Characters[motherId];
+                    PrCharacter father = GlobalData.Characters[fatherId];
+
+                    if (traitsCnt != 0) { PrGenerator.CreateByTwoParentsLogicTraits(_generatedPrCharacter, mother, father, name); }
+
+                    PrGenerator.CreateByTwoParentsLogicRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
+                }
+            }
+        }
+
+        // TODO: input? anchor?
+
+        if (phobiasCnt != 0) { PrGenerator.CreateByChaoticRandomPhobias(_generatedPrCharacter, phobiasCnt); }
+
         // Отображаем сгенерированного персонажа в редакторе
+        _generatedCharacter = PrGenerator.Translate(_generatedPrCharacter);
         _editSelectedElementController.SelectedElement = _generatedCharacter;
-        
+
+        _plot.Add(_generatedCharacter);
+
         Debug.Log($"Character generated: {_generatedCharacter.Name}");
     }
 }
