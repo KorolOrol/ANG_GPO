@@ -23,6 +23,9 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private Dictionary<Button, VisualElement> _actions;
 
+    /// <summary>
+    /// Список контроллеров действий.
+    /// </summary>
     private List<IActionController> _actionControllers;
     
     /// <summary>
@@ -44,6 +47,16 @@ public class MainWindowScript : MonoBehaviour
     /// Кнопка открытия сюжета.
     /// </summary>
     private Button _openButton;
+    
+    /// <summary>
+    /// Кнопка экспорта в JSON.
+    /// </summary>
+    private Button _exportJsonButton;
+    
+    /// <summary>
+    /// Кнопка экспорта в текстовый файл.
+    /// </summary>
+    private Button _exportTextButton;
     
     /// <summary>
     /// Кнопка информации о приложении.
@@ -76,11 +89,15 @@ public class MainWindowScript : MonoBehaviour
         _saveButton = _root.Q<Button>("SaveButton");
         _newButton = _root.Q<Button>("NewButton");
         _openButton = _root.Q<Button>("OpenButton");
+        _exportJsonButton = _root.Q<Button>("ExportJsonButton");
+        _exportTextButton = _root.Q<Button>("ExportTextButton");
         _aboutButton = _root.Q<Button>("AboutButton");
         
         _saveButton.clicked += OnSaveButtonClicked;
         _newButton.clicked += OnNewButtonClicked;
         _openButton.clicked += OnOpenButtonClicked;
+        _exportJsonButton.clicked += OnExportJsonButtonClicked;
+        _exportTextButton.clicked += OnExportTextButtonClicked;
         _aboutButton.clicked += OnAboutButtonClicked;
 
         _actions = new Dictionary<Button, VisualElement>
@@ -159,6 +176,27 @@ public class MainWindowScript : MonoBehaviour
             controller.Initiate(_root, _plot);
         }
         UpdateActionEvent?.Invoke();
+    }
+    
+    /// <summary>
+    /// Обработчик нажатия кнопки экспорта в JSON.
+    /// </summary>
+    private void OnExportJsonButtonClicked()
+    {
+        string path = EditorUtility.SaveFilePanel("Export JSON", "", "PlotExport", "json");
+        if (path.Length == 0) return;
+        Serializer.Serialize(_plot, path);
+    }
+    
+    /// <summary>
+    /// Обработчик нажатия кнопки экспорта в текстовый файл.
+    /// </summary>
+    private void OnExportTextButtonClicked()
+    {
+        string path = EditorUtility.SaveFilePanel("Export Text", "", "PlotExport", "txt");
+        if (path.Length == 0) return;
+        string text = _plot.FullInfo();
+        System.IO.File.WriteAllText(path, text);
     }
     
     /// <summary>
