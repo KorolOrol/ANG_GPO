@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 
@@ -184,7 +185,11 @@ public class MapGeneratorManual : MonoBehaviour
 
         int chunksX = Mathf.CeilToInt((float)mapWidth / chunkSize);
         int chunksY = Mathf.CeilToInt((float)mapHeight / chunkSize);
-        string[,] chunkBiome = new string[chunksX, chunksY];
+        string[][] chunkBiome = new string[chunksX][];
+        for (int index = 0; index < chunksX; index++)
+        {
+            chunkBiome[index] = new string[chunksY];
+        }
 
         for (int cx = 0; cx < chunksX; cx++)
         {
@@ -197,53 +202,53 @@ public class MapGeneratorManual : MonoBehaviour
                         int x = cx * chunkSize + dx, y = cy * chunkSize + dy;
                         if (x >= mapWidth || y >= mapHeight) continue;
                         string b = GetBiome(heightMap[x, y], biomeNoiseMap[x, y]);
-                        if (b == "Water" || b == "Deep Water") continue;
-                        if (!count.ContainsKey(b)) count[b] = 0;
+                        if (b is "Water" or "Deep Water") continue;
+                        count.TryAdd(b, 0);
                         count[b]++;
                     }
 
                 string mainBiome = null;
                 int max = -1;
-                foreach (var kv in count)
-                    if (kv.Value > max) { max = kv.Value; mainBiome = kv.Key; }
-                mainBiome ??= "Grassland";
-                chunkBiome[cx, cy] = mainBiome;
-
-                if (showChunkBiomes)
+                foreach (KeyValuePair<string, int> kv in count.Where(kv => kv.Value > max))
                 {
-                    float centerX = cx * chunkSize + chunkSize / 2f;
-                    float centerY = cy * chunkSize + chunkSize / 2f;
-                    float worldX = -(centerX - mapWidth / 2f) * 10f;
-                    float worldZ = -(centerY - mapHeight / 2f) * 10f;
-
-                    var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
-                    textObj.transform.SetParent(transform);
-                    textObj.transform.position = new Vector3(worldX, 10f, worldZ);
-                    textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
-                    textObj.transform.localScale = Vector3.one * 65f;
-                    textObj.tag = "GeneratedObject";
-
-                    var tm = textObj.AddComponent<TextMeshPro>();
-                    tm.text = mainBiome;
-                    tm.fontSize = 10f;
-                    tm.enableAutoSizing = false;
-                    tm.alignment = TextAlignmentOptions.Center;
-                    tm.enableWordWrapping = false;
-                    tm.overflowMode = TextOverflowModes.Overflow;
-                    tm.ForceMeshUpdate();
-
-                    Vector2 ts = tm.GetRenderedValues(false);
-                    float padX = 0.2f, padY = 0.1f;
-                    var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                    bg.name = $"BiomeBG_{cx}_{cy}";
-                    bg.transform.SetParent(textObj.transform);
-                    bg.transform.localPosition = new Vector3(0, 0, 0.01f);
-                    bg.transform.localRotation = Quaternion.identity;
-                    bg.transform.localScale = new Vector3(ts.x + padX, ts.y + padY, 1f);
-                    var mat = new Material(Shader.Find("Unlit/Color"));
-                    mat.color = Color.black;
-                    bg.GetComponent<MeshRenderer>().material = mat;
+                    max = kv.Value; mainBiome = kv.Key;
                 }
+                mainBiome ??= "Grassland";
+                chunkBiome[cx][cy] = mainBiome;
+
+                if (!showChunkBiomes) continue;
+                float centerX = cx * chunkSize + chunkSize / 2f;
+                float centerY = cy * chunkSize + chunkSize / 2f;
+                float worldX = -(centerX - mapWidth / 2f) * 10f;
+                float worldZ = -(centerY - mapHeight / 2f) * 10f;
+
+                var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
+                textObj.transform.SetParent(transform);
+                textObj.transform.position = new Vector3(worldX, 10f, worldZ);
+                textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
+                textObj.transform.localScale = Vector3.one * 65f;
+                textObj.tag = "GeneratedObject";
+
+                var tm = textObj.AddComponent<TextMeshPro>();
+                tm.text = mainBiome;
+                tm.fontSize = 10f;
+                tm.enableAutoSizing = false;
+                tm.alignment = TextAlignmentOptions.Center;
+                tm.textWrappingMode = TextWrappingModes.NoWrap;
+                tm.overflowMode = TextOverflowModes.Overflow;
+                tm.ForceMeshUpdate();
+
+                Vector2 ts = tm.GetRenderedValues(false);
+                float padX = 0.2f, padY = 0.1f;
+                var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                bg.name = $"BiomeBG_{cx}_{cy}";
+                bg.transform.SetParent(textObj.transform);
+                bg.transform.localPosition = new Vector3(0, 0, 0.01f);
+                bg.transform.localRotation = Quaternion.identity;
+                bg.transform.localScale = new Vector3(ts.x + padX, ts.y + padY, 1f);
+                var mat = new Material(Shader.Find("Unlit/Color"));
+                mat.color = Color.black;
+                bg.GetComponent<MeshRenderer>().material = mat;
             }
         }
 
@@ -253,7 +258,7 @@ public class MapGeneratorManual : MonoBehaviour
             {
                 for (int cy = 0; cy < chunksY; cy++)
                 {
-                    string mainB = chunkBiome[cx, cy];
+                    string mainB = chunkBiome[cx][cy];
                     for (int dx = 0; dx < chunkSize; dx++)
                         for (int dy = 0; dy < chunkSize; dy++)
                         {
@@ -267,14 +272,13 @@ public class MapGeneratorManual : MonoBehaviour
         }
 
         placedLocations.Clear();
-        for (int i = 0; i < locations.Count; i++)
+        foreach (var loc in locations)
         {
-            var loc = locations[i];
-            List<Vector2Int> valid = new();
+            List<Vector2Int> valid = new List<Vector2Int>();
             for (int cx = 0; cx < chunksX; cx++)
-                for (int cy = 0; cy < chunksY; cy++)
-                    if (chunkBiome[cx, cy] == loc.biome)
-                        valid.Add(new Vector2Int(cx, cy));
+            for (int cy = 0; cy < chunksY; cy++)
+                if (chunkBiome[cx][cy] == loc.biome)
+                    valid.Add(new Vector2Int(cx, cy));
             if (valid.Count == 0) { Debug.LogWarning($"Нет чанков с {loc.biome}"); continue; }
             var ch = valid[Random.Range(0, valid.Count)];
             int px = Mathf.Clamp(ch.x * chunkSize + Random.Range(0, chunkSize), 0, mapWidth - 1);
@@ -289,7 +293,7 @@ public class MapGeneratorManual : MonoBehaviour
                     if (placedLocations.TryGetValue(other, out var e))
                         DrawSimpleRoad(s, e);
 
-        FindObjectOfType<MapDisplay>()
+        FindFirstObjectByType<MapDisplay>()
             .DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
     }
 
@@ -299,16 +303,19 @@ public class MapGeneratorManual : MonoBehaviour
     /// <param name="height">Значение высоты точки</param>
     /// <param name="noise">Дополнительный шум для вариативности</param>
     /// <returns>Название определенного биома</returns>
-    private string GetBiome(float height, float noise)
+    private static string GetBiome(float height, float noise)
     {
-        if (height <= 0.4f) return noise < 0.5f ? "Water" : "Deep Water";
-        if (height <= 0.44f) return "Sand";
-        if (height <= 0.6f) return noise < 0.5f ? "Grassland" : "Forest";
-        if (height <= 0.69f) return noise < 0.5f ? "Forest" : "Jungle";
-        if (height <= 0.8f) return "MountainBase";
-        if (height <= 0.85f) return "MountainMid";
-        if (height <= 0.9f) return "MountainHigh";
-        return "MountainPeak";
+        return height switch
+        {
+            <= 0.4f => noise < 0.5f ? "Water" : "Deep Water",
+            <= 0.44f => "Sand",
+            <= 0.6f => noise < 0.5f ? "Grassland" : "Forest",
+            <= 0.69f => noise < 0.5f ? "Forest" : "Jungle",
+            <= 0.8f => "MountainBase",
+            <= 0.85f => "MountainMid",
+            <= 0.9f => "MountainHigh",
+            _ => "MountainPeak"
+        };
     }
 
     /// <summary>
@@ -385,7 +392,7 @@ public class MapGeneratorManual : MonoBehaviour
                 if (xi < 0 || xi >= mapWidth || yi < 0 || yi >= mapHeight) continue;
                 float c = heightMap[xi, yi] < 0.41f || heightMap[xi, yi] > 0.79f ? float.MaxValue :
                           heightMap[xi, yi] > 0.6f ? 2f : 1f;
-                if (c == float.MaxValue) continue;
+                if (Mathf.Approximately(c, float.MaxValue)) continue;
                 float ng = g[cur] + Vector2.Distance(cur, w) * c;
                 if (!g.ContainsKey(w) || ng < g[w])
                 {
@@ -402,7 +409,7 @@ public class MapGeneratorManual : MonoBehaviour
             colourMap[yi * mapWidth + xi] = Color.red;
             p = came[p];
         }
-        FindObjectOfType<MapDisplay>()
+        FindFirstObjectByType<MapDisplay>()
             .DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
     }
 
@@ -439,7 +446,7 @@ public class MapGeneratorManual : MonoBehaviour
                     colourMap[y * mapWidth + x] = GetColorForBiome(GetBiome(heightMap[x, y], biomeNoiseMap[x, y]));
         }
 
-        Texture2D tex = TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight);
+        var tex = TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight);
         byte[] png = tex.EncodeToPNG();
         string pngPath = Path.Combine(dir, fileName + ".png");
         File.WriteAllBytes(pngPath, png);
@@ -465,10 +472,12 @@ public class MapGeneratorManual : MonoBehaviour
 
         foreach (var locDef in locations)
         {
-            LocationSaveData lsd = new LocationSaveData();
-            lsd.locationName = locDef.locationName;
-            lsd.biome = locDef.biome;
-            lsd.connectedLocations = new List<string>(locDef.connectedLocations ?? new List<string>());
+            var lsd = new LocationSaveData
+            {
+                locationName = locDef.locationName,
+                biome = locDef.biome,
+                connectedLocations = new List<string>(locDef.connectedLocations ?? new List<string>())
+            };
 
             if (placedLocations.TryGetValue(locDef.locationName, out var pos))
             {
@@ -519,7 +528,7 @@ public class MapGeneratorManual : MonoBehaviour
         }
 
         string json = File.ReadAllText(jsonPath);
-        MapSaveData data = JsonUtility.FromJson<MapSaveData>(json);
+        var data = JsonUtility.FromJson<MapSaveData>(json);
         if (data == null)
         {
             Debug.LogError("Не удалось распарсить JSON");
@@ -576,7 +585,11 @@ public class MapGeneratorManual : MonoBehaviour
 
         int chunksX = Mathf.CeilToInt((float)mapWidth / chunkSize);
         int chunksY = Mathf.CeilToInt((float)mapHeight / chunkSize);
-        string[,] chunkBiome = new string[chunksX, chunksY];
+        string[][] chunkBiome = new string[chunksX][];
+        for (int index = 0; index < chunksX; index++)
+        {
+            chunkBiome[index] = new string[chunksY];
+        }
 
         for (int cx = 0; cx < chunksX; cx++)
         {
@@ -589,66 +602,65 @@ public class MapGeneratorManual : MonoBehaviour
                         int x = cx * chunkSize + dx, y = cy * chunkSize + dy;
                         if (x >= mapWidth || y >= mapHeight) continue;
                         string b = GetBiome(heightMap[x, y], biomeNoiseMap[x, y]);
-                        if (b == "Water" || b == "Deep Water") continue;
-                        if (!count.ContainsKey(b)) count[b] = 0;
+                        if (b is "Water" or "Deep Water") continue;
+                        count.TryAdd(b, 0);
                         count[b]++;
                     }
 
                 string mainBiome = null;
                 int max = -1;
-                foreach (var kv in count)
-                    if (kv.Value > max) { max = kv.Value; mainBiome = kv.Key; }
-                mainBiome ??= "Grassland";
-                chunkBiome[cx, cy] = mainBiome;
-
-                if (showChunkBiomes)
+                foreach (KeyValuePair<string, int> kv in count.Where(kv => kv.Value > max))
                 {
-                    float centerX = cx * chunkSize + chunkSize / 2f;
-                    float centerY = cy * chunkSize + chunkSize / 2f;
-                    float worldX = -(centerX - mapWidth / 2f) * 10f;
-                    float worldZ = -(centerY - mapHeight / 2f) * 10f;
-
-                    var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
-                    textObj.transform.SetParent(transform);
-                    textObj.transform.position = new Vector3(worldX, 10f, worldZ);
-                    textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
-                    textObj.transform.localScale = Vector3.one * 65f;
-                    textObj.tag = "GeneratedObject";
-
-                    var tm = textObj.AddComponent<TextMeshPro>();
-                    tm.text = mainBiome;
-                    tm.fontSize = 10f;
-                    tm.enableAutoSizing = false;
-                    tm.alignment = TextAlignmentOptions.Center;
-                    tm.enableWordWrapping = false;
-                    tm.overflowMode = TextOverflowModes.Overflow;
-                    tm.ForceMeshUpdate();
-
-                    Vector2 ts = tm.GetRenderedValues(false);
-                    float padX = 0.2f, padY = 0.1f;
-                    var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
-                    bg.name = $"BiomeBG_{cx}_{cy}";
-                    bg.transform.SetParent(textObj.transform);
-                    bg.transform.localPosition = new Vector3(0, 0, 0.01f);
-                    bg.transform.localRotation = Quaternion.identity;
-                    bg.transform.localScale = new Vector3(ts.x + padX, ts.y + padY, 1f);
-                    var mat = new Material(Shader.Find("Unlit/Color"));
-                    mat.color = Color.black;
-                    bg.GetComponent<MeshRenderer>().material = mat;
+                    max = kv.Value; mainBiome = kv.Key;
                 }
+                mainBiome ??= "Grassland";
+                chunkBiome[cx][cy] = mainBiome;
+
+                if (!showChunkBiomes) continue;
+                float centerX = cx * chunkSize + chunkSize / 2f;
+                float centerY = cy * chunkSize + chunkSize / 2f;
+                float worldX = -(centerX - mapWidth / 2f) * 10f;
+                float worldZ = -(centerY - mapHeight / 2f) * 10f;
+
+                var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
+                textObj.transform.SetParent(transform);
+                textObj.transform.position = new Vector3(worldX, 10f, worldZ);
+                textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
+                textObj.transform.localScale = Vector3.one * 65f;
+                textObj.tag = "GeneratedObject";
+
+                var tm = textObj.AddComponent<TextMeshPro>();
+                tm.text = mainBiome;
+                tm.fontSize = 10f;
+                tm.enableAutoSizing = false;
+                tm.alignment = TextAlignmentOptions.Center;
+                tm.textWrappingMode = TextWrappingModes.NoWrap;
+                tm.overflowMode = TextOverflowModes.Overflow;
+                tm.ForceMeshUpdate();
+
+                Vector2 ts = tm.GetRenderedValues(false);
+                float padX = 0.2f, padY = 0.1f;
+                var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                bg.name = $"BiomeBG_{cx}_{cy}";
+                bg.transform.SetParent(textObj.transform);
+                bg.transform.localPosition = new Vector3(0, 0, 0.01f);
+                bg.transform.localRotation = Quaternion.identity;
+                bg.transform.localScale = new Vector3(ts.x + padX, ts.y + padY, 1f);
+                var mat = new Material(Shader.Find("Unlit/Color"))
+                {
+                    color = Color.black
+                };
+                bg.GetComponent<MeshRenderer>().material = mat;
             }
         }
 
         Dictionary<string, Vector2> loadedPositions = new Dictionary<string, Vector2>();
         if (data.locations != null)
         {
-            foreach (var ls in data.locations)
+            foreach (var ls in data.locations.Where(ls => ls.x >= 0 && ls.y >= 0))
             {
-                if (ls.x >= 0 && ls.y >= 0)
-                {
-                    CreateLocationObject(ls.locationName, ls.x, ls.y);
-                    loadedPositions[ls.locationName] = new Vector2(ls.x, ls.y);
-                }
+                CreateLocationObject(ls.locationName, ls.x, ls.y);
+                loadedPositions[ls.locationName] = new Vector2(ls.x, ls.y);
             }
         }
 
@@ -668,7 +680,7 @@ public class MapGeneratorManual : MonoBehaviour
             }
         }
 
-        FindObjectOfType<MapDisplay>()
+        FindFirstObjectByType<MapDisplay>()
             .DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
 
         placedLocations = loadedPositions;

@@ -6,9 +6,9 @@ using AIGenerator;
 using AIGenerator.TextGenerator;
 using BaseClasses.Enum;
 using BaseClasses.Model;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Utils;
 
 /// <summary>
 /// Скрипт для действия с ИИ в пользовательском интерфейсе.
@@ -224,7 +224,7 @@ public class AIActionController : IActionController
         
         _selectSystemPromptButton.clicked += () =>
         {
-            string path = EditorUtility.OpenFilePanel("Select System Prompt File", "", "");
+            string path = FileDialogUtility.OpenFilePanel("Select System Prompt File", "", "");
             if (string.IsNullOrWhiteSpace(path)) return;
             _selectedSystemPromptPath = path;
             _selectedSystemPromptPathLabel.text = "System Prompt: " + path;

@@ -101,7 +101,7 @@ public class MapZoom : MonoBehaviour
         if (!(sourceRenderer.sharedMaterial.mainTexture is Texture2D tex2D)) return;
         mainMapTexture = tex2D;
 
-        var manual = FindObjectOfType<MapGeneratorManual>();
+        var manual = FindFirstObjectByType<MapGeneratorManual>();
 
         int baseSize = zoomSize * 2 + 1;
         int subSize = baseSize * subdivisions;
@@ -312,9 +312,7 @@ public class MapZoom : MonoBehaviour
         zoomedTexture.SetPixels(subColors);
         zoomedTexture.Apply();
 
-        Texture2D finalTex;
-
-        finalTex = ScaleTexture(zoomedTexture, subSize * zoomScale, subSize * zoomScale);
+        var finalTex = ScaleTexture(zoomedTexture, subSize * zoomScale, subSize * zoomScale);
 
         finalTex.filterMode = FilterMode.Point;
         targetRenderer.sharedMaterial.mainTexture = finalTex;
@@ -477,7 +475,7 @@ public class MapZoom : MonoBehaviour
             DestroyImmediate(container);
         }
 
-        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+        GameObject[] allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
         foreach (GameObject obj in allObjects)
         {
             if (obj.name.StartsWith("CityBuilding") ||

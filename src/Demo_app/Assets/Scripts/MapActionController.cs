@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
@@ -7,6 +6,7 @@ using BaseClasses.Model;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 /// <summary>
 /// Скрипт для управления настройками карты и генерации карты.
@@ -107,7 +107,7 @@ public class MapActionController : IActionController
     {
         _plot = plot;
         // Предполагаем, что MapGeneratorManual находится на той же сцене
-        _mapGenerator = GameObject.FindObjectOfType<MapGeneratorManual>();
+        _mapGenerator = Object.FindFirstObjectByType<MapGeneratorManual>();
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден на сцене. Генерация карты будет недоступна.");

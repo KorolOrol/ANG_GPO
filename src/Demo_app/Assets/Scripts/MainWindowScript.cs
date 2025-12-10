@@ -4,9 +4,9 @@ using BaseClasses.Enum;
 using BaseClasses.Model;
 using BaseClasses.Services;
 using DataBase;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Utils;
 
 /// <summary>
 /// Скрипт главного окна приложения.
@@ -143,7 +143,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private void OnSaveButtonClicked()
     {
-        string path = EditorUtility.SaveFilePanel("Save File", "", "New Save", "ang");
+        string path = FileDialogUtility.SaveFilePanel("Save File", "", "New Save", "ang");
         if (path.Length == 0) return;
         _dbm = new DataBaseManager(path);
         _dbm.StorePlot(_plot);
@@ -167,7 +167,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private void OnOpenButtonClicked()
     {
-        string path = EditorUtility.OpenFilePanel("Open File", "", "ang");
+        string path = FileDialogUtility.OpenFilePanel("Open File", "", "ang");
         if (path.Length == 0) return;
         _dbm = new DataBaseManager(path);
         _plot = _dbm.ReadPlot();
@@ -183,7 +183,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private void OnExportJsonButtonClicked()
     {
-        string path = EditorUtility.SaveFilePanel("Export JSON", "", "PlotExport", "json");
+        string path = FileDialogUtility.SaveFilePanel("Export JSON", "", "PlotExport", "json");
         if (path.Length == 0) return;
         Serializer.Serialize(_plot, path);
     }
@@ -193,7 +193,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private void OnExportTextButtonClicked()
     {
-        string path = EditorUtility.SaveFilePanel("Export Text", "", "PlotExport", "txt");
+        string path = FileDialogUtility.SaveFilePanel("Export Text", "", "PlotExport", "txt");
         if (path.Length == 0) return;
         string text = _plot.FullInfo();
         System.IO.File.WriteAllText(path, text);
@@ -204,7 +204,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private static void OnAboutButtonClicked()
     {
-        EditorUtility.DisplayDialog("About", "Narrative Generator v1.0", "OK");
+        FileDialogUtility.DisplayDialog("About", "Narrative Generator v1.0", "OK");
     }
 
     /// <summary>

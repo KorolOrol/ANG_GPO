@@ -65,6 +65,7 @@
     <Compile Include="Assets/MapScripts/BiomeGenerator.cs" />
     <Compile Include="Assets/Scripts/FullElementConstructor.cs" />
     <Compile Include="Assets/Scripts/EditSelectedElementController.cs" />
+    <Compile Include="Assets/Scripts/Utils/FileDialogUtility.cs" />
     <Compile Include="Assets/Scripts/MainWindowScript.cs" />
     <Compile Include="Assets/MapScripts/LocationGenerate/Location.cs" />
     <Compile Include="Assets/MapScripts/MapGeneratorManual.cs" />
