@@ -5,6 +5,8 @@ using BaseClasses.Interface;
 using BaseClasses.Model;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
@@ -281,9 +283,12 @@ public class MapActionController : IActionController
     /// Создание элемента списка для отображения локации.
     /// </summary>
     /// <returns>Визуальный элемент для списка.</returns>
-    private VisualElement MakeLocationListItem()
+    private static VisualElement MakeLocationListItem()
     {
-        var elementAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
+        AsyncOperationHandle<VisualTreeAsset> handle = 
+            Addressables.LoadAssetAsync<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
+        handle.WaitForCompletion();
+        var elementAsset = handle.Result;
         var element = elementAsset.CloneTree();
         return element;
     }
@@ -307,7 +312,10 @@ public class MapActionController : IActionController
 
         if (element == null) return;
 
-        var vectorImage = AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeLocationIcon.svg");
+        var handle = 
+            Addressables.LoadAssetAsync<VectorImage>("Assets/Icons/ElemTypeLocationIcon.svg");
+        handle.WaitForCompletion();
+        var vectorImage = handle.Result;
         labelUI.text = element.Name;
         iconUI.style.backgroundImage = new StyleBackground(vectorImage);
     }

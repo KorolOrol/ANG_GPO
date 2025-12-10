@@ -77,8 +77,6 @@
     <Compile Include="Assets/MapScripts/LocationGenerate/ClickHandler.cs" />
     <Compile Include="Assets/MapScripts/TextureGenerator.cs" />
     <Compile Include="Assets/Scripts/ViewActionController.cs" />
-    <Compile Include="Assets/MapScripts/MapGeneratorEditor.cs" />
-    <Compile Include="Assets/MapScripts/MapGeneratorManualEditor.cs" />
     <Compile Include="Assets/MapScripts/MapGenerator.cs" />
     <Compile Include="Assets/MapScripts/LocationGenerate/MapZoom.cs" />
     <Compile Include="Assets/MapScripts/LocationPlacement/LocationData.cs" />
@@ -112,6 +110,7 @@
     <None Include="Assets/Packages/System.IO.Pipelines.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/Microsoft.Bcl.AsyncInterfaces.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/UI/EditSelectedElement.uxml" />
+    <None Include="Assets/AddressableAssetsData/link.xml" />
     <None Include="Assets/Packages/System.ClientModel.1.1.0/lib/netstandard2.0/System.ClientModel.xml" />
     <None Include="Assets/Packages/Microsoft.Extensions.DependencyInjection.Abstractions.3.1.10/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml" />
     <None Include="Assets/Packages/System.Text.Json.9.0.10/lib/netstandard2.0/System.Text.Json.xml" />
@@ -947,6 +946,9 @@
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ScriptableBuildPipeline.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Editor.dll</HintPath>
     </Reference>
@@ -962,6 +964,9 @@
     <Reference Include="PPv2URPConverters">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/PPv2URPConverters.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Addressables.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime.Shared">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.Shared.dll</HintPath>
     </Reference>
@@ -973,6 +978,9 @@
     </Reference>
     <Reference Include="Unity.Searcher.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Searcher.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline.Editor">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PlasticSCM.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.PlasticSCM.Editor.dll</HintPath>
@@ -1019,6 +1027,9 @@
     <Reference Include="Unity.VisualScripting.Flow.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualScripting.Flow.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ResourceManager.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
@@ -1027,6 +1038,9 @@
     </Reference>
     <Reference Include="Unity.InputSystem.ForUI">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.InputSystem.ForUI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Profiling.Core">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Profiling.Core.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.GPUDriven.Runtime">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.GPUDriven.Runtime.dll</HintPath>
@@ -1099,6 +1113,9 @@
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Addressables.Editor">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Addressables.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
