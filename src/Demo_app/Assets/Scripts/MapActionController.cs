@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
@@ -403,10 +404,6 @@ public class MapActionController : IActionController
         {
             _addLocationButton.clicked += OnAddLocationButtonClicked;
             Debug.Log("Кнопка Add Location подписана");
-        }
-        else
-        {
-            Debug.LogError("AddLocationButton НЕ НАЙДЕН! Проверьте имя кнопки в UI Builder");
         }
 
         if (_connectLocationsButton != null)
