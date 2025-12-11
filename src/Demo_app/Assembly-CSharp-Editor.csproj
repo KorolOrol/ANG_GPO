@@ -463,6 +463,9 @@
     <Reference Include="BaseClasses">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Plugins/BaseClasses.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/Newtonsoft.Json.13.0.4/lib/netstandard2.0/Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="MessagePack">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/MessagePack.3.1.4/lib/netstandard2.1/MessagePack.dll</HintPath>
     </Reference>
@@ -543,6 +546,9 @@
     </Reference>
     <Reference Include="MessagePack.Annotations">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/MessagePack.Annotations.3.1.4/lib/netstandard2.0/MessagePack.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="PrGenLib">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Plugins/PrGenLib.dll</HintPath>
     </Reference>
     <Reference Include="deniszykov.TypeConversion">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/deniszykov.TypeConversion.3.2.3/lib/netstandard2.1/deniszykov.TypeConversion.dll</HintPath>

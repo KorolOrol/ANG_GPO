@@ -9,8 +9,8 @@
     ".NETStandard,Version=v2.1/": {
       "PrGenLib/1.0.0": {
         "dependencies": {
-          "BaseClasses": "1.0.0",
-          "Newtonsoft.Json": "13.0.3"
+          "Newtonsoft.Json": "13.0.3",
+          "BaseClasses.Reference": "1.0.0.0"
         },
         "runtime": {
           "PrGenLib.dll": {}
@@ -123,10 +123,7 @@
           }
         }
       },
-      "BaseClasses/1.0.0": {
-        "dependencies": {
-          "System.Text.Json": "9.0.9"
-        },
+      "BaseClasses.Reference/1.0.0.0": {
         "runtime": {
           "BaseClasses.dll": {
             "assemblyVersion": "1.0.0.0",
@@ -212,8 +209,8 @@
       "path": "system.threading.tasks.extensions/4.5.4",
       "hashPath": "system.threading.tasks.extensions.4.5.4.nupkg.sha512"
     },
-    "BaseClasses/1.0.0": {
-      "type": "project",
+    "BaseClasses.Reference/1.0.0.0": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     }
