@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class MapGenerator : MonoBehaviour
@@ -54,7 +52,7 @@ public class MapGenerator : MonoBehaviour
         noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, offset);
         Debug.Log($"NoiseMap generated. Size: {noiseMap.GetLength(0)}x{noiseMap.GetLength(1)}");
 
-        BiomeGenerator biomeGen = FindObjectOfType<BiomeGenerator>();
+        BiomeGenerator biomeGen = FindFirstObjectByType<BiomeGenerator>();
         if (biomeGen == null)
         {
             Debug.LogError("BiomeGenerator не найден в сцене!");
@@ -97,7 +95,7 @@ public class MapGenerator : MonoBehaviour
             }
         }
         Debug.Log($"First color in ColourMap: {colourMap[0]}");
-        MapDisplay display = FindObjectOfType<MapDisplay>();
+        MapDisplay display = FindFirstObjectByType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap)
         {
             Debug.Log("Drawing NoiseMap...");
@@ -241,7 +239,7 @@ public class MapGenerator : MonoBehaviour
             }
         }
 
-        MapDisplay display = FindObjectOfType<MapDisplay>();
+        MapDisplay display = FindFirstObjectByType<MapDisplay>();
         display.DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
     }
 
@@ -256,11 +254,15 @@ public class MapGenerator : MonoBehaviour
         List<Vector2> openSet = new List<Vector2> { start };
         Dictionary<Vector2, Vector2> cameFrom = new Dictionary<Vector2, Vector2>();
 
-        Dictionary<Vector2, float> gScore = new Dictionary<Vector2, float>();
-        gScore[start] = 0;
+        Dictionary<Vector2, float> gScore = new Dictionary<Vector2, float>
+        {
+            [start] = 0
+        };
 
-        Dictionary<Vector2, float> fScore = new Dictionary<Vector2, float>();
-        fScore[start] = Vector2.Distance(start, end);
+        Dictionary<Vector2, float> fScore = new Dictionary<Vector2, float>
+        {
+            [start] = Vector2.Distance(start, end)
+        };
 
         while (openSet.Count > 0)
         {
@@ -290,7 +292,7 @@ public class MapGenerator : MonoBehaviour
             foreach (Vector2 neighbor in GetNeighbors(current))
             {
                 float terrainCost = GetTerrainCost(neighbor);
-                if (terrainCost == float.MaxValue) continue;
+                if (Mathf.Approximately(terrainCost, float.MaxValue)) continue;
 
                 float tentativeGScore = gScore[current] + Vector2.Distance(current, neighbor) * terrainCost;
 

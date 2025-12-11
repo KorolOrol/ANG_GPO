@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using System.Linq;
@@ -234,12 +235,12 @@ public class MapGeneratorManual : MonoBehaviour
                     float worldX = -(centerX - mapWidth / 2f) * 10f;
                     float worldZ = -(centerY - mapHeight / 2f) * 10f;
 
-                    var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
-                    textObj.transform.SetParent(transform);
-                    textObj.transform.position = new Vector3(worldX, 10f, worldZ);
-                    textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
-                    textObj.transform.localScale = Vector3.one * 65f;
-                    textObj.tag = "GeneratedObject";
+                var textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
+                textObj.transform.SetParent(transform);
+                textObj.transform.position = new Vector3(worldX, 10f, worldZ);
+                textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
+                textObj.transform.localScale = Vector3.one * 65f;
+                textObj.tag = "GeneratedObject";
 
                     var tm = textObj.AddComponent<TextMeshPro>();
                     tm.text = chunkBiome[cx, cy];
@@ -263,7 +264,7 @@ public class MapGeneratorManual : MonoBehaviour
             {
                 for (int cy = 0; cy < chunksY; cy++)
                 {
-                    string mainB = chunkBiome[cx, cy];
+                    string mainB = chunkBiome[cx][cy];
                     for (int dx = 0; dx < chunkSize; dx++)
                         for (int dy = 0; dy < chunkSize; dy++)
                         {
@@ -278,7 +279,7 @@ public class MapGeneratorManual : MonoBehaviour
 
         // Размещаем существующие локации
         placedLocations.Clear();
-        for (int i = 0; i < locations.Count; i++)
+        foreach (var loc in locations)
         {
             var loc = locations[i];
             PlaceLocation(loc);
@@ -772,7 +773,7 @@ public class MapGeneratorManual : MonoBehaviour
                     colourMap[y * mapWidth + x] = GetColorForBiome(GetBiome(heightMap[x, y], biomeNoiseMap[x, y]));
         }
 
-        Texture2D tex = TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight);
+        var tex = TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight);
         byte[] png = tex.EncodeToPNG();
         string pngPath = Path.Combine(dir, fileName + ".png");
         File.WriteAllBytes(pngPath, png);
@@ -849,7 +850,7 @@ public class MapGeneratorManual : MonoBehaviour
         }
 
         string json = File.ReadAllText(jsonPath);
-        MapSaveData data = JsonUtility.FromJson<MapSaveData>(json);
+        var data = JsonUtility.FromJson<MapSaveData>(json);
         if (data == null)
         {
             Debug.LogError("Не удалось распарсить JSON");

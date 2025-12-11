@@ -723,10 +723,62 @@ public class PrGenerator
 
     }
 
+    /// <summary>
+    /// Возвращает список отношений персонажа к другим
+    /// </summary>
+    /// <param name="character">PrCharacter</param>
+    /// <returns>List<string> of Relations</returns>
+    public static List<string> GetAllRelationsWithDesc(PrCharacter character)
+    {
+
+        List<string> listWithAff = new List<string>();
+
+        foreach (var relation in character.Relations)
+        {
+            PrCharacter opponent = GlobalData.Characters[relation.Key];
+
+            if (relation.Value <= -5.0)
+            {
+                listWithAff.Add($"Terrible attitude towards {opponent.Name}");
+            }
+            else if (relation.Value <= -3.0)
+            {
+                listWithAff.Add($"Bad attitude towards {opponent.Name}");
+            }
+            else if (relation.Value <= -1.0)
+            {
+                listWithAff.Add($"Abnormal attitude towards {opponent.Name}");
+            }
+            else if (relation.Value >= 5.0)
+            {
+                listWithAff.Add($"Excellent attitude towards {opponent.Name}");
+            }
+            else if (relation.Value >= 3.0)
+            {
+                listWithAff.Add($"Good attitude towards {opponent.Name}");
+            }
+            else if (relation.Value >= 1.0)
+            {
+                listWithAff.Add($"Normal attitude towards {opponent.Name}");
+            }
+            else
+            {
+                listWithAff.Add($"Neutral attitude towards {opponent.Name}");
+            }
+        }
+
+        return listWithAff;
+    }
+
     #endregion
 
     #region [Translate To BaseClass]
 
+    /// <summary>
+    /// Преобразует PrCharacter в базовый класс Element
+    /// </summary>
+    /// <param name="character">Исходный персонаж для преобразования</param>
+    /// <returns>Элемент базового класса с данными персонажа</returns>
     public static Element Translate(PrCharacter character)
     {
         string baseName = "";
@@ -742,12 +794,26 @@ public class PrGenerator
 
         List<string> traits = new List<string>();
         List<string> phobias = new List<string>();
+        List<string> relations = new List<string>();
 
         traits = GetAllTraitsWithAffDesc(character.Traits);
         phobias = GetAllPhobiasWithAffDesc(character.Phobias);
+        relations = GetAllRelationsWithDesc(character);
 
         baseParams.Add("Traits", traits);
         baseParams.Add("Phobias", phobias);
+        baseParams.Add("Relations", relations);
+
+        if (character.Age != null)
+        {
+            baseParams.Add("Age", character.Age.ToString());
+        }
+
+        if (character.Gender != null)
+        {
+            baseParams.Add("Gender", (bool)character.Gender ? "Мужской" : "Женский");
+        }
+
 
         Element baseCharacter = new Element(ElemType.Character, baseName, description, baseParams);
 
