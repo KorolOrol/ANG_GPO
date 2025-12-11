@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Model;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
@@ -25,12 +26,12 @@ public class ProceduralActionController : IActionController
     /// <summary>
     /// Слайдер для максимального количества черт характера.
     /// </summary>
-    private Slider _maxTraitsSlider;
+    private SliderInt _maxTraitsSlider;
     
     /// <summary>
     /// Слайдер для максимального количества фобий.
     /// </summary>
-    private Slider _maxPhobiasSlider;
+    private SliderInt _maxPhobiasSlider;
     
     /// <summary>
     /// Текстовое поле для фамилии персонажа.
@@ -41,7 +42,12 @@ public class ProceduralActionController : IActionController
     /// Текстовое поле для возраста персонажа.
     /// </summary>
     private TextField _ageTextField;
-    
+
+    /// <summary>
+    /// Выпадающий список для выбора пола персонажа.
+    /// </summary>
+    private DropdownField _genderDropdown;
+
     /// <summary>
     /// Текстовое поле для описания персонажа.
     /// </summary>
@@ -71,7 +77,12 @@ public class ProceduralActionController : IActionController
     /// Выпадающий список для выбора режима генерации.
     /// </summary>
     private DropdownField _generationModeDropdown;
-    
+
+    /// <summary>
+    /// Текстовое поля для входящих черт
+    /// </summary>
+    private TextField _inputTraitOrTraits;
+
     /// <summary>
     /// Кнопка для запуска генерации персонажа.
     /// </summary>
@@ -125,26 +136,51 @@ public class ProceduralActionController : IActionController
         if (_isVisualElementsInitiated) return;
         _isVisualElementsInitiated = true;
         
-        _nameTextField = root.Q<TextField>("NameTextField");
-        _maxTraitsSlider = root.Q<Slider>("MaxTraitsSlider");
-        _maxPhobiasSlider = root.Q<Slider>("MaxPhobiasSlider");
+        _nameTextField = root.Q<TextField>("PrNameTextField");
+        _maxTraitsSlider = root.Q<SliderInt>("MaxTraitsSlider");
+        _maxPhobiasSlider = root.Q<SliderInt>("MaxPhobiasSlider");
+
         _surnameTextField = root.Q<TextField>("SurnameTextField");
         _ageTextField = root.Q<TextField>("AgeTextField");
-        _descriptionTextField = root.Q<TextField>("DescriptionTextField");
+        _genderDropdown = root.Q<DropdownField>("GenderDropdown");
+
+        _descriptionTextField = root.Q<TextField>("PrDescriptionTextField");
+
         _motherDropdown = root.Q<DropdownField>("MotherDropdown");
         _fatherDropdown = root.Q<DropdownField>("FatherDropdown");
+
         _relationToCharacterDropdown = root.Q<DropdownField>("RelationToCharacterDropdown");
         _relationValueTextField = root.Q<TextField>("RelationValueTextField");
+
         _generationModeDropdown = root.Q<DropdownField>("GenerationModeDropdown");
+        _ageTextField = root.Q<TextField>("AgeTextField");
+
         _generateButton = root.Q<Button>("GenerateButton");
+        _inputTraitOrTraits = root.Q<TextField>("InputTraitOrTraits");
+        _inputTraitOrTraits.style.display = DisplayStyle.None;
+
         _editGeneratedElement = root.Q<VisualElement>("EditGeneratedElement");
         
         // Инициализация режимов генерации
-        _generationModeDropdown.choices = new[] { "Chaotic", "Logic", "ByParentsChaotic", "ByParentsLogic" }.ToList();
-        // _generationModeDropdown.value = "Random";
-        
+        _generationModeDropdown.choices = new[] { " ", "Chaotic", "Logic", "ByParentsChaotic", "ByParentsLogic", "ByInputTrait", "ByInputTraits" }.ToList();
+        _genderDropdown.choices = new[] { " ", "Male", "Female" }.ToList();
+
+        _generationModeDropdown.RegisterValueChangedCallback(OnGenerationModeChanged);
+
         // Обработчик кнопки генерации
         _generateButton.clicked += OnGenerateButtonClicked;
+    }
+
+    private void OnGenerationModeChanged(ChangeEvent<string> evt)
+    {
+        if (evt.newValue == "ByInputTrait" || evt.newValue == "ByInputTraits")
+        {
+            _inputTraitOrTraits.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            _inputTraitOrTraits.style.display = DisplayStyle.None;
+        }
     }
 
     /// <summary>
@@ -188,10 +224,9 @@ public class ProceduralActionController : IActionController
         
         _generatedPrCharacter = new PrCharacter(name);
 
-        if (!string.IsNullOrWhiteSpace(_surnameTextField.value))
-        {
-            _generatedPrCharacter.Surname = _surnameTextField.value;
-        }
+        if (!string.IsNullOrWhiteSpace(_surnameTextField.value)) { _generatedPrCharacter.Surname = _surnameTextField.value; }
+
+        if (!string.IsNullOrWhiteSpace(_genderDropdown.value)) { _generatedPrCharacter.Gender = _genderDropdown.value == "Male" ? true : false; }
         
         if (!string.IsNullOrWhiteSpace(_ageTextField.value) && int.TryParse(_ageTextField.value, out int age))
         {
@@ -203,59 +238,93 @@ public class ProceduralActionController : IActionController
             _generatedPrCharacter.Description = _descriptionTextField.value;
         }
 
-        if (!string.IsNullOrWhiteSpace(_fatherDropdown.value)) { _generatedPrCharacter.FatherID = Convert.ToInt32(_fatherDropdown.value); }
-
-        if (!string.IsNullOrWhiteSpace(_motherDropdown.value)) { _generatedPrCharacter.MotherID = Convert.ToInt32(_motherDropdown.value); }
-
-        if (_generationModeDropdown.value == "Chaotic")
+        if (!string.IsNullOrWhiteSpace(_fatherDropdown.value))
         {
-            PrGenerator.CreateByChaoticRandomTraits(_generatedPrCharacter, traitsCnt);
-        }
+            PrCharacter foundCharacter = GlobalData.Characters.FirstOrDefault(p => p.Name.Contains(_fatherDropdown.value.Remove(_fatherDropdown.value.Length - 1)));
 
-        if (_generationModeDropdown.value == "Logic")
-        {
-            PrGenerator.CreateByLogicRandomTraits(_generatedPrCharacter, traitsCnt);
-        }
-
-        if (_generationModeDropdown.value == "ByParentsChaotic")
-        {
-            if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+            if (foundCharacter != null)
             {
-                int motherId = _generatedPrCharacter.MotherID.Value;
-                int fatherId = _generatedPrCharacter.FatherID.Value;
-
-                if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
-                {
-                    PrCharacter mother = GlobalData.Characters[motherId];
-                    PrCharacter father = GlobalData.Characters[fatherId];
-
-                    if (traitsCnt != 0) { PrGenerator.CreateByTwoParentsHalfTraits(_generatedPrCharacter, mother, father, name); }
-
-                    PrGenerator.CreateByTwoParentsHalfRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
-                }
+                _generatedPrCharacter.FatherID = foundCharacter.ID;
             }
         }
 
-        if (_generationModeDropdown.value == "ByParentsLogic")
+        if (!string.IsNullOrWhiteSpace(_motherDropdown.value))
         {
-            if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+            PrCharacter foundCharacter = GlobalData.Characters.FirstOrDefault(p => p.Name.Contains(_motherDropdown.value.Remove(_motherDropdown.value.Length - 1)));
+
+            if (foundCharacter != null)
             {
-                int motherId = _generatedPrCharacter.MotherID.Value;
-                int fatherId = _generatedPrCharacter.FatherID.Value;
-
-                if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
-                {
-                    PrCharacter mother = GlobalData.Characters[motherId];
-                    PrCharacter father = GlobalData.Characters[fatherId];
-
-                    if (traitsCnt != 0) { PrGenerator.CreateByTwoParentsLogicTraits(_generatedPrCharacter, mother, father, name); }
-
-                    PrGenerator.CreateByTwoParentsLogicRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
-                }
+                _generatedPrCharacter.MotherID = foundCharacter.ID;
             }
         }
 
-        // TODO: input? anchor?
+        if (traitsCnt != 0)
+        {
+            if (_generationModeDropdown.value == "Chaotic")
+            {
+                PrGenerator.CreateByChaoticRandomTraits(_generatedPrCharacter, traitsCnt);
+            }
+
+            if (_generationModeDropdown.value == "Logic")
+            {
+                PrGenerator.CreateByLogicRandomTraits(_generatedPrCharacter, traitsCnt);
+            }
+
+            if (_generationModeDropdown.value == "ByInputTrait")
+            {
+                string[] words = _inputTraitOrTraits.value.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                if (words.Length == 1)
+                {
+                    PrGenerator.CreateByInputTrait(_generatedPrCharacter, _inputTraitOrTraits.value, traitsCnt);
+                }
+            }
+
+            if (_generationModeDropdown.value == "ByInputTraits")
+            {
+                List<string> traitsList = _inputTraitOrTraits.value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(t => t.Trim())
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .ToList();
+                if (traitsCnt >= traitsList.Count)
+                {
+                    PrGenerator.CreateByInputTraits(_generatedPrCharacter, traitsList, traitsCnt);
+                }
+            }
+
+            if (_generationModeDropdown.value == "ByParentsChaotic")
+            {
+                if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+                {
+                    int motherId = _generatedPrCharacter.MotherID.Value;
+                    int fatherId = _generatedPrCharacter.FatherID.Value;
+
+                    if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
+                    {
+                        PrCharacter mother = GlobalData.Characters[motherId];
+                        PrCharacter father = GlobalData.Characters[fatherId];
+
+                        PrGenerator.CreateByTwoParentsHalfRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
+                    }
+                }
+            }
+
+            if (_generationModeDropdown.value == "ByParentsLogic")
+            {
+                if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+                {
+                    int motherId = _generatedPrCharacter.MotherID.Value;
+                    int fatherId = _generatedPrCharacter.FatherID.Value;
+
+                    if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
+                    {
+                        PrCharacter mother = GlobalData.Characters[motherId];
+                        PrCharacter father = GlobalData.Characters[fatherId];
+
+                        PrGenerator.CreateByTwoParentsLogicRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
+                    }
+                }
+            }
+        }
 
         if (phobiasCnt != 0) { PrGenerator.CreateByChaoticRandomPhobias(_generatedPrCharacter, phobiasCnt); }
 
