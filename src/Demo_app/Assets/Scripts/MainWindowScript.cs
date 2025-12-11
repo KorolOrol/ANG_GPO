@@ -121,16 +121,6 @@ public class MainWindowScript : MonoBehaviour
             pair.Key.clicked += () => OnActionButtonClicked(pair.Key);
         }
         
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Character, "1"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Item, "2"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Location, "3"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Event, "4"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Character, "5"));
-        Binder.Bind(_plot.Elements[0], _plot.Elements[1]);
-        Binder.Bind(_plot.Elements[0], _plot.Elements[2]);
-        Binder.Bind(_plot.Elements[0], _plot.Elements[3]);
-        Binder.Bind(_plot.Elements[0], _plot.Elements[4], 50);
-        
         foreach (var controller in _actionControllers)
         {
             controller.Initiate(_root, _plot);

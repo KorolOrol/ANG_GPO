@@ -110,7 +110,6 @@
     <None Include="Assets/Packages/System.IO.Pipelines.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/Microsoft.Bcl.AsyncInterfaces.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/UI/EditSelectedElement.uxml" />
-    <None Include="Assets/AddressableAssetsData/link.xml" />
     <None Include="Assets/Packages/System.ClientModel.1.1.0/lib/netstandard2.0/System.ClientModel.xml" />
     <None Include="Assets/Packages/Microsoft.Extensions.DependencyInjection.Abstractions.3.1.10/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml" />
     <None Include="Assets/Packages/System.Text.Json.9.0.10/lib/netstandard2.0/System.Text.Json.xml" />
@@ -961,11 +960,11 @@
     <Reference Include="Unity.AI.Navigation.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.AI.Navigation.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="PPv2URPConverters">
-      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/PPv2URPConverters.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Addressables">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Addressables.dll</HintPath>
+    </Reference>
+    <Reference Include="PPv2URPConverters">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/PPv2URPConverters.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime.Shared">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.Core.Runtime.Shared.dll</HintPath>
@@ -976,11 +975,11 @@
     <Reference Include="Unity.VisualScripting.Shared.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualScripting.Shared.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Searcher.Editor">
-      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Searcher.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.ScriptableBuildPipeline.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Searcher.Editor">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Searcher.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.PlasticSCM.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.PlasticSCM.Editor.dll</HintPath>
@@ -1036,11 +1035,11 @@
     <Reference Include="Unity.Collections">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.InputSystem.ForUI">
-      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.InputSystem.ForUI.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Profiling.Core">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Profiling.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.InputSystem.ForUI">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.InputSystem.ForUI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.GPUDriven.Runtime">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.GPUDriven.Runtime.dll</HintPath>
@@ -1090,11 +1089,11 @@
     <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
-      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Toolchain.Linux-x86_64">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Toolchain.Linux-x86_64.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Collections.Editor.dll</HintPath>
