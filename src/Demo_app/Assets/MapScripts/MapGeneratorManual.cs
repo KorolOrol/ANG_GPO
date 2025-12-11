@@ -264,7 +264,7 @@ public class MapGeneratorManual : MonoBehaviour
             {
                 for (int cy = 0; cy < chunksY; cy++)
                 {
-                    string mainB = chunkBiome[cx][cy];
+                    string mainB = chunkBiome[cx, cy];
                     for (int dx = 0; dx < chunkSize; dx++)
                         for (int dy = 0; dy < chunkSize; dy++)
                         {
@@ -281,7 +281,6 @@ public class MapGeneratorManual : MonoBehaviour
         placedLocations.Clear();
         foreach (var loc in locations)
         {
-            var loc = locations[i];
             PlaceLocation(loc);
         }
 
