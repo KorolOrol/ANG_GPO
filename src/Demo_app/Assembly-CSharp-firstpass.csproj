@@ -43,6 +43,7 @@
   <ItemGroup>
     <None Include="Assets/Plugins/AIGenerator.deps.json" />
     <None Include="Assets/Plugins/BaseClasses.deps.json" />
+    <None Include="Assets/Plugins/PrGenLib.deps.json" />
     <None Include="Assets/Plugins/DataBase.deps.json" />
     <Reference Include="UnityEngine">
       <HintPath>/home/korolorol/Unity/Hub/Editor/6000.2.6f2/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
