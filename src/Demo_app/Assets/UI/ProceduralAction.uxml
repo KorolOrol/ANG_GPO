@@ -19,7 +19,7 @@
                     </ui:VisualElement>
                     <ui:VisualElement name="RelationsBar" style="justify-content: flex-start; align-content: flex-start; flex-direction: row; flex-wrap: wrap; align-items: stretch; align-self: stretch; -unity-text-align: middle-center;">
                         <ui:DropdownField label="Relation" name="RelationToCharacterDropdown" class="DropdownMini" style="width: 50%;" />
-                        <ui:TextField name="RelationValueTextField" keyboard-type="NumberPad" auto-correction="true" class="TextField" style="width: 70px;" />
+                        <ui:VisualElement name="RelationTogglesContainer" style="flex-direction: column;" />
                     </ui:VisualElement>
                 </ui:GroupBox>
                 <ui:GroupBox text="Generation Mode" class="GroupBox">

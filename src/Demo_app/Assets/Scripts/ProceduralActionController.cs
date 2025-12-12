@@ -67,12 +67,17 @@ public class ProceduralActionController : IActionController
     /// Выпадающий список для выбора персонажа для связи.
     /// </summary>
     private DropdownField _relationToCharacterDropdown;
-    
+
     /// <summary>
-    /// Текстовое поле для значения отношений.
+    /// Контейнер для всех Toggles отношений
     /// </summary>
-    private TextField _relationValueTextField;
-    
+    private VisualElement _relationTogglesContainer;
+
+    /// <summary>
+    /// Состояния Toggles для каждого персонажа
+    /// </summary>
+    private Dictionary<string, bool> _relationToggleStates = new Dictionary<string, bool>();
+
     /// <summary>
     /// Выпадающий список для выбора режима генерации.
     /// </summary>
@@ -150,10 +155,9 @@ public class ProceduralActionController : IActionController
         _fatherDropdown = root.Q<DropdownField>("FatherDropdown");
 
         _relationToCharacterDropdown = root.Q<DropdownField>("RelationToCharacterDropdown");
-        _relationValueTextField = root.Q<TextField>("RelationValueTextField");
+        _relationTogglesContainer = root.Q<VisualElement>("RelationTogglesContainer");
 
         _generationModeDropdown = root.Q<DropdownField>("GenerationModeDropdown");
-        _ageTextField = root.Q<TextField>("AgeTextField");
 
         _generateButton = root.Q<Button>("GenerateButton");
         _inputTraitOrTraits = root.Q<TextField>("InputTraitOrTraits");
@@ -166,11 +170,61 @@ public class ProceduralActionController : IActionController
         _genderDropdown.choices = new[] { " ", "Male", "Female" }.ToList();
 
         _generationModeDropdown.RegisterValueChangedCallback(OnGenerationModeChanged);
+        _relationToCharacterDropdown.RegisterValueChangedCallback(OnRelationDropdownChanged);
 
         // Обработчик кнопки генерации
         _generateButton.clicked += OnGenerateButtonClicked;
     }
 
+    // <summary>
+    /// Создает Toggles для всех доступных персонажей
+    /// </summary>
+    private void CreateRelationToggles()
+    {
+        _relationTogglesContainer.Clear();
+
+        var characters = _plot.Elements
+            .Where(e => e.Type == ElemType.Character)
+            .Select(e => e.Name)
+            .ToList();
+
+        foreach (var characterName in characters)
+        {
+            var toggle = new Toggle
+            {
+                text = $"Generate relation to {characterName}",
+                name = $"RelationToggle_{characterName}",
+                value = _relationToggleStates.ContainsKey(characterName) ? _relationToggleStates[characterName] : false
+            };
+
+            toggle.RegisterValueChangedCallback(evt =>
+            {
+                _relationToggleStates[characterName] = evt.newValue;
+            });
+
+            _relationTogglesContainer.Add(toggle);
+        }
+
+        UpdateVisibleToggle();
+    }
+
+    /// <summary>
+    /// Показывает только Toggle для выбранного персонажа
+    /// </summary>
+    private void UpdateVisibleToggle()
+    {
+        foreach (var toggle in _relationTogglesContainer.Children().OfType<Toggle>())
+        {
+            toggle.style.display = toggle.name == $"RelationToggle_{_relationToCharacterDropdown.value}"
+                ? DisplayStyle.Flex
+                : DisplayStyle.None;
+        }
+    }
+
+    /// <summary>
+    /// При изменении режима генерации появлятся или скрывается строка для ввода черт характера
+    /// </summary>
+    /// <param name="evt"></param>
     private void OnGenerationModeChanged(ChangeEvent<string> evt)
     {
         if (evt.newValue == "ByInputTrait" || evt.newValue == "ByInputTraits")
@@ -181,6 +235,15 @@ public class ProceduralActionController : IActionController
         {
             _inputTraitOrTraits.style.display = DisplayStyle.None;
         }
+    }
+
+    /// <summary>
+    /// При изменении персонажа в RelationDropdown меняет Toggle под него
+    /// </summary>
+    /// <param name="evt"></param>
+    private void OnRelationDropdownChanged(ChangeEvent<string> evt)
+    {
+        UpdateVisibleToggle();
     }
 
     /// <summary>
@@ -205,6 +268,11 @@ public class ProceduralActionController : IActionController
         _motherDropdown.choices = characters;
         _fatherDropdown.choices = characters;
         _relationToCharacterDropdown.choices = characters;
+
+        if (_relationTogglesContainer.childCount != characters.Count)
+        {
+            CreateRelationToggles();
+        }
     }
     
     /// <summary>
@@ -327,6 +395,23 @@ public class ProceduralActionController : IActionController
         }
 
         if (phobiasCnt != 0) { PrGenerator.CreateByChaoticRandomPhobias(_generatedPrCharacter, phobiasCnt); }
+
+        if (!string.IsNullOrWhiteSpace(_relationToCharacterDropdown.value))
+        {
+            bool shouldGenerateRelation = _relationToggleStates.ContainsKey(_relationToCharacterDropdown.value) && _relationToggleStates[_relationToCharacterDropdown.value];
+
+            foreach (var relation in _relationToggleStates)
+            {
+                if (relation.Value)
+                {
+                    PrCharacter foundCharacter = GlobalData.Characters.FirstOrDefault(p => p.Name.Contains(relation.Key.Remove(relation.Key.Length - 1)));
+                    if (foundCharacter != null)
+                    {
+                        PrGenerator.GetRelations(_generatedPrCharacter, foundCharacter);
+                    }
+                }
+            }
+        }
 
         // Отображаем сгенерированного персонажа в редакторе
         _generatedCharacter = PrGenerator.Translate(_generatedPrCharacter);
