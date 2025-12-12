@@ -1,41 +1,44 @@
 using UnityEngine;
 
-public class MapManager : MonoBehaviour
+namespace MapScripts.LocationGenerate
 {
-    public GameObject worldMap;
-    public GameObject locationMap;
-    public LocationMapGenerator locationGenerator;
-
-    private Location currentLocation;
-
-    /// <summary>
-    /// Открывает указанную локацию
-    /// </summary>
-    /// <param name="location"></param>
-    public void OpenLocation(Location location)
+    public class MapManager : MonoBehaviour
     {
-        currentLocation = location;
-        worldMap.SetActive(false);
-        locationMap.SetActive(true);
+        public GameObject worldMap;
+        public GameObject locationMap;
+        public LocationMapGenerator locationGenerator;
 
-        if (!location.isGenerated)
-        {
-            locationGenerator.GenerateLocationMap(location);
-            location.isGenerated = true;
-        }
-        else
-        {
-            locationGenerator.LoadLocationMap(location);
-        }
-    }
+        public Location CurrentLocation { get; private set; }
 
-    /// <summary>
-    /// Возвращает на карту мира
-    /// </summary>
-    public void ReturnToWorld()
-    {
-        locationMap.SetActive(false);
-        worldMap.SetActive(true);
+        /// <summary>
+        /// Открывает указанную локацию
+        /// </summary>
+        /// <param name="location"></param>
+        public void OpenLocation(Location location)
+        {
+            CurrentLocation = location;
+            worldMap.SetActive(false);
+            locationMap.SetActive(true);
+
+            if (!location.isGenerated)
+            {
+                locationGenerator.GenerateLocationMap(location);
+                location.isGenerated = true;
+            }
+            else
+            {
+                LocationMapGenerator.LoadLocationMap(location);
+            }
+        }
+
+        /// <summary>
+        /// Возвращает на карту мира
+        /// </summary>
+        public void ReturnToWorld()
+        {
+            locationMap.SetActive(false);
+            worldMap.SetActive(true);
+        }
     }
 }
     

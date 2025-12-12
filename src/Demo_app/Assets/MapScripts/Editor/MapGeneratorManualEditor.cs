@@ -1,38 +1,41 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(MapGeneratorManual))]
-public class MapGeneratorManualEditor : Editor
+namespace MapScripts.Editor
 {
-    public override void OnInspectorGUI()
+    [CustomEditor(typeof(MapGeneratorManual))]
+    public class MapGeneratorManualEditor : UnityEditor.Editor
     {
-        DrawDefaultInspector();
-
-        MapGeneratorManual generator = (MapGeneratorManual)target;
-
-        GUILayout.Space(10);
-        GUILayout.Label("=== Управление картой ===", EditorStyles.boldLabel);
-
-        if (GUILayout.Button("Сгенерировать карту вручную"))
+        public override void OnInspectorGUI()
         {
-            generator.GenerateManualMap();
+            DrawDefaultInspector();
+
+            MapGeneratorManual generator = (MapGeneratorManual)target;
+
+            GUILayout.Space(10);
+            GUILayout.Label("=== Управление картой ===", EditorStyles.boldLabel);
+
+            if (GUILayout.Button("Сгенерировать карту вручную"))
+            {
+                generator.GenerateManualMap();
+            }
+
+            GUILayout.Space(5);
+
+            if (GUILayout.Button("Сохранить карту"))
+            {
+                generator.SaveMapContext();
+            }
+
+            if (GUILayout.Button("Загрузить карту"))
+            {
+                generator.LoadMapContext();
+            }
+
+            GUILayout.Space(10);
+            EditorGUILayout.HelpBox(
+                "Файлы сохраняются в Assets/SavedMaps как .png и .json.\n" +
+                "Имя файла задаётся в поле 'saveFileName'.", MessageType.Info);
         }
-
-        GUILayout.Space(5);
-
-        if (GUILayout.Button("Сохранить карту"))
-        {
-            generator.SaveMapContext();
-        }
-
-        if (GUILayout.Button("Загрузить карту"))
-        {
-            generator.LoadMapContext();
-        }
-
-        GUILayout.Space(10);
-        EditorGUILayout.HelpBox(
-            "Файлы сохраняются в Assets/SavedMaps как .png и .json.\n" +
-            "Имя файла задаётся в поле 'saveFileName'.", MessageType.Info);
     }
 }

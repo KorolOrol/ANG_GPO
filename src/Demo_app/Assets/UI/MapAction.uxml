@@ -11,13 +11,13 @@
             </ui:GroupBox>
             <ui:GroupBox text="Noize &amp; Biome" class="GroupBox">
                 <ui:TextField label="Seed" name="SeedTextField" value="42" class="TextField" />
-                <ui:TextField label="Noize Scale" name="NoizeScaleTextField" value="50" class="TextField" />
+                <ui:TextField label="Noise Scale" name="NoiseScaleTextField" value="50" class="TextField" />
                 <ui:TextField label="Octaves" name="OctavesTextField" value="4" class="TextField" />
-                <ui:Slider label="Persistance" value="0" high-value="1" name="PersistanceSlider" show-input-field="true" class="Slider" />
+                <ui:Slider label="Persistence" value="0" high-value="1" name="PersistenceSlider" show-input-field="true" class="Slider" />
                 <ui:Slider label="Lacunarity" value="0" high-value="10" name="LacunaritySlider" show-input-field="true" fill="false" class="Slider" />
                 <ui:GroupBox text="Noize Offset" class="GroupBox" style="flex-direction: column;">
-                    <ui:TextField label="X" name="NoizeOffsetXTextField" class="TextField" />
-                    <ui:TextField label="Y" name="NoizeOffsetYTextField" class="TextField" />
+                    <ui:TextField label="X" name="NoiseOffsetXTextField" class="TextField" />
+                    <ui:TextField label="Y" name="NoiseOffsetYTextField" class="TextField" />
                 </ui:GroupBox>
             </ui:GroupBox>
             <ui:GroupBox text="Location Create" class="GroupBox">

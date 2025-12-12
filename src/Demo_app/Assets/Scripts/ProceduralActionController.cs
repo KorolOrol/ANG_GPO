@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Model;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -76,7 +74,7 @@ public class ProceduralActionController : IActionController
     /// <summary>
     /// Состояния Toggles для каждого персонажа
     /// </summary>
-    private Dictionary<string, bool> _relationToggleStates = new Dictionary<string, bool>();
+    private readonly Dictionary<string, bool> _relationToggleStates = new Dictionary<string, bool>();
 
     /// <summary>
     /// Выпадающий список для выбора режима генерации.
@@ -176,25 +174,25 @@ public class ProceduralActionController : IActionController
         _generateButton.clicked += OnGenerateButtonClicked;
     }
 
-    // <summary>
+    /// <summary>
     /// Создает Toggles для всех доступных персонажей
     /// </summary>
     private void CreateRelationToggles()
     {
         _relationTogglesContainer.Clear();
 
-        var characters = _plot.Elements
+        List<string> characters = _plot.Elements
             .Where(e => e.Type == ElemType.Character)
             .Select(e => e.Name)
             .ToList();
 
-        foreach (var characterName in characters)
+        foreach (string characterName in characters)
         {
             var toggle = new Toggle
             {
                 text = $"Generate relation to {characterName}",
                 name = $"RelationToggle_{characterName}",
-                value = _relationToggleStates.ContainsKey(characterName) ? _relationToggleStates[characterName] : false
+                value = _relationToggleStates.GetValueOrDefault(characterName, false)
             };
 
             toggle.RegisterValueChangedCallback(evt =>
@@ -227,14 +225,10 @@ public class ProceduralActionController : IActionController
     /// <param name="evt"></param>
     private void OnGenerationModeChanged(ChangeEvent<string> evt)
     {
-        if (evt.newValue == "ByInputTrait" || evt.newValue == "ByInputTraits")
-        {
-            _inputTraitOrTraits.style.display = DisplayStyle.Flex;
-        }
-        else
-        {
-            _inputTraitOrTraits.style.display = DisplayStyle.None;
-        }
+        _inputTraitOrTraits.style.display = 
+            evt.newValue is "ByInputTrait" or "ByInputTraits" ? 
+                DisplayStyle.Flex : 
+                DisplayStyle.None;
     }
 
     /// <summary>
@@ -260,7 +254,7 @@ public class ProceduralActionController : IActionController
     /// </summary>
     private void UpdateCharacterDropdowns()
     {
-        var characters = _plot.Elements
+        List<string> characters = _plot.Elements
             .Where(e => e.Type == ElemType.Character)
             .Select(e => e.Name)
             .ToList();
@@ -284,31 +278,29 @@ public class ProceduralActionController : IActionController
             ? "Generated Character" 
             : _nameTextField.value;
         
-        int traitsCnt = (int)_maxTraitsSlider.value;
-        int phobiasCnt = (int)_maxPhobiasSlider.value;
+        int traitsCnt = _maxTraitsSlider.value;
+        int phobiasCnt = _maxPhobiasSlider.value;
         
         Debug.Log($"Generating character: {name} with max {traitsCnt} traits and {phobiasCnt} phobias\n" +
             $"Mode: {_generationModeDropdown.value}");
         
         _generatedPrCharacter = new PrCharacter(name);
 
-        if (!string.IsNullOrWhiteSpace(_surnameTextField.value)) { _generatedPrCharacter.Surname = _surnameTextField.value; }
+        if (!string.IsNullOrWhiteSpace(_surnameTextField.value)) 
+            _generatedPrCharacter.Surname = _surnameTextField.value;
 
-        if (!string.IsNullOrWhiteSpace(_genderDropdown.value)) { _generatedPrCharacter.Gender = _genderDropdown.value == "Male" ? true : false; }
+        if (!string.IsNullOrWhiteSpace(_genderDropdown.value)) 
+            _generatedPrCharacter.Gender = _genderDropdown.value == "Male";
         
         if (!string.IsNullOrWhiteSpace(_ageTextField.value) && int.TryParse(_ageTextField.value, out int age))
-        {
             _generatedPrCharacter.Age = age;
-        }
         
-        if (!string.IsNullOrWhiteSpace(_descriptionTextField.value))
-        {
-            _generatedPrCharacter.Description = _descriptionTextField.value;
-        }
+        if (!string.IsNullOrWhiteSpace(_descriptionTextField.value)) _generatedPrCharacter.Description = _descriptionTextField.value;
 
         if (!string.IsNullOrWhiteSpace(_fatherDropdown.value))
         {
-            PrCharacter foundCharacter = GlobalData.Characters.FirstOrDefault(p => p.Name.Contains(_fatherDropdown.value.Remove(_fatherDropdown.value.Length - 1)));
+            var foundCharacter = GlobalData.Characters.FirstOrDefault(p =>
+                p.Name != null && p.Name.Contains(_fatherDropdown.value.Remove(_fatherDropdown.value.Length - 1)));
 
             if (foundCharacter != null)
             {
@@ -318,98 +310,107 @@ public class ProceduralActionController : IActionController
 
         if (!string.IsNullOrWhiteSpace(_motherDropdown.value))
         {
-            PrCharacter foundCharacter = GlobalData.Characters.FirstOrDefault(p => p.Name.Contains(_motherDropdown.value.Remove(_motherDropdown.value.Length - 1)));
+            var foundCharacter = GlobalData.Characters.FirstOrDefault(p =>
+                p.Name != null && p.Name.Contains(_motherDropdown.value.Remove(_motherDropdown.value.Length - 1)));
 
-            if (foundCharacter != null)
-            {
-                _generatedPrCharacter.MotherID = foundCharacter.ID;
-            }
+            if (foundCharacter != null) _generatedPrCharacter.MotherID = foundCharacter.ID;
         }
 
         if (traitsCnt != 0)
         {
-            if (_generationModeDropdown.value == "Chaotic")
+            switch (_generationModeDropdown.value)
             {
-                PrGenerator.CreateByChaoticRandomTraits(_generatedPrCharacter, traitsCnt);
-            }
-
-            if (_generationModeDropdown.value == "Logic")
-            {
-                PrGenerator.CreateByLogicRandomTraits(_generatedPrCharacter, traitsCnt);
-            }
-
-            if (_generationModeDropdown.value == "ByInputTrait")
-            {
-                string[] words = _inputTraitOrTraits.value.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-                if (words.Length == 1)
-                {
-                    PrGenerator.CreateByInputTrait(_generatedPrCharacter, _inputTraitOrTraits.value, traitsCnt);
-                }
-            }
-
-            if (_generationModeDropdown.value == "ByInputTraits")
-            {
-                List<string> traitsList = _inputTraitOrTraits.value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(t => t.Trim())
-                    .Where(t => !string.IsNullOrWhiteSpace(t))
-                    .ToList();
-                if (traitsCnt >= traitsList.Count)
-                {
-                    PrGenerator.CreateByInputTraits(_generatedPrCharacter, traitsList, traitsCnt);
-                }
-            }
-
-            if (_generationModeDropdown.value == "ByParentsChaotic")
-            {
-                if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
-                {
-                    int motherId = _generatedPrCharacter.MotherID.Value;
-                    int fatherId = _generatedPrCharacter.FatherID.Value;
-
-                    if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
+                case "Chaotic":
+                    PrGenerator.CreateByChaoticRandomTraits(_generatedPrCharacter, traitsCnt);
+                    break;
+                case "Logic":
+                    PrGenerator.CreateByLogicRandomTraits(_generatedPrCharacter, traitsCnt);
+                    break;
+                case "ByInputTrait":
                     {
-                        PrCharacter mother = GlobalData.Characters[motherId];
-                        PrCharacter father = GlobalData.Characters[fatherId];
-
-                        PrGenerator.CreateByTwoParentsHalfRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
+                        string[] words = _inputTraitOrTraits.value.Split(new[]
+                            {
+                                ' ',
+                                '\t',
+                                '\n',
+                                '\r'
+                            },
+                            StringSplitOptions.RemoveEmptyEntries);
+                        if (words.Length == 1)
+                        {
+                            PrGenerator.CreateByInputTrait(_generatedPrCharacter,
+                                _inputTraitOrTraits.value,
+                                traitsCnt);
+                        }
+                        break;
                     }
-                }
-            }
-
-            if (_generationModeDropdown.value == "ByParentsLogic")
-            {
-                if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
-                {
-                    int motherId = _generatedPrCharacter.MotherID.Value;
-                    int fatherId = _generatedPrCharacter.FatherID.Value;
-
-                    if (GlobalData.Characters[motherId] != null && GlobalData.Characters[fatherId] != null)
+                case "ByInputTraits":
                     {
-                        PrCharacter mother = GlobalData.Characters[motherId];
-                        PrCharacter father = GlobalData.Characters[fatherId];
-
-                        PrGenerator.CreateByTwoParentsLogicRandomTraits(_generatedPrCharacter, traitsCnt, mother, father, name);
+                        List<string> traitsList = _inputTraitOrTraits.value.Split(new[]
+                                { ',' },
+                                StringSplitOptions.RemoveEmptyEntries)
+                            .Select(t => t.Trim())
+                            .Where(t => !string.IsNullOrWhiteSpace(t))
+                            .ToList();
+                        if (traitsCnt >= traitsList.Count)
+                        {
+                            PrGenerator.CreateByInputTraits(_generatedPrCharacter, traitsList, traitsCnt);
+                        }
+                        break;
                     }
-                }
+                case "ByParentsChaotic":
+                    {
+                        if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+                        {
+                            int motherId = _generatedPrCharacter.MotherID.Value;
+                            int fatherId = _generatedPrCharacter.FatherID.Value;
+
+                            var mother = GlobalData.Characters[motherId];
+                            var father = GlobalData.Characters[fatherId];
+
+                            PrGenerator.CreateByTwoParentsHalfRandomTraits(_generatedPrCharacter,
+                                traitsCnt,
+                                mother,
+                                father,
+                                name);
+                        }
+                        break;
+                    }
+                case "ByParentsLogic":
+                    {
+                        if (_generatedPrCharacter.FatherID.HasValue && _generatedPrCharacter.MotherID.HasValue)
+                        {
+                            int motherId = _generatedPrCharacter.MotherID.Value;
+                            int fatherId = _generatedPrCharacter.FatherID.Value;
+
+                            var mother = GlobalData.Characters[motherId];
+                            var father = GlobalData.Characters[fatherId];
+
+                            PrGenerator.CreateByTwoParentsLogicRandomTraits(_generatedPrCharacter,
+                                traitsCnt,
+                                mother,
+                                father,
+                                name);
+                        }
+                        break;
+                    }
             }
+
         }
 
         if (phobiasCnt != 0) { PrGenerator.CreateByChaoticRandomPhobias(_generatedPrCharacter, phobiasCnt); }
 
         if (!string.IsNullOrWhiteSpace(_relationToCharacterDropdown.value))
         {
-            bool shouldGenerateRelation = _relationToggleStates.ContainsKey(_relationToCharacterDropdown.value) && _relationToggleStates[_relationToCharacterDropdown.value];
+            bool shouldGenerateRelation = _relationToggleStates.ContainsKey(_relationToCharacterDropdown.value) &&
+                _relationToggleStates[_relationToCharacterDropdown.value];
 
-            foreach (var relation in _relationToggleStates)
+            foreach (var foundCharacter in _relationToggleStates.Where(relation => relation.Value)
+                .Select(relation => GlobalData.Characters.FirstOrDefault(p =>
+                    p.Name != null && p.Name.Contains(relation.Key.Remove(relation.Key.Length - 1))))
+                .Where(foundCharacter => foundCharacter != null))
             {
-                if (relation.Value)
-                {
-                    PrCharacter foundCharacter = GlobalData.Characters.FirstOrDefault(p => p.Name.Contains(relation.Key.Remove(relation.Key.Length - 1)));
-                    if (foundCharacter != null)
-                    {
-                        PrGenerator.GetRelations(_generatedPrCharacter, foundCharacter);
-                    }
-                }
+                PrGenerator.GetRelations(_generatedPrCharacter, foundCharacter);
             }
         }
 

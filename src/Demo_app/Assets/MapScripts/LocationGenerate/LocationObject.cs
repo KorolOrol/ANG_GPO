@@ -1,82 +1,75 @@
 using UnityEngine;
-using TMPro;
 
-public class LocationObject : MonoBehaviour
+namespace MapScripts.LocationGenerate
 {
-    public string locationName;
-    public string biome;
-    public Vector2 mapPosition;
-
-    private Material originalMaterial;
-    private Color originalColor;
-
-    /// <summary>
-    /// Инициализирует объект локации
-    /// </summary>
-    public void Initialize(string name, string biomeType, Vector2 position)
+    public class LocationObject : MonoBehaviour
     {
-        locationName = name;
-        biome = biomeType;
-        mapPosition = position;
+        public string locationName;
+        public string Biome { get; set; }
+        public Vector2 MapPosition { get; set; }
 
-        // Сохраняем оригинальный материал для анимаций
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        public Material OriginalMaterial { get; private set; }
+        private Color _originalColor;
+
+        /// <summary>
+        /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+        /// </summary>
+        public void Initialize(string locName, string biomeType, Vector2 position)
         {
-            originalMaterial = renderer.material;
-            originalColor = renderer.material.color;
+            locationName = locName;
+            Biome = biomeType;
+            MapPosition = position;
+
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            var renderer = GetComponent<Renderer>();
+            if (renderer)
+            {
+                OriginalMaterial = renderer.material;
+                _originalColor = renderer.material.color;
+            }
+
+            Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ '{locName}' пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
         }
 
-        Debug.Log($"Объект локации '{name}' инициализирован");
-    }
-
-    /// <summary>
-    /// Подсвечивает локацию
-    /// </summary>
-    public void SetHighlighted(bool highlighted)
-    {
-        Renderer renderer = GetComponent<Renderer>();
-        if (renderer != null)
+        /// <summary>
+        /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+        /// </summary>
+        public void SetHighlighted(bool highlighted)
         {
-            if (highlighted)
-            {
-                renderer.material.color = Color.yellow;
-            }
-            else
-            {
-                renderer.material.color = originalColor;
-            }
+            var renderer = GetComponent<Renderer>();
+            if (renderer == null) return;
+            renderer.material.color = highlighted ? Color.yellow : _originalColor;
         }
-    }
 
-    /// <summary>
-    /// Пульсация (для выделения)
-    /// </summary>
-    public void Pulse()
-    {
-        // Можно добавить анимацию пульсации
-        Debug.Log($"Локация '{locationName}' выделена");
-    }
+        /// <summary>
+        /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+        /// </summary>
+        public void Pulse()
+        {
+            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            Debug.Log($"пїЅпїЅпїЅпїЅпїЅпїЅпїЅ '{locationName}' пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
+        }
 
-    /// <summary>
-    /// Вызывается при клике
-    /// </summary>
-    private void OnMouseDown()
-    {
-        Debug.Log($"Клик по локации: {locationName}");
-        SetHighlighted(true);
+        /// <summary>
+        /// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+        /// </summary>
+        private void OnMouseDown()
+        {
+            Debug.Log($"пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ: {locationName}");
+            SetHighlighted(true);
 
-        // Можно добавить вызов приближения здесь
-        // FindObjectOfType<CameraController>().ZoomToLocation(this);
-    }
+            // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+            // FindObjectOfType<CameraController>().ZoomToLocation(this);
+        }
 
-    private void OnMouseEnter()
-    {
-        SetHighlighted(true);
-    }
+        private void OnMouseEnter()
+        {
+            SetHighlighted(true);
+        }
 
-    private void OnMouseExit()
-    {
-        SetHighlighted(false);
+        private void OnMouseExit()
+        {
+            SetHighlighted(false);
+        }
     }
 }

@@ -1,71 +1,74 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-[RequireComponent(typeof(UIDocument))]
-public class MapDisplayUI : MonoBehaviour
+namespace MapScripts
 {
-    [SerializeField] private string mapContainerName = "MapContainer";
-
-    private VisualElement mapContainer;
-    private UIDocument uiDocument;
-
-    private void Awake()
+    [RequireComponent(typeof(UIDocument))]
+    public class MapDisplayUI : MonoBehaviour
     {
-        uiDocument = GetComponent<UIDocument>();
-        FindMapContainer();
-    }
+        [SerializeField] private string mapContainerName = "MapContainer";
 
-    private void FindMapContainer()
-    {
-        if (uiDocument != null && uiDocument.rootVisualElement != null)
+        private VisualElement _mapContainer;
+        private UIDocument _uiDocument;
+
+        private void Awake()
         {
-            mapContainer = uiDocument.rootVisualElement.Q<VisualElement>(mapContainerName);
-            if (mapContainer == null)
+            _uiDocument = GetComponent<UIDocument>();
+            FindMapContainer();
+        }
+
+        private void FindMapContainer()
+        {
+            if (!_uiDocument || _uiDocument.rootVisualElement == null) return;
+            _mapContainer = _uiDocument.rootVisualElement.Q<VisualElement>(mapContainerName);
+            if (_mapContainer == null)
             {
-                Debug.LogError($"Не найден VisualElement с именем '{mapContainerName}' в UI Document");
+                Debug.LogError($"пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ VisualElement пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ '{mapContainerName}' пїЅ UI Document");
             }
         }
-    }
 
-    public void DrawTexture(Texture2D texture)
-    {
-        if (mapContainer == null)
+        public void DrawTexture(Texture2D texture)
         {
-            FindMapContainer();
-            if (mapContainer == null) return;
+            if (_mapContainer == null)
+            {
+                FindMapContainer();
+                if (_mapContainer == null) return;
+            }
+
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ Image пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            _mapContainer.Clear();
+
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            var image = new VisualElement
+            {
+                style =
+                {
+                    backgroundImage = Background.FromTexture2D(texture),
+                    width = texture.width,
+                    height = texture.height,
+                    alignSelf = Align.Center
+                }
+            };
+
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+            if (texture.width > _mapContainer.resolvedStyle.width ||
+                texture.height > _mapContainer.resolvedStyle.height)
+            {
+                // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+                float scaleX = _mapContainer.resolvedStyle.width / texture.width;
+                float scaleY = _mapContainer.resolvedStyle.height / texture.height;
+                float scale = Mathf.Min(scaleX, scaleY);
+
+                image.style.width = texture.width * scale;
+                image.style.height = texture.height * scale;
+            }
+
+            _mapContainer.Add(image);
         }
 
-        // Создаем Image из текстуры и добавляем в контейнер
-        mapContainer.Clear();
-
-        // Создаем визуальный элемент для отображения текстуры
-        var image = new VisualElement();
-        image.style.backgroundImage = Background.FromTexture2D(texture);
-        image.style.width = texture.width;
-        image.style.height = texture.height;
-        image.style.alignSelf = Align.Center;
-
-        // Подгоняем размер под контейнер
-        if (texture.width > mapContainer.resolvedStyle.width ||
-            texture.height > mapContainer.resolvedStyle.height)
+        public void ClearMap()
         {
-            // Если текстура больше контейнера, масштабируем
-            float scaleX = mapContainer.resolvedStyle.width / texture.width;
-            float scaleY = mapContainer.resolvedStyle.height / texture.height;
-            float scale = Mathf.Min(scaleX, scaleY);
-
-            image.style.width = texture.width * scale;
-            image.style.height = texture.height * scale;
-        }
-
-        mapContainer.Add(image);
-    }
-
-    public void ClearMap()
-    {
-        if (mapContainer != null)
-        {
-            mapContainer.Clear();
+            _mapContainer?.Clear();
         }
     }
 }

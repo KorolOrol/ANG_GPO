@@ -2,113 +2,128 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class LocationUIManager : MonoBehaviour
+namespace MapScripts.LocationGenerate
 {
-    [SerializeField] private MapGeneratorManual mapGenerator;
-    [SerializeField] private UIDocument uiDocument;
-    [SerializeField] private string mapContainerName = "MapContainer";
-
-    private VisualElement mapContainer;
-    private Dictionary<string, VisualElement> locationMarkers = new Dictionary<string, VisualElement>();
-    private List<VisualElement> roadMarkers = new List<VisualElement>();
-
-    private void Start()
+    public class LocationUIManager : MonoBehaviour
     {
-        Initialize();
-    }
+        [SerializeField] private MapGeneratorManual mapGenerator;
+        [SerializeField] private UIDocument uiDocument;
+        [SerializeField] private string mapContainerName = "MapContainer";
 
-    private void Initialize()
-    {
-        if (uiDocument == null)
+        private VisualElement _mapContainer;
+        private readonly Dictionary<string, VisualElement> _locationMarkers = new Dictionary<string, VisualElement>();
+        private readonly List<VisualElement> _roadMarkers = new List<VisualElement>();
+
+        private void Start()
         {
-            uiDocument = GetComponent<UIDocument>();
-            if (uiDocument == null) return;
+            Initialize();
         }
 
-        if (uiDocument.rootVisualElement != null)
+        private void Initialize()
         {
-            mapContainer = uiDocument.rootVisualElement.Q<VisualElement>(mapContainerName);
+            if (!uiDocument)
+            {
+                uiDocument = GetComponent<UIDocument>();
+                if (uiDocument == null) return;
+            }
+
+            if (uiDocument.rootVisualElement != null)
+            {
+                _mapContainer = uiDocument.rootVisualElement.Q<VisualElement>(mapContainerName);
+            }
         }
-    }
 
-    public void AddLocationMarker(string locationName, Vector2 position, Color color)
-    {
-        if (mapContainer == null) Initialize();
-        if (mapContainer == null || mapGenerator == null) return;
-
-        var marker = new VisualElement();
-        marker.name = $"Marker_{locationName}";
-        marker.style.width = 16;
-        marker.style.height = 16;
-        marker.style.backgroundColor = new StyleColor(color);
-        marker.style.position = Position.Absolute;
-
-        float xPercent = (position.x / mapGenerator.mapWidth) * 100f;
-        float yPercent = (position.y / mapGenerator.mapHeight) * 100f;
-
-        marker.style.left = xPercent;
-        marker.style.top = yPercent;
-
-        var label = new Label(locationName);
-        label.style.color = Color.white;
-        label.style.fontSize = 11;
-        label.style.position = Position.Absolute;
-        label.style.top = -20;
-        label.style.left = -20;
-
-        marker.Add(label);
-        mapContainer.Add(marker);
-
-        locationMarkers[locationName] = marker;
-    }
-
-    public void AddRoadMarker(Vector2 start, Vector2 end, Color color)
-    {
-        if (mapContainer == null) Initialize();
-        if (mapContainer == null || mapGenerator == null) return;
-
-        float startXPercent = (start.x / mapGenerator.mapWidth) * 100f;
-        float startYPercent = (start.y / mapGenerator.mapHeight) * 100f;
-        float endXPercent = (end.x / mapGenerator.mapWidth) * 100f;
-        float endYPercent = (end.y / mapGenerator.mapHeight) * 100f;
-
-        var line = new VisualElement();
-        line.name = $"Road_{Time.frameCount}";
-
-        // Простая линия вместо повернутой
-        line.style.position = Position.Absolute;
-        line.style.left = startXPercent;
-        line.style.top = startYPercent;
-        line.style.width = Mathf.Abs(endXPercent - startXPercent);
-        line.style.height = 3;
-        line.style.backgroundColor = new StyleColor(color);
-
-        mapContainer.Add(line);
-        roadMarkers.Add(line);
-    }
-
-    public void ClearMarkers()
-    {
-        if (mapContainer == null) return;
-
-        foreach (var marker in locationMarkers.Values)
-            mapContainer.Remove(marker);
-
-        foreach (var road in roadMarkers)
-            mapContainer.Remove(road);
-
-        locationMarkers.Clear();
-        roadMarkers.Clear();
-    }
-
-    public void RemoveLocationMarker(string locationName)
-    {
-        if (mapContainer == null) return;
-
-        if (locationMarkers.TryGetValue(locationName, out var marker))
+        public void AddLocationMarker(string locationName, Vector2 position, Color color)
         {
-            mapContainer.Remove(marker);
-            locationMarkers.Remove(locationName);
+            if (_mapContainer == null) Initialize();
+            if (_mapContainer == null || !mapGenerator) return;
+
+            var marker = new VisualElement
+            {
+                name = $"Marker_{locationName}",
+                style =
+                {
+                    width = 16,
+                    height = 16,
+                    backgroundColor = new StyleColor(color),
+                    position = Position.Absolute
+                }
+            };
+
+            float xPercent = position.x / mapGenerator.mapWidth * 100f;
+            float yPercent = position.y / mapGenerator.mapHeight * 100f;
+
+            marker.style.left = xPercent;
+            marker.style.top = yPercent;
+
+            var label = new Label(locationName)
+            {
+                style =
+                {
+                    color = Color.white,
+                    fontSize = 11,
+                    position = Position.Absolute,
+                    top = -20,
+                    left = -20
+                }
+            };
+
+            marker.Add(label);
+            _mapContainer.Add(marker);
+
+            _locationMarkers[locationName] = marker;
+        }
+
+        public void AddRoadMarker(Vector2 start, Vector2 end, Color color)
+        {
+            if (_mapContainer == null) Initialize();
+            if (_mapContainer == null || !mapGenerator) return;
+
+            float startXPercent = start.x / mapGenerator.mapWidth * 100f;
+            float startYPercent = start.y / mapGenerator.mapHeight * 100f;
+            float endXPercent = end.x / mapGenerator.mapWidth * 100f;
+            float endYPercent = end.y / mapGenerator.mapHeight * 100f;
+
+            var line = new VisualElement
+            {
+                name = $"Road_{Time.frameCount}",
+                style =
+                {
+                    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+                    position = Position.Absolute,
+                    left = startXPercent,
+                    top = startYPercent,
+                    width = Mathf.Abs(endXPercent - startXPercent),
+                    height = 3,
+                    backgroundColor = new StyleColor(color)
+                }
+            };
+
+            _mapContainer.Add(line);
+            _roadMarkers.Add(line);
+        }
+
+        public void ClearMarkers()
+        {
+            if (_mapContainer == null) return;
+
+            foreach (var marker in _locationMarkers.Values)
+                _mapContainer.Remove(marker);
+
+            foreach (var road in _roadMarkers)
+                _mapContainer.Remove(road);
+
+            _locationMarkers.Clear();
+            _roadMarkers.Clear();
+        }
+
+        public void RemoveLocationMarker(string locationName)
+        {
+            if (_mapContainer == null) return;
+
+            if (!_locationMarkers.TryGetValue(locationName, out var marker)) return;
+            _mapContainer.Remove(marker);
+            _locationMarkers.Remove(locationName);
         }
     }
 }

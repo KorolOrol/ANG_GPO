@@ -1,17 +1,26 @@
 using UnityEngine;
 
-[System.Serializable]
-public class Location
+namespace MapScripts.LocationGenerate
 {
-    public string name;
-    public Vector2Int positionOnMap;
-    public LocationType type;
-    public bool isGenerated = false;
-}
+    [System.Serializable]
+    public class Location
+    {
+        public string name;
+        public Vector2Int PositionOnMap { get; }
+        public LocationType Type { get; }
+        public bool isGenerated;
 
-public enum LocationType
-{
-    Village,
-    City,
-    Dungeon
+        public Location(Vector2Int positionOnMap, LocationType type)
+        {
+            PositionOnMap = positionOnMap;
+            Type = type;
+        }
+    }
+
+    public enum LocationType
+    {
+        Village,
+        City,
+        Dungeon
+    }
 }
