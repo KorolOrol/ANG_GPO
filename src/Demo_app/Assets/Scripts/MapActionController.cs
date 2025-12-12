@@ -42,7 +42,7 @@ public class MapActionController : IActionController
     /// <summary>
     /// Текстовое поле для масштаба шума.
     /// </summary>
-    private TextField _noizeScaleTextField;
+    private TextField _noiseScaleTextField;
 
     /// <summary>
     /// Текстовое поле для количества октав.
@@ -211,10 +211,10 @@ public class MapActionController : IActionController
             _seedTextField.value = _mapGenerator.seed.ToString();
             Debug.Log($"SeedTextField установлен: {_seedTextField.value}");
         }
-        if (_noizeScaleTextField != null)
+        if (_noiseScaleTextField != null)
         {
-            _noizeScaleTextField.value = _mapGenerator.noiseScale.ToString(CultureInfo.InvariantCulture);
-            Debug.Log($"NoiseScaleTextField установлен: {_noizeScaleTextField.value}");
+            _noiseScaleTextField.value = _mapGenerator.noiseScale.ToString(CultureInfo.InvariantCulture);
+            Debug.Log($"NoiseScaleTextField установлен: {_noiseScaleTextField.value}");
         }
         if (_octavesTextField != null)
         {
@@ -223,7 +223,7 @@ public class MapActionController : IActionController
         }
         if (_persistenceSlider != null)
         {
-            _persistenceSlider.value = _mapGenerator.persistance;
+            _persistenceSlider.value = _mapGenerator.persistence;
             Debug.Log($"PersistenceSlider установлен: {_persistenceSlider.value}");
         }
         if (_lacunaritySlider != null)
@@ -234,7 +234,7 @@ public class MapActionController : IActionController
         if (_noiseOffsetXTextField != null)
         {
             _noiseOffsetXTextField.value = _mapGenerator.noiseOffset.x.ToString(CultureInfo.InvariantCulture);
-            Debug.Log($"NoizeOffsetXTextField установлен: {_noiseOffsetXTextField.value}");
+            Debug.Log($"NoiseOffsetXTextField установлен: {_noiseOffsetXTextField.value}");
         }
         if (_noiseOffsetYTextField != null)
         {
@@ -258,12 +258,12 @@ public class MapActionController : IActionController
         _heightSlider = root.Q<Slider>("HeightSlider");
         _chunkSizeTextField = root.Q<TextField>("ChunkSizeTextField");
         _seedTextField = root.Q<TextField>("SeedTextField");
-        _noizeScaleTextField = root.Q<TextField>("NoizeScaleTextField");
+        _noiseScaleTextField = root.Q<TextField>("NoiseScaleTextField");
         _octavesTextField = root.Q<TextField>("OctavesTextField");
-        _persistenceSlider = root.Q<Slider>("PersistanceSlider");
+        _persistenceSlider = root.Q<Slider>("PersistenceSlider");
         _lacunaritySlider = root.Q<Slider>("LacunaritySlider");
-        _noiseOffsetXTextField = root.Q<TextField>("NoizeOffsetXTextField");
-        _noiseOffsetYTextField = root.Q<TextField>("NoizeOffsetYTextField");
+        _noiseOffsetXTextField = root.Q<TextField>("NoiseOffsetXTextField");
+        _noiseOffsetYTextField = root.Q<TextField>("NoiseOffsetYTextField");
         _generateMapButton = root.Q<Button>("GenerateMapButton");
         _clearMapButton = root.Q<Button>("ClearMapButton");
         _locationsListView = root.Q<ListView>("LocationsListView");
@@ -439,7 +439,7 @@ public class MapActionController : IActionController
         {
             _mapGenerator.seed = seed;
         }
-        if (_noizeScaleTextField != null && float.TryParse(_noizeScaleTextField.value, out float noiseScale))
+        if (_noiseScaleTextField != null && float.TryParse(_noiseScaleTextField.value, out float noiseScale))
         {
             _mapGenerator.noiseScale = noiseScale;
         }
@@ -447,7 +447,7 @@ public class MapActionController : IActionController
         {
             _mapGenerator.octaves = octaves;
         }
-        if (_persistenceSlider != null) _mapGenerator.persistance = _persistenceSlider.value;
+        if (_persistenceSlider != null) _mapGenerator.persistence = _persistenceSlider.value;
         if (_lacunaritySlider != null) _mapGenerator.lacunarity = _lacunaritySlider.value;
         if (_noiseOffsetXTextField != null && float.TryParse(_noiseOffsetXTextField.value, out float offsetX))
         {
@@ -694,7 +694,9 @@ public class MapActionController : IActionController
     /// </summary>
     private static VisualElement MakeLocationListItem()
     {
-        var elementAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
+        var handle = Addressables.LoadAssetAsync<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
+        handle.WaitForCompletion();
+        var elementAsset = handle.Result;
         if (elementAsset != null)
         {
             return elementAsset.CloneTree();

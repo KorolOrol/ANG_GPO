@@ -193,7 +193,13 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private static void OnAboutButtonClicked()
     {
-        FileDialogUtility.DisplayDialog("About", "Narrative Generator v1.0", "OK");
+        FileDialogUtility.DisplayDialog("About", "Cassius Narrative Generator v1.0\n" +
+            "Developers:\n" +
+            "Zhukovich Mikhail\n" +
+            "Kalashnikov Konstantin\n" +
+            "Agabekyan Grigoriy\n" +
+            "Kharlamov Egor\n" +
+            "(C) 2025, TUSUR", "OK");
     }
 
     /// <summary>

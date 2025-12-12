@@ -5,6 +5,7 @@ using System.Linq;
 using MapScripts.LocationGenerate;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace MapScripts
@@ -73,7 +74,7 @@ namespace MapScripts
         [Header("Noise & Biome")]
         public float noiseScale = 50f;
         public int octaves = 4;
-        [Range(0, 1)] public float persistance = 0.5f;
+        [FormerlySerializedAs("persistance")] [Range(0, 1)] public float persistence = 0.5f;
         [Range(1, 10)] public float lacunarity = 2f;
         public int seed = 42;
         public Vector2 noiseOffset;
@@ -189,7 +190,7 @@ namespace MapScripts
             _placedLocations.Clear();
 
             // Генерация карт
-            _heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, noiseOffset);
+            _heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistence, lacunarity, noiseOffset);
 
             if (!biomeGenerator)
             {
@@ -788,7 +789,7 @@ namespace MapScripts
                 seed = seed,
                 noiseScale = noiseScale,
                 octaves = octaves,
-                persistance = persistance,
+                persistance = persistence,
                 lacunarity = lacunarity,
                 noiseOffset = noiseOffset,
                 chunkSize = chunkSize,
@@ -866,7 +867,7 @@ namespace MapScripts
             seed = data.seed;
             noiseScale = data.noiseScale;
             octaves = data.octaves;
-            persistance = data.persistance;
+            persistence = data.persistance;
             lacunarity = data.lacunarity;
             noiseOffset = data.noiseOffset;
             chunkSize = data.chunkSize;
