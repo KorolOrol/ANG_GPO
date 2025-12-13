@@ -60,6 +60,16 @@ public class MapActionController : IActionController
     private Slider _lacunaritySlider;
 
     /// <summary>
+    /// Переключатель для границ чанков.
+    /// </summary>
+    private Toggle _drawChunkBordersToggle;
+
+    /// <summary>
+    /// Переключатель для границ чанков.
+    /// </summary>
+    private Toggle _showChunkBiomesToggle;
+
+    /// <summary>
     /// Текстовое поле для смещения шума по X.
     /// </summary>
     private TextField _noiseOffsetXTextField;
@@ -90,7 +100,10 @@ public class MapActionController : IActionController
     private Button _addLocationButton;
     private Button _connectLocationsButton;
     private Button _removeLocationButton;
-    private Toggle _autoPlaceToggle;
+
+    private Image _map3DView;
+    private RenderTexture _mapRenderTexture;
+    private Camera _mapCamera;
 
     /// <summary>
     /// Доступные биомы
@@ -106,80 +119,53 @@ public class MapActionController : IActionController
     /// </summary>
     private bool _isVisualElementsInitiated;
 
+    private void Setup3DMapView()
+    {
+        // Находим камеру для карты
+        _mapCamera = GameObject.Find("MapCamera")?.GetComponent<Camera>();
+        if (_mapCamera == null)
+        {
+            Debug.LogError("MapCamera не найдена! Создайте камеру с именем 'MapCamera'");
+            return;
+        }
+
+        // Получаем Render Texture с камеры
+        _mapRenderTexture = _mapCamera.targetTexture;
+        if (_mapRenderTexture == null)
+        {
+            Debug.LogError("MapCamera не имеет назначенной Render Texture");
+            return;
+        }
+
+        // Устанавливаем текстуру в UI элемент
+        _map3DView.image = _mapRenderTexture;
+
+        // При генерации карты обновляем позицию камеры
+        _generateMapButton.clicked += () => {
+            UpdateCameraPosition();
+        };
+    }
+
+    private void UpdateCameraPosition()
+    {
+        if (_mapGenerator == null || _mapCamera == null) return;
+
+        // Рассчитываем позицию камеры в зависимости от размера карты
+        float mapSize = Mathf.Max(_mapGenerator.mapWidth, _mapGenerator.mapHeight);
+        float cameraHeight = mapSize * 5f; // Высота камеры зависит от размера карты
+
+        _mapCamera.transform.position = new Vector3(0, cameraHeight, 0);
+        _mapCamera.orthographicSize = mapSize * 5f; // Масштабируем обзор
+    }
+
     /// <summary>
     /// Инициализация контроллера карты.
     /// </summary>
     public void Initiate(VisualElement root, Plot plot)
     {
-        Debug.Log("=== MapActionController.Initiate() начато ===");
-        Debug.Log($"Корневой элемент: {root.name}");
-
         _mapGenerator = Object.FindFirstObjectByType<MapGeneratorManual>();
-        if (_mapGenerator == null)
-        {
-            Debug.LogError("MapGeneratorManual не найден на сцене.");
-        }
-        else
-        {
-            Debug.Log($"MapGeneratorManual найден: {_mapGenerator.gameObject.name}");
-        }
-
-        // ВЫВОДИМ ВСЕ ЭЛЕМЕНТЫ ДЛЯ ОТЛАДКИ
-        DebugLogAllUIElements(root);
 
         InitiateVisualElements(root);
-
-        Debug.Log("=== MapActionController.Initiate() завершено ===");
-    }
-
-    /// <summary>
-    /// Выводит все UI элементы для отладки
-    /// </summary>
-    private static void DebugLogAllUIElements(VisualElement root)
-    {
-        Debug.Log("=== ВСЕ UI ЭЛЕМЕНТЫ ===");
-
-        // Ищем все кнопки
-        List<Button> allButtons = root.Query<Button>().ToList();
-        Debug.Log($"Найдено кнопок: {allButtons.Count}");
-        foreach (var button in allButtons)
-        {
-            Debug.Log($"  Кнопка: имя='{button.name}', текст='{button.text}'");
-        }
-
-        // Ищем все TextField
-        List<TextField> allTextFields = root.Query<TextField>().ToList();
-        Debug.Log($"Найдено TextField: {allTextFields.Count}");
-        foreach (var field in allTextFields)
-        {
-            Debug.Log($"  TextField: имя='{field.name}', label='{field.label}', значение='{field.value}'");
-        }
-
-        // Ищем все DropdownField
-        List<DropdownField> allDropdowns = root.Query<DropdownField>().ToList();
-        Debug.Log($"Найдено DropdownField: {allDropdowns.Count}");
-        foreach (var dropdown in allDropdowns)
-        {
-            Debug.Log($"  Dropdown: имя='{dropdown.name}', значение='{dropdown.value}'");
-        }
-
-        // Ищем все Toggle
-        List<Toggle> allToggles = root.Query<Toggle>().ToList();
-        Debug.Log($"Найдено Toggle: {allToggles.Count}");
-        foreach (var toggle in allToggles)
-        {
-            Debug.Log($"  Toggle: имя='{toggle.name}', значение={toggle.value}");
-        }
-
-        // Ищем все ListView
-        List<ListView> allListViews = root.Query<ListView>().ToList();
-        Debug.Log($"Найдено ListView: {allListViews.Count}");
-        foreach (var listView in allListViews)
-        {
-            Debug.Log($"  ListView: имя='{listView.name}'");
-        }
-
-        Debug.Log("=== КОНЕЦ СПИСКА ЭЛЕМЕНТОВ ===");
     }
 
     /// <summary>
@@ -189,57 +175,45 @@ public class MapActionController : IActionController
     {
         if (_mapGenerator == null) return;
 
-        Debug.Log("Инициализация значений UI из MapGeneratorManual...");
-
         if (_widthSlider != null)
         {
             _widthSlider.value = _mapGenerator.mapWidth;
-            Debug.Log($"WidthSlider установлен: {_widthSlider.value}");
         }
         if (_heightSlider != null)
         {
             _heightSlider.value = _mapGenerator.mapHeight;
-            Debug.Log($"HeightSlider установлен: {_heightSlider.value}");
         }
         if (_chunkSizeTextField != null)
         {
             _chunkSizeTextField.value = _mapGenerator.chunkSize.ToString();
-            Debug.Log($"ChunkSizeTextField установлен: {_chunkSizeTextField.value}");
         }
         if (_seedTextField != null)
         {
             _seedTextField.value = _mapGenerator.seed.ToString();
-            Debug.Log($"SeedTextField установлен: {_seedTextField.value}");
         }
         if (_noiseScaleTextField != null)
         {
             _noiseScaleTextField.value = _mapGenerator.noiseScale.ToString(CultureInfo.InvariantCulture);
-            Debug.Log($"NoiseScaleTextField установлен: {_noiseScaleTextField.value}");
         }
         if (_octavesTextField != null)
         {
             _octavesTextField.value = _mapGenerator.octaves.ToString();
-            Debug.Log($"OctavesTextField установлен: {_octavesTextField.value}");
         }
         if (_persistenceSlider != null)
         {
             _persistenceSlider.value = _mapGenerator.persistence;
-            Debug.Log($"PersistenceSlider установлен: {_persistenceSlider.value}");
         }
         if (_lacunaritySlider != null)
         {
             _lacunaritySlider.value = _mapGenerator.lacunarity;
-            Debug.Log($"LacunaritySlider установлен: {_lacunaritySlider.value}");
         }
         if (_noiseOffsetXTextField != null)
         {
             _noiseOffsetXTextField.value = _mapGenerator.noiseOffset.x.ToString(CultureInfo.InvariantCulture);
-            Debug.Log($"NoiseOffsetXTextField установлен: {_noiseOffsetXTextField.value}");
         }
         if (_noiseOffsetYTextField != null)
         {
             _noiseOffsetYTextField.value = _mapGenerator.noiseOffset.y.ToString(CultureInfo.InvariantCulture);
-            Debug.Log($"NoiseOffsetYTextField установлен: {_noiseOffsetYTextField.value}");
         }
     }
 
@@ -251,103 +225,40 @@ public class MapActionController : IActionController
         if (_isVisualElementsInitiated) return;
         _isVisualElementsInitiated = true;
 
-        Debug.Log("=== ИНИЦИАЛИЗАЦИЯ ВИЗУАЛЬНЫХ ЭЛЕМЕНТОВ ===");
+        _generateMapButton = root.Q<Button>("GenerateMapButton");
+        _clearMapButton = root.Q<Button>("ClearMapButton");
 
-        // Существующие элементы
         _widthSlider = root.Q<Slider>("WidthSlider");
         _heightSlider = root.Q<Slider>("HeightSlider");
         _chunkSizeTextField = root.Q<TextField>("ChunkSizeTextField");
+
         _seedTextField = root.Q<TextField>("SeedTextField");
         _noiseScaleTextField = root.Q<TextField>("NoiseScaleTextField");
         _octavesTextField = root.Q<TextField>("OctavesTextField");
         _persistenceSlider = root.Q<Slider>("PersistenceSlider");
         _lacunaritySlider = root.Q<Slider>("LacunaritySlider");
+
+        _drawChunkBordersToggle = root.Q<Toggle>("DrawChunkBordersToggle");
+        _showChunkBiomesToggle = root.Q<Toggle>("ShowChunkBiomesToggle");
+
         _noiseOffsetXTextField = root.Q<TextField>("NoiseOffsetXTextField");
         _noiseOffsetYTextField = root.Q<TextField>("NoiseOffsetYTextField");
-        _generateMapButton = root.Q<Button>("GenerateMapButton");
-        _clearMapButton = root.Q<Button>("ClearMapButton");
+
         _locationsListView = root.Q<ListView>("LocationsListView");
         root.Q<VisualElement>("MapViewVisualElement");
 
-        Debug.Log($"Основные элементы: GenerateMapButton={_generateMapButton != null}, " +
-            $"ClearMapButton={_clearMapButton != null}");
-        Debug.Log($"ListView найден: {_locationsListView != null}");
-
         // НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ УПРАВЛЕНИЯ ЛОКАЦИЯМИ
-        // Пробуем разные варианты имен
         _locationNameField = root.Q<TextField>("LocationNameField");
-        if (_locationNameField == null)
-        {
-            Debug.LogWarning("LocationNameField не найден, пробую другие варианты...");
-            _locationNameField = root.Q<TextField>("locationNameField"); // с маленькой буквы
-            _locationNameField = root.Q<TextField>("LocationName"); // без Field
-            _locationNameField = root.Q<TextField>("location-name"); // через дефис
-        }
-
         _biomeDropdown = root.Q<DropdownField>("BiomeDropdown");
-        if (_biomeDropdown == null)
-        {
-            Debug.LogWarning("BiomeDropdown не найден, пробую другие варианты...");
-            _biomeDropdown = root.Q<DropdownField>("biomeDropdown");
-            _biomeDropdown = root.Q<DropdownField>("Biome");
-        }
-
-        _addLocationButton = root.Q<Button>("AddLocationButton");
-        if (_addLocationButton == null)
-        {
-            Debug.LogWarning("AddLocationButton не найден, пробую другие варианты...");
-            _addLocationButton = root.Q<Button>("addLocationButton");
-            _addLocationButton = root.Q<Button>("AddLocation");
-            _addLocationButton = root.Q<Button>("Add Location"); // с пробелом
-            _addLocationButton = root.Q<Button>("Add");
-        }
-
+        _addLocationButton = root.Q<Button>("AddMapLocationButton");
         _connectLocationsButton = root.Q<Button>("ConnectLocationsButton");
-        if (_connectLocationsButton == null)
-        {
-            Debug.LogWarning("ConnectLocationsButton не найден, пробую другие варианты...");
-            _connectLocationsButton = root.Q<Button>("connectLocationsButton");
-            _connectLocationsButton = root.Q<Button>("ConnectLocations");
-            _connectLocationsButton = root.Q<Button>("Connect Locations");
-            _connectLocationsButton = root.Q<Button>("Connect");
-        }
-
         _removeLocationButton = root.Q<Button>("RemoveLocationButton");
-        if (_removeLocationButton == null)
-        {
-            Debug.LogWarning("RemoveLocationButton не найден, пробую другие варианты...");
-            _removeLocationButton = root.Q<Button>("removeLocationButton");
-            _removeLocationButton = root.Q<Button>("RemoveLocation");
-            _removeLocationButton = root.Q<Button>("Remove Locations");
-            _removeLocationButton = root.Q<Button>("Remove");
-        }
 
-        _autoPlaceToggle = root.Q<Toggle>("AutoPlaceToggle");
-        if (_autoPlaceToggle == null)
-        {
-            Debug.LogWarning("AutoPlaceToggle не найден, пробую другие варианты...");
-            _autoPlaceToggle = root.Q<Toggle>("autoPlaceToggle");
-            _autoPlaceToggle = root.Q<Toggle>("AutoPlace");
-        }
+        _map3DView = root.Q<Image>("Map3DView");
 
-        Debug.Log($"Управление локациями: LocationNameField={_locationNameField != null}, " +
-            $"AddLocationButton={_addLocationButton != null}");
-        Debug.Log($"ConnectLocationsButton={_connectLocationsButton != null}, " +
-            $"RemoveLocationButton={_removeLocationButton != null}");
-
-        // Настройка Dropdown для биомов
-        if (_biomeDropdown != null)
-        {
-            _biomeDropdown.choices = _availableBiomes;
-            if (_biomeDropdown.choices.Count > 0)
-                _biomeDropdown.value = _biomeDropdown.choices[0];
-            Debug.Log($"BiomeDropdown настроен: {_biomeDropdown.choices.Count} биомов, " +
-                $"значение: {_biomeDropdown.value}");
-        }
-        else
-        {
-            Debug.LogError("BiomeDropdown НЕ НАЙДЕН! Создайте DropdownField с именем 'BiomeDropdown' в UI Builder");
-        }
+        _biomeDropdown.choices = _availableBiomes;
+        if (_biomeDropdown.choices.Count > 0)
+            _biomeDropdown.value = _biomeDropdown.choices[0];
 
         // Настройка ListView локаций
         if (_locationsListView != null)
@@ -369,51 +280,17 @@ public class MapActionController : IActionController
 
             Debug.Log("ListView инициализирован");
         }
-        else
-        {
-            Debug.LogError("LocationsListView НЕ НАЙДЕН! " +
-                "Создайте ListView с именем 'LocationsListView' в UI Builder");
-        }
 
-        // Регистрация обработчиков событий
-        if (_generateMapButton != null)
-        {
-            _generateMapButton.clicked += OnGenerateMapButtonClicked;
-            Debug.Log("Кнопка Generate подписана");
-        }
-        else
-        {
-            Debug.LogError("GenerateMapButton НЕ НАЙДЕН!");
-        }
 
-        if (_clearMapButton != null)
-        {
-            _clearMapButton.clicked += OnClearMapButtonClicked;
-            Debug.Log("Кнопка Clear подписана");
-        }
+        _generateMapButton.clicked += OnGenerateMapButtonClicked;
+        _clearMapButton.clicked += OnClearMapButtonClicked;
+        _addLocationButton.clicked += OnAddLocationButtonClicked;
+        _connectLocationsButton.clicked += OnConnectLocationsButtonClicked;
+        _removeLocationButton.clicked += OnRemoveLocationButtonClicked;
 
-        if (_addLocationButton != null)
-        {
-            _addLocationButton.clicked += OnAddLocationButtonClicked;
-            Debug.Log("Кнопка Add Location подписана");
-        }
-
-        if (_connectLocationsButton != null)
-        {
-            _connectLocationsButton.clicked += OnConnectLocationsButtonClicked;
-            Debug.Log("Кнопка Connect подписана");
-        }
-
-        if (_removeLocationButton != null)
-        {
-            _removeLocationButton.clicked += OnRemoveLocationButtonClicked;
-            Debug.Log("Кнопка Remove подписана");
-        }
-
-        // Обновляем список локаций при старте
         UpdateLocationsList();
 
-        Debug.Log("=== ИНИЦИАЛИЗАЦИЯ ЗАВЕРШЕНА ===");
+        Setup3DMapView();
     }
 
     /// <summary>
@@ -421,7 +298,6 @@ public class MapActionController : IActionController
     /// </summary>
     private void OnGenerateMapButtonClicked()
     {
-        Debug.Log("=== НАЖАТА КНОПКА 'Generate Map' ===");
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден.");
@@ -447,8 +323,13 @@ public class MapActionController : IActionController
         {
             _mapGenerator.octaves = octaves;
         }
+
         if (_persistenceSlider != null) _mapGenerator.persistence = _persistenceSlider.value;
         if (_lacunaritySlider != null) _mapGenerator.lacunarity = _lacunaritySlider.value;
+
+        _mapGenerator.drawChunkBorders = _drawChunkBordersToggle.value;
+        _mapGenerator.showChunkBiomes = _showChunkBiomesToggle.value;
+
         if (_noiseOffsetXTextField != null && float.TryParse(_noiseOffsetXTextField.value, out float offsetX))
         {
             float offsetY = _mapGenerator.noiseOffset.y;
@@ -459,15 +340,11 @@ public class MapActionController : IActionController
             _mapGenerator.noiseOffset = new Vector2(offsetX, offsetY);
         }
 
-        Debug.Log("Параметры установлены, вызываю GenerateManualMap()...");
-
         // Генерируем карту
         _mapGenerator.GenerateManualMap();
 
         // Обновляем список локаций
         UpdateLocationsList();
-
-        Debug.Log("=== ГЕНЕРАЦИЯ КАРТЫ ЗАВЕРШЕНА ===");
     }
 
     /// <summary>
@@ -475,7 +352,6 @@ public class MapActionController : IActionController
     /// </summary>
     private void OnClearMapButtonClicked()
     {
-        Debug.Log("=== НАЖАТА КНОПКА 'Clear Map' ===");
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден.");
@@ -521,9 +397,8 @@ public class MapActionController : IActionController
 
         string locationName = _locationNameField.value?.Trim();
         string biome = _biomeDropdown.value;
-        bool autoPlace = _autoPlaceToggle?.value ?? true;
 
-        Debug.Log($"Введенные данные: имя='{locationName}', биом='{biome}', авторазмещение={autoPlace}");
+        Debug.Log($"Введенные данные: имя='{locationName}', биом='{biome}'");
 
         if (string.IsNullOrEmpty(locationName))
         {
@@ -537,12 +412,8 @@ public class MapActionController : IActionController
             return;
         }
 
-        Debug.Log($"Добавляю локацию: {locationName}...");
-
         // Добавляем локацию
-        _mapGenerator.AddLocationManually(locationName, biome, autoPlace);
-
-        Debug.Log("Локация добавлена в MapGenerator");
+        _mapGenerator.AddLocationManually(locationName, biome);
 
         // Обновляем список локаций
         UpdateLocationsList();
@@ -559,49 +430,101 @@ public class MapActionController : IActionController
     private void OnConnectLocationsButtonClicked()
     {
         Debug.Log("=== КНОПКА 'Connect Locations' НАЖАТА ===");
-
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден");
             return;
         }
-
         if (_locationsListView == null)
         {
             Debug.LogError("ListView не найден");
             return;
         }
 
-        // Проверяем выбранные элементы
-        if (_locationsListView.selectedIndex < 0)
+        // Получаем все выбранные индексы
+        List<int> selectedIndices = new List<int>();
+
+        // Современный способ для множественного выбора
+        if (_locationsListView.selectionType == SelectionType.Multiple)
         {
-            Debug.LogError("Выберите хотя бы одну локацию в списке");
-            Debug.Log($"Всего локаций: {_mapGenerator.locations.Count}");
+            try
+            {
+                foreach (var index in _locationsListView.selectedIndices)
+                {
+                    selectedIndices.Add(index);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Не удалось получить несколько выбранных индексов: {e.Message}");
+                // Падаем обратно на одиночный выбор
+                if (_locationsListView.selectedIndex >= 0)
+                {
+                    selectedIndices.Add(_locationsListView.selectedIndex);
+                }
+            }
+        }
+        else
+        {
+            // Старый способ - только один выбранный индекс
+            if (_locationsListView.selectedIndex >= 0)
+            {
+                selectedIndices.Add(_locationsListView.selectedIndex);
+            }
+        }
+
+        if (selectedIndices.Count < 2)
+        {
+            Debug.LogError($"Выберите минимум 2 локации для соединения (выбрано: {selectedIndices.Count})");
             return;
         }
 
-        // В старой версии UI Toolkit множественный выбор может не работать.
-        // Делаем простое соединение - соединяем выбранную локацию с последней добавленной
-        int selectedIndex = _locationsListView.selectedIndex;
-        Debug.Log($"Выбрана локация с индексом: {selectedIndex}");
+        Debug.Log($"Выбрано локаций для соединения: {selectedIndices.Count}");
 
-        if (_mapGenerator.locations.Count < 2)
+        // Собираем имена выбранных локаций
+        List<string> selectedLocationNames = new List<string>();
+        foreach (int index in selectedIndices)
         {
-            Debug.LogError("Для соединения нужно как минимум 2 локации");
+            if (index >= 0 && index < _mapGenerator.locations.Count)
+            {
+                selectedLocationNames.Add(_mapGenerator.locations[index].locationName);
+            }
+        }
+
+        // Проверяем, что все выбранные локации размещены на карте
+        bool allPlaced = true;
+        foreach (string locName in selectedLocationNames)
+        {
+            if (!_mapGenerator.IsLocationPlaced(locName))
+            {
+                Debug.LogError($"Локация '{locName}' не размещена на карте");
+                allPlaced = false;
+            }
+        }
+
+        if (!allPlaced)
+        {
+            Debug.LogError("Не все выбранные локации размещены на карте");
             return;
         }
 
-        // Соединяем выбранную локацию с первой локацией в списке (или последней)
-        string location1 = _mapGenerator.locations[selectedIndex].locationName;
+        // Вариант 1: Соединяем в цепочку (A-B, B-C, C-D)
+        for (int i = 0; i < selectedLocationNames.Count - 1; i++)
+        {
+            string loc1 = selectedLocationNames[i];
+            string loc2 = selectedLocationNames[i + 1];
+            _mapGenerator.ConnectLocations(loc1, loc2);
+            Debug.Log($"Соединены локации: '{loc1}' и '{loc2}'");
+        }
 
-        string location2 =
-            // Если выбрана первая, соединяем со второй
-            selectedIndex == 0 ? _mapGenerator.locations[1].locationName :
-            // Иначе соединяем с первой
-            _mapGenerator.locations[0].locationName;
-
-        Debug.Log($"Соединяю локации: '{location1}' и '{location2}'");
-        _mapGenerator.ConnectLocations(location1, location2);
+        // Вариант 2: Замыкаем в кольцо (только если больше 2 локаций)
+        if (selectedLocationNames.Count > 2)
+        {
+            string first = selectedLocationNames[0];
+            string last = selectedLocationNames[selectedLocationNames.Count - 1];
+            _mapGenerator.ConnectLocations(first, last);
+            Debug.Log($"Замкнуто кольцо между '{first}' и '{last}'");
+        }
 
         Debug.Log("=== СОЕДИНЕНИЕ ЗАВЕРШЕНО ===");
     }

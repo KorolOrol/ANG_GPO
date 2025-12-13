@@ -93,13 +93,9 @@ namespace MapScripts
         [Tooltip("Имя файла (без расширения) для сохранения/загрузки")]
         public string saveFileName = "map_saved";
 
-        [Header("UI Display")]
-        [Tooltip("Добавьте сюда компонент MapDisplayUI для отображения карты в интерфейсе")]
-        public MapDisplayUI uiMapDisplay;
-
-        [Header("Location UI")]
-        [Tooltip("Добавьте сюда компонент LocationUIManager для отображения маркеров локаций")]
-        public LocationUIManager locationUIManager;
+        [Header("Map Display")]
+        [Tooltip("Добавьте сюда компонент MapDisplay для отображения карты в интерфейсе")]
+        public MapDisplay mapDisplay;
 
         private float[,] _heightMap;
         private float[,] _biomeNoiseMap;
@@ -124,6 +120,14 @@ namespace MapScripts
             return compressed;
         }
 
+        /// <summary>
+        /// Проверяет, размещена ли локация на карте
+        /// </summary>
+        public bool IsLocationPlaced(string locationName)
+        {
+            return _placedLocations.ContainsKey(locationName);
+        }
+
         public void ClearMap()
         {
             // Удаляем все созданные объекты
@@ -136,15 +140,9 @@ namespace MapScripts
             _placedLocations.Clear();
             locations.Clear();
 
-            // Очищаем UI
-            if (uiMapDisplay)
+            if (mapDisplay)
             {
-                uiMapDisplay.ClearMap();
-            }
-
-            if (locationUIManager)
-            {
-                locationUIManager.ClearMarkers();
+                mapDisplay.ClearMap();
             }
 
             Debug.Log("Карта и все локации очищены");
@@ -300,14 +298,9 @@ namespace MapScripts
             // Отображаем карту
             var mapTexture = TextureGenerator.TextureFromColourMap(_colourMap, mapWidth, mapHeight);
 
-            if (uiMapDisplay)
+            if (mapDisplay)
             {
-                uiMapDisplay.DrawTexture(mapTexture);
-                Debug.Log("Карта отображена в UI");
-            }
-            else
-            {
-                Debug.LogWarning("uiMapDisplay не назначен!");
+                mapDisplay.DrawTexture(mapTexture);
             }
 
             Debug.Log("=== ГЕНЕРАЦИЯ КАРТЫ ЗАВЕРШЕНА ===");
@@ -323,10 +316,18 @@ namespace MapScripts
             string[,] chunkBiome = CalculateChunkBiomes();
 
             List<Vector2Int> valid = new List<Vector2Int>();
+
+            // Сначала ищем подходящие чанки
             for (int cx = 0; cx < chunksX; cx++)
-            for (int cy = 0; cy < chunksY; cy++)
-                if (chunkBiome[cx, cy] == loc.biome)
-                    valid.Add(new Vector2Int(cx, cy));
+            {
+                for (int cy = 0; cy < chunksY; cy++)
+                {
+                    if (chunkBiome[cx, cy] == loc.biome)
+                    {
+                        valid.Add(new Vector2Int(cx, cy));
+                    }
+                }
+            }
 
             if (valid.Count == 0)
             {
@@ -334,9 +335,33 @@ namespace MapScripts
                 return;
             }
 
-            var ch = valid[Random.Range(0, valid.Count)];
-            int px = Mathf.Clamp(ch.x * chunkSize + Random.Range(0, chunkSize), 0, mapWidth - 1);
-            int py = Mathf.Clamp(ch.y * chunkSize + Random.Range(0, chunkSize), 0, mapHeight - 1);
+            // Пытаемся найти подходящую точку в чанке
+            int attempts = 0;
+            const int maxAttempts = 100;
+            Vector2Int chosenChunk = Vector2Int.zero;
+            int px = 0, py = 0;
+
+            while (attempts < maxAttempts)
+            {
+                chosenChunk = valid[Random.Range(0, valid.Count)];
+                px = Mathf.Clamp(chosenChunk.x * chunkSize + Random.Range(0, chunkSize), 0, mapWidth - 1);
+                py = Mathf.Clamp(chosenChunk.y * chunkSize + Random.Range(0, chunkSize), 0, mapHeight - 1);
+
+                string actualBiome = GetBiome(_heightMap[px, py], _biomeNoiseMap[px, py]);
+
+                if (actualBiome == loc.biome)
+                {
+                    break;
+                }
+
+                attempts++;
+            }
+
+            if (attempts >= maxAttempts)
+            {
+                px = Mathf.Clamp(chosenChunk.x * chunkSize + Random.Range(0, chunkSize), 0, mapWidth - 1);
+                py = Mathf.Clamp(chosenChunk.y * chunkSize + Random.Range(0, chunkSize), 0, mapHeight - 1);
+            }
 
             _placedLocations[loc.locationName] = new Vector2(px, py);
             CreateLocationObject(loc.locationName, px, py);
@@ -349,7 +374,7 @@ namespace MapScripts
         {
             // Определяем цвет для биома
             string biome = GetLocationBiome(locName);
-            var color = GetBiomeColor(biome);
+            var color = Color.black;
 
             // СОЗДАЕМ КУБ ПРОГРАММНО
             var cube =
@@ -373,17 +398,21 @@ namespace MapScripts
             var renderer = cube.GetComponent<Renderer>();
             if (renderer)
             {
-                // Создаем новый материал
-                var material = new Material(Shader.Find("Standard"))
+                if (renderer.material != null)
                 {
-                    color = color
-                };
-
-                // Добавляем свечение для лучшей видимости
-                material.EnableKeyword("_EMISSION");
-                material.SetColor("_EmissionColor", color * 0.3f);
-
-                renderer.material = material;
+                    renderer.material.color = color;
+                    renderer.material.SetColor("black", Color.black);
+                }
+                else
+                {
+                    // Если материала нет, создаем новый
+                    var material = new Material(Shader.Find("Standard"))
+                    {
+                        color = color
+                    };
+                    renderer.material.SetColor("black", Color.black);
+                    renderer.material = material;
+                }
             }
 
             // ДОБАВЛЯЕМ ПОДПИСЬ (TextMeshPro)
@@ -392,13 +421,6 @@ namespace MapScripts
             // ДОБАВЛЯЕМ КОМПОНЕНТ ДЛЯ УПРАВЛЕНИЯ
             var locationComponent = cube.AddComponent<LocationObject>();
             locationComponent.Initialize(locName, biome, new Vector2(x, y));
-
-            // UI маркер
-            if (locationUIManager)
-            {
-                var markerColor = GetRandomColorForLocation(locName);
-                locationUIManager.AddLocationMarker(locName, new Vector2(x, y), markerColor);
-            }
 
             Debug.Log($"Создан куб локации '{locName}' в позиции ({x}, {y}), цвет: {color}");
         }
@@ -411,8 +433,9 @@ namespace MapScripts
             // Создаем объект для текста
             var textObj = new GameObject("Label");
             textObj.transform.SetParent(parent.transform);
-            textObj.transform.localPosition = new Vector3(0, 30f, 0); // Над кубом
-            textObj.transform.localScale = new Vector3(10f, 10f, 10f);
+            textObj.transform.localPosition = new Vector3(0, 5f, 3f); // Над кубом
+            textObj.transform.rotation = Quaternion.Euler(90f, 0, 0); // Над кубом
+            textObj.transform.localScale = new Vector3(1f, 1f, 1f);
 
             // Добавляем TextMeshPro
             var tm = textObj.AddComponent<TextMeshPro>();
@@ -426,7 +449,7 @@ namespace MapScripts
             var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
             bg.name = "LabelBackground";
             bg.transform.SetParent(textObj.transform);
-            bg.transform.localPosition = new Vector3(0, 0, -0.1f);
+            bg.transform.localPosition = new Vector3(0, 0, 0.1f);
             bg.transform.localRotation = Quaternion.identity;
 
             // Рассчитываем размер подложки
@@ -471,20 +494,6 @@ namespace MapScripts
         {
             var loc = locations.Find(l => l.locationName == locationName);
             return loc?.biome ?? "Grassland";
-        }
-
-        /// <summary>
-        /// Возвращает случайный цвет для маркера локации
-        /// </summary>
-        private static Color GetRandomColorForLocation(string locationName)
-        {
-            int hash = locationName.GetHashCode();
-            return new Color(
-                (hash & 0xFF) / 255f,
-                (hash >> 8 & 0xFF) / 255f,
-                (hash >> 16 & 0xFF) / 255f,
-                1f
-            );
         }
 
         /// <summary>
@@ -576,24 +585,21 @@ namespace MapScripts
             }
             roadPath.Add(a);
 
-            // UI маркер дороги
-            if (locationUIManager)
-            {
-                locationUIManager.AddRoadMarker(a, b, Color.red);
-            }
+            //// UI маркер дороги
+            //if (locationUIManager)
+            //{
+            //    locationUIManager.AddRoadMarker(a, b, Color.red);
+            //}
 
             // Перерисовываем карту
             var mapTexture = TextureGenerator.TextureFromColourMap(_colourMap, mapWidth, mapHeight);
 
-            if (uiMapDisplay)
+            if (mapDisplay)
             {
-                uiMapDisplay.DrawTexture(mapTexture);
+                mapDisplay.DrawTexture(mapTexture);
             }
         }
 
-        /// <summary>
-        /// Добавляет локацию вручную
-        /// </summary>
         /// <summary>
         /// Добавляет локацию вручную
         /// </summary>
@@ -629,14 +635,9 @@ namespace MapScripts
 
                 // Обновляем текстуру карты
                 var mapTexture = TextureGenerator.TextureFromColourMap(_colourMap, mapWidth, mapHeight);
-                if (uiMapDisplay != null)
+                if (mapDisplay)
                 {
-                    uiMapDisplay.DrawTexture(mapTexture);
-                    Debug.Log("Карта перерисована");
-                }
-                else
-                {
-                    Debug.LogWarning("uiMapDisplay не назначен, карта не перерисована");
+                    mapDisplay.DrawTexture(mapTexture);
                 }
             }
             else
@@ -697,11 +698,11 @@ namespace MapScripts
             var obj = GameObject.Find(locationName);
             if (obj != null) Destroy(obj);
 
-            // Удаляем UI маркер
-            if (locationUIManager != null)
-            {
-                locationUIManager.RemoveLocationMarker(locationName);
-            }
+            //// Удаляем UI маркер
+            //if (locationUIManager != null)
+            //{
+            //    locationUIManager.RemoveLocationMarker(locationName);
+            //}
 
             Debug.Log($"Локация '{locationName}' удалена");
         }
@@ -941,9 +942,9 @@ namespace MapScripts
 
             var mapTexture = TextureGenerator.TextureFromColourMap(_colourMap, mapWidth, mapHeight);
 
-            if (uiMapDisplay)
+            if (mapDisplay)
             {
-                uiMapDisplay.DrawTexture(mapTexture);
+                mapDisplay.DrawTexture(mapTexture);
             }
 
             Debug.Log($"Карта загружена из {jsonPath}");

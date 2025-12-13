@@ -1,15 +1,132 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MapDisplay : MonoBehaviour
 {
-    public Renderer textureRender;
+    public Renderer textureRenderer;
+    private Vector3 _originalScale;
+    private bool _isInitialized = false;
+    private Texture2D _currentTexture;
+
+    private void Awake()
+    {
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        if (textureRenderer == null)
+        {
+            textureRenderer = GetComponent<Renderer>();
+        }
+
+        if (textureRenderer != null)
+        {
+            _originalScale = transform.localScale;
+            _isInitialized = true;
+
+            SetupMaterial();
+        }
+    }
+
     public void DrawTexture(Texture2D texture)
     {
+        if (!_isInitialized)
+        {
+            Initialize();
+            if (!_isInitialized) return;
+        }
 
+        if (texture == null)
+        {
+            Debug.LogWarning("Null");
+            return;
+        }
 
-        textureRender.sharedMaterial.mainTexture = texture;
-        textureRender.transform.localScale = new Vector3(texture.width, 1, texture.height);
+        _currentTexture = texture;
+        textureRenderer.sharedMaterial.mainTexture = texture;
+        transform.localScale = new Vector3(texture.width, 1, texture.height);
+        SetupMaterial();
+        gameObject.SetActive(true);
+    }
+
+    private void SetupMaterial()
+    {
+        textureRenderer.material.shader = Shader.Find("Universal Render Pipeline/Unlit");
+        textureRenderer.material.SetColor("_BaseColor", Color.white);
+        textureRenderer.sharedMaterial.mainTextureScale = Vector2.one;
+        textureRenderer.sharedMaterial.mainTextureOffset = Vector2.zero;
+    }
+
+    public void ClearMap()
+    {
+        if (!_isInitialized) return;
+
+        gameObject.SetActive(false);
+        _currentTexture = null;
+
+        if (textureRenderer.sharedMaterial != null)
+        {
+            textureRenderer.sharedMaterial.mainTexture = null;
+        }
+
+        transform.localScale = _originalScale;
+    }
+
+    public void SetVisibility(bool visible)
+    {
+        gameObject.SetActive(visible);
+    }
+
+    public bool IsVisible()
+    {
+        return gameObject.activeSelf;
+    }
+
+    public Texture2D GetCurrentTexture()
+    {
+        return _currentTexture;
+    }
+
+    public void CenterMap()
+    {
+        transform.position = Vector3.zero;
+    }
+
+    public void ScaleMap(float scale)
+    {
+        if (_currentTexture != null)
+        {
+            transform.localScale = new Vector3(_currentTexture.width * scale, 1, _currentTexture.height * scale);
+        }
+        else if (textureRenderer.sharedMaterial != null && textureRenderer.sharedMaterial.mainTexture != null)
+        {
+            Texture2D texture = textureRenderer.sharedMaterial.mainTexture as Texture2D;
+            if (texture != null)
+            {
+                transform.localScale = new Vector3(texture.width * scale, 1, texture.height * scale);
+            }
+        }
+    }
+
+    public Vector2 GetMapSize()
+    {
+        if (_currentTexture != null)
+        {
+            return new Vector2(_currentTexture.width, _currentTexture.height);
+        }
+        return Vector2.zero;
+    }
+
+    public void SetMapPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
+
+    public void RedrawCurrentTexture()
+    {
+        if (_currentTexture != null)
+        {
+            DrawTexture(_currentTexture);
+        }
     }
 }

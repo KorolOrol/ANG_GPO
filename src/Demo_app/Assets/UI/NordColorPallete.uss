@@ -104,6 +104,7 @@
 .Slider > .unity-base-slider__input > .unity-base-slider__text-field {
     background-color: var(--nord-white);
     color: var(--nord-dark);
+    width: 60px;
 }
 
 .unity-foldout__checkmark {
@@ -201,4 +202,37 @@
 
 .DropdownMini > .unity-base-field:focus:enabled > .unity-base-field__label {
     color: var(--nord-white);
+}
+
+.SliderMini {
+}
+
+.SliderMini > .unity-base-field__label {
+    min-width: auto;
+    width: 30%;
+    color: var(--nord-gray);
+}
+
+.SliderMini > .unity-base-slider__input > .unity-base-slider__text-field {
+    background-color: var(--nord-white);
+    color: var(--nord-dark);
+    width: 80px;
+}
+
+.ListViewChoosable {
+}
+
+.ListViewChoosable .unity-list-view__item {
+    border-bottom-color: rgb(76, 86, 106);
+    padding: 5px;
+    transition: background-color 0.2s;
+}
+
+.ListViewChoosable .unity-list-view__item:hover {
+    background-color: rgb(67, 76, 94);
+}
+
+.ListViewChoosable .unity-list-view__item.selected {
+    background-color: rgb(59, 113, 140);
+    color: white;
 }
