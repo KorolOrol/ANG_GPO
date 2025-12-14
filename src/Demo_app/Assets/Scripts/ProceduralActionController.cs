@@ -50,7 +50,12 @@ public class ProceduralActionController : IActionController
     /// Текстовое поле для описания персонажа.
     /// </summary>
     private TextField _descriptionTextField;
-    
+
+    /// <summary>
+    /// Текстовое поле для описания персонажа.
+    /// </summary>
+    private Toggle _genDescriptionToggle;
+
     /// <summary>
     /// Выпадающий список для выбора матери персонажа.
     /// </summary>
@@ -148,6 +153,7 @@ public class ProceduralActionController : IActionController
         _genderDropdown = root.Q<DropdownField>("GenderDropdown");
 
         _descriptionTextField = root.Q<TextField>("PrDescriptionTextField");
+        _genDescriptionToggle = root.Q<Toggle>("GenDescriptionToggle");
 
         _motherDropdown = root.Q<DropdownField>("MotherDropdown");
         _fatherDropdown = root.Q<DropdownField>("FatherDropdown");
@@ -412,6 +418,12 @@ public class ProceduralActionController : IActionController
             {
                 PrGenerator.GetRelations(_generatedPrCharacter, foundCharacter);
             }
+        }
+
+        if (_genDescriptionToggle.value)
+        {
+            _generatedPrCharacter.Description = "";
+            PrGenerator.CreateDesc(_generatedPrCharacter);
         }
 
         // Отображаем сгенерированного персонажа в редакторе
