@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using MapScripts.LocationGenerate;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
@@ -67,8 +67,8 @@ namespace MapScripts
     public class MapGeneratorManual : MonoBehaviour
     {
         [Header("Map Settings")]
-        [Range(50, 300)] public int mapWidth = 100;
-        [Range(50, 300)] public int mapHeight = 100;
+        [Range(50, 500)] public int mapWidth = 100;
+        [Range(50, 500)] public int mapHeight = 100;
         public int chunkSize = 20;
 
         [Header("Noise & Biome")]
@@ -101,6 +101,9 @@ namespace MapScripts
         private float[,] _biomeNoiseMap;
         private Color[] _colourMap;
 
+        public MapZoom mapZoom;
+        public GameObject zoomDisplay;
+
         private readonly Dictionary<string, Vector2> _placedLocations = new Dictionary<string, Vector2>();
 
         /// <summary>
@@ -128,6 +131,51 @@ namespace MapScripts
             return _placedLocations.ContainsKey(locationName);
         }
 
+        public void HandleCityClick(Vector3 cityPosition)
+        {
+            var mapZoom = FindFirstObjectByType<MapZoom>();
+            if (mapZoom == null)
+            {
+                Debug.LogError("MapZoom не найден в сцене");
+                return;
+            }
+
+            // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: правильные знаки преобразования
+            float mx = (mapWidth * 0.5f) - (cityPosition.x / 10f);
+            float my = (mapHeight * 0.5f) - (cityPosition.z / 10f);
+
+            Debug.Log($"Клик по городу. Мировые координаты: ({cityPosition.x:F1}, {cityPosition.z:F1}), " +
+                      $"Координаты карты: ({mx:F1}, {my:F1})");
+
+            mapZoom.coordinate = new Vector2Int(Mathf.RoundToInt(mx), Mathf.RoundToInt(my));
+            mapZoom.updateZoom = true;
+
+            SwitchToZoomView();
+        }
+
+        private void SwitchToZoomView()
+        {
+            // Скрываем обычную карту
+            if (mapDisplay != null) mapDisplay.SetVisibility(false);
+
+            SetChildrenVisibility(false);
+
+            // Находим и показываем зум
+            if (zoomDisplay != null)
+            {
+                zoomDisplay.gameObject.SetActive(true);
+            }
+        }
+
+        public void SetChildrenVisibility(bool isVisible)
+        {
+            // Итерация по всем прямым дочерним элементам через Transform
+            foreach (Transform child in transform)
+            {
+                child.gameObject.SetActive(isVisible);
+            }
+        }
+
         public void ClearMap()
         {
             // Удаляем все созданные объекты
@@ -144,8 +192,6 @@ namespace MapScripts
             {
                 mapDisplay.ClearMap();
             }
-
-            Debug.Log("Карта и все локации очищены");
         }
 
         /// <summary>
@@ -180,8 +226,6 @@ namespace MapScripts
         /// </summary>
         public void GenerateManualMap()
         {
-            Debug.Log("=== НАЧАЛО ГЕНЕРАЦИИ КАРТЫ ===");
-
             // Очистка
             ClearMap();
 
@@ -302,8 +346,6 @@ namespace MapScripts
             {
                 mapDisplay.DrawTexture(mapTexture);
             }
-
-            Debug.Log("=== ГЕНЕРАЦИЯ КАРТЫ ЗАВЕРШЕНА ===");
         }
 
         /// <summary>
@@ -417,12 +459,6 @@ namespace MapScripts
 
             // ДОБАВЛЯЕМ ПОДПИСЬ (TextMeshPro)
             CreateLocationLabel(cube, locName, color);
-
-            // ДОБАВЛЯЕМ КОМПОНЕНТ ДЛЯ УПРАВЛЕНИЯ
-            var locationComponent = cube.AddComponent<LocationObject>();
-            locationComponent.Initialize(locName, biome, new Vector2(x, y));
-
-            Debug.Log($"Создан куб локации '{locName}' в позиции ({x}, {y}), цвет: {color}");
         }
 
         /// <summary>
@@ -448,6 +484,7 @@ namespace MapScripts
             // Черная подложка для лучшей читаемости
             var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
             bg.name = "LabelBackground";
+            Destroy(bg.GetComponent<Collider>());
             bg.transform.SetParent(textObj.transform);
             bg.transform.localPosition = new Vector3(0, 0, 0.1f);
             bg.transform.localRotation = Quaternion.identity;
@@ -605,12 +642,8 @@ namespace MapScripts
         /// </summary>
         public void AddLocationManually(string locationName, string biome, bool autoPlace = true)
         {
-            Debug.Log("=== MapGeneratorManual.AddLocationManually() ===");
-            Debug.Log($"Параметры: name='{locationName}', biome='{biome}', autoPlace={autoPlace}");
-
             // Проверяем, нет ли уже такой локации
             bool locationExists = locations.Any(l => l.locationName == locationName);
-            Debug.Log($"Локация с именем '{locationName}' уже существует? {locationExists}");
 
             if (locationExists)
             {
@@ -645,8 +678,6 @@ namespace MapScripts
                 Debug.LogWarning("Авторазмещение отключено или карты не сгенерированы. " +
                     $"heightMap={_heightMap != null}, biomeNoiseMap={_biomeNoiseMap != null}");
             }
-
-            Debug.Log($"=== Локация '{locationName}' добавлена (биом: {biome}) ===");
         }
 
         /// <summary>

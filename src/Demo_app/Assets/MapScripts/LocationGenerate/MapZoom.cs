@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.InputSystem;
+using MapScripts;
 
 /// <summary>
 /// Компонент для создания приближенного вида карты с генерацией городов и зданий
@@ -59,17 +61,16 @@ public class MapZoom : MonoBehaviour
     private Texture2D mainMapTexture;
     private Texture2D zoomedTexture;
 
-    public GameObject camerasController;
-    private CamerasController CC;
-
     public ModularBuildingGenerator MBGPrefab;
 
     private GameObject BuildsContainer;
     private GameObject MapGenContainer;
 
+    public MapGeneratorManual mapGenMan;
+    public GameObject mapDisplay;
+
     private void Start()
     {
-        CC = camerasController.GetComponent<CamerasController>();
     }
 
     /// <summary>
@@ -77,15 +78,49 @@ public class MapZoom : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Mouse.current.middleButton.wasPressedThisFrame)
         {
-            HandleCityClick();
+            ReturnToMainMap();
         }
 
         if (updateZoom)
         {
             updateZoom = false;
             GenerateZoomedMap();
+        }
+    }
+
+    public void ReturnToMainMap()
+    {
+        // Показываем основную карту
+        if (MapGenContainer != null) MapGenContainer.SetActive(true);
+        if (sourceRenderer != null) sourceRenderer.gameObject.SetActive(true);
+        if (BuildsContainer != null) BuildsContainer.SetActive(true);
+
+        // Удаляем контейнер 3D-города если есть
+        GameObject cityContainer = GameObject.Find("3DCityContainer");
+        if (cityContainer != null) DestroyImmediate(cityContainer);
+
+        if (mapDisplay != null)
+        {
+            mapDisplay.gameObject.SetActive(true);
+        }
+
+        SetChildrenVisibility(mapGenMan.gameObject, true);
+
+        GameObject zoomDisplay = GameObject.Find("ZoomDisplay");
+        if (zoomDisplay != null)
+        {
+            zoomDisplay.SetActive(false);
+        }
+    }
+
+    public void SetChildrenVisibility(GameObject toWho, bool isVisible)
+    {
+        // Итерация по всем прямым дочерним элементам через Transform
+        foreach (Transform child in toWho.transform)
+        {
+            child.gameObject.SetActive(isVisible);
         }
     }
 
@@ -107,7 +142,6 @@ public class MapZoom : MonoBehaviour
             GameObject hitObject = hit.collider.gameObject;
             if (hitObject.CompareTag("GeneratedObject") && hitObject.name.Contains("City"))
             {
-                CC.ChangeCamera();
                 Generate3DCity(hitObject);
             }
         }
@@ -133,13 +167,7 @@ public class MapZoom : MonoBehaviour
         if (sourceRenderer != null) sourceRenderer.gameObject.SetActive(false);
         if (buildingsContainer != null) BuildsContainer = buildingsContainer.gameObject; buildingsContainer.gameObject.SetActive(false);
 
-        float cameraPosX = cityObject.transform.position.x - 200;
-        float cameraPosY = cityObject.transform.position.y + 400;
-        float cameraPosZ = cityObject.transform.position.z - 1000;
-
         int buildingCNT = 1;
-
-        CC.CityCamera.transform.position = new Vector3(cameraPosX, cameraPosY, cameraPosZ);
 
         // Генерируем 3D-здания
         foreach (Transform building in buildingsContainer)
@@ -190,11 +218,28 @@ public class MapZoom : MonoBehaviour
         return inside[x, y] && !roads[x, y] && !walls[x, y] && !occupied[x, y];
     }
 
+    private void UpdateMapDimensions()
+    {
+        MapGeneratorManual mapGen = FindFirstObjectByType<MapGeneratorManual>();
+        if (mapGen != null)
+        {
+            mainMapWidth = mapGen.mapWidth;
+            mainMapHeight = mapGen.mapHeight;
+            Debug.Log($"Размеры карты обновлены: ширина={mainMapWidth}, высота={mainMapHeight}");
+        }
+        else
+        {
+            Debug.LogWarning("MapGeneratorManual не найден! Используются значения по умолчанию.");
+        }
+    }
+
     /// <summary>
     /// Генерирует приближенный вид карты с городами, зданиями и дорогами
     /// </summary>
     void GenerateZoomedMap()
     {
+        UpdateMapDimensions();
+
         ClearAllBuildings();
 
         if (sourceRenderer == null || targetRenderer == null) return;
@@ -232,30 +277,32 @@ public class MapZoom : MonoBehaviour
         var pivots = new List<(string name, Vector2Int mapPos, Vector2Int bufPos)>();
         int half = zoomSize;
 
+        SetChildrenVisibility(mapGenMan.gameObject, true);
+
         var allObjects = GameObject.FindGameObjectsWithTag("GeneratedObject");
         Debug.Log($"Всего объектов с тегом GeneratedObject: {allObjects.Length}");
 
+        SetChildrenVisibility(mapGenMan.gameObject, false);
+
         foreach (var obj in allObjects)
         {
-            if (!obj.name.Contains("City") && !obj.name.Contains("Town") && !obj.name.Contains("Village") &&
-                !obj.name.Contains("Settlement") && !obj.name.Contains("Capital"))
-            {
-                continue;
-            }
-
-            if (obj.name.Contains("BiomeLabel") || obj.name.Contains("Building") || obj.name.Contains("Marker"))
-            {
-                continue;
-            }
-
             Vector3 p = obj.transform.position;
-            float mx = mainMapWidth * .5f - p.x / 10f;
-            float my = mainMapHeight * .5f - p.z / 10f;
-            int ix = Mathf.RoundToInt(mx), iy = Mathf.RoundToInt(my);
 
-            bool isVisible = (Mathf.Abs(ix - coordinate.x) <= half && Mathf.Abs(iy - coordinate.y) <= half);
+            float mx = mainMapWidth * 0.5f - p.x / 10f;
+            float my = mainMapHeight * 0.5f - p.z / 10f;
 
-            Debug.Log($"Город: {obj.name}, Карта: ({ix}, {iy}), Видим: {isVisible}");
+            int ix = Mathf.RoundToInt(mx);
+            int iy = Mathf.RoundToInt(my);
+
+            int minX = coordinate.x - half;
+            int maxX = coordinate.x + half;
+            int minY = coordinate.y - half;
+            int maxY = coordinate.y + half;
+            bool isVisible = (ix >= minX && ix <= maxX && iy >= minY && iy <= maxY);
+
+            Debug.Log($"Город: {obj.name}, Мировые координаты: ({p.x:F1}, {p.z:F1}), " +
+                      $"Карта: ({ix}, {iy}), Центр зума: ({coordinate.x}, {coordinate.y}), " +
+                      $"Видим: {isVisible}");
 
             if (isVisible)
             {
@@ -569,7 +616,7 @@ public class MapZoom : MonoBehaviour
     /// <summary>
     /// Очищает все сгенерированные здания и маркеры на карте
     /// </summary>
-    private void ClearAllBuildings()
+    public void ClearAllBuildings()
     {
         GameObject container = GameObject.Find("BuildingsContainer");
         if (container != null)

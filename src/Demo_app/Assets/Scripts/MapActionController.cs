@@ -22,12 +22,8 @@ public class MapActionController : IActionController
     /// <summary>
     /// Слайдер для настройки ширины карты.
     /// </summary>
-    private Slider _widthSlider;
+    private Slider _sizeSlider;
 
-    /// <summary>
-    /// Слайдер для настройки высоты карты.
-    /// </summary>
-    private Slider _heightSlider;
 
     /// <summary>
     /// Текстовое поле для размера чанка.
@@ -97,6 +93,7 @@ public class MapActionController : IActionController
     // НОВЫЕ ПОЛЯ ДЛЯ УПРАВЛЕНИЯ ЛОКАЦИЯМИ
     private TextField _locationNameField;
     private DropdownField _biomeDropdown;
+    private DropdownField _cityModeDropdown;
     private Button _addLocationButton;
     private Button _connectLocationsButton;
     private Button _removeLocationButton;
@@ -150,12 +147,49 @@ public class MapActionController : IActionController
     {
         if (_mapGenerator == null || _mapCamera == null) return;
 
+        float mapWidthUnits = _mapGenerator.mapWidth * 10f;
+        float mapHeightUnits = _mapGenerator.mapHeight * 10f;
+
+        float aspectRatio = (float)_mapRenderTexture.width / _mapRenderTexture.height;
+
+        // Правильный расчет orthographicSize для прямоугольной карты
+        float widthBasedSize = mapWidthUnits / (2f * aspectRatio);
+        float heightBasedSize = mapHeightUnits / 2f;
+        float targetOrthoSize = Mathf.Max(widthBasedSize, heightBasedSize);
+
+        // Высота камеры с небольшим отступом для лучшего обзора
+        float cameraHeight = targetOrthoSize * 1.1f;
+
+        // Позиционирование камеры
+        _mapCamera.transform.position = new Vector3(0, cameraHeight, 0);
+        _mapCamera.transform.rotation = Quaternion.Euler(90, 0, 0);
+        _mapCamera.orthographicSize = targetOrthoSize;
+
+        Debug.Log($"Камера обновлена: позиция=({_mapCamera.transform.position}), " +
+                  $"размер={_mapCamera.orthographicSize:F2}, " +
+                  $"ширина карты={mapWidthUnits:F1}, высота карты={mapHeightUnits:F1}");
+    }
+
+    private void UpdateCameraPositionZoom()
+    {
+        if (_mapGenerator == null || _mapCamera == null) return;
+
         // Рассчитываем позицию камеры в зависимости от размера карты
-        float mapSize = Mathf.Max(_mapGenerator.mapWidth, _mapGenerator.mapHeight);
+        float mapSize = 100f;
         float cameraHeight = mapSize * 5f; // Высота камеры зависит от размера карты
 
+        // Позиционируем камеру точно над центром карты
         _mapCamera.transform.position = new Vector3(0, cameraHeight, 0);
-        _mapCamera.orthographicSize = mapSize * 5f; // Масштабируем обзор
+        _mapCamera.transform.rotation = Quaternion.Euler(90, 0, 0); // Смотрим прямо вниз
+
+        // Рассчитываем orthographicSize для полного охвата карты
+        float aspectRatio = (float)_mapRenderTexture.width / _mapRenderTexture.height;
+        _mapCamera.orthographicSize = Mathf.Max(
+            mapSize * 5f / aspectRatio,
+            mapSize * 5f
+        );
+
+        Debug.Log($"Камера обновлена: позиция=({_mapCamera.transform.position}), размер={_mapCamera.orthographicSize}, соотношение={aspectRatio:F2}");
     }
 
     /// <summary>
@@ -175,13 +209,13 @@ public class MapActionController : IActionController
     {
         if (_mapGenerator == null) return;
 
-        if (_widthSlider != null)
+        if (_sizeSlider != null)
         {
-            _widthSlider.value = _mapGenerator.mapWidth;
+            _sizeSlider.value = _mapGenerator.mapWidth;
         }
-        if (_heightSlider != null)
+        if (_sizeSlider != null)
         {
-            _heightSlider.value = _mapGenerator.mapHeight;
+            _sizeSlider.value = _mapGenerator.mapHeight;
         }
         if (_chunkSizeTextField != null)
         {
@@ -228,8 +262,7 @@ public class MapActionController : IActionController
         _generateMapButton = root.Q<Button>("GenerateMapButton");
         _clearMapButton = root.Q<Button>("ClearMapButton");
 
-        _widthSlider = root.Q<Slider>("WidthSlider");
-        _heightSlider = root.Q<Slider>("HeightSlider");
+        _sizeSlider = root.Q<Slider>("SizeSlider");
         _chunkSizeTextField = root.Q<TextField>("ChunkSizeTextField");
 
         _seedTextField = root.Q<TextField>("SeedTextField");
@@ -250,6 +283,7 @@ public class MapActionController : IActionController
         // НОВЫЕ ЭЛЕМЕНТЫ ДЛЯ УПРАВЛЕНИЯ ЛОКАЦИЯМИ
         _locationNameField = root.Q<TextField>("LocationNameField");
         _biomeDropdown = root.Q<DropdownField>("BiomeDropdown");
+        _cityModeDropdown = root.Q<DropdownField>("CityModeDropdown");
         _addLocationButton = root.Q<Button>("AddMapLocationButton");
         _connectLocationsButton = root.Q<Button>("ConnectLocationsButton");
         _removeLocationButton = root.Q<Button>("RemoveLocationButton");
@@ -259,6 +293,13 @@ public class MapActionController : IActionController
         _biomeDropdown.choices = _availableBiomes;
         if (_biomeDropdown.choices.Count > 0)
             _biomeDropdown.value = _biomeDropdown.choices[0];
+
+        _cityModeDropdown.choices = new List<string>()
+        {
+            "Simple Cubes", "Advanced with Sizes"
+        };
+        if (_cityModeDropdown.choices.Count > 0)
+            _cityModeDropdown.value = _cityModeDropdown.choices[0];
 
         // Настройка ListView локаций
         if (_locationsListView != null)
@@ -270,17 +311,15 @@ public class MapActionController : IActionController
             try
             {
                 _locationsListView.selectionType = SelectionType.Multiple;
-                Debug.Log("ListView настроен на множественный выбор");
             }
             catch (Exception e)
             {
                 Debug.LogWarning($"Не удалось установить множественный выбор: {e.Message}");
-                Debug.Log("Работаем с одиночным выбором");
             }
 
-            Debug.Log("ListView инициализирован");
         }
 
+        SetupMapClickHandler(root);
 
         _generateMapButton.clicked += OnGenerateMapButtonClicked;
         _clearMapButton.clicked += OnClearMapButtonClicked;
@@ -291,6 +330,161 @@ public class MapActionController : IActionController
         UpdateLocationsList();
 
         Setup3DMapView();
+    }
+
+    private void SetupMapClickHandler(VisualElement root)
+    {
+        // Находим контейнер с картой
+        var mapContainer = root.Q<VisualElement>("MapContainer");
+
+        if (mapContainer == null)
+        {
+            Debug.LogError("Элемент 'MapContainer' не найден в UI");
+            return;
+        }
+
+        // Отладка размеров контейнера
+        mapContainer.RegisterCallback<GeometryChangedEvent>(evt => {
+            Debug.Log($"MapContainer размер: {mapContainer.layout}, видимость: {mapContainer.style.display}");
+        });
+
+        // Регистрируем обработчик кликов по контейнеру карты
+        mapContainer.RegisterCallback<MouseDownEvent>(evt => {
+            if (evt.button == 0) // Левая кнопка мыши
+            {
+                HandleMapClick(evt.localMousePosition, mapContainer);
+            }
+        });
+
+        // Обработка возврата из зума при нажатии средней кнопки или escape
+        mapContainer.RegisterCallback<MouseDownEvent>(evt => {
+            if (evt.button == 2) // Средняя кнопка мыши
+            {
+                HandleReturnFromZoom();
+            }
+        });
+
+        root.RegisterCallback<KeyDownEvent>(evt => {
+            if (evt.keyCode == KeyCode.Escape)
+            {
+                HandleReturnFromZoom();
+            }
+        });
+    }
+
+    private void HandleMapClick(Vector2 screenPosition, VisualElement container)
+    {
+        if (_mapGenerator == null || _mapCamera == null ||
+            _map3DView == null || _mapRenderTexture == null ||
+            _mapRenderTexture.width == 0 || _mapRenderTexture.height == 0)
+        {
+            Debug.LogWarning("Компоненты карты не инициализированы или имеют нулевые размеры");
+            return;
+        }
+
+        float containerWidth = _map3DView.layout.width;
+        float containerHeight = _map3DView.layout.height;
+
+        if (containerWidth <= 0 || containerHeight <= 0)
+        {
+            Debug.LogWarning("Контейнер карты имеет недопустимые размеры");
+            return;
+        }
+
+        Vector2 localPosition = _map3DView.WorldToLocal(container.LocalToWorld(screenPosition));
+
+        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: ИСПОЛЬЗУЕМ СООТНОШЕНИЕ КАРТЫ, А НЕ RENDER TEXTURE
+        float mapAspectRatio = (float)_mapGenerator.mapWidth / _mapGenerator.mapHeight;
+        float containerRatio = containerWidth / containerHeight;
+
+        float displayedWidth, displayedHeight;
+        float offsetX = 0, offsetY = 0;
+
+        // ПРАВИЛЬНЫЙ РАСЧЕТ ОТСТУПОВ НА ОСНОВЕ СООТНОШЕНИЯ КАРТЫ
+        if (mapAspectRatio > containerRatio)
+        {
+            // Карта шире контейнера - отступы сверху и снизу
+            displayedWidth = containerWidth;
+            displayedHeight = containerWidth / mapAspectRatio;
+            offsetY = (containerHeight - displayedHeight) / 2;
+        }
+        else
+        {
+            // Карта уже контейнера - отступы слева и справа
+            displayedHeight = containerHeight;
+            displayedWidth = containerHeight * mapAspectRatio;
+            offsetX = (containerWidth - displayedWidth) / 2;
+        }
+
+        // ПРОВЕРКА ПОПАДАНИЯ В ВИДИМУЮ ОБЛАСТЬ
+        if (localPosition.x < offsetX || localPosition.x > offsetX + displayedWidth ||
+            localPosition.y < offsetY || localPosition.y > offsetY + displayedHeight)
+        {
+            Debug.Log("Клик вне области отображаемой карты");
+            return;
+        }
+
+        // Нормализуем координаты ОТНОСИТЕЛЬНО ВИДИМОЙ ОБЛАСТИ
+        float normalizedX = (localPosition.x - offsetX) / displayedWidth;
+        float normalizedY = (localPosition.y - offsetY) / displayedHeight;
+
+        normalizedX = Mathf.Clamp01(normalizedX);
+        normalizedY = Mathf.Clamp01(normalizedY);
+
+        // ПРАВИЛЬНЫЙ РАСЧЕТ КООРДИНАТ КАРТЫ
+        int mapX = Mathf.RoundToInt(normalizedX * _mapGenerator.mapWidth);
+        int mapY = Mathf.RoundToInt(normalizedY * _mapGenerator.mapHeight); // УБРАНО (1.0f - ...)
+
+        // Проверка границ карты
+        if (mapX < 0 || mapX >= _mapGenerator.mapWidth ||
+            mapY < 0 || mapY >= _mapGenerator.mapHeight)
+        {
+            Debug.Log($"Клик вне карты: ({mapX}, {mapY}) не в пределах ({_mapGenerator.mapWidth}, {_mapGenerator.mapHeight})");
+            return;
+        }
+
+        Debug.Log($"Контейнер: ширина={containerWidth}, высота={containerHeight}\n" +
+            $"RenderTexture: ширина={_mapRenderTexture.width}, высота={_mapRenderTexture.height}\n" +
+            $"Соотношение: карты={mapAspectRatio:F2}, контейнера={containerRatio:F2}\n" +
+            $"Отступы: offsetX={offsetX:F1}, offsetY={offsetY:F1}\n" +
+            $"Видимая область: ширина={displayedWidth:F1}, высота={displayedHeight:F1}");
+
+        // КОРРЕКТНАЯ ФОРМУЛА ДЛЯ ПРЯМОУГОЛЬНОЙ КАРТЫ
+        float worldX = (mapX - _mapGenerator.mapWidth / 2f) * 10f;
+        float worldZ = -(mapY - _mapGenerator.mapHeight / 2f) * 10f; // ВЕРНУЛИ ОТРИЦАНИЕ
+
+        Debug.Log($"Мировые координаты карты: ({worldX:F1}, 0, {worldZ:F1})");
+
+        // Создаем луч из камеры в точку на карте
+        Vector3 cameraPosition = _mapCamera.transform.position;
+        Vector3 targetPosition = new Vector3(worldX, 0, worldZ);
+        Ray ray = new Ray(cameraPosition, (targetPosition - cameraPosition).normalized);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, 10000f))
+        {
+            Debug.Log($"Попадание в объект: {hit.collider.name}, Позиция: {hit.point}");
+
+            if (hit.collider.CompareTag("GeneratedObject"))
+            {
+                Debug.Log($"Клик по локации: {hit.collider.name}");
+                _mapGenerator.HandleCityClick(hit.point);
+                UpdateCameraPositionZoom();
+            }
+        }
+        else
+        {
+            Debug.Log($"Клик в пустое место. Мировые координаты: ({worldX:F1}, 0, {worldZ:F1})");
+        }
+    }
+    private void HandleReturnFromZoom()
+    {
+        // Проверяем, есть ли MapZoom в сцене
+        var mapZoom = Object.FindFirstObjectByType<MapZoom>();
+        if (mapZoom != null && mapZoom.gameObject.activeSelf)
+        {
+            mapZoom.ReturnToMainMap();
+            UpdateCameraPosition();
+        }
     }
 
     /// <summary>
@@ -304,9 +498,17 @@ public class MapActionController : IActionController
             return;
         }
 
+        if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
+        {
+            _mapGenerator.mapDisplay.gameObject.SetActive(true);
+            _mapGenerator.SetChildrenVisibility(true);
+            _mapGenerator.mapZoom.ClearAllBuildings();
+            _mapGenerator.zoomDisplay.gameObject.SetActive(false);
+        }
+
         // Считываем значения из UI
-        if (_widthSlider != null) _mapGenerator.mapWidth = (int)_widthSlider.value;
-        if (_heightSlider != null) _mapGenerator.mapHeight = (int)_heightSlider.value;
+        if (_sizeSlider != null) _mapGenerator.mapWidth = (int)_sizeSlider.value;
+        if (_sizeSlider != null) _mapGenerator.mapHeight = (int)_sizeSlider.value;
         if (_chunkSizeTextField != null && int.TryParse(_chunkSizeTextField.value, out int chunkSize))
         {
             _mapGenerator.chunkSize = chunkSize;
@@ -340,6 +542,16 @@ public class MapActionController : IActionController
             _mapGenerator.noiseOffset = new Vector2(offsetX, offsetY);
         }
 
+        if (_cityModeDropdown.value == "Simple Cubes")
+        {
+            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.SimpleCubes;
+        }
+
+        if (_cityModeDropdown.value == "Advanced with Sizes")
+        {
+            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.AdvancedWithSizes;
+        }
+
         // Генерируем карту
         _mapGenerator.GenerateManualMap();
 
@@ -358,6 +570,14 @@ public class MapActionController : IActionController
             return;
         }
 
+        if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
+        {
+            _mapGenerator.mapDisplay.gameObject.SetActive(true);
+            _mapGenerator.SetChildrenVisibility(true);
+            _mapGenerator.mapZoom.ClearAllBuildings();
+            _mapGenerator.zoomDisplay.gameObject.SetActive(false);
+        }
+
         _mapGenerator.ClearMap();
 
         if (_locationsListView != null)
@@ -374,8 +594,6 @@ public class MapActionController : IActionController
     /// </summary>
     private void OnAddLocationButtonClicked()
     {
-        Debug.Log("=== КНОПКА 'Add Location' НАЖАТА ===");
-
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден.");
@@ -395,10 +613,14 @@ public class MapActionController : IActionController
             return;
         }
 
+        if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
+        {
+            Debug.LogError("Вы в режиме Zoom! MapDisplay не найден!");
+            return;
+        }
+
         string locationName = _locationNameField.value?.Trim();
         string biome = _biomeDropdown.value;
-
-        Debug.Log($"Введенные данные: имя='{locationName}', биом='{biome}'");
 
         if (string.IsNullOrEmpty(locationName))
         {
@@ -420,8 +642,6 @@ public class MapActionController : IActionController
 
         // Очищаем поле ввода
         _locationNameField.value = "";
-
-        Debug.Log("=== ДОБАВЛЕНИЕ ЗАВЕРШЕНО ===");
     }
 
     /// <summary>
@@ -429,15 +649,21 @@ public class MapActionController : IActionController
     /// </summary>
     private void OnConnectLocationsButtonClicked()
     {
-        Debug.Log("=== КНОПКА 'Connect Locations' НАЖАТА ===");
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден");
             return;
         }
+
         if (_locationsListView == null)
         {
             Debug.LogError("ListView не найден");
+            return;
+        }
+
+        if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
+        {
+            Debug.LogError("Вы в режиме Zoom! MapDisplay не найден!");
             return;
         }
 
@@ -525,8 +751,6 @@ public class MapActionController : IActionController
             _mapGenerator.ConnectLocations(first, last);
             Debug.Log($"Замкнуто кольцо между '{first}' и '{last}'");
         }
-
-        Debug.Log("=== СОЕДИНЕНИЕ ЗАВЕРШЕНО ===");
     }
 
     /// <summary>
@@ -534,8 +758,6 @@ public class MapActionController : IActionController
     /// </summary>
     private void OnRemoveLocationButtonClicked()
     {
-        Debug.Log("=== КНОПКА 'Remove Location' НАЖАТА ===");
-
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден");
@@ -545,6 +767,12 @@ public class MapActionController : IActionController
         if (_locationsListView == null || _locationsListView.selectedIndex < 0)
         {
             Debug.LogError("Выберите локацию для удаления в списке");
+            return;
+        }
+
+        if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
+        {
+            Debug.LogError("Вы в режиме Zoom! MapDisplay не найден!");
             return;
         }
 
@@ -563,8 +791,6 @@ public class MapActionController : IActionController
 
             Debug.Log($"Локация '{locationName}' удалена");
         }
-
-        Debug.Log("=== УДАЛЕНИЕ ЗАВЕРШЕНО ===");
     }
 
     /// <summary>
@@ -580,8 +806,6 @@ public class MapActionController : IActionController
     /// </summary>
     private void UpdateLocationsList()
     {
-        Debug.Log("=== ОБНОВЛЕНИЕ СПИСКА ЛОКАЦИЙ ===");
-
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден");
@@ -594,8 +818,6 @@ public class MapActionController : IActionController
             return;
         }
 
-        Debug.Log($"Количество локаций в MapGeneratorManual: {_mapGenerator.locations.Count}");
-
         // Устанавливаем источник данных
         _locationsListView.itemsSource = _mapGenerator.locations;
 
@@ -606,10 +828,17 @@ public class MapActionController : IActionController
         for (int i = 0; i < _mapGenerator.locations.Count; i++)
         {
             var loc = _mapGenerator.locations[i];
-            Debug.Log($"{i}: '{loc.locationName}' ({loc.biome}) - связей: {loc.connectedLocations?.Count ?? 0}");
         }
 
-        Debug.Log("=== ОБНОВЛЕНИЕ ЗАВЕРШЕНО ===");
+        if (_cityModeDropdown.value == "Simple Cubes")
+        {
+            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.SimpleCubes;
+        }
+
+        if (_cityModeDropdown.value == "Advanced with Sizes")
+        {
+            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.AdvancedWithSizes;
+        }
     }
 
     /// <summary>
