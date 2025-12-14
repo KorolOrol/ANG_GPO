@@ -158,6 +158,11 @@
     color: var(--nord-dark);
 }
 
+.SpecialButton {
+    background-color: var(--nord-purple);
+    color: var(--nord-dark);
+}
+
 .DescriptionTextField {
     white-space: normal;
     max-height: 200px;

@@ -74,12 +74,14 @@
     <Compile Include="Assets/Scripts/ProceduralActionController.cs" />
     <Compile Include="Assets/MapScripts/LocationPlacement/PlacementOptimizer.cs" />
     <Compile Include="Assets/MapScripts/LocationGenerate/LocationMapGenerator.cs" />
+    <Compile Include="Assets/MapScripts/LocationGenerate/CamerasController.cs" />
     <Compile Include="Assets/MapScripts/LocationGenerate/ClickHandler.cs" />
     <Compile Include="Assets/MapScripts/TextureGenerator.cs" />
     <Compile Include="Assets/Scripts/ViewActionController.cs" />
     <Compile Include="Assets/MapScripts/LocationGenerate/LocationObject.cs" />
     <Compile Include="Assets/MapScripts/MapDisplayUi.cs" />
     <Compile Include="Assets/MapScripts/MapGenerator.cs" />
+    <Compile Include="Assets/MapScripts/LocationGenerate/FreeCameraController.cs" />
     <Compile Include="Assets/MapScripts/LocationGenerate/MapZoom.cs" />
     <Compile Include="Assets/MapScripts/LocationPlacement/LocationData.cs" />
     <Compile Include="Assets/MapScripts/HouseGeneration/ModularBuildingGenerator.cs" />
@@ -89,7 +91,6 @@
     <Compile Include="Assets/MapScripts/LocationGenerate/LocationUIManager.cs" />
     <Compile Include="Assets/Scripts/MapActionController.cs" />
     <Compile Include="Assets/MapScripts/Noise.cs" />
-    <None Include="Assets/AddressableAssetsData/link.xml" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/lib/netstandard2.1/System.ComponentModel.Annotations.xml" />
     <None Include="Assets/Packages/System.Text.Json.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
