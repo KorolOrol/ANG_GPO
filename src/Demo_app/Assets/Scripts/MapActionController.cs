@@ -24,7 +24,6 @@ public class MapActionController : IActionController
     /// </summary>
     private Slider _sizeSlider;
 
-
     /// <summary>
     /// Текстовое поле для размера чанка.
     /// </summary>
@@ -101,6 +100,7 @@ public class MapActionController : IActionController
     private Image _map3DView;
     private RenderTexture _mapRenderTexture;
     private Camera _mapCamera;
+    private Camera _3DmapCamera;
 
     /// <summary>
     /// Доступные биомы
@@ -145,6 +145,8 @@ public class MapActionController : IActionController
 
     private void UpdateCameraPosition()
     {
+        _mapGenerator.viewLevel = MapGeneratorManual.ViewLevel.Regular;
+
         if (_mapGenerator == null || _mapCamera == null) return;
 
         float mapWidthUnits = _mapGenerator.mapWidth * 10f;
@@ -172,6 +174,8 @@ public class MapActionController : IActionController
 
     private void UpdateCameraPositionZoom()
     {
+        _mapGenerator.viewLevel = MapGeneratorManual.ViewLevel.Zoom;
+
         if (_mapGenerator == null || _mapCamera == null) return;
 
         // Рассчитываем позицию камеры в зависимости от размера карты
@@ -179,6 +183,7 @@ public class MapActionController : IActionController
         float cameraHeight = mapSize * 5f; // Высота камеры зависит от размера карты
 
         // Позиционируем камеру точно над центром карты
+        _mapCamera.gameObject.SetActive(true);
         _mapCamera.transform.position = new Vector3(0, cameraHeight, 0);
         _mapCamera.transform.rotation = Quaternion.Euler(90, 0, 0); // Смотрим прямо вниз
 
@@ -363,13 +368,6 @@ public class MapActionController : IActionController
                 HandleReturnFromZoom();
             }
         });
-
-        root.RegisterCallback<KeyDownEvent>(evt => {
-            if (evt.keyCode == KeyCode.Escape)
-            {
-                HandleReturnFromZoom();
-            }
-        });
     }
 
     private void HandleMapClick(Vector2 screenPosition, VisualElement container)
@@ -451,7 +449,13 @@ public class MapActionController : IActionController
 
         // КОРРЕКТНАЯ ФОРМУЛА ДЛЯ ПРЯМОУГОЛЬНОЙ КАРТЫ
         float worldX = (mapX - _mapGenerator.mapWidth / 2f) * 10f;
-        float worldZ = -(mapY - _mapGenerator.mapHeight / 2f) * 10f; // ВЕРНУЛИ ОТРИЦАНИЕ
+        float worldZ = -(mapY - _mapGenerator.mapHeight / 2f) * 10f;
+
+        if (_mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Zoom)
+        {
+            worldX /= _mapGenerator.mapWidth / 100f;
+            worldZ /= _mapGenerator.mapWidth / 100f;
+        }
 
         Debug.Log($"Мировые координаты карты: ({worldX:F1}, 0, {worldZ:F1})");
 
@@ -464,7 +468,14 @@ public class MapActionController : IActionController
         {
             Debug.Log($"Попадание в объект: {hit.collider.name}, Позиция: {hit.point}");
 
-            if (hit.collider.CompareTag("GeneratedObject"))
+            if (hit.collider.CompareTag("GeneratedObject") && hit.collider.transform.parent.name.Contains("BuildingsContainer") && _mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Zoom)
+            {
+                Debug.Log($"Клик по локации: {hit.collider.name}");
+                _mapGenerator.SwitchTo3DView(hit.collider.gameObject);
+                UpdateCameraTo3D(hit.collider.gameObject);
+
+            }
+            else if (hit.collider.CompareTag("GeneratedObject") && _mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Regular)
             {
                 Debug.Log($"Клик по локации: {hit.collider.name}");
                 _mapGenerator.HandleCityClick(hit.point);
@@ -476,6 +487,44 @@ public class MapActionController : IActionController
             Debug.Log($"Клик в пустое место. Мировые координаты: ({worldX:F1}, 0, {worldZ:F1})");
         }
     }
+
+    private void UpdateCameraTo3D(GameObject buildingPosition)
+    {
+        _mapGenerator.viewLevel = MapGeneratorManual.ViewLevel.ThreeDim;
+
+        Vector3 avgPos = new Vector3();
+        float avgX = 0f;
+        float avgZ = 0f;
+
+        foreach (Transform obj in buildingPosition.transform.parent)
+        {
+            avgX += obj.position.x;
+            avgZ += obj.position.z;
+        }
+
+        int childCnt = buildingPosition.transform.parent.childCount;
+
+        avgPos = new Vector3((avgX / childCnt) - 100f, 400f, (avgZ / childCnt) - 250f);
+
+        _mapCamera = GameObject.Find("MapCamera")?.GetComponent<Camera>();
+        if (_mapCamera == null)
+        {
+            Debug.LogError("MapCamera не найдена!");
+            return;
+        }
+        _mapCamera.gameObject.SetActive(false);
+
+        _3DmapCamera = GameObject.Find("3DMapCamera")?.GetComponent<Camera>();
+
+        _3DmapCamera.gameObject.transform.position = avgPos;
+
+        if (_3DmapCamera == null)
+        {
+            Debug.LogError("3DMapCamera не найдена!");
+            return;
+        }
+    }
+
     private void HandleReturnFromZoom()
     {
         // Проверяем, есть ли MapZoom в сцене
@@ -484,6 +533,11 @@ public class MapActionController : IActionController
         {
             mapZoom.ReturnToMainMap();
             UpdateCameraPosition();
+        }
+        if (_mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.ThreeDim)
+        {
+            _mapGenerator.mapZoom.ReturnToZoomMap();
+            UpdateCameraPositionZoom();
         }
     }
 
@@ -500,10 +554,8 @@ public class MapActionController : IActionController
 
         if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
         {
-            _mapGenerator.mapDisplay.gameObject.SetActive(true);
-            _mapGenerator.SetChildrenVisibility(true);
-            _mapGenerator.mapZoom.ClearAllBuildings();
-            _mapGenerator.zoomDisplay.gameObject.SetActive(false);
+            HandleReturnFromZoom();
+            HandleReturnFromZoom();
         }
 
         // Считываем значения из UI
@@ -557,6 +609,8 @@ public class MapActionController : IActionController
 
         // Обновляем список локаций
         UpdateLocationsList();
+
+        _mapGenerator.viewLevel = MapGeneratorManual.ViewLevel.Regular;
     }
 
     /// <summary>
@@ -564,6 +618,8 @@ public class MapActionController : IActionController
     /// </summary>
     private void OnClearMapButtonClicked()
     {
+        _mapGenerator.viewLevel = MapGeneratorManual.ViewLevel.Regular;
+
         if (_mapGenerator == null)
         {
             Debug.LogError("MapGeneratorManual не найден.");
@@ -572,10 +628,8 @@ public class MapActionController : IActionController
 
         if (!_mapGenerator.mapDisplay.gameObject.activeInHierarchy)
         {
-            _mapGenerator.mapDisplay.gameObject.SetActive(true);
-            _mapGenerator.SetChildrenVisibility(true);
-            _mapGenerator.mapZoom.ClearAllBuildings();
-            _mapGenerator.zoomDisplay.gameObject.SetActive(false);
+            HandleReturnFromZoom();
+            HandleReturnFromZoom();
         }
 
         _mapGenerator.ClearMap();

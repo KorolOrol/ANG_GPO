@@ -43,7 +43,10 @@ public class MapDisplay : MonoBehaviour
         }
 
         _currentTexture = texture;
-        textureRenderer.sharedMaterial.mainTexture = texture;
+        if (textureRenderer.material != null) 
+		{
+		    textureRenderer.material.mainTexture = texture;
+		}
         transform.localScale = new Vector3(texture.width, 1, texture.height);
         SetupMaterial();
         gameObject.SetActive(true);
@@ -51,8 +54,6 @@ public class MapDisplay : MonoBehaviour
 
     private void SetupMaterial()
     {
-        textureRenderer.material.shader = Shader.Find("Universal Render Pipeline/Unlit");
-        textureRenderer.material.SetColor("_BaseColor", Color.white);
         textureRenderer.sharedMaterial.mainTextureScale = Vector2.one;
         textureRenderer.sharedMaterial.mainTextureOffset = Vector2.zero;
     }

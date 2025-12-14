@@ -115,6 +115,25 @@ public class MapZoom : MonoBehaviour
         }
     }
 
+    public void ReturnToZoomMap()
+    {
+        // Показываем основную карту
+        if (MapGenContainer != null) MapGenContainer.SetActive(true);
+        if (sourceRenderer != null) sourceRenderer.gameObject.SetActive(true);
+        if (BuildsContainer != null) BuildsContainer.SetActive(true);
+
+        // Удаляем контейнер 3D-города если есть
+        GameObject cityContainer = GameObject.Find("3DCityContainer");
+        if (cityContainer != null) DestroyImmediate(cityContainer);
+
+        if (mapGenMan.zoomDisplay != null)
+        {
+            mapGenMan.zoomDisplay.gameObject.SetActive(true);
+        }
+
+        mapGenMan.mapDisplay.gameObject.SetActive(false);
+    }
+
     public void SetChildrenVisibility(GameObject toWho, bool isVisible)
     {
         // Итерация по всем прямым дочерним элементам через Transform
@@ -147,7 +166,7 @@ public class MapZoom : MonoBehaviour
         }
     }
 
-    private void Generate3DCity(GameObject cityObject)
+    public void Generate3DCity(GameObject cityObject)
     {
         // Находим контейнер с зданиями
         Transform buildingsContainer = GameObject.Find("BuildingsContainer")?.transform;
@@ -173,15 +192,14 @@ public class MapZoom : MonoBehaviour
         foreach (Transform building in buildingsContainer)
         {
             // Настройка параметров генератора
-            MBGPrefab.SizeX = (int)(building.localScale.x / 34.615f);
-            MBGPrefab.SizeZ = (int)(building.localScale.z / 34.615f);
+            MBGPrefab.SizeX = (int)(building.localScale.x / 11.71875f);
+            MBGPrefab.SizeZ = (int)(building.localScale.z / 11.71875f);
 
             MBGPrefab.floors = (int)building.localScale.y / 10;
 
             MBGPrefab.PosX = (int)building.position.x + 2 * (MBGPrefab.SizeX / 2);
-            MBGPrefab.PosY = 45 + 15 * (MBGPrefab.floors - 1) - (1 * (MBGPrefab.floors - 1));
-            MBGPrefab.PosZ = (int)building.position.z;
-
+            MBGPrefab.PosY = 5 + 5 * (MBGPrefab.floors - 1) - (1 * (MBGPrefab.floors - 1));
+            MBGPrefab.PosZ = (int)building.position.z + 3;
 
             MBGPrefab.GenerateTestBuilding();
 
@@ -190,9 +208,9 @@ public class MapZoom : MonoBehaviour
             buildingCNT++;
 
             builtHouse.transform.localScale = new Vector3(
-                15,
-                15,
-                15
+                5f,
+                5f,
+                5f
             );
 
             builtHouse.transform.SetParent(container.transform);
@@ -280,7 +298,6 @@ public class MapZoom : MonoBehaviour
         SetChildrenVisibility(mapGenMan.gameObject, true);
 
         var allObjects = GameObject.FindGameObjectsWithTag("GeneratedObject");
-        Debug.Log($"Всего объектов с тегом GeneratedObject: {allObjects.Length}");
 
         SetChildrenVisibility(mapGenMan.gameObject, false);
 
@@ -312,7 +329,6 @@ public class MapZoom : MonoBehaviour
                 if (bx >= 0 && bx < (zoomSize * 2 + 1) && by >= 0 && by < (zoomSize * 2 + 1))
                 {
                     pivots.Add((obj.name, new Vector2Int(ix, iy), new Vector2Int(bx, by)));
-                    Debug.Log($"  ДОБАВЛЕН в pivots: ({bx}, {by})");
                 }
                 else
                 {
@@ -320,8 +336,6 @@ public class MapZoom : MonoBehaviour
                 }
             }
         }
-
-        Debug.Log($"Найдено городов для генерации зданий: {pivots.Count}");
 
         Transform buildingsContainer = new GameObject("BuildingsContainer").transform;
         buildingsContainer.parent = targetRenderer.transform;
@@ -496,7 +510,7 @@ public class MapZoom : MonoBehaviour
         Vector3 wp = c + r * ((u - 0.5f) * wS) + fwd * ((v - 0.5f) * wS);
 
         GameObject building = Instantiate(buildingPrefab, wp + Vector3.up * 0.01f, Quaternion.identity, container);
-        building.name = "CityBuilding";
+        building.name = $"CityBuilding_{bx}_{by}";
 
         float cellWorldSize = 10f * tt.localScale.x / baseSize;
         float height = Random.Range(minBuildingHeight, maxBuildingHeight) * 10;

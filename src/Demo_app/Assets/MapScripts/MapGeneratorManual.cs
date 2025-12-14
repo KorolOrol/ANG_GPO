@@ -104,6 +104,10 @@ namespace MapScripts
         public MapZoom mapZoom;
         public GameObject zoomDisplay;
 
+        public enum ViewLevel { Regular, Zoom, ThreeDim }
+
+        public ViewLevel viewLevel = ViewLevel.Regular;
+
         private readonly Dictionary<string, Vector2> _placedLocations = new Dictionary<string, Vector2>();
 
         /// <summary>
@@ -133,6 +137,9 @@ namespace MapScripts
 
         public void HandleCityClick(Vector3 cityPosition)
         {
+
+            viewLevel = ViewLevel.Zoom;
+
             var mapZoom = FindFirstObjectByType<MapZoom>();
             if (mapZoom == null)
             {
@@ -165,6 +172,12 @@ namespace MapScripts
             {
                 zoomDisplay.gameObject.SetActive(true);
             }
+        }
+
+        public void SwitchTo3DView(GameObject buildingObject) // pos: -150 150 -400 rot: 33.75 22.5
+        {
+            viewLevel = ViewLevel.ThreeDim;
+            mapZoom.Generate3DCity(buildingObject);
         }
 
         public void SetChildrenVisibility(bool isVisible)
@@ -479,28 +492,8 @@ namespace MapScripts
             tm.fontSize = 20f;
             tm.alignment = TextAlignmentOptions.Center;
             tm.enableAutoSizing = false;
-            tm.color = Color.white;
-
-            // Черная подложка для лучшей читаемости
-            var bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            bg.name = "LabelBackground";
-            Destroy(bg.GetComponent<Collider>());
-            bg.transform.SetParent(textObj.transform);
-            bg.transform.localPosition = new Vector3(0, 0, 0.1f);
-            bg.transform.localRotation = Quaternion.identity;
-
-            // Рассчитываем размер подложки
-            tm.ForceMeshUpdate();
-            var textSize = tm.GetRenderedValues(false);
-            bg.transform.localScale = new Vector3(textSize.x + 2f, textSize.y + 1f, 1f);
-
-            // Черный материал для подложки
-            var bgRenderer = bg.GetComponent<Renderer>();
-            var bgMat = new Material(Shader.Find("Unlit/Color"))
-            {
-                color = Color.black
-            };
-            bgRenderer.material = bgMat;
+            tm.color = Color.black;
+            tm.textWrappingMode = TextWrappingModes.NoWrap;
         }
 
         /// <summary>
@@ -659,11 +652,9 @@ namespace MapScripts
             };
 
             locations.Add(newLocation);
-            Debug.Log($"Локация добавлена в список. Всего локаций: {locations.Count}");
 
             if (autoPlace && _heightMap != null && _biomeNoiseMap != null)
             {
-                Debug.Log("Авторазмещение локации...");
                 PlaceLocation(newLocation);
 
                 // Обновляем текстуру карты

@@ -258,7 +258,7 @@ public class ModularBuildingGenerator : MonoBehaviour
         float X = -buildingSize.x * 2;
         float Z = -buildingSize.z * 2;
 
-        Debug.Log($"X: {buildingSize.x} | Y: {buildingSize.y} | Z: {buildingSize.z}");
+        //Debug.Log($"X: {buildingSize.x} | Y: {buildingSize.y} | Z: {buildingSize.z}");
 
         // Создаем стены для каждой стороны
         CreateWallSegment(new Vector3(X, position.y, Z), 180, size.x, floorNumber, northWallGroup.transform);   // Северная
@@ -303,7 +303,7 @@ public class ModularBuildingGenerator : MonoBehaviour
 
                 Vector3 wallPosition = position + new Vector3(0, 0, (i * 2));
 
-                Debug.Log($"{group.name} | CNT: {wallsCount} | I: {i}\n WallPos: {wallPosition} | Pos: {position}");
+                //Debug.Log($"{group.name} | CNT: {wallsCount} | I: {i}\n WallPos: {wallPosition} | Pos: {position}");
 
                 GameObject wall = Instantiate(
                     prefabOfWallDoorWindow,
@@ -342,7 +342,7 @@ public class ModularBuildingGenerator : MonoBehaviour
 
                 Vector3 wallPosition = position + new Vector3((i * 2), 0, 0);
 
-                Debug.Log($"{group.name} | CNT: {wallsCount} | I: {i}\n WallPos: {wallPosition} | Pos: {position}");
+                //Debug.Log($"{group.name} | CNT: {wallsCount} | I: {i}\n WallPos: {wallPosition} | Pos: {position}");
 
                 GameObject wall = Instantiate(
                     prefabOfWallDoorWindow,
