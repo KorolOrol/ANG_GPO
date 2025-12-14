@@ -22,8 +22,8 @@
                     <ui:TextField label="Y" name="NoiseOffsetYTextField" class="TextField" />
                 </ui:GroupBox>
                 <ui:VisualElement name="MapTogglesBar" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
-                    <ui:Toggle label="Draw Borders" name="DrawChunkBordersToggle" />
-                    <ui:Toggle label="Show Biomes" name="ShowChunkBiomesToggle" />
+                    <ui:Toggle label="Draw Borders" name="DrawChunkBordersToggle" focusable="false" />
+                    <ui:Toggle label="Show Biomes" name="ShowChunkBiomesToggle" focusable="false" />
                 </ui:VisualElement>
             </ui:GroupBox>
             <ui:GroupBox text="Locations" class="GroupBox">
