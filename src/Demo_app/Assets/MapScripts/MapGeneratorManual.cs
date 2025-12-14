@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using MapScripts.LocationGenerate;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
@@ -13,7 +13,7 @@ namespace MapScripts
     /// <summary>
     /// Определение локации для ручного размещения на карте
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class LocationDefinition
     {
         public string locationName;
@@ -24,7 +24,7 @@ namespace MapScripts
     /// <summary>
     /// Данные сохранения позиции и связей локации
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class LocationSaveData
     {
         public string locationName;
@@ -37,7 +37,7 @@ namespace MapScripts
     /// <summary>
     /// Структура для сохранения всей карты с параметрами генерации
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class MapSaveData
     {
         public int mapWidth;
@@ -66,6 +66,8 @@ namespace MapScripts
     /// </summary>
     public class MapGeneratorManual : MonoBehaviour
     {
+        private readonly static int Black = Shader.PropertyToID("black");
+
         [Header("Map Settings")]
         [Range(50, 500)] public int mapWidth = 100;
         [Range(50, 500)] public int mapHeight = 100;
@@ -140,8 +142,8 @@ namespace MapScripts
 
             viewLevel = ViewLevel.Zoom;
 
-            var mapZoom = FindFirstObjectByType<MapZoom>();
-            if (mapZoom == null)
+            var localMapZoom = FindFirstObjectByType<MapZoom>();
+            if (localMapZoom == null)
             {
                 Debug.LogError("MapZoom не найден в сцене");
                 return;
@@ -154,8 +156,8 @@ namespace MapScripts
             Debug.Log($"Клик по городу. Мировые координаты: ({cityPosition.x:F1}, {cityPosition.z:F1}), " +
                       $"Координаты карты: ({mx:F1}, {my:F1})");
 
-            mapZoom.coordinate = new Vector2Int(Mathf.RoundToInt(mx), Mathf.RoundToInt(my));
-            mapZoom.updateZoom = true;
+            localMapZoom.coordinate = new Vector2Int(Mathf.RoundToInt(mx), Mathf.RoundToInt(my));
+            localMapZoom.updateZoom = true;
 
             SwitchToZoomView();
         }
@@ -393,7 +395,7 @@ namespace MapScripts
             // Пытаемся найти подходящую точку в чанке
             int attempts = 0;
             const int maxAttempts = 100;
-            Vector2Int chosenChunk = Vector2Int.zero;
+            var chosenChunk = Vector2Int.zero;
             int px = 0, py = 0;
 
             while (attempts < maxAttempts)
@@ -428,7 +430,7 @@ namespace MapScripts
         private void CreateLocationObject(string locName, int x, int y)
         {
             // Определяем цвет для биома
-            string biome = GetLocationBiome(locName);
+            // string biome = GetLocationBiome(locName);
             var color = Color.black;
 
             // СОЗДАЕМ КУБ ПРОГРАММНО
@@ -450,13 +452,13 @@ namespace MapScripts
             cube.transform.SetParent(transform);
 
             // НАСТРАИВАЕМ МАТЕРИАЛ И ЦВЕТ
-            var renderer = cube.GetComponent<Renderer>();
-            if (renderer)
+            var componentRenderer = cube.GetComponent<Renderer>();
+            if (componentRenderer)
             {
-                if (renderer.material != null)
+                if (componentRenderer.material)
                 {
-                    renderer.material.color = color;
-                    renderer.material.SetColor("black", Color.black);
+                    componentRenderer.material.color = color;
+                    componentRenderer.material.SetColor(Black, Color.black);
                 }
                 else
                 {
@@ -465,8 +467,8 @@ namespace MapScripts
                     {
                         color = color
                     };
-                    renderer.material.SetColor("black", Color.black);
-                    renderer.material = material;
+                    componentRenderer.material.SetColor(Black, Color.black);
+                    componentRenderer.material = material;
                 }
             }
 
@@ -496,7 +498,7 @@ namespace MapScripts
             tm.textWrappingMode = TextWrappingModes.NoWrap;
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Возвращает цвет для биома (отличается от цвета на карте для контраста)
         /// </summary>
         private static Color GetBiomeColor(string biome)
@@ -515,16 +517,16 @@ namespace MapScripts
                 "MountainPeak" => Color.white,
                 _ => Color.magenta
             };
-        }
+        }*/
 
-        /// <summary>
-        /// Возвращает биом для локации по имени
-        /// </summary>
-        private string GetLocationBiome(string locationName)
-        {
-            var loc = locations.Find(l => l.locationName == locationName);
-            return loc?.biome ?? "Grassland";
-        }
+        // /// <summary>
+        // /// Возвращает биом для локации по имени
+        // /// </summary>
+        // private string GetLocationBiome(string locationName)
+        // {
+        //     var loc = locations.Find(l => l.locationName == locationName);
+        //     return loc?.biome ?? "Grassland";
+        // }
 
         /// <summary>
         /// Рассчитывает биомы чанков

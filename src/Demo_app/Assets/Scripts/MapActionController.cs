@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using BaseClasses.Model;
 using MapScripts;
-using UnityEditor;
+using MapScripts.LocationGenerate;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.UIElements;
@@ -30,7 +30,7 @@ public class MapActionController : IActionController
     private TextField _chunkSizeTextField;
 
     /// <summary>
-    /// Текстовое поле для сида генерации.
+    /// Текстовое поле сида генерации.
     /// </summary>
     private TextField _seedTextField;
 
@@ -100,7 +100,7 @@ public class MapActionController : IActionController
     private Image _map3DView;
     private RenderTexture _mapRenderTexture;
     private Camera _mapCamera;
-    private Camera _3DmapCamera;
+    private Camera _3dMapCamera;
 
     /// <summary>
     /// Доступные биомы
@@ -138,9 +138,7 @@ public class MapActionController : IActionController
         _map3DView.image = _mapRenderTexture;
 
         // При генерации карты обновляем позицию камеры
-        _generateMapButton.clicked += () => {
-            UpdateCameraPosition();
-        };
+        _generateMapButton.clicked += UpdateCameraPosition;
     }
 
     private void UpdateCameraPosition()
@@ -194,7 +192,8 @@ public class MapActionController : IActionController
             mapSize * 5f
         );
 
-        Debug.Log($"Камера обновлена: позиция=({_mapCamera.transform.position}), размер={_mapCamera.orthographicSize}, соотношение={aspectRatio:F2}");
+        Debug.Log($"Камера обновлена: позиция=({_mapCamera.transform.position}), " +
+            $"размер={_mapCamera.orthographicSize}, соотношение={aspectRatio:F2}");
     }
 
     /// <summary>
@@ -207,7 +206,7 @@ public class MapActionController : IActionController
         InitiateVisualElements(root);
     }
 
-    /// <summary>
+    /*/// <summary>
     /// Инициализация начальных значений UI из компонента генерации или конфигурации.
     /// </summary>
     private void InitializeUIValues()
@@ -254,7 +253,7 @@ public class MapActionController : IActionController
         {
             _noiseOffsetYTextField.value = _mapGenerator.noiseOffset.y.ToString(CultureInfo.InvariantCulture);
         }
-    }
+    }*/
 
     /// <summary>
     /// Инициализация визуальных элементов UI.
@@ -349,7 +348,7 @@ public class MapActionController : IActionController
         }
 
         // Отладка размеров контейнера
-        mapContainer.RegisterCallback<GeometryChangedEvent>(evt => {
+        mapContainer.RegisterCallback<GeometryChangedEvent>(_ => {
             Debug.Log($"MapContainer размер: {mapContainer.layout}, видимость: {mapContainer.style.display}");
         });
 
@@ -389,7 +388,7 @@ public class MapActionController : IActionController
             return;
         }
 
-        Vector2 localPosition = _map3DView.WorldToLocal(container.LocalToWorld(screenPosition));
+        var localPosition = _map3DView.WorldToLocal(container.LocalToWorld(screenPosition));
 
         // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: ИСПОЛЬЗУЕМ СООТНОШЕНИЕ КАРТЫ, А НЕ RENDER TEXTURE
         float mapAspectRatio = (float)_mapGenerator.mapWidth / _mapGenerator.mapHeight;
@@ -460,22 +459,25 @@ public class MapActionController : IActionController
         Debug.Log($"Мировые координаты карты: ({worldX:F1}, 0, {worldZ:F1})");
 
         // Создаем луч из камеры в точку на карте
-        Vector3 cameraPosition = _mapCamera.transform.position;
-        Vector3 targetPosition = new Vector3(worldX, 0, worldZ);
-        Ray ray = new Ray(cameraPosition, (targetPosition - cameraPosition).normalized);
+        var cameraPosition = _mapCamera.transform.position;
+        var targetPosition = new Vector3(worldX, 0, worldZ);
+        var ray = new Ray(cameraPosition, (targetPosition - cameraPosition).normalized);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, 10000f))
+        if (Physics.Raycast(ray, out var hit, 10000f))
         {
             Debug.Log($"Попадание в объект: {hit.collider.name}, Позиция: {hit.point}");
 
-            if (hit.collider.CompareTag("GeneratedObject") && hit.collider.transform.parent.name.Contains("BuildingsContainer") && _mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Zoom)
+            if (hit.collider.CompareTag("GeneratedObject") &&
+                hit.collider.transform.parent.name.Contains("BuildingsContainer") &&
+                _mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Zoom)
             {
                 Debug.Log($"Клик по локации: {hit.collider.name}");
                 _mapGenerator.SwitchTo3DView(hit.collider.gameObject);
                 UpdateCameraTo3D(hit.collider.gameObject);
 
             }
-            else if (hit.collider.CompareTag("GeneratedObject") && _mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Regular)
+            else if (hit.collider.CompareTag("GeneratedObject") &&
+                _mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.Regular)
             {
                 Debug.Log($"Клик по локации: {hit.collider.name}");
                 _mapGenerator.HandleCityClick(hit.point);
@@ -492,7 +494,6 @@ public class MapActionController : IActionController
     {
         _mapGenerator.viewLevel = MapGeneratorManual.ViewLevel.ThreeDim;
 
-        Vector3 avgPos = new Vector3();
         float avgX = 0f;
         float avgZ = 0f;
 
@@ -504,7 +505,7 @@ public class MapActionController : IActionController
 
         int childCnt = buildingPosition.transform.parent.childCount;
 
-        avgPos = new Vector3((avgX / childCnt) - 100f, 400f, (avgZ / childCnt) - 250f);
+        var avgPos = new Vector3(avgX / childCnt - 100f, 400f, avgZ / childCnt - 250f);
 
         _mapCamera = GameObject.Find("MapCamera")?.GetComponent<Camera>();
         if (_mapCamera == null)
@@ -514,15 +515,13 @@ public class MapActionController : IActionController
         }
         _mapCamera.gameObject.SetActive(false);
 
-        _3DmapCamera = GameObject.Find("3DMapCamera")?.GetComponent<Camera>();
+        _3dMapCamera = GameObject.Find("3DMapCamera")?.GetComponent<Camera>();
 
-        _3DmapCamera.gameObject.transform.position = avgPos;
+        if (!_3dMapCamera) return;
+        _3dMapCamera.gameObject.transform.position = avgPos;
 
-        if (_3DmapCamera == null)
-        {
-            Debug.LogError("3DMapCamera не найдена!");
-            return;
-        }
+        if (_3dMapCamera) return;
+        Debug.LogError("3DMapCamera не найдена!");
     }
 
     private void HandleReturnFromZoom()
@@ -534,11 +533,9 @@ public class MapActionController : IActionController
             mapZoom.ReturnToMainMap();
             UpdateCameraPosition();
         }
-        if (_mapGenerator.viewLevel == MapGeneratorManual.ViewLevel.ThreeDim)
-        {
-            _mapGenerator.mapZoom.ReturnToZoomMap();
-            UpdateCameraPositionZoom();
-        }
+        if (_mapGenerator.viewLevel != MapGeneratorManual.ViewLevel.ThreeDim) return;
+        _mapGenerator.mapZoom.ReturnToZoomMap();
+        UpdateCameraPositionZoom();
     }
 
     /// <summary>
@@ -594,15 +591,12 @@ public class MapActionController : IActionController
             _mapGenerator.noiseOffset = new Vector2(offsetX, offsetY);
         }
 
-        if (_cityModeDropdown.value == "Simple Cubes")
+        _mapGenerator.mapZoom.buildingGenerationMethod = _cityModeDropdown.value switch
         {
-            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.SimpleCubes;
-        }
-
-        if (_cityModeDropdown.value == "Advanced with Sizes")
-        {
-            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.AdvancedWithSizes;
-        }
+            "Simple Cubes" => BuildingGenerationMethod.SimpleCubes,
+            "Advanced with Sizes" => BuildingGenerationMethod.AdvancedWithSizes,
+            _ => _mapGenerator.mapZoom.buildingGenerationMethod
+        };
 
         // Генерируем карту
         _mapGenerator.GenerateManualMap();
@@ -729,10 +723,7 @@ public class MapActionController : IActionController
         {
             try
             {
-                foreach (var index in _locationsListView.selectedIndices)
-                {
-                    selectedIndices.Add(index);
-                }
+                selectedIndices.AddRange(_locationsListView.selectedIndices);
             }
             catch (Exception e)
             {
@@ -762,24 +753,16 @@ public class MapActionController : IActionController
         Debug.Log($"Выбрано локаций для соединения: {selectedIndices.Count}");
 
         // Собираем имена выбранных локаций
-        List<string> selectedLocationNames = new List<string>();
-        foreach (int index in selectedIndices)
-        {
-            if (index >= 0 && index < _mapGenerator.locations.Count)
-            {
-                selectedLocationNames.Add(_mapGenerator.locations[index].locationName);
-            }
-        }
+        List<string> selectedLocationNames = selectedIndices
+            .Where(index => index >= 0 && index < _mapGenerator.locations.Count)
+            .Select(index => _mapGenerator.locations[index].locationName).ToList();
 
         // Проверяем, что все выбранные локации размещены на карте
         bool allPlaced = true;
-        foreach (string locName in selectedLocationNames)
+        foreach (string locName in selectedLocationNames.Where(locName => !_mapGenerator.IsLocationPlaced(locName)))
         {
-            if (!_mapGenerator.IsLocationPlaced(locName))
-            {
-                Debug.LogError($"Локация '{locName}' не размещена на карте");
-                allPlaced = false;
-            }
+            Debug.LogError($"Локация '{locName}' не размещена на карте");
+            allPlaced = false;
         }
 
         if (!allPlaced)
@@ -801,7 +784,7 @@ public class MapActionController : IActionController
         if (selectedLocationNames.Count > 2)
         {
             string first = selectedLocationNames[0];
-            string last = selectedLocationNames[selectedLocationNames.Count - 1];
+            string last = selectedLocationNames[^1];
             _mapGenerator.ConnectLocations(first, last);
             Debug.Log($"Замкнуто кольцо между '{first}' и '{last}'");
         }
@@ -833,18 +816,16 @@ public class MapActionController : IActionController
         int selectedIndex = _locationsListView.selectedIndex;
         Debug.Log($"Выбран индекс для удаления: {selectedIndex}");
 
-        if (selectedIndex >= 0 && selectedIndex < _mapGenerator.locations.Count)
-        {
-            string locationName = _mapGenerator.locations[selectedIndex].locationName;
-            Debug.Log($"Удаляю локацию: '{locationName}'");
+        if (selectedIndex < 0 || selectedIndex >= _mapGenerator.locations.Count) return;
+        string locationName = _mapGenerator.locations[selectedIndex].locationName;
+        Debug.Log($"Удаляю локацию: '{locationName}'");
 
-            _mapGenerator.RemoveLocation(locationName);
+        _mapGenerator.RemoveLocation(locationName);
 
-            // Обновляем список локаций
-            UpdateLocationsList();
+        // Обновляем список локаций
+        UpdateLocationsList();
 
-            Debug.Log($"Локация '{locationName}' удалена");
-        }
+        Debug.Log($"Локация '{locationName}' удалена");
     }
 
     /// <summary>
@@ -878,21 +859,13 @@ public class MapActionController : IActionController
         // Обновляем отображение
         _locationsListView.RefreshItems();
 
-        // Выводим список локаций в консоль
-        for (int i = 0; i < _mapGenerator.locations.Count; i++)
+        _mapGenerator.mapZoom.buildingGenerationMethod = _cityModeDropdown.value switch
         {
-            var loc = _mapGenerator.locations[i];
-        }
+            "Simple Cubes" => BuildingGenerationMethod.SimpleCubes,
+            "Advanced with Sizes" => BuildingGenerationMethod.AdvancedWithSizes,
+            _ => _mapGenerator.mapZoom.buildingGenerationMethod
+        };
 
-        if (_cityModeDropdown.value == "Simple Cubes")
-        {
-            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.SimpleCubes;
-        }
-
-        if (_cityModeDropdown.value == "Advanced with Sizes")
-        {
-            _mapGenerator.mapZoom.buildingGenerationMethod = BuildingGenerationMethod.AdvancedWithSizes;
-        }
     }
 
     /// <summary>

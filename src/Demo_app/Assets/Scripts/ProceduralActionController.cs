@@ -220,7 +220,7 @@ public class ProceduralActionController : IActionController
     }
 
     /// <summary>
-    /// При изменении режима генерации появлятся или скрывается строка для ввода черт характера
+    /// При изменении режима генерации появляется или скрывается строка для ввода черт характера
     /// </summary>
     /// <param name="evt"></param>
     private void OnGenerationModeChanged(ChangeEvent<string> evt)
@@ -402,8 +402,8 @@ public class ProceduralActionController : IActionController
 
         if (!string.IsNullOrWhiteSpace(_relationToCharacterDropdown.value))
         {
-            bool shouldGenerateRelation = _relationToggleStates.ContainsKey(_relationToCharacterDropdown.value) &&
-                _relationToggleStates[_relationToCharacterDropdown.value];
+            // bool shouldGenerateRelation = _relationToggleStates.ContainsKey(_relationToCharacterDropdown.value) &&
+            //     _relationToggleStates[_relationToCharacterDropdown.value];
 
             foreach (var foundCharacter in _relationToggleStates.Where(relation => relation.Value)
                 .Select(relation => GlobalData.Characters.FirstOrDefault(p =>
