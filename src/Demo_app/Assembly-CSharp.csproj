@@ -119,7 +119,6 @@
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc" />
     <None Include="Assets/Packages/Newtonsoft.Json.13.0.4/lib/netstandard2.0/Newtonsoft.Json.xml" />
     <None Include="Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" />
-    <None Include="Assets/AddressableAssetsData/link.xml" />
     <None Include="Assets/Packages/System.Text.Encodings.Web.9.0.10/lib/netstandard2.0/System.Text.Encodings.Web.xml" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/version.txt" />
@@ -1151,6 +1150,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{0fdf2e61-ee97-b52c-825e-edbbec666bee}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -42,7 +42,7 @@ internal class Program
         // 3. ИНТЕГРАЦИЯ С БАЗОВОЙ МОДЕЛЬЮ
         // Переводим персонажа Пейна в базовый класс Element
         // Метод Translate преобразует все характеристики в стандартный формат с понятными описаниями
-        Element Test = PrGenerator.Translate(Pain);
+        var Test = PrGenerator.Translate(Pain);
         Console.WriteLine(Test);
 
         while (true)
