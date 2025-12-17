@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Model;
+using BaseClasses.Services;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -428,7 +429,9 @@ public class ProceduralActionController : IActionController
 
         // Отображаем сгенерированного персонажа в редакторе
         _generatedCharacter = PrGenerator.Translate(_generatedPrCharacter);
-        _editSelectedElementController.SelectedElement = _generatedCharacter;
+        var addedCharacter = FullElementConstructor.CreateFullElement(ElemType.Character);
+        Merger.Merge(addedCharacter, _generatedCharacter);
+        _generatedCharacter = addedCharacter;
 
         _plot.Add(_generatedCharacter);
 
