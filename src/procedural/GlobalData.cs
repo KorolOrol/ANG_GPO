@@ -427,36 +427,62 @@ public class GlobalData
         new Trait("Трипофобия", "Боится скопления отверстий."), // Trypophobia
     };
 
-    public static void getKinship(PrCharacter subject, PrCharacter komu) // TO DO: Poumney napisat!
+    public static void getKinship(PrCharacter ego) // TO DO: Poumney napisat!
     {
-        if (subject.Gender == true)
-        {
-            if ((subject.FatherID == komu.ID) || (subject.MotherID  == komu.ID))
-            {
-                Console.WriteLine("{0} является сыном {1}", subject.Name, komu.Name);
-            }
-            else if (subject.FatherID == komu.ID)
-            {
+        if (ego.FatherID != null) Console.WriteLine("По линии отца для {0}:", ego.Name);
+        Console.WriteLine($"Отец -- {Characters[Convert.ToInt32(ego.FatherID)].Name} (ID: {Characters[Convert.ToInt32(ego.FatherID)].ID})");
 
-            }
-        }
-        else
-        {
-            if ((subject.FatherID == komu.ID) || (subject.MotherID  == komu.ID))
-            {
-                Console.WriteLine("{0} является дочерью {1}", subject.Name, komu.Name);
-            }
+        if (findByParents(Characters[Convert.ToInt32(ego.FatherID)], false) != null) Console.WriteLine($"Тётя -- {findByParents(Characters[Convert.ToInt32(ego.FatherID)], false).Name} (ID: {findByParents(Characters[Convert.ToInt32(ego.FatherID)], false).ID})");
+        if (findByParents(Characters[Convert.ToInt32(ego.FatherID)], true) != null) Console.WriteLine($"Дядя -- {findByParents(Characters[Convert.ToInt32(ego.FatherID)], true).Name} (ID: {findByParents(Characters[Convert.ToInt32(ego.FatherID)], true).ID})");
 
-        }
+        if (Characters[Convert.ToInt32(ego.FatherID)].FatherID != null) Console.WriteLine($"Дедушка -- {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].Name} (ID: {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].ID})");
+        if (Characters[Convert.ToInt32(ego.FatherID)].MotherID != null) Console.WriteLine($"Бабушка -- {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].MotherID)].Name} (ID: {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].MotherID)].ID})");
 
-        Console.WriteLine("-");
+        if (Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].FatherID != null) Console.WriteLine($"Прадедушка -- {Characters[Convert.ToInt32(Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].FatherID)].Name} (ID: {Characters[Convert.ToInt32(Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].FatherID)].ID})");
+        if (Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].MotherID != null) Console.WriteLine($"Прабабушка -- {Characters[Convert.ToInt32(Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].MotherID)].Name} (ID: {Characters[Convert.ToInt32(Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.FatherID)].FatherID)].MotherID)].ID})");
+
+        Console.WriteLine(); // (ID: {.ID})
+
+        if (ego.MotherID != null) Console.WriteLine("По линии матери для {0}:", ego.Name);
+        Console.WriteLine($"Мать -- {Characters[Convert.ToInt32(ego.MotherID)].Name} (ID: {Characters[Convert.ToInt32(ego.MotherID)].ID})");
+
+        if (Characters[Convert.ToInt32(ego.MotherID)].FatherID != null) Console.WriteLine($"Дедушка -- {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.MotherID)].FatherID)].Name} (ID: {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.MotherID)].FatherID)].ID})");
+        if (Characters[Convert.ToInt32(ego.MotherID)].MotherID != null) Console.WriteLine($"Бабушка -- {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.MotherID)].MotherID)].Name} (ID: {Characters[Convert.ToInt32(Characters[Convert.ToInt32(ego.MotherID)].MotherID)].ID})");
+
+        Console.WriteLine();
+
+        if (findByParents(Characters[Convert.ToInt32(ego.ID)], false) != null) Console.WriteLine($"Сестра -- {findByParents(Characters[Convert.ToInt32(ego.ID)], false).Name} (ID: {findByParents(Characters[Convert.ToInt32(ego.ID)], false).ID})");
+        if (findByParents(Characters[Convert.ToInt32(ego.ID)], true) != null) Console.WriteLine($"Брат -- {findByParents(Characters[Convert.ToInt32(ego.ID)], true).Name} (ID: {findByParents(Characters[Convert.ToInt32(ego.ID)], true).ID})");
+
+        if (findByKids(Characters[Convert.ToInt32(ego.ID)], false) != null) Console.WriteLine($"Дочь -- {findByKids(Characters[Convert.ToInt32(ego.ID)], false).Name} (ID: {findByKids(Characters[Convert.ToInt32(ego.ID)], false).ID})");
+        if (findByKids(Characters[Convert.ToInt32(ego.ID)], true) != null) Console.WriteLine($"Сын -- {findByKids(Characters[Convert.ToInt32(ego.ID)], true).Name} (ID: {findByKids(Characters[Convert.ToInt32(ego.ID)], true).ID})");
+
     }
 
-    /*    public static PrCharacter findParent(PrCharacter subject, bool gender)
+    public static PrCharacter findByParents(PrCharacter character, bool gender)
+    {
+        foreach (var PrCharacter in Characters)
         {
-            PrCharacter parent = 
-            return parent;
-        }*/
+            if (PrCharacter.MotherID == character.MotherID && PrCharacter.FatherID == character.FatherID && PrCharacter.ID != character.ID && PrCharacter.Gender == gender)
+            {
+                return PrCharacter;
+            }
+        }
+        return null;
+    }
+
+    public static PrCharacter findByKids(PrCharacter character, bool gender)
+    {
+        foreach (var PrCharacter in Characters)
+        {
+            if ((PrCharacter.FatherID == character.ID || PrCharacter.MotherID == character.ID) && PrCharacter.Gender == gender)
+            {
+                return PrCharacter;
+            }
+        }
+        return null;
+    }
+
 
     public static void printAllPrCharacters()
     {
@@ -468,8 +494,8 @@ public class GlobalData
 
     public static bool? checkGender(string input_gender)
     {
-        List<string> Males = new List<string> { "Male", "M", "Мужчина", "М", "1", "True" };
-        List<string> Females = new List<string> { "Female", "F", "Женщина", "Ж", "0", "False" };
+        List<string> Males = new List<string> { "Male", "M", "Мужчина", "Мужской", "М", "1", "True" };
+        List<string> Females = new List<string> { "Female", "F", "Женщина", "Женский", "Ж", "0", "False" };
 
         if (Males.Contains(input_gender))
         {

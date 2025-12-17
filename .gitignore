@@ -241,3 +241,9 @@ bld/
 # Test zone
 
 /src/base/ConsoleApp1
+src/Demo_app/Assembly-CSharp-Editor.csproj
+src/Demo_app/Assembly-CSharp.csproj
+src/Demo_app/Demo_app.sln
+src/Demo_app/Demo_app.sln
+src/Demo_app/Assembly-CSharp-Editor.csproj
+src/Demo_app/Assembly-CSharp.csproj

@@ -225,7 +225,7 @@ namespace DataBase
         {
             if (element == null) { throw new ArgumentNullException(); }
 
-            foreach (var prop in elementNode.Properties.Keys)
+            foreach (var prop in elementNode.Properties.Keys.ToList())
             {
                 if (!sourceArray.Contains(prop))
                 {

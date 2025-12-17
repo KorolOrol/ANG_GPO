@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using BaseClasses.Enum;
 using BaseClasses.Model;
 using BaseClasses.Services;
 using DataBase;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Utils;
 
 /// <summary>
 /// Скрипт главного окна приложения.
@@ -23,6 +22,9 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private Dictionary<Button, VisualElement> _actions;
 
+    /// <summary>
+    /// Список контроллеров действий.
+    /// </summary>
     private List<IActionController> _actionControllers;
     
     /// <summary>
@@ -44,6 +46,16 @@ public class MainWindowScript : MonoBehaviour
     /// Кнопка открытия сюжета.
     /// </summary>
     private Button _openButton;
+    
+    /// <summary>
+    /// Кнопка экспорта в JSON.
+    /// </summary>
+    private Button _exportJsonButton;
+    
+    /// <summary>
+    /// Кнопка экспорта в текстовый файл.
+    /// </summary>
+    private Button _exportTextButton;
     
     /// <summary>
     /// Кнопка информации о приложении.
@@ -76,11 +88,15 @@ public class MainWindowScript : MonoBehaviour
         _saveButton = _root.Q<Button>("SaveButton");
         _newButton = _root.Q<Button>("NewButton");
         _openButton = _root.Q<Button>("OpenButton");
+        _exportJsonButton = _root.Q<Button>("ExportJsonButton");
+        _exportTextButton = _root.Q<Button>("ExportTextButton");
         _aboutButton = _root.Q<Button>("AboutButton");
         
         _saveButton.clicked += OnSaveButtonClicked;
         _newButton.clicked += OnNewButtonClicked;
         _openButton.clicked += OnOpenButtonClicked;
+        _exportJsonButton.clicked += OnExportJsonButtonClicked;
+        _exportTextButton.clicked += OnExportTextButtonClicked;
         _aboutButton.clicked += OnAboutButtonClicked;
 
         _actions = new Dictionary<Button, VisualElement>
@@ -104,16 +120,6 @@ public class MainWindowScript : MonoBehaviour
             pair.Key.clicked += () => OnActionButtonClicked(pair.Key);
         }
         
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Character, "1"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Item, "2"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Location, "3"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Event, "4"));
-        _plot.Add(FullElementConstructor.CreateFullElement(ElemType.Character, "5"));
-        Binder.Bind(_plot.Elements[0], _plot.Elements[1]);
-        Binder.Bind(_plot.Elements[0], _plot.Elements[2]);
-        Binder.Bind(_plot.Elements[0], _plot.Elements[3]);
-        Binder.Bind(_plot.Elements[0], _plot.Elements[4], 50);
-        
         foreach (var controller in _actionControllers)
         {
             controller.Initiate(_root, _plot);
@@ -126,7 +132,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private void OnSaveButtonClicked()
     {
-        string path = EditorUtility.SaveFilePanel("Save File", "", "New Save", "ang");
+        string path = FileDialogUtility.SaveFilePanel("Save File", "", "New Save", "ang");
         if (path.Length == 0) return;
         _dbm = new DataBaseManager(path);
         _dbm.StorePlot(_plot);
@@ -150,7 +156,7 @@ public class MainWindowScript : MonoBehaviour
     /// </summary>
     private void OnOpenButtonClicked()
     {
-        string path = EditorUtility.OpenFilePanel("Open File", "", "ang");
+        string path = FileDialogUtility.OpenFilePanel("Open File", "", "ang");
         if (path.Length == 0) return;
         _dbm = new DataBaseManager(path);
         _plot = _dbm.ReadPlot();
@@ -162,11 +168,38 @@ public class MainWindowScript : MonoBehaviour
     }
     
     /// <summary>
+    /// Обработчик нажатия кнопки экспорта в JSON.
+    /// </summary>
+    private void OnExportJsonButtonClicked()
+    {
+        string path = FileDialogUtility.SaveFilePanel("Export JSON", "", "PlotExport", "json");
+        if (path.Length == 0) return;
+        Serializer.Serialize(_plot, path);
+    }
+    
+    /// <summary>
+    /// Обработчик нажатия кнопки экспорта в текстовый файл.
+    /// </summary>
+    private void OnExportTextButtonClicked()
+    {
+        string path = FileDialogUtility.SaveFilePanel("Export Text", "", "PlotExport", "txt");
+        if (path.Length == 0) return;
+        string text = _plot.FullInfo();
+        System.IO.File.WriteAllText(path, text);
+    }
+    
+    /// <summary>
     /// Обработчик нажатия кнопки информации о приложении.
     /// </summary>
     private static void OnAboutButtonClicked()
     {
-        EditorUtility.DisplayDialog("About", "Narrative Generator v1.0", "OK");
+        FileDialogUtility.DisplayDialog("About", "Cassius Narrative Generator v1.0\n" +
+            "Developers:\n" +
+            "Zhukovich Mikhail\n" +
+            "Kalashnikov Konstantin\n" +
+            "Agabekyan Grigoriy\n" +
+            "Kharlamov Egor\n" +
+            "(C) 2025, TUSUR", "OK");
     }
 
     /// <summary>

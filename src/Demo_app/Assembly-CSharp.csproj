@@ -62,48 +62,88 @@
     <Analyzer Include="/home/korolorol/Unity/Hub/Editor/6000.2.6f2/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets/MapScripts/BiomeGenerator.cs" />
     <Compile Include="Assets/Scripts/FullElementConstructor.cs" />
     <Compile Include="Assets/Scripts/EditSelectedElementController.cs" />
+    <Compile Include="Assets/Scripts/Utils/FileDialogUtility.cs" />
     <Compile Include="Assets/Scripts/MainWindowScript.cs" />
+    <Compile Include="Assets/MapScripts/MapGeneratorManual.cs" />
+    <Compile Include="Assets/MapScripts/LocationPlacement/ChunkManager.cs" />
     <Compile Include="Assets/Scripts/AIActionController.cs" />
     <Compile Include="Assets/Scripts/ProceduralActionController.cs" />
+    <Compile Include="Assets/MapScripts/LocationPlacement/PlacementOptimizer.cs" />
+    <Compile Include="Assets/MapScripts/TextureGenerator.cs" />
     <Compile Include="Assets/Scripts/ViewActionController.cs" />
+    <Compile Include="Assets/MapScripts/MapDisplayUi.cs" />
+    <Compile Include="Assets/MapScripts/MapGenerator.cs" />
+    <Compile Include="Assets/MapScripts/LocationGenerate/MapZoom.cs" />
+    <Compile Include="Assets/MapScripts/LocationPlacement/LocationData.cs" />
+    <Compile Include="Assets/MapScripts/HouseGeneration/ModularBuildingGenerator.cs" />
+    <Compile Include="Assets/MapScripts/MapDisplay.cs" />
     <Compile Include="Assets/Scripts/IActionController.cs" />
     <Compile Include="Assets/Scripts/MapActionController.cs" />
+    <Compile Include="Assets/MapScripts/Noise.cs" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/lib/netstandard2.1/System.ComponentModel.Annotations.xml" />
     <None Include="Assets/Packages/System.Text.Json.9.0.10/useSharedDesignerContext.txt" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
     <None Include="Assets/Packages/System.Memory.Data.1.0.2/lib/netstandard2.0/System.Memory.Data.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets/Packages/MessagePack.3.1.4/lib/netstandard2.1/MessagePack.xml" />
     <None Include="Assets/UI/ProceduralAction.uxml" />
     <None Include="Assets/Packages/Microsoft.NET.StringTools.17.11.4/lib/netstandard2.0/Microsoft.NET.StringTools.xml" />
     <None Include="Assets/Packages/Microsoft.Extensions.Primitives.3.1.10/lib/netstandard2.0/Microsoft.Extensions.Primitives.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets/UI/NordColorPallete.uss" />
     <None Include="Assets/UI/MainWindow.uxml" />
     <None Include="Assets/Packages/deniszykov.TypeConversion.3.2.3/lib/netstandard2.1/deniszykov.TypeConversion.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" />
     <None Include="Assets/UI/AIAction.uxml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader" />
+    <None Include="Assets/SavedMaps/map_saved.json" />
     <None Include="Assets/Packages/Microsoft.Bcl.AsyncInterfaces.9.0.10/lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets/UI/ViewAction.uxml" />
     <None Include="Assets/Packages/MessagePack.Annotations.3.1.4/lib/netstandard2.0/MessagePack.Annotations.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/SDFFunctions.hlsl" />
     <None Include="Assets/Packages/System.Text.Encodings.Web.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/System.IO.Pipelines.9.0.10/lib/netstandard2.0/System.IO.Pipelines.xml" />
     <None Include="Assets/Packages/System.Diagnostics.DiagnosticSource.6.0.1/lib/netstandard2.0/System.Diagnostics.DiagnosticSource.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Surface.shader" />
+    <None Include="Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF.shader" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets/TextMesh Pro/Resources/LineBreaking Leading Characters.txt" />
     <None Include="Assets/Packages/System.Collections.Immutable.8.0.0/useSharedDesignerContext.txt" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc" />
+    <None Include="Assets/Packages/Newtonsoft.Json.13.0.4/lib/netstandard2.0/Newtonsoft.Json.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" />
+    <None Include="Assets/AddressableAssetsData/link.xml" />
     <None Include="Assets/Packages/System.Text.Encodings.Web.9.0.10/lib/netstandard2.0/System.Text.Encodings.Web.xml" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/System.ComponentModel.Annotations.4.7.0/version.txt" />
+    <None Include="Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt" />
     <None Include="Assets/Packages/System.IO.Pipelines.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/Packages/Microsoft.Bcl.AsyncInterfaces.9.0.10/useSharedDesignerContext.txt" />
     <None Include="Assets/UI/EditSelectedElement.uxml" />
     <None Include="Assets/Packages/System.ClientModel.1.1.0/lib/netstandard2.0/System.ClientModel.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets/Packages/Microsoft.Extensions.DependencyInjection.Abstractions.3.1.10/lib/netstandard2.0/Microsoft.Extensions.DependencyInjection.Abstractions.xml" />
     <None Include="Assets/Packages/System.Text.Json.9.0.10/lib/netstandard2.0/System.Text.Json.xml" />
     <None Include="Assets/Packages/OpenAI.2.0.0/lib/netstandard2.0/OpenAI.xml" />
     <None Include="Assets/Packages/Microsoft.Extensions.Options.3.1.10/lib/netstandard2.0/Microsoft.Extensions.Options.xml" />
     <None Include="Assets/UI/ElementListItem.uxml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt" />
     <None Include="Assets/UI/MapAction.uxml" />
     <None Include="Assets/Packages/Microsoft.NET.StringTools.17.11.4/notices/THIRDPARTYNOTICES.txt" />
     <None Include="Assets/Packages/System.Collections.Immutable.8.0.0/lib/netstandard2.0/System.Collections.Immutable.xml" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" />
+    <None Include="Assets/TextMesh Pro/Sprites/EmojiOne.json" />
     <None Include="Assets/Packages/System.Diagnostics.DiagnosticSource.6.0.1/useSharedDesignerContext.txt" />
+    <None Include="Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" />
     <Reference Include="UnityEngine">
       <HintPath>/home/korolorol/Unity/Hub/Editor/6000.2.6f2/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>
@@ -476,6 +516,9 @@
     <Reference Include="BaseClasses">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Plugins/BaseClasses.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/Newtonsoft.Json.13.0.4/lib/netstandard2.0/Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="MessagePack">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/MessagePack.3.1.4/lib/netstandard2.1/MessagePack.dll</HintPath>
     </Reference>
@@ -535,6 +578,9 @@
     </Reference>
     <Reference Include="MessagePack.Annotations">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/MessagePack.Annotations.3.1.4/lib/netstandard2.0/MessagePack.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="PrGenLib">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Plugins/PrGenLib.dll</HintPath>
     </Reference>
     <Reference Include="deniszykov.TypeConversion">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Assets/Packages/deniszykov.TypeConversion.3.2.3/lib/netstandard2.1/deniszykov.TypeConversion.dll</HintPath>
@@ -929,6 +975,9 @@
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ScriptableBuildPipeline.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.RenderPipelines.Universal.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Editor.dll</HintPath>
     </Reference>
@@ -941,6 +990,9 @@
     <Reference Include="Unity.AI.Navigation.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.AI.Navigation.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Addressables.dll</HintPath>
+    </Reference>
     <Reference Include="PPv2URPConverters">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/PPv2URPConverters.dll</HintPath>
     </Reference>
@@ -952,6 +1004,9 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.Shared.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualScripting.Shared.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline.Editor">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ScriptableBuildPipeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Searcher.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Searcher.Editor.dll</HintPath>
@@ -1001,11 +1056,17 @@
     <Reference Include="Unity.VisualScripting.Flow.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualScripting.Flow.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.ResourceManager.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.VisualStudio.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Profiling.Core">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Profiling.Core.dll</HintPath>
     </Reference>
     <Reference Include="Unity.InputSystem.ForUI">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.InputSystem.ForUI.dll</HintPath>
@@ -1058,11 +1119,11 @@
     <Reference Include="Unity.RenderPipelines.Universal.Config.Runtime">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipelines.Universal.Config.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
-      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Toolchain.Linux-x86_64">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Toolchain.Linux-x86_64.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections.Editor">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Collections.Editor.dll</HintPath>
@@ -1081,6 +1142,9 @@
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.InputSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Addressables.Editor">
+      <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/Unity.Addressables.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>/home/korolorol/src/ANG_GPO/src/Demo_app/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>

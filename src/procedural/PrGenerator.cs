@@ -763,6 +763,11 @@ public class PrGenerator
 
     #region [Translate To BaseClass]
 
+    /// <summary>
+    /// Преобразует PrCharacter в базовый класс Element
+    /// </summary>
+    /// <param name="character">Исходный персонаж для преобразования</param>
+    /// <returns>Элемент базового класса с данными персонажа</returns>
     public static Element Translate(PrCharacter character)
     {
         string baseName = "";
@@ -787,6 +792,16 @@ public class PrGenerator
         baseParams.Add("Черты характера", traits);
         baseParams.Add("Фобии", phobias);
         baseParams.Add("Отношения", relations);
+
+        if (character.Age != null)
+        {
+            baseParams.Add("Возраст", character.Age.ToString());
+        }
+
+        if (character.Gender != null)
+        {
+            baseParams.Add("Пол", (bool)character.Gender ? "Мужской" : "Женский");
+        }
 
         Element baseCharacter = new Element(ElemType.Character, baseName, description, baseParams);
 

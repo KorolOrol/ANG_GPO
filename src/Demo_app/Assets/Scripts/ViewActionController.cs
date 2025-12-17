@@ -4,8 +4,8 @@ using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.UIElements;
 
 /// <summary>
@@ -234,7 +234,9 @@ public class ViewActionController : IActionController
     /// </summary>
     private VisualElement MakeElementListItem()
     {
-        var elementAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
+        var handle = Addressables.LoadAssetAsync<VisualTreeAsset>("Assets/UI/ElementListItem.uxml");
+        handle.WaitForCompletion();
+        var elementAsset = handle.Result;
         var element = elementAsset.CloneTree();
         return element;
     }
@@ -255,15 +257,23 @@ public class ViewActionController : IActionController
         }
 
         if (element == null) return;
-        var vectorImage = element.Type switch
+        string path = element.Type switch
         {
-            ElemType.Character =>
-                AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeCharacterIcon.svg"),
-            ElemType.Item => AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeItemIcon.svg"),
-            ElemType.Location => AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeLocationIcon.svg"),
-            ElemType.Event => AssetDatabase.LoadAssetAtPath<VectorImage>("Assets/Icons/ElemTypeEventIcon.svg"),
-            _ => icon
+            ElemType.Character => "Assets/Icons/ElemTypeCharacterIcon.svg",
+            ElemType.Item => "Assets/Icons/ElemTypeItemIcon.svg",
+            ElemType.Location => "Assets/Icons/ElemTypeLocationIcon.svg",
+            ElemType.Event => "Assets/Icons/ElemTypeEventIcon.svg",
+            _ => ""
         };
+        if (path == "")
+        {
+            labelUI.text = element.Name;
+            iconUI.style.backgroundImage = new StyleBackground(icon);
+            return;
+        }
+        var handle = Addressables.LoadAssetAsync<VectorImage>(path);
+        handle.WaitForCompletion();
+        var vectorImage = handle.Result;
         labelUI.text = element.Name;
         iconUI.style.backgroundImage = new StyleBackground(vectorImage);
     }
