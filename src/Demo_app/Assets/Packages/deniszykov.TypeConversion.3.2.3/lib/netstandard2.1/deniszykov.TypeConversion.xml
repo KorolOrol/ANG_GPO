@@ -1,0 +1,1920 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>deniszykov.TypeConversion</name>
+    </assembly>
+    <members>
+        <member name="T:deniszykov.TypeConversion.ConversionDescriptor">
+            <summary>
+            Describes how conversion from <see cref="P:deniszykov.TypeConversion.ConversionDescriptor.FromType"/> to <see cref="P:deniszykov.TypeConversion.ConversionDescriptor.ToType"/> will be performed.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionDescriptor.Methods">
+            <summary>
+            List of conversion methods. From most preferred to least preferred. Collection not empty.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormat">
+            <summary>
+            Default format used for conversion. Usage of this parameter by <see cref="T:deniszykov.TypeConversion.IConverter`2"/> depends on <see cref="T:deniszykov.TypeConversion.ConversionOptions"/>.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider">
+            <summary>
+            Default format provider used for conversion. Usage of this parameter by <see cref="T:deniszykov.TypeConversion.IConverter`2"/> depends on <see cref="T:deniszykov.TypeConversion.ConversionOptions"/>.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionDescriptor.Conversion">
+            <summary>
+            Conversion function.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionDescriptor.SafeConversion">
+            <summary>
+            Safe conversion function. If null then <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.Conversion"/> function is used inside try/catch block.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.ConversionDescriptor.FromType">
+            <summary>
+            Conversion source type.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.ConversionDescriptor.ToType">
+            <summary>
+            Conversion destination type.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.ConversionDescriptor.HasSomeConversion">
+            <summary>
+            Returns true if any conversion method exists between <see cref="P:deniszykov.TypeConversion.ConversionDescriptor.FromType"/> and <see cref="P:deniszykov.TypeConversion.ConversionDescriptor.ToType"/> types.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionDescriptor.#ctor(System.Collections.ObjectModel.ReadOnlyCollection{deniszykov.TypeConversion.ConversionMethodInfo},System.String,System.IFormatProvider,System.Delegate,System.Delegate)">
+            <summary>
+            Constructor for <see cref="T:deniszykov.TypeConversion.ConversionDescriptor"/>.
+            </summary>
+            <param name="methods">One or more methods. Value for <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.Methods"/>.</param>
+            <param name="defaultFormat">Value for <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormat"/>.</param>
+            <param name="defaultFormatProvider">Value for <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider"/>. If value is null then <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/> is used.</param>
+            <param name="conversion">Value for <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.Conversion"/>.</param>
+            <param name="safeConversion">Value for <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.SafeConversion"/>.</param>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionDescriptor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionMetadataProvider">
+            <summary>
+            Conversion metadata provider used by <see cref="T:deniszykov.TypeConversion.ITypeConversionProvider"/> to discover conversion methods on types. 
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.ConversionTypeInfo.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.#ctor(Microsoft.Extensions.Options.IOptions{deniszykov.TypeConversion.ConversionMetadataProviderOptions})">
+            <summary>
+            Constructor of <see cref="T:deniszykov.TypeConversion.ConversionMetadataProvider"/>.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.GetConvertFromMethods(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.GetConvertToMethods(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.IsAssignableFrom(System.Type,System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.IsFormatParameter(System.Reflection.ParameterInfo)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.IsFormatProviderParameter(System.Reflection.ParameterInfo)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMetadataProvider.GetDefaultFormat(deniszykov.TypeConversion.ConversionMethodInfo)">
+            <inheritdoc />
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionMetadataProviderOptions">
+            <summary>
+            Configuration for <see cref="T:deniszykov.TypeConversion.ConversionMetadataProvider"/>
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.ConvertFromMethodNames">
+            <summary>
+            List of method names used to create value of some type from other type. If not set then default list of names used. Example: 'Parse', 'Create', 'From'.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.ConvertToMethodNames">
+            <summary>
+            List of method names used to transform value of some type to other type. If not set then default list of names used. Example: 'ToString', 'ToNumber'.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.DisallowedMethodNames">
+            <summary>
+            List of words that are not allowed in conversion method names. If not set then default list of names used. Example: 'Exact'.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.FormatParameterNames">
+            <summary>
+            List of possible names for '<see cref="T:System.String"/> format' parameter. Default value is 'format'.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.FormatProviderParameterNames">
+            <summary>
+            List of possible names for '<see cref="T:System.IFormatProvider"/> formatProvider' parameter. If not set then format provider parameter determined by it's type. Default value is null.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.AdditionalConversionMethods">
+            <summary>
+            List of additional methods used to convert between types. Keep this list short because it's scanned each time for each new converted type.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.ForbiddenConversionMethods">
+            <summary>
+            List of methods which should not be used to to convert between types.  Keep this list short because it's scanned each time for each new converted type.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMetadataProviderOptions.MethodFilter">
+            <summary>
+            Predicate used to filter undesired conversion methods during method discovery.
+            </summary>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionMethodInfo">
+            <summary>
+            Information about .NET Method used to perform conversion.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodInfo.Method">
+            <summary>
+            Method used to create conversion delegate.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodInfo.Parameters">
+            <summary>
+            List of <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.Method"/>'s parameters.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodInfo.ConversionParameterTypes">
+            <summary>
+            List of <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.Parameters"/>'s roles in conversion.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodInfo.FromType">
+            <summary>
+            Conversion source type.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodInfo.ToType">
+            <summary>
+            Conversion destination type.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodInfo.Quality">
+            <summary>
+            Conversion quality with specified <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.Method"/>.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.ConversionMethodInfo.IsSafeConversion">
+            <summary>
+            Return true if it is <value>bool TryParse(value, out result)</value> conversion method.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMethodInfo.#ctor(System.Reflection.MethodBase,System.Reflection.ParameterInfo[],deniszykov.TypeConversion.ConversionParameterType[],System.Nullable{deniszykov.TypeConversion.ConversionQuality})">
+            <summary>
+            Constructor of <see cref="T:deniszykov.TypeConversion.ConversionMethodInfo"/>.
+            </summary>
+            <param name="methodBase">Value for <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.Method"/>.</param>
+            <param name="parameters">Value for <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.Parameters"/>..</param>
+            <param name="conversionParameterTypes">Value for <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.ConversionParameterTypes"/>.</param>
+            <param name="conversionQualityOverride">Override value for <see cref="F:deniszykov.TypeConversion.ConversionMethodInfo.Quality"/>. If not set then quality is determinate by signature.</param>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMethodInfo.CompareTo(deniszykov.TypeConversion.ConversionMethodInfo)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.ConversionMethodInfo.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionMethodSelectionStrategy">
+            <summary>
+            Strategy to select conversion method from alternatives.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodSelectionStrategy.MostSpecificMethod">
+            <summary>
+            Choose method with most additional parameters like 'format', 'formatProvider' even if 'format' and 'formatProvider' is passed as <value>null</value>.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodSelectionStrategy.MostFittingMethod">
+            <summary>
+            Choose method depending of on passed into <see cref="M:deniszykov.TypeConversion.IConverter.Convert(System.Object,System.Object@,System.String,System.IFormatProvider)"/> parameters.
+            If 'format' is passed, choose method with 'format' parameter, if 'formatProvider' is passed, choose method with 'formatParameter' parameter etc.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionMethodSelectionStrategy.Default">
+            <summary>
+            Default value. Set to <see cref="F:deniszykov.TypeConversion.ConversionMethodSelectionStrategy.MostFittingMethod"/> due less runtime errors.
+            </summary>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionOptions">
+            <summary>
+            Options for <see cref="T:deniszykov.TypeConversion.IConverter"/> and <see cref="T:deniszykov.TypeConversion.ITypeConversionProvider"/> types.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.None">
+            <summary>
+            No special options.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.UseDefaultFormatIfNotSpecified">
+            <summary>
+            Replace <value>null</value> in 'format' parameter with <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormat"/> during conversion.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.UseDefaultFormatProviderIfNotSpecified">
+            <summary>
+            Replace <value>null</value> in 'formatProvider' parameter with <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider"/> during conversion.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.OptimizeWithExpressions">
+            <summary>
+            Optimize performance with <see cref="M:System.Linq.Expressions.Expression`1.Compile"/> to generate dynamic code.
+            Disable if runtime doesn't support dynamic code execution. For example on Unity's WebGL, Playstation, or Mono with --aot flag.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.OptimizeWithGenerics">
+            <summary>
+            Optimize performance with usage of generics.
+            Disable if runtime doesn't support JIT compilation of new code. For example on Unity's WebGL, Playstation, or Mono with --aot flag.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.FastCast">
+            <summary>
+            Converter tries to cast value to desired type skipping conversion function.
+            This optimization could give some performance gain in exchange for possible errors due not calling conversion function.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.PromoteValueToActualType">
+            <summary>
+            Converter tries to use actual value's type instead of specified one.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.SkipComponentModelTypeConverters">
+            <summary>
+            Do not use type converters derived from <see cref="T:System.ComponentModel.TypeConverter"/>.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionOptions.Default">
+            <summary>
+            Default option. Set to <see cref="F:deniszykov.TypeConversion.ConversionOptions.UseDefaultFormatProviderIfNotSpecified"/> because this will lead to predictable
+            conversion on different platforms and locales, <see cref="F:deniszykov.TypeConversion.ConversionOptions.OptimizeWithExpressions"/> and <see cref="F:deniszykov.TypeConversion.ConversionOptions.OptimizeWithGenerics"/> optimizations.
+            </summary>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionParameterType">
+            <summary>
+            Type of parameter in conversion method.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionParameterType.Value">
+            <summary>
+            Original value to convert. If this parameter is not present then value is <value>this</value> of method.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionParameterType.ConvertedValue">
+            <summary>
+            Converted value output. If this parameter is not present then output value is result type of method.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionParameterType.Format">
+            <summary>
+            Format parameter. Type is always <see cref="T:System.String"/>.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionParameterType.FormatProvider">
+            <summary>
+            Format provider parameter. Type is always <see cref="T:System.IFormatProvider"/>.
+            </summary>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ConversionQuality">
+            <summary>
+            Quality of conversion method. Quality is defined by purpose and performance.
+            Therefore, the explicit/implicit cast operators are the highest quality way of type conversion, second only to the native conversion (type casting and boxing).
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.None">
+            <summary>
+            No conversion method is found. Trying to invoke conversion with this quality will cause <see cref="T:System.InvalidOperationException"/>.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.Constructor">
+            <summary>
+            Conversion via Constructor accepting appropriate type.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.TypeConverter">
+            <summary>
+            Conversion via System.ComponentModel.TypeConverter instance.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.Method">
+            <summary>
+            Conversion via method on type (Parse, ToXXX, FromXXX)
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.Explicit">
+            <summary>
+            Explicit conversion operator.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.Implicit">
+            <summary>
+            Implicit conversion operator.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.Native">
+            <summary>
+            Runtime provided conversion method for build-in types.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.ConversionQuality.Custom">
+            <summary>
+            User-provided conversion function.
+            </summary>
+        </member>
+        <member name="T:deniszykov.TypeConversion.Converter`2">
+            <summary>
+            Provides type conversion methods from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/>.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.Converter`2.Descriptor">
+            <inheritdoc />
+        </member>
+        <member name="P:deniszykov.TypeConversion.Converter`2.deniszykov#TypeConversion#IConverter#FromType">
+            <inheritdoc />
+        </member>
+        <member name="P:deniszykov.TypeConversion.Converter`2.deniszykov#TypeConversion#IConverter#ToType">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.Converter`2.deniszykov#TypeConversion#IConverter#Convert(System.Object,System.Object@,System.String,System.IFormatProvider)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.Converter`2.deniszykov#TypeConversion#IConverter#TryConvert(System.Object,System.Object@,System.String,System.IFormatProvider)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.Converter`2.Convert(`0,`1@,System.String,System.IFormatProvider)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.Converter`2.TryConvert(`0,`1@,System.String,System.IFormatProvider)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.Converter`2.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.CustomConversion`2.Register(deniszykov.TypeConversion.ICustomConversionRegistry)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.CustomConversion`2.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:deniszykov.TypeConversion.EnumConversionInfo`1">
+            <summary>
+            Provides methods of conversion between <see cref="T:System.Enum"/> type and it's underlying type.
+            </summary>
+            <typeparam name="EnumT">Enum type.</typeparam>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.Type">
+            <inheritdoc />
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.ToNumber">
+            <summary>
+            <typeparamref name="EnumT"/> to Number(SByte,Byte,Int16...) conversion function. Instance of <see cref="T:System.Func`2"/> where T1 is <typeparamref name="EnumT"/> and TResult is number type.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.FromNumber">
+            <summary>
+             Number(SByte,Byte,Int16...) to <typeparamref name="EnumT"/> conversion function. Instance of <see cref="T:System.Func`2"/> where T1 is number type and TResult is <typeparamref name="EnumT"/> type.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.Comparer">
+            <summary>
+            Comparer for <typeparamref name="EnumT"/> values.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.UnderlyingTypeCode">
+            <summary>
+            Type code of enum underlying type.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.UnderlyingType">
+            <summary>
+            Type of enum underlying type.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.IsFlags">
+            <summary>
+            Flag indicating what enum has <see cref="T:System.FlagsAttribute"/>.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.IsSigned">
+            <summary>
+            Flag indicating what Enum <see cref="P:deniszykov.TypeConversion.EnumConversionInfo`1.UnderlyingType"/> is signed number.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.MaxValue">
+            <summary>
+            Maximum value for enumeration (declared values only).
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.DefaultValue">
+            <summary>
+            Default value for enumeration (zero).
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.MinValue">
+            <summary>
+            Minimum value for enumeration (declared values only).
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.Names">
+            <summary>
+            Names of all enumeration values. Order is corresponding to <see cref="P:deniszykov.TypeConversion.EnumConversionInfo`1.Values"/>.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.EnumConversionInfo`1.Values">
+            <summary>
+            All declared enumeration values. Order is corresponding to <see cref="P:deniszykov.TypeConversion.EnumConversionInfo`1.Names"/>. 
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToName(`0)">
+            <summary>
+            Get name of passed enumeration value.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <returns>Cached name of enumeration member or string representation of it's underlying type.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToSByte(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.SByte"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.SByte"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.SByte"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToByte(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.Byte"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.Byte"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.Byte"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToInt16(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.Int16"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.Int16"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.Int16"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToUInt16(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.UInt16"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.UInt16"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.UInt16"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToInt32(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.Int32"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.Int32"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.Int32"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToUInt32(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.UInt32"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.UInt32"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.UInt32"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToInt64(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.Int64"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.Int64"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.Int64"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToUInt64(`0,System.Boolean)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.UInt64"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.UInt64"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.UInt64"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToSingle(`0)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.Single"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.Single"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.ToDouble(`0)">
+            <summary>
+            Convert passed enumeration value to <see cref="T:System.Double"/>. Throws <see cref="T:System.OverflowException"/> if value can't fit into <see cref="T:System.Double"/>.
+            </summary>
+            <param name="value">Enumeration value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns><see cref="T:System.Double"/> value of passed enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromSByte(System.SByte,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromByte(System.Byte,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromInt16(System.Int16,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromUInt16(System.UInt16,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration . Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromInt32(System.Int32,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromUInt32(System.UInt32,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromInt64(System.Int64,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromUInt64(System.UInt64,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromSingle(System.Single,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.FromDouble(System.Double,System.Boolean)">
+            <summary>
+            Convert passed number value to enumeration. Throws <see cref="T:System.OverflowException"/> if value can't fit into enumeration's underlying type.
+            </summary>
+            <param name="value">Numeric value.</param>
+            <param name="checkedConversion">Use checked conversion and allow/disallow overflow.</param>
+            <returns>Enumeration value from passed numeric value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.IsDefined(`0)">
+            <summary>
+            Check if passed enumeration value is defined in enumeration.
+            </summary>
+            <param name="value">Enumeration value to check.</param>
+            <returns>True if defined. False if not defined.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.Parse(System.String)">
+            <summary>
+            Map passed <paramref name="name"/> to enumeration member name and return it's value. Or parse <paramref name="name"/> as number and maps it to first matching enumeration member.
+            </summary>
+            <param name="name">Enumeration member name-or-Enumeration member's numeric value-or-Enumeration member names separated by comma.</param>
+            <returns>Enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.Parse(System.String,System.Boolean)">
+            <summary>
+            Map passed <paramref name="name"/> to enumeration member name and return it's value. Or parse <paramref name="name"/> as number and maps it to first matching enumeration member.
+            </summary>
+            <param name="name">Enumeration member name-or-Enumeration member's numeric value-or-Enumeration member names separated by comma.</param>
+            <param name="ignoreCase">Ignore case of enumerable names during parsing.</param>
+            <returns>Enumeration value.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.TryParse(System.String,`0@)">
+            <summary>
+            Try to map passed <paramref name="name"/> to enumeration member name and return it's value. Or try to parse <paramref name="name"/> as number and maps it to first matching enumeration member.
+            </summary>
+            <param name="name">Enumeration member name-or-Enumeration member's numeric value-or-Enumeration member names separated by comma.</param>
+            <param name="value">Mapped enumeration value.</param>
+            <returns>True if mapped successfully. False if mapping failed.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.EnumConversionInfo`1.TryParse(System.String,`0@,System.Boolean)">
+            <summary>
+            Try to map passed <paramref name="name"/> to enumeration member name and return it's value. Or try to parse <paramref name="name"/> as number and maps it to first matching enumeration member.
+            </summary>
+            <param name="name">Enumeration member name-or-Enumeration member's numeric value-or-Enumeration member names separated by comma.</param>
+            <param name="value">Mapped enumeration value.</param>
+            <param name="ignoreCase">Ignore case of enumerable names during parsing.</param>
+            <returns>True if mapped successfully. False if mapping failed.</returns>
+        </member>
+        <member name="T:deniszykov.TypeConversion.IConversionMetadataProvider">
+            <summary>
+            Conversion metadata provider used by <see cref="T:deniszykov.TypeConversion.ITypeConversionProvider"/> to discover conversion methods on types. 
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConversionMetadataProvider.GetConvertFromMethods(System.Type)">
+            <summary>
+            Get a list of conversion methods from <paramref name="type"/> type.  These method will accept instance of <paramref name="type"/> or declared on <paramref name="type"/>.
+            </summary>
+            <returns>List of conversion methods.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConversionMetadataProvider.GetConvertToMethods(System.Type)">
+            <summary>
+            Get a list of conversion methods to <paramref name="type"/> type. These method will return instance of <paramref name="type"/> or are constructors.
+            </summary>
+            <returns>List of conversion methods.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConversionMetadataProvider.IsAssignableFrom(System.Type,System.Type)">
+            <summary>
+            Checks if <paramref name="type"/> is <paramref name="fromType"/> or has <paramref name="fromType"/> in base types or in interfaces.
+            </summary>
+            <param name="type">Type to check.</param>
+            <param name="fromType">Base type or interface to find.</param>
+            <returns>True if found.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConversionMetadataProvider.IsFormatParameter(System.Reflection.ParameterInfo)">
+            <summary>
+            Check if passed parameter is 'format' parameter and has <see cref="T:System.String"/> type.
+            </summary>
+            <param name="methodParameter">Parameter to check.</param>
+            <returns>True if parameter is 'format' parameter.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConversionMetadataProvider.IsFormatProviderParameter(System.Reflection.ParameterInfo)">
+            <summary>
+            Check if passed parameter is 'formatProvider' parameter and has <see cref="T:System.IFormatProvider"/> type.
+            </summary>
+            <param name="methodParameter">Parameter to check.</param>
+            <returns>True if parameter is 'formatProvider' parameter.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConversionMetadataProvider.GetDefaultFormat(deniszykov.TypeConversion.ConversionMethodInfo)">
+            <summary>
+            Get default value for 'format' parameter for specified conversion. Typically default value of 'format' parameter is taken.
+            </summary>
+            <param name="conversionMethodInfo">Conversion method to look on.</param>
+            <returns>Format value or null if not found.</returns>
+        </member>
+        <member name="T:deniszykov.TypeConversion.IConverter">
+            <summary>
+            Converter used to transform value of type <see cref="P:deniszykov.TypeConversion.IConverter.FromType"/> to value of <see cref="P:deniszykov.TypeConversion.IConverter.ToType"/>.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.IConverter.Descriptor">
+            <summary>
+            Description of method used for this conversion.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.IConverter.FromType">
+            <summary>
+            Source type of conversion.
+            </summary>
+        </member>
+        <member name="P:deniszykov.TypeConversion.IConverter.ToType">
+            <summary>
+            Destination type of conversion.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConverter.Convert(System.Object,System.Object@,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="value"/> from <see cref="P:deniszykov.TypeConversion.IConverter.FromType"/> to <see cref="P:deniszykov.TypeConversion.IConverter.ToType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <param name="value">A value to convert.</param>
+            <param name="result">A converted value.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConverter.TryConvert(System.Object,System.Object@,System.String,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="value"/> from <see cref="P:deniszykov.TypeConversion.IConverter.FromType"/> to <see cref="P:deniszykov.TypeConversion.IConverter.ToType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="value">A value to convert.</param>
+            <param name="result">A converted value or null if conversion fails.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="T:deniszykov.TypeConversion.IConverter`2">
+            <summary>
+            Provides type conversion methods from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/>.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConverter`2.Convert(`0,`1@,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="value"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <param name="value">A value to convert.</param>
+            <param name="result">A converted value.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+        </member>
+        <member name="M:deniszykov.TypeConversion.IConverter`2.TryConvert(`0,`1@,System.String,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="value"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="value">A value to convert.</param>
+            <param name="result">A converted value or <value>default</value> if conversion fails.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ICustomConversionRegistry">
+            <summary>
+            Container containing conversion function registration. Implementations are <see cref="T:deniszykov.TypeConversion.TypeConversionProvider"/> and <see cref="T:deniszykov.TypeConversion.TypeConversionProviderOptions"/>.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ICustomConversionRegistry.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},deniszykov.TypeConversion.ConversionQuality)">
+            <summary>
+            Register conversion between <typeparamref name="FromTypeT"/> and <typeparamref name="ToTypeT"/> via specified <paramref name="conversionFunc"/>.
+            </summary>
+            <param name="conversionFunc">Conversion function which take value of <typeparamref name="FromTypeT"/> and converts it to <typeparamref name="ToTypeT"/> using specified format and <see cref="T:System.IFormatProvider"/>.</param>
+            <param name="quality">Conversion quality for this conversion. Default to <see cref="F:deniszykov.TypeConversion.ConversionQuality.Custom"/></param>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ICustomConversionRegistry.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},System.Func{``0,System.String,System.IFormatProvider,System.Collections.Generic.KeyValuePair{``1,System.Boolean}},deniszykov.TypeConversion.ConversionQuality)">
+            <summary>
+            Register conversion between <typeparamref name="FromTypeT"/> and <typeparamref name="ToTypeT"/> via specified <paramref name="conversionFunc"/>.
+            </summary>
+            <param name="conversionFunc">Conversion function which take value of <typeparamref name="FromTypeT"/> and converts it to <typeparamref name="ToTypeT"/> using specified format and <see cref="T:System.IFormatProvider"/>.</param>
+            <param name="safeConversionFunc">Conversion function which take value of <typeparamref name="FromTypeT"/> and try to convert it to <typeparamref name="ToTypeT"/> using specified format and <see cref="T:System.IFormatProvider"/>.</param>
+            <param name="quality">Conversion quality for this conversion. Default to <see cref="F:deniszykov.TypeConversion.ConversionQuality.Custom"/></param>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ITypeConversionProvider">
+            <summary>
+            Class providing <see cref="T:deniszykov.TypeConversion.IConverter"/> and <see cref="T:deniszykov.TypeConversion.IConverter`2"/> instances on demand.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProvider.GetConverter``2">
+            <summary>
+            Get converter instance which could convert values from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/>.
+            </summary>
+            <returns>Instance of <see cref="T:deniszykov.TypeConversion.IConverter`2"/>. Same instance is returned for same generic parameters.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProvider.GetConverter(System.Type,System.Type)">
+            <summary>
+            Get converter instance which could convert values from <paramref name="fromType"/> to <paramref name="toType"/>.
+            </summary>
+            <returns>Instance of <see cref="T:deniszykov.TypeConversion.IConverter"/>. Same instance is returned for same parameters.</returns>
+        </member>
+        <member name="T:deniszykov.TypeConversion.ITypeConversionProviderExtensions">
+            <summary>
+            Extensions method for fast conversion with <see cref="T:deniszykov.TypeConversion.ITypeConversionProvider"/> class.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using specified default format and format provider (<see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>).
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.String)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using specified <paramref name="format"/> and default format provider (<see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>).
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using specified <paramref name="formatProvider"/>.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.Object@)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using default format and default format provider.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="result">Converted to <paramref name="toType"/> value or null.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.Object@,System.String)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using specified <paramref name="format"/> and default format provider.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="result">Converted to <paramref name="toType"/> value or null.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.Object@,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="result">Converted to <paramref name="toType"/> value or null.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert(deniszykov.TypeConversion.ITypeConversionProvider,System.Type,System.Type,System.Object,System.Object@,System.String,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <paramref name="fromType"/> to <paramref name="toType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromType">Convert from type.</param>
+            <param name="toType">Convert to type.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <paramref name="fromType"/> type.</param>
+            <param name="result">Converted to <paramref name="toType"/> value or null.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using default format and default format provider.
+            </summary>
+            <typeparam name="FromTypeT"></typeparam>
+            <typeparam name="ToTypeT"></typeparam>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,System.String)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using specified <paramref name="format"/> and default format provider.
+            </summary>
+            <typeparam name="FromTypeT"></typeparam>
+            <typeparam name="ToTypeT"></typeparam>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using default format and <paramref name="formatProvider"/>.
+            </summary>
+            <typeparam name="FromTypeT"></typeparam>
+            <typeparam name="ToTypeT"></typeparam>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.Convert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <typeparam name="FromTypeT">From type.</typeparam>
+            <typeparam name="ToTypeT">To type.</typeparam>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="fromValue"/>.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,``1@)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using default format and default format provider.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <typeparam name="FromTypeT">From type.</typeparam>
+            <typeparam name="ToTypeT">To type.</typeparam>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="result">Converted to <typeparamref name="ToTypeT"/> value or null.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,``1@,System.String)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using specified <paramref name="format"/> and default format provider.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <typeparam name="FromTypeT">From type.</typeparam>
+            <typeparam name="ToTypeT">To type.</typeparam>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="result">Converted to <typeparamref name="ToTypeT"/> value or null.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,``1@,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using default format and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <typeparam name="FromTypeT">From type.</typeparam>
+            <typeparam name="ToTypeT">To type.</typeparam>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="result">Converted to <typeparamref name="ToTypeT"/> value or null.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.TryConvert``2(deniszykov.TypeConversion.ITypeConversionProvider,``0,``1@,System.String,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <typeparamref name="ToTypeT"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <typeparam name="FromTypeT">From type.</typeparam>
+            <typeparam name="ToTypeT">To type.</typeparam>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="result">Converted to <typeparamref name="ToTypeT"/> value or null.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.ConvertToString``1(deniszykov.TypeConversion.ITypeConversionProvider,``0)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <see cref="T:System.String"/> using default format and default format provider.
+            </summary>
+            <typeparam name="FromTypeT">From type.</typeparam>\
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <returns>Converted <paramref name="fromValue"/> or empty string if null.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.ConvertToString``1(deniszykov.TypeConversion.ITypeConversionProvider,``0,System.String)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <see cref="T:System.String"/> using specified <paramref name="format"/> and default format provider.
+            </summary>
+            <typeparam name="FromTypeT">From type.</typeparam>\
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <returns>Converted <paramref name="fromValue"/> or empty string if null.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.ConvertToString``1(deniszykov.TypeConversion.ITypeConversionProvider,``0,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <see cref="T:System.String"/> using default format and <paramref name="formatProvider"/>.
+            </summary>
+            <typeparam name="FromTypeT">From type.</typeparam>\
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="fromValue"/> or empty string if null.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.ITypeConversionProviderExtensions.ConvertToString``1(deniszykov.TypeConversion.ITypeConversionProvider,``0,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="fromValue"/> from <typeparamref name="FromTypeT"/> to <see cref="T:System.String"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <typeparam name="FromTypeT">From type.</typeparam>\
+            <param name="typeConversionProvider">Conversion provider instance.</param>
+            <param name="fromValue">Value to convert. Value should be assignable from <typeparamref name="FromTypeT"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="fromValue"/> or empty string if null.</returns>
+        </member>
+        <member name="T:deniszykov.TypeConversion.TypeConversionProvider">
+            <summary>
+            Class providing <see cref="T:deniszykov.TypeConversion.IConverter"/> and <see cref="T:deniszykov.TypeConversion.IConverter`2"/> instances on demand.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProvider.CheckedConversionFormat">
+            <summary>
+            Format string enabling "checked" numeric conversion.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProvider.UncheckedConversionFormat">
+            <summary>
+            Format string enabling "unchecked" numeric conversion.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.#ctor(Microsoft.Extensions.Options.IOptions{deniszykov.TypeConversion.TypeConversionProviderOptions},deniszykov.TypeConversion.IConversionMetadataProvider,System.Collections.Generic.IEnumerable{deniszykov.TypeConversion.ICustomConversionRegistration})">
+            <summary>
+            Constructor of <see cref="T:deniszykov.TypeConversion.TypeConversionProvider"/>.
+            </summary>
+            <param name="configuration">Configuration options.</param>
+            <param name="configurationOptions">Configuration options.</param>
+            <param name="metadataProvider">Metadata provider used to discover conversion method on types. If null then instance of <see cref="T:deniszykov.TypeConversion.ConversionMetadataProvider"/> is created.</param>
+            <param name="registrations">Registrations of custom providers. Alternative way of registering custom conversion is <see cref="T:deniszykov.TypeConversion.TypeConversionProviderOptions"/>.</param>
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.GetConverter``2">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.GetConverter(System.Type,System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},deniszykov.TypeConversion.ConversionQuality)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},System.Func{``0,System.String,System.IFormatProvider,System.Collections.Generic.KeyValuePair{``1,System.Boolean}},deniszykov.TypeConversion.ConversionQuality)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.DebugPrintConversions">
+            <summary>
+            Print information about all known conversions between types.
+            </summary>
+            <returns>List of conversions separated with newline.</returns>
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProvider.PrepareTypesForAotRuntime``2">
+            <summary>
+            Prepare conversion between <typeparamref name="FromTypeT"/> and <typeparamref name="ToTypeT"/> for AOT runtime and expose all internal generic method to static analyzer.
+            </summary>
+        </member>
+        <member name="T:deniszykov.TypeConversion.TypeConversionProviderOptions">
+            <summary>
+            Configuration for <see cref="T:deniszykov.TypeConversion.TypeConversionProvider"/> class.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProviderCultureName">
+            <summary>
+            Name of default format provider to set <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider"/>.
+            Application of <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider"/> is controlled by <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.Options"/> configuration parameter.
+            If both <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProvider"/> and <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProviderCultureName"/> are set then <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProvider"/> is used.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProviderOptions.Options">
+            <summary>
+            Options used by <see cref="T:deniszykov.TypeConversion.Converter`2"/> and <see cref="T:deniszykov.TypeConversion.TypeConversionProvider"/> types.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProviderOptions.ConversionMethodSelectionStrategy">
+            <summary>
+            Conversion method selection strategy determines which method to choose when multiple are available.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProvider">
+            <summary>
+            Default format provider to set <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider"/>. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.
+            Application of <see cref="F:deniszykov.TypeConversion.ConversionDescriptor.DefaultFormatProvider"/> is controlled by <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.Options"/> configuration parameter.
+            If both <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProvider"/> and <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProviderCultureName"/> are set then <see cref="F:deniszykov.TypeConversion.TypeConversionProviderOptions.DefaultFormatProvider"/> is used.
+            </summary>
+        </member>
+        <member name="F:deniszykov.TypeConversion.TypeConversionProviderOptions.CustomConversionRegistrationCallback">
+            <summary>
+            Delegate which could be applied to <see cref="T:deniszykov.TypeConversion.ICustomConversionRegistry"/> to register all custom conversions which declared with <see cref="M:deniszykov.TypeConversion.TypeConversionProviderOptions.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},deniszykov.TypeConversion.ConversionQuality)"/>.
+            </summary>
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProviderOptions.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},deniszykov.TypeConversion.ConversionQuality)">
+            <inheritdoc />
+        </member>
+        <member name="M:deniszykov.TypeConversion.TypeConversionProviderOptions.RegisterConversion``2(System.Func{``0,System.String,System.IFormatProvider,``1},System.Func{``0,System.String,System.IFormatProvider,System.Collections.Generic.KeyValuePair{``1,System.Boolean}},deniszykov.TypeConversion.ConversionQuality)">
+            <inheritdoc />
+        </member>
+        <member name="T:JetBrains.Annotations.CanBeNullAttribute">
+            <summary>
+            Indicates that the value of the marked element could be <c>null</c> sometimes,
+            so checking for <c>null</c> is required before its usage.
+            </summary>
+            <example><code>
+            [CanBeNull] object Test() => null;
+            
+            void UseTest() {
+              var p = Test();
+              var s = p.ToString(); // Warning: Possible 'System.NullReferenceException'
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.NotNullAttribute">
+            <summary>
+            Indicates that the value of the marked element can never be <c>null</c>.
+            </summary>
+            <example><code>
+            [NotNull] object Foo() {
+              return null; // Warning: Possible 'null' assignment
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.ItemNotNullAttribute">
+            <summary>
+            Can be applied to symbols of types derived from IEnumerable as well as to symbols of Task
+            and Lazy classes to indicate that the value of a collection item, of the Task.Result property
+            or of the Lazy.Value property can never be null.
+            </summary>
+            <example><code>
+            public void Foo([ItemNotNull]List&lt;string&gt; books)
+            {
+              foreach (var book in books) {
+                if (book != null) // Warning: Expression is always true
+                 Console.WriteLine(book.ToUpper());
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.ItemCanBeNullAttribute">
+            <summary>
+            Can be applied to symbols of types derived from IEnumerable as well as to symbols of Task
+            and Lazy classes to indicate that the value of a collection item, of the Task.Result property
+            or of the Lazy.Value property can be null.
+            </summary>
+            <example><code>
+            public void Foo([ItemCanBeNull]List&lt;string&gt; books)
+            {
+              foreach (var book in books)
+              {
+                // Warning: Possible 'System.NullReferenceException'
+                Console.WriteLine(book.ToUpper());
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.StringFormatMethodAttribute">
+            <summary>
+            Indicates that the marked method builds string by the format pattern and (optional) arguments.
+            The parameter, which contains the format string, should be given in constructor. The format string
+            should be in <see cref="M:System.String.Format(System.IFormatProvider,System.String,System.Object[])"/>-like form.
+            </summary>
+            <example><code>
+            [StringFormatMethod("message")]
+            void ShowError(string message, params object[] args) { /* do something */ }
+            
+            void Foo() {
+              ShowError("Failed: {0}"); // Warning: Non-existing argument in format string
+            }
+            </code></example>
+        </member>
+        <member name="M:JetBrains.Annotations.StringFormatMethodAttribute.#ctor(System.String)">
+            <param name="formatParameterName">
+            Specifies which parameter of an annotated method should be treated as the format string
+            </param>
+        </member>
+        <member name="T:JetBrains.Annotations.ValueProviderAttribute">
+             <summary>
+             Use this annotation to specify a type that contains static or const fields
+             with values for the annotated property/field/parameter.
+             The specified type will be used to improve completion suggestions.
+             </summary>
+             <example><code>
+             namespace TestNamespace
+             {
+               public class Constants
+               {
+                 public static int INT_CONST = 1;
+                 public const string STRING_CONST = "1";
+               }
+            
+               public class Class1
+               {
+                 [ValueProvider("TestNamespace.Constants")] public int myField;
+                 public void Foo([ValueProvider("TestNamespace.Constants")] string str) { }
+            
+                 public void Test()
+                 {
+                   Foo(/*try completion here*/);//
+                   myField = /*try completion here*/
+                 }
+               }
+             }
+             </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.ValueRangeAttribute">
+            <summary>
+            Indicates that the integral value falls into the specified interval.
+            It's allowed to specify multiple non-intersecting intervals.
+            Values of interval boundaries are inclusive.
+            </summary>
+            <example><code>
+            void Foo([ValueRange(0, 100)] int value) {
+              if (value == -1) { // Warning: Expression is always 'false'
+                ...
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.NonNegativeValueAttribute">
+            <summary>
+            Indicates that the integral value never falls below zero.
+            </summary>
+            <example><code>
+            void Foo([NonNegativeValue] int value) {
+              if (value == -1) { // Warning: Expression is always 'false'
+                ...
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.InvokerParameterNameAttribute">
+            <summary>
+            Indicates that the function argument should be a string literal and match one
+            of the parameters of the caller function. For example, ReSharper annotates
+            the parameter of <see cref="T:System.ArgumentNullException"/>.
+            </summary>
+            <example><code>
+            void Foo(string param) {
+              if (param == null)
+                throw new ArgumentNullException("par"); // Warning: Cannot resolve symbol
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.NotifyPropertyChangedInvocatorAttribute">
+             <summary>
+             Indicates that the method is contained in a type that implements
+             <c>System.ComponentModel.INotifyPropertyChanged</c> interface and this method
+             is used to notify that some property value changed.
+             </summary>
+             <remarks>
+             The method should be non-static and conform to one of the supported signatures:
+             <list>
+             <item><c>NotifyChanged(string)</c></item>
+             <item><c>NotifyChanged(params string[])</c></item>
+             <item><c>NotifyChanged{T}(Expression{Func{T}})</c></item>
+             <item><c>NotifyChanged{T,U}(Expression{Func{T,U}})</c></item>
+             <item><c>SetProperty{T}(ref T, T, string)</c></item>
+             </list>
+             </remarks>
+             <example><code>
+             public class Foo : INotifyPropertyChanged {
+               public event PropertyChangedEventHandler PropertyChanged;
+             
+               [NotifyPropertyChangedInvocator]
+               protected virtual void NotifyChanged(string propertyName) { ... }
+            
+               string _name;
+             
+               public string Name {
+                 get { return _name; }
+                 set { _name = value; NotifyChanged("LastName"); /* Warning */ }
+               }
+             }
+             </code>
+             Examples of generated notifications:
+             <list>
+             <item><c>NotifyChanged("Property")</c></item>
+             <item><c>NotifyChanged(() =&gt; Property)</c></item>
+             <item><c>NotifyChanged((VM x) =&gt; x.Property)</c></item>
+             <item><c>SetProperty(ref myField, value, "Property")</c></item>
+             </list>
+             </example>
+        </member>
+        <member name="T:JetBrains.Annotations.ContractAnnotationAttribute">
+            <summary>
+            Describes dependency between method input and output.
+            </summary>
+            <syntax>
+            <p>Function Definition Table syntax:</p>
+            <list>
+            <item>FDT      ::= FDTRow [;FDTRow]*</item>
+            <item>FDTRow   ::= Input =&gt; Output | Output &lt;= Input</item>
+            <item>Input    ::= ParameterName: Value [, Input]*</item>
+            <item>Output   ::= [ParameterName: Value]* {halt|stop|void|nothing|Value}</item>
+            <item>Value    ::= true | false | null | notnull | canbenull</item>
+            </list>
+            If the method has a single input parameter, its name could be omitted.<br/>
+            Using <c>halt</c> (or <c>void</c>/<c>nothing</c>, which is the same) for the method output
+            means that the method doesn't return normally (throws or terminates the process).<br/>
+            Value <c>canbenull</c> is only applicable for output parameters.<br/>
+            You can use multiple <c>[ContractAnnotation]</c> for each FDT row, or use single attribute
+            with rows separated by semicolon. There is no notion of order rows, all rows are checked
+            for applicability and applied per each program state tracked by the analysis engine.<br/>
+            </syntax>
+            <examples><list>
+            <item><code>
+            [ContractAnnotation("=&gt; halt")]
+            public void TerminationMethod()
+            </code></item>
+            <item><code>
+            [ContractAnnotation("null &lt;= param:null")] // reverse condition syntax
+            public string GetName(string surname)
+            </code></item>
+            <item><code>
+            [ContractAnnotation("s:null =&gt; true")]
+            public bool IsNullOrEmpty(string s) // string.IsNullOrEmpty()
+            </code></item>
+            <item><code>
+            // A method that returns null if the parameter is null,
+            // and not null if the parameter is not null
+            [ContractAnnotation("null =&gt; null; notnull =&gt; notnull")]
+            public object Transform(object data)
+            </code></item>
+            <item><code>
+            [ContractAnnotation("=&gt; true, result: notnull; =&gt; false, result: null")]
+            public bool TryParse(string s, out Person result)
+            </code></item>
+            </list></examples>
+        </member>
+        <member name="T:JetBrains.Annotations.LocalizationRequiredAttribute">
+            <summary>
+            Indicates whether the marked element should be localized.
+            </summary>
+            <example><code>
+            [LocalizationRequiredAttribute(true)]
+            class Foo {
+              string str = "my string"; // Warning: Localizable string
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.CannotApplyEqualityOperatorAttribute">
+            <summary>
+            Indicates that the value of the marked type (or its derivatives)
+            cannot be compared using '==' or '!=' operators and <c>Equals()</c>
+            should be used instead. However, using '==' or '!=' for comparison
+            with <c>null</c> is always permitted.
+            </summary>
+            <example><code>
+            [CannotApplyEqualityOperator]
+            class NoEquality { }
+            
+            class UsesNoEquality {
+              void Test() {
+                var ca1 = new NoEquality();
+                var ca2 = new NoEquality();
+                if (ca1 != null) { // OK
+                  bool condition = ca1 == ca2; // Warning
+                }
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.BaseTypeRequiredAttribute">
+            <summary>
+            When applied to a target attribute, specifies a requirement for any type marked
+            with the target attribute to implement or inherit specific type or types.
+            </summary>
+            <example><code>
+            [BaseTypeRequired(typeof(IComponent)] // Specify requirement
+            class ComponentAttribute : Attribute { }
+            
+            [Component] // ComponentAttribute requires implementing IComponent interface
+            class MyComponent : IComponent { }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.UsedImplicitlyAttribute">
+            <summary>
+            Indicates that the marked symbol is used implicitly (e.g. via reflection, in external library),
+            so this symbol will not be reported as unused (as well as by other usage inspections).
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.MeansImplicitUseAttribute">
+            <summary>
+            Can be applied to attributes, type parameters, and parameters of a type assignable from <see cref="T:System.Type"/> .
+            When applied to an attribute, the decorated attribute behaves the same as <see cref="T:JetBrains.Annotations.UsedImplicitlyAttribute"/>.
+            When applied to a type parameter or to a parameter of type <see cref="T:System.Type"/>,  indicates that the corresponding type
+            is used implicitly.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.ImplicitUseKindFlags">
+            <summary>
+            Specify the details of implicitly used symbol when it is marked
+            with <see cref="T:JetBrains.Annotations.MeansImplicitUseAttribute"/> or <see cref="T:JetBrains.Annotations.UsedImplicitlyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseKindFlags.Access">
+            <summary>Only entity marked with attribute considered used.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseKindFlags.Assign">
+            <summary>Indicates implicit assignment to a member.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature">
+            <summary>
+            Indicates implicit instantiation of a type with fixed constructor signature.
+            That means any unused constructor parameters won't be reported as such.
+            </summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature">
+            <summary>Indicates implicit instantiation of a type.</summary>
+        </member>
+        <member name="T:JetBrains.Annotations.ImplicitUseTargetFlags">
+            <summary>
+            Specify what is considered to be used implicitly when marked
+            with <see cref="T:JetBrains.Annotations.MeansImplicitUseAttribute"/> or <see cref="T:JetBrains.Annotations.UsedImplicitlyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseTargetFlags.Members">
+            <summary>Members of entity marked with attribute are considered used.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseTargetFlags.WithInheritors">
+            <summary> Inherited entities are considered used. </summary>
+        </member>
+        <member name="F:JetBrains.Annotations.ImplicitUseTargetFlags.WithMembers">
+            <summary>Entity marked with attribute and all its members considered used.</summary>
+        </member>
+        <member name="T:JetBrains.Annotations.PublicAPIAttribute">
+            <summary>
+            This attribute is intended to mark publicly available API
+            which should not be removed and so is treated as used.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.InstantHandleAttribute">
+            <summary>
+            Tells code analysis engine if the parameter is completely handled when the invoked method is on stack.
+            If the parameter is a delegate, indicates that delegate is executed while the method is executed.
+            If the parameter is an enumerable, indicates that it is enumerated while the method is executed.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.PureAttribute">
+            <summary>
+            Indicates that a method does not make any observable state changes.
+            The same as <c>System.Diagnostics.Contracts.PureAttribute</c>.
+            </summary>
+            <example><code>
+            [Pure] int Multiply(int x, int y) => x * y;
+            
+            void M() {
+              Multiply(123, 42); // Warning: Return value of pure method is not used
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.MustUseReturnValueAttribute">
+            <summary>
+            Indicates that the return value of the method invocation must be used.
+            </summary>
+            <remarks>
+            Methods decorated with this attribute (in contrast to pure methods) might change state,
+            but make no sense without using their return value. <br/>
+            Similarly to <see cref="T:JetBrains.Annotations.PureAttribute"/>, this attribute
+            will help detecting usages of the method when the return value in not used.
+            Additionally, you can optionally specify a custom message, which will be used when showing warnings, e.g.
+            <code>[MustUseReturnValue("Use the return value to...")]</code>.
+            </remarks>
+        </member>
+        <member name="T:JetBrains.Annotations.ProvidesContextAttribute">
+            <summary>
+            Indicates the type member or parameter of some type, that should be used instead of all other ways
+            to get the value of that type. This annotation is useful when you have some "context" value evaluated
+            and stored somewhere, meaning that all other ways to get this value must be consolidated with existing one.
+            </summary>
+            <example><code>
+            class Foo {
+              [ProvidesContext] IBarService _barService = ...;
+            
+              void ProcessNode(INode node) {
+                DoSomething(node, node.GetGlobalServices().Bar);
+                //              ^ Warning: use value of '_barService' field
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.PathReferenceAttribute">
+            <summary>
+            Indicates that a parameter is a path to a file or a folder within a web project.
+            Path can be relative or absolute, starting from web root (~).
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.SourceTemplateAttribute">
+            <summary>
+            An extension method marked with this attribute is processed by code completion
+            as a 'Source Template'. When the extension method is completed over some expression, its source code
+            is automatically expanded like a template at call site.
+            </summary>
+            <remarks>
+            Template method body can contain valid source code and/or special comments starting with '$'.
+            Text inside these comments is added as source code when the template is applied. Template parameters
+            can be used either as additional method parameters or as identifiers wrapped in two '$' signs.
+            Use the <see cref="T:JetBrains.Annotations.MacroAttribute"/> attribute to specify macros for parameters.
+            </remarks>
+            <example>
+            In this example, the 'forEach' method is a source template available over all values
+            of enumerable types, producing ordinary C# 'foreach' statement and placing caret inside block:
+            <code>
+            [SourceTemplate]
+            public static void forEach&lt;T&gt;(this IEnumerable&lt;T&gt; xs) {
+              foreach (var x in xs) {
+                 //$ $END$
+              }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:JetBrains.Annotations.MacroAttribute">
+            <summary>
+            Allows specifying a macro for a parameter of a <see cref="T:JetBrains.Annotations.SourceTemplateAttribute">source template</see>.
+            </summary>
+            <remarks>
+            You can apply the attribute on the whole method or on any of its additional parameters. The macro expression
+            is defined in the <see cref="P:JetBrains.Annotations.MacroAttribute.Expression"/> property. When applied on a method, the target
+            template parameter is defined in the <see cref="P:JetBrains.Annotations.MacroAttribute.Target"/> property. To apply the macro silently
+            for the parameter, set the <see cref="P:JetBrains.Annotations.MacroAttribute.Editable"/> property value = -1.
+            </remarks>
+            <example>
+            Applying the attribute on a source template method:
+            <code>
+            [SourceTemplate, Macro(Target = "item", Expression = "suggestVariableName()")]
+            public static void forEach&lt;T&gt;(this IEnumerable&lt;T&gt; collection) {
+              foreach (var item in collection) {
+                //$ $END$
+              }
+            }
+            </code>
+            Applying the attribute on a template method parameter:
+            <code>
+            [SourceTemplate]
+            public static void something(this Entity x, [Macro(Expression = "guid()", Editable = -1)] string newguid) {
+              /*$ var $x$Id = "$newguid$" + x.ToString();
+              x.DoSomething($x$Id); */
+            }
+            </code>
+            </example>
+        </member>
+        <member name="P:JetBrains.Annotations.MacroAttribute.Expression">
+            <summary>
+            Allows specifying a macro that will be executed for a <see cref="T:JetBrains.Annotations.SourceTemplateAttribute">source template</see>
+            parameter when the template is expanded.
+            </summary>
+        </member>
+        <member name="P:JetBrains.Annotations.MacroAttribute.Editable">
+            <summary>
+            Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
+            </summary>
+            <remarks>
+            If the target parameter is used several times in the template, only one occurrence becomes editable;
+            other occurrences are changed synchronously. To specify the zero-based index of the editable occurrence,
+            use values >= 0. To make the parameter non-editable when the template is expanded, use -1.
+            </remarks>
+        </member>
+        <member name="P:JetBrains.Annotations.MacroAttribute.Target">
+            <summary>
+            Identifies the target parameter of a <see cref="T:JetBrains.Annotations.SourceTemplateAttribute">source template</see> if the
+            <see cref="T:JetBrains.Annotations.MacroAttribute"/> is applied on a template method.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcActionAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC action. If applied to a method, the MVC action name is calculated
+            implicitly from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcAreaAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that the marked parameter is an MVC area.
+            Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcControllerAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter is
+            an MVC controller. If applied to a method, the MVC controller name is calculated
+            implicitly from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcMasterAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that the marked parameter is an MVC Master. Use this attribute
+            for custom wrappers similar to <c>System.Web.Mvc.Controller.View(String, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcModelTypeAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that the marked parameter is an MVC model type. Use this attribute
+            for custom wrappers similar to <c>System.Web.Mvc.Controller.View(String, Object)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcPartialViewAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter is an MVC
+            partial view. If applied to a method, the MVC partial view name is calculated implicitly
+            from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcSuppressViewErrorAttribute">
+            <summary>
+            ASP.NET MVC attribute. Allows disabling inspections for MVC views within a class or a method.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcDisplayTemplateAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC display template.
+            Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.DisplayExtensions.DisplayForModel(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcEditorTemplateAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that the marked parameter is an MVC editor template.
+            Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.EditorExtensions.EditorForModel(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcTemplateAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that the marked parameter is an MVC template.
+            Use this attribute for custom wrappers similar to
+            <c>System.ComponentModel.DataAnnotations.UIHintAttribute(System.String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcViewAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC view component. If applied to a method, the MVC view name is calculated implicitly
+            from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Controller.View(Object)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcViewComponentAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC view component name.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcViewComponentViewAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC view component view. If applied to a method, the MVC view component view name is default.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AspMvcActionSelectorAttribute">
+            <summary>
+            ASP.NET MVC attribute. When applied to a parameter of an attribute,
+            indicates that this parameter is an MVC action name.
+            </summary>
+            <example><code>
+            [ActionName("Foo")]
+            public ActionResult Login(string returnUrl) {
+              ViewBag.ReturnUrl = Url.Action("Foo"); // OK
+              return RedirectToAction("Bar"); // Error: Cannot resolve action
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.RazorSectionAttribute">
+            <summary>
+            Razor attribute. Indicates that the marked parameter or method is a Razor section.
+            Use this attribute for custom wrappers similar to
+            <c>System.Web.WebPages.WebPageBase.RenderSection(String)</c>.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.CollectionAccessAttribute">
+            <summary>
+            Indicates how method, constructor invocation, or property access
+            over collection type affects the contents of the collection.
+            Use <see cref="P:JetBrains.Annotations.CollectionAccessAttribute.CollectionAccessType"/> to specify the access type.
+            </summary>
+            <remarks>
+            Using this attribute only makes sense if all collection methods are marked with this attribute.
+            </remarks>
+            <example><code>
+            public class MyStringCollection : List&lt;string&gt;
+            {
+              [CollectionAccess(CollectionAccessType.Read)]
+              public string GetFirstString()
+              {
+                return this.ElementAt(0);
+              }
+            }
+            class Test
+            {
+              public void Foo()
+              {
+                // Warning: Contents of the collection is never updated
+                var col = new MyStringCollection();
+                string x = col.GetFirstString();
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.CollectionAccessType">
+            <summary>
+            Provides a value for the <see cref="T:JetBrains.Annotations.CollectionAccessAttribute"/> to define
+            how the collection method invocation affects the contents of the collection.
+            </summary>
+        </member>
+        <member name="F:JetBrains.Annotations.CollectionAccessType.None">
+            <summary>Method does not use or modify content of the collection.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.CollectionAccessType.Read">
+            <summary>Method only reads content of the collection but does not modify it.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.CollectionAccessType.ModifyExistingContent">
+            <summary>Method can change content of the collection but does not add new elements.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.CollectionAccessType.UpdatedContent">
+            <summary>Method can add new elements to the collection.</summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AssertionMethodAttribute">
+            <summary>
+            Indicates that the marked method is assertion method, i.e. it halts the control flow if
+            one of the conditions is satisfied. To set the condition, mark one of the parameters with
+            <see cref="T:JetBrains.Annotations.AssertionConditionAttribute"/> attribute.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AssertionConditionAttribute">
+            <summary>
+            Indicates the condition parameter of the assertion method. The method itself should be
+            marked by <see cref="T:JetBrains.Annotations.AssertionMethodAttribute"/> attribute. The mandatory argument of
+            the attribute is the assertion type.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.AssertionConditionType">
+            <summary>
+            Specifies assertion type. If the assertion method argument satisfies the condition,
+            then the execution continues. Otherwise, execution is assumed to be halted.
+            </summary>
+        </member>
+        <member name="F:JetBrains.Annotations.AssertionConditionType.IS_TRUE">
+            <summary>Marked parameter should be evaluated to true.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.AssertionConditionType.IS_FALSE">
+            <summary>Marked parameter should be evaluated to false.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.AssertionConditionType.IS_NULL">
+            <summary>Marked parameter should be evaluated to null value.</summary>
+        </member>
+        <member name="F:JetBrains.Annotations.AssertionConditionType.IS_NOT_NULL">
+            <summary>Marked parameter should be evaluated to not null value.</summary>
+        </member>
+        <member name="T:JetBrains.Annotations.TerminatesProgramAttribute">
+            <summary>
+            Indicates that the marked method unconditionally terminates control flow execution.
+            For example, it could unconditionally throw exception.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.LinqTunnelAttribute">
+            <summary>
+            Indicates that method is pure LINQ method, with postponed enumeration (like Enumerable.Select,
+            .Where). This annotation allows inference of [InstantHandle] annotation for parameters
+            of delegate type by analyzing LINQ method chains.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.NoEnumerationAttribute">
+            <summary>
+            Indicates that IEnumerable passed as a parameter is not enumerated.
+            Use this annotation to suppress the 'Possible multiple enumeration of IEnumerable' inspection.
+            </summary>
+            <example><code>
+            static void ThrowIfNull&lt;T&gt;([NoEnumeration] T v, string n) where T : class
+            {
+              // custom check for null but no enumeration
+            }
+            
+            void Foo(IEnumerable&lt;string&gt; values)
+            {
+              ThrowIfNull(values, nameof(values));
+              var x = values.ToList(); // No warnings about multiple enumeration
+            }
+            </code></example>
+        </member>
+        <member name="T:JetBrains.Annotations.RegexPatternAttribute">
+            <summary>
+            Indicates that the marked parameter is a regular expression pattern.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.NoReorderAttribute">
+            <summary>
+            Prevents the Member Reordering feature from tossing members of the marked class.
+            </summary>
+            <remarks>
+            The attribute must be mentioned in your member reordering patterns.
+            </remarks>
+        </member>
+        <member name="T:JetBrains.Annotations.XamlItemsControlAttribute">
+            <summary>
+            XAML attribute. Indicates the type that has <c>ItemsSource</c> property and should be treated
+            as <c>ItemsControl</c>-derived type, to enable inner items <c>DataContext</c> type resolve.
+            </summary>
+        </member>
+        <member name="T:JetBrains.Annotations.XamlItemBindingOfItemsControlAttribute">
+            <summary>
+            XAML attribute. Indicates the property of some <c>BindingBase</c>-derived type, that
+            is used to bind some item of <c>ItemsControl</c>-derived type. This annotation will
+            enable the <c>DataContext</c> type resolve for XAML bindings for such properties.
+            </summary>
+            <remarks>
+            Property should have the tree ancestor of the <c>ItemsControl</c> type or
+            marked with the <see cref="T:JetBrains.Annotations.XamlItemsControlAttribute"/> attribute.
+            </remarks>
+        </member>
+        <member name="T:JetBrains.Annotations.XamlItemStyleOfItemsControlAttribute">
+            <summary>
+            XAML attribute. Indicates the property of some <c>Style</c>-derived type, that
+            is used to style items of <c>ItemsControl</c>-derived type. This annotation will
+            enable the <c>DataContext</c> type resolve for XAML bindings for such properties.
+            </summary>
+            <remarks>
+            Property should have the tree ancestor of the <c>ItemsControl</c> type or
+            marked with the <see cref="T:JetBrains.Annotations.XamlItemsControlAttribute"/> attribute.
+            </remarks>
+        </member>
+        <member name="T:System.TypeConvert">
+            <summary>
+            This is compatibility shim for old 'TypeConvert' package.
+            </summary>
+        </member>
+        <member name="M:System.TypeConvert.Convert``2(``0,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="value"/> from <typeparamref name="FromType"/> to <typeparamref name="ToType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <typeparam name="FromType">From type.</typeparam>
+            <typeparam name="ToType">To type.</typeparam>
+            <param name="value">Value to convert. Value should be assignable from <typeparamref name="FromType"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="value"/>.</returns>
+        </member>
+        <member name="M:System.TypeConvert.TryConvert``2(``0,``1@,System.String,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="value"/> from <typeparamref name="FromType"/> to <typeparamref name="ToType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <typeparam name="FromType">From type.</typeparam>
+            <typeparam name="ToType">To type.</typeparam>
+            <param name="value">Value to convert. Value should be assignable from <typeparamref name="FromType"/> type.</param>
+            <param name="result">Converted to <typeparamref name="ToType"/> value or null.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:System.TypeConvert.ToString``1(``0,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="value"/> from <typeparamref name="FromType"/> to <see cref="T:System.String"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <typeparam name="FromType">From type.</typeparam>\
+            <param name="value">Value to convert. Value should be assignable from <typeparamref name="FromType"/> type.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="value"/> or empty string if null.</returns>
+        </member>
+        <member name="M:System.TypeConvert.Convert(System.Object,System.Type,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="value"/> to <paramref name="toType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <param name="toType">Convert to type.</param>
+            <param name="value">Value to convert.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="value"/>.</returns>
+        </member>
+        <member name="M:System.TypeConvert.TryConvert(System.Object@,System.Type,System.String,System.IFormatProvider)">
+            <summary>
+            Tries to covert <paramref name="value"/> to <paramref name="toType"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            Any exception except <see cref="T:System.InvalidCastException"/>, <see cref="T:System.FormatException"/>, <see cref="T:System.ArithmeticException"/>, <see cref="T:System.NotSupportedException"/>, <see cref="T:System.ArgumentException"/> and <see cref="T:System.InvalidTimeZoneException"/> will be re-thrown.
+            </summary>
+            <param name="toType">Convert to type.</param>
+            <param name="value">Value to convert. Converted value will be placed in this variable.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>True if conversion succeed. False if not.</returns>
+        </member>
+        <member name="M:System.TypeConvert.ToString(System.Object,System.String,System.IFormatProvider)">
+            <summary>
+            Covert <paramref name="value"/> to <see cref="T:System.String"/> using specified <paramref name="format"/> and <paramref name="formatProvider"/>.
+            </summary>
+            <param name="value">Value to convert.</param>
+            <param name="format">Formatting options used for conversion. Value and behaviour is conversion specific.</param>
+            <param name="formatProvider">Localization/regional settings used for conversion. Used from/to <see cref="T:System.String"/> conversions. Default to <see cref="P:System.Globalization.CultureInfo.InvariantCulture"/>.</param>
+            <returns>Converted <paramref name="value"/> or empty string if its null.</returns>
+        </member>
+    </members>
+</doc>

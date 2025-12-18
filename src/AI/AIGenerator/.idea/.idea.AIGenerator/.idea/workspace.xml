@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5a52ffae-2018-43db-8874-5917e018dff0" name="Изменения" comment="">
+      <change beforePath="$PROJECT_DIR$/../../Demo_app/Assets/Plugins/BaseClasses.dll" beforeDir="false" afterPath="$PROJECT_DIR$/../../Demo_app/Assets/Plugins/BaseClasses.dll" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/../../.." value="AI" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;KorolOrol&quot;
+  }
+}</component>
+  <component name="GitHubPullRequestState">{
+  &quot;prStates&quot;: [
+    {
+      &quot;id&quot;: {
+        &quot;id&quot;: &quot;PR_kwDOLVys1s6qZjLI&quot;,
+        &quot;number&quot;: 10
+      },
+      &quot;lastSeen&quot;: 1758767302178
+    }
+  ]
+}</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="main" />
+        <option value="develop" />
+        <option value="base_classes" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/KorolOrol/ANG_GPO.git&quot;,
+    &quot;accountId&quot;: &quot;19d48a82-90cf-4af6-ba95-edf03624323b&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="mock:///home/korolorol/src/ANG_GPO/src/AI/AIGenerator/TextGenerator/OpenAIGenerator.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///home/korolorol/src/ANG_GPO/src/AI/AIGenerator/TextGenerator/OpenAIGenerator.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="33AiyT8iMyHYWneH17y3neyCClX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;demo__app&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/korolorol/src/ANG_GPO/src/AI/AITest/AITest.sln&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Задача по умолчанию">
+      <changelist id="5a52ffae-2018-43db-8874-5917e018dff0" name="Изменения" comment="" />
+      <created>1758766531627</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758766531627</updated>
+      <workItem from="1758766532686" duration="2662000" />
+      <workItem from="1758769234620" duration="1410000" />
+      <workItem from="1758773479711" duration="2402000" />
+      <workItem from="1759378479257" duration="1041000" />
+      <workItem from="1759379658151" duration="1216000" />
+      <workItem from="1763007681034" duration="112000" />
+      <workItem from="1763613513247" duration="597000" />
+      <workItem from="1763614282813" duration="857000" />
+      <workItem from="1764209378277" duration="146000" />
+    </task>
+    <task id="LOCAL-00001" summary="fix(AiElement): добавлена проверка на пустой список перед обработкой&#10;feat(AIGenerator): добавлена ссылка на BaseClasses">
+      <option name="closed" value="true" />
+      <created>1758767136498</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1758767136498</updated>
+    </task>
+    <task id="LOCAL-00002" summary="feat(OpenAIGenerator): добавлены фильтры для обработки результатов генерации">
+      <option name="closed" value="true" />
+      <created>1758767677633</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1758767677633</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix(OpenAIGenerator): улучшена обработка переменных окружения для разных платформ">
+      <option name="closed" value="true" />
+      <created>1758768492999</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1758768492999</updated>
+    </task>
+    <task id="LOCAL-00004" summary="refactor(AiElement): использован словарь для сопоставления типов элементов и улучшения читабельности">
+      <option name="closed" value="true" />
+      <created>1758769673182</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1758769673182</updated>
+    </task>
+    <task id="LOCAL-00005" summary="comments(AiElement)">
+      <option name="closed" value="true" />
+      <created>1758770006890</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1758770006890</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat(AITest): добавлены ссылки на проекты AIGenerator и BaseClasses">
+      <option name="closed" value="true" />
+      <created>1758773790202</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1758773790202</updated>
+    </task>
+    <task id="LOCAL-00007" summary="feature(AIGenerator): Изменения для сборки под .NET standard 2.1">
+      <option name="closed" value="true" />
+      <created>1759379316988</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1759379316988</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="fix(AiElement): добавлена проверка на пустой список перед обработкой&#10;feat(AIGenerator): добавлена ссылка на BaseClasses" />
+    <MESSAGE value="feat(OpenAIGenerator): добавлены фильтры для обработки результатов генерации" />
+    <MESSAGE value="fix(OpenAIGenerator): улучшена обработка переменных окружения для разных платформ" />
+    <MESSAGE value="refactor(AiElement): использован словарь для сопоставления типов элементов и улучшения читабельности" />
+    <MESSAGE value="comments(AiElement)" />
+    <MESSAGE value="feat(AITest): добавлены ссылки на проекты AIGenerator и BaseClasses" />
+    <MESSAGE value="feature(AIGenerator): Изменения для сборки под .NET standard 2.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="feature(AIGenerator): Изменения для сборки под .NET standard 2.1" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
+          <option name="timeStamp" value="3" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

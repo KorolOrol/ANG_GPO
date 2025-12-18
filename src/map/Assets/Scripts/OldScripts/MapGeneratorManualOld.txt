@@ -1,0 +1,322 @@
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+
+[System.Serializable]
+public class LocationDefinition
+{
+    public string locationName;             // Название локации
+    public string biome;                    // Название биома, в котором должна находиться локация
+    public List<string> connectedLocations; // Список имён локаций, с которыми эта локация связана дорогой
+}
+
+public class MapGeneratorManual : MonoBehaviour
+{
+    [Header("Map Settings")]
+    [Range(50, 300)]
+    public int mapWidth = 100;
+    [Range(50, 300)]
+    public int mapHeight = 100;
+    public int chunkSize = 20;              // Размер чанка (в пикселях)
+
+    [Header("Noise & Biome")]
+    public float noiseScale = 50f;
+    public int octaves = 4;
+    [Range(0, 1)]
+    public float persistance = 0.5f;
+    [Range(1, 10)]
+    public float lacunarity = 2f;
+    public int seed = 42;
+    public Vector2 noiseOffset;
+    public BiomeGenerator biomeGenerator;   // Ссылка на компонент BiomeGenerator
+    [Header("Debug Options")]
+    public bool drawChunkBorders = true;
+    public bool showChunkBiomes = true;
+
+    [Header("Manual Locations")]
+    public List<LocationDefinition> locations;   // Задаются из инспектора
+    public GameObject objectPrefab;         // Префаб для локаций
+
+    private float[,] heightMap;
+    private float[,] biomeNoiseMap;
+    private Color[] colourMap;
+
+    public void GenerateManualMap()
+    {
+        // Удаляем старые объекты
+        List<GameObject> toDelete = new List<GameObject>();
+        foreach (Transform child in transform)
+        {
+            toDelete.Add(child.gameObject);
+        }
+        foreach (var obj in toDelete)
+        {
+            DestroyImmediate(obj);
+        }
+
+        // 1) Генерируем основные карты шума
+        heightMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistance, lacunarity, noiseOffset);
+        biomeNoiseMap = biomeGenerator.GenerateBiomeNoiseMap(mapWidth, mapHeight);
+
+        // 2) Строим цветовую карту по биомам
+        colourMap = new Color[mapWidth * mapHeight];
+        for (int y = 0; y < mapHeight; y++)
+        {
+            for (int x = 0; x < mapWidth; x++)
+            {
+                string b = GetBiome(heightMap[x, y], biomeNoiseMap[x, y]);
+                colourMap[y * mapWidth + x] = GetColorForBiome(b);
+            }
+        }
+        // 2.5) Отрисовка границ чанков
+        if (drawChunkBorders)
+        {
+            for (int cx = 0; cx <= mapWidth; cx += chunkSize)
+            {
+                for (int y = 0; y < mapHeight; y++)
+                {
+                    if (cx < mapWidth)
+                        colourMap[y * mapWidth + cx] = Color.black;
+                }
+            }
+
+            for (int cy = 0; cy <= mapHeight; cy += chunkSize)
+            {
+                for (int x = 0; x < mapWidth; x++)
+                {
+                    if (cy < mapHeight)
+                        colourMap[cy * mapWidth + x] = Color.black;
+                }
+            }
+        }
+
+        // 3) Разбиваем карту на чанки и определяем главный биом в каждом чанке
+        int chunksX = Mathf.CeilToInt((float)mapWidth / chunkSize);
+        int chunksY = Mathf.CeilToInt((float)mapHeight / chunkSize);
+        string[,] chunkBiome = new string[chunksX, chunksY];
+
+        for (int cx = 0; cx < chunksX; cx++)
+        {
+            for (int cy = 0; cy < chunksY; cy++)
+            {
+                // Считаем частоту биомов в чанке (исключая воду)
+                Dictionary<string, int> count = new Dictionary<string, int>();
+                for (int dx = 0; dx < chunkSize; dx++)
+                {
+                    for (int dy = 0; dy < chunkSize; dy++)
+                    {
+                        int x = cx * chunkSize + dx;
+                        int y = cy * chunkSize + dy;
+                        if (x >= mapWidth || y >= mapHeight) continue;
+
+                        string b = GetBiome(heightMap[x, y], biomeNoiseMap[x, y]);
+
+                        // Пропускаем воду
+                        if (b == "Water" || b == "Deep Water") continue;
+
+                        if (!count.ContainsKey(b)) count[b] = 0;
+                        count[b]++;
+                    }
+                }
+
+                // Выбираем наиболее часто встречающийся биом (не воду)
+                string mainBiome = null;
+                int max = -1;
+                foreach (var kv in count)
+                {
+                    if (kv.Value > max)
+                    {
+                        max = kv.Value;
+                        mainBiome = kv.Key;
+                    }
+                }
+
+                // Если всё было водой — устанавливаем Grassland по умолчанию
+                mainBiome ??= "Grassland";
+                chunkBiome[cx, cy] = mainBiome;
+
+                // Показываем название главного биома в центре чанка (если включено)
+                if (showChunkBiomes)
+                {
+                    float centerX = (cx * chunkSize + chunkSize / 2f);
+                    float centerY = (cy * chunkSize + chunkSize / 2f);
+
+                    float worldX = -(centerX - mapWidth / 2f) * 10f;
+                    float worldZ = -(centerY - mapHeight / 2f) * 10f;
+                    Vector3 pos = new Vector3(worldX, 10f, worldZ);
+
+                    GameObject textObj = new GameObject($"BiomeLabel_{cx}_{cy}");
+                    textObj.transform.SetParent(transform);
+
+                    // Добавляем текст
+                    var tm = textObj.AddComponent<TextMeshPro>();
+                    tm.text = mainBiome;
+                    tm.fontSize = 10f;
+                    tm.enableAutoSizing = false;
+                    tm.alignment = TextAlignmentOptions.Center;
+                    tm.enableWordWrapping = false;
+                    tm.overflowMode = TextOverflowModes.Overflow;
+
+                    // Убираем размытие
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_FaceDilate, 0f);
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_OutlineSoftness, 0f);
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_GlowPower, 0f);
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_GlowOuter, 0f);
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_UnderlaySoftness, 0f);
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, 0f);
+                    tm.fontMaterial.SetFloat(ShaderUtilities.ID_UnderlayDilate, 0f);
+
+                    // Позиция
+                    textObj.transform.position = new Vector3(worldX, 10f, worldZ);
+                    textObj.transform.localScale = Vector3.one * 100f;
+                    textObj.transform.rotation = Quaternion.Euler(90, 0, 0);
+                    textObj.tag = "GeneratedObject";
+
+                    // Обновляем геометрию и получаем размеры текста
+                    tm.ForceMeshUpdate();
+                    Vector2 textSize = tm.GetRenderedValues(false);
+                    float paddingX = 0.2f;
+                    float paddingY = 0.1f;
+
+                    // Создаём фон
+                    GameObject bg = GameObject.CreatePrimitive(PrimitiveType.Quad);
+                    bg.name = $"BiomeLabelBG_{cx}_{cy}";
+                    bg.transform.SetParent(textObj.transform);
+                    bg.transform.localPosition = new Vector3(0, 0, 0.01f);
+                    bg.transform.localRotation = Quaternion.identity;
+                    bg.transform.localScale = new Vector3(textSize.x + paddingX, textSize.y + paddingY, 1f);
+
+                    // Чёрный материал без освещения
+                    var mat = new Material(Shader.Find("Unlit/Color"));
+                    mat.color = Color.black;
+                    bg.GetComponent<MeshRenderer>().material = mat;
+                }
+
+
+            }
+        }
+
+
+        // 4) Размещаем каждую локацию в чанке с нужным биомом
+        Dictionary<string, Vector2> placedPositions = new Dictionary<string, Vector2>();
+        foreach (var loc in locations)
+        {
+            // Находим все чанки с запрошенным биомом
+            List<Vector2Int> validChunks = new List<Vector2Int>();
+            for (int cx = 0; cx < chunksX; cx++)
+                for (int cy = 0; cy < chunksY; cy++)
+                    if (chunkBiome[cx, cy] == loc.biome)
+                        validChunks.Add(new Vector2Int(cx, cy));
+
+            if (validChunks.Count == 0)
+            {
+                Debug.LogWarning($"Нет чанков с биомом {loc.biome} для {loc.locationName}");
+                continue;
+            }
+
+            // Выбираем случайный чанк и случайную точку внутри
+            Vector2Int chosenChunk = validChunks[Random.Range(0, validChunks.Count)];
+            int px = chosenChunk.x * chunkSize + Random.Range(0, chunkSize);
+            int py = chosenChunk.y * chunkSize + Random.Range(0, chunkSize);
+            px = Mathf.Clamp(px, 0, mapWidth - 1);
+            py = Mathf.Clamp(py, 0, mapHeight - 1);
+            placedPositions[loc.locationName] = new Vector2(px, py);
+
+            // Создаём объект на карте
+            CreateLocationObject(loc.locationName, px, py);
+        }
+
+        // 5) (Опционально) отрисовываем дороги между связанными локациями (простая линия)
+        foreach (var loc in locations)
+        {
+            Vector2 start;
+            if (!placedPositions.TryGetValue(loc.locationName, out start)) continue;
+
+            foreach (var otherName in loc.connectedLocations)
+            {
+                Vector2 end;
+                if (placedPositions.TryGetValue(otherName, out end))
+                {
+                    DrawSimpleRoad(start, end);
+                }
+            }
+        }
+
+        // 6) Выводим текстуру на плейн
+        MapDisplay display = FindObjectOfType<MapDisplay>();
+        display.DrawTexture(TextureGenerator.TextureFromColourMap(colourMap, mapWidth, mapHeight));
+    }
+
+    // Определяет биом по высоте + шуму
+    private string GetBiome(float height, float noise)
+    {
+        if (height <= 0.4f) return (noise < 0.5f) ? "Water" : "Deep Water";
+        if (height <= 0.44f) return "Sand";
+        if (height <= 0.6f) return (noise < 0.5f) ? "Grassland" : "Forest";
+        if (height <= 0.69f) return (noise < 0.5f) ? "Forest" : "Jungle";
+        if (height <= 0.8f) return "MountainBase";
+        if (height <= 0.85f) return "MountainMid";
+        if (height <= 0.9f) return "MountainHigh";
+        return "MountainPeak";
+    }
+
+    // Цвет для биома
+    private Color GetColorForBiome(string biome)
+    {
+        switch (biome)
+        {
+            case "Water": return new Color(0.1f, 0.1f, 0.8f);
+            case "Deep Water": return new Color(0f, 0f, 0.5f);
+            case "Sand": return new Color(0.93f, 0.79f, 0.69f);
+            case "Grassland": return new Color(0.5f, 0.8f, 0.2f);
+            case "Forest": return new Color(0.1f, 0.5f, 0.1f);
+            case "Jungle": return new Color(0f, 0.4f, 0f);
+            case "MountainBase": return Color.gray;
+            case "MountainMid": return new Color(0.6f, 0.6f, 0.6f);
+            case "MountainHigh": return new Color(0.8f, 0.8f, 0.8f);
+            case "MountainPeak": return Color.white;
+            default: return Color.magenta;
+        }
+    }
+
+    // Инстанцирует объект локации на карте
+    private void CreateLocationObject(string name, int x, int y)
+    {
+        float worldX = -(x - mapWidth / 2f) * 10f;
+        float worldZ = -(y - mapHeight / 2f) * 10f;
+        Vector3 pos = new Vector3(worldX, 5f, worldZ);
+        GameObject obj = Instantiate(objectPrefab, pos, Quaternion.Euler(-90, 90, 0), transform);
+        obj.name = name;
+        obj.tag = "GeneratedObject";
+
+        // Добавляем подпись с именем
+        GameObject textObj = new GameObject("Label");
+        textObj.transform.SetParent(obj.transform);
+        var tm = textObj.AddComponent<TextMeshPro>();
+        tm.text = name;
+        tm.fontSize = 200;
+        tm.alignment = TextAlignmentOptions.Center;
+        textObj.transform.localPosition = new Vector3(0, 2f, 0);
+    }
+
+    // Рисует простую прямую дорогу по пикселям на карте
+    private void DrawSimpleRoad(Vector2 a, Vector2 b)
+    {
+        int x0 = Mathf.RoundToInt(a.x), y0 = Mathf.RoundToInt(a.y);
+        int x1 = Mathf.RoundToInt(b.x), y1 = Mathf.RoundToInt(b.y);
+
+        // Алгоритм Брезенхема для линии
+        int dx = Mathf.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
+        int dy = -Mathf.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy;
+
+        while (true)
+        {
+            colourMap[y0 * mapWidth + x0] = Color.red;
+            if (x0 == x1 && y0 == y1) break;
+            int e2 = 2 * err;
+            if (e2 >= dy) { err += dy; x0 += sx; }
+            if (e2 <= dx) { err += dx; y0 += sy; }
+        }
+    }
+}

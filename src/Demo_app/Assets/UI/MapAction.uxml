@@ -1,0 +1,48 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/NordColorPallete.uss?fileID=7433441132597879392&amp;guid=01c835fef615bc1dca2f640088e2a2e6&amp;type=3#NordColorPallete" />
+    <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
+        <ui:ScrollView style="flex-grow: 1; width: 50%;">
+            <ui:VisualElement name="GenClearMapTogglesBar" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap; align-self: center;">
+                <ui:Button text="Generate" name="GenerateMapButton" emoji-fallback-support="true" class="Button PositiveButton" style="transform-origin: left;" />
+                <ui:Button text="Clear Map" name="ClearMapButton" emoji-fallback-support="true" class="Button PositiveButton" />
+            </ui:VisualElement>
+            <ui:GroupBox text="Map Settings" class="GroupBox">
+                <ui:Slider label="Size" value="100" high-value="500" name="SizeSlider" show-input-field="true" low-value="10" fill="true" class="Slider" />
+                <ui:TextField label="Chunk Size" name="ChunkSizeTextField" value="10" class="TextField" />
+                <ui:DropdownField label="City Mode" name="CityModeDropdown" choices="Simple Cubes,Advanced with Sizes" class="Dropdown" style="transform-origin: center; rotate: 0;" />
+            </ui:GroupBox>
+            <ui:GroupBox text="Noize &amp; Biome" class="GroupBox">
+                <ui:TextField label="Seed" name="SeedTextField" value="42" class="TextField" />
+                <ui:TextField label="Noise Scale" name="NoiseScaleTextField" value="50" class="TextField" />
+                <ui:TextField label="Octaves" name="OctavesTextField" value="4" class="TextField" />
+                <ui:Slider label="Persistence" value="0.1" high-value="1" name="PersistenceSlider" show-input-field="true" class="SliderMini" />
+                <ui:Slider label="Lacunarity" value="0.1" high-value="10" name="LacunaritySlider" show-input-field="true" fill="false" class="SliderMini" />
+                <ui:GroupBox text="Noize Offset" class="GroupBox" style="flex-direction: column;">
+                    <ui:TextField label="X" name="NoiseOffsetXTextField" class="TextField" />
+                    <ui:TextField label="Y" name="NoiseOffsetYTextField" class="TextField" />
+                </ui:GroupBox>
+                <ui:VisualElement name="MapTogglesBar" style="flex-grow: 1; flex-direction: row; flex-wrap: wrap;">
+                    <ui:Toggle label="Draw Borders" name="DrawChunkBordersToggle" focusable="false" />
+                    <ui:Toggle label="Show Biomes" name="ShowChunkBiomesToggle" focusable="false" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+            <ui:GroupBox text="Locations" class="GroupBox">
+                <ui:TextField label="Name" name="LocationNameField" class="TextField" />
+                <ui:DropdownField label="Biome" name="BiomeDropdown" choices="Grassland,Forest,Jungle,MountainBase,MountainMid,MountainHigh,MountainPeak,Sand" class="Dropdown" style="transform-origin: center; rotate: 0;" />
+                <ui:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: center;">
+                    <ui:Button text="Add" name="AddMapLocationButton" class="Button PositiveButton" />
+                    <ui:Button text="Connect" name="ConnectLocationsButton" class="Button SpecialButton" />
+                    <ui:Button text="Delete" name="RemoveLocationButton" class="Button NegativeButton" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+            <ui:GroupBox text="Location List" class="GroupBox" style="height: 300px;">
+                <ui:ListView item-template="project://database/Assets/UI/ElementListItem.uxml?fileID=9197481963319205126&amp;guid=bd08c85c1ed78c246b581ffa34df91cc&amp;type=3#ElementListItem" name="LocationsListView" fixed-item-height="50" selection-type="Multiple" class="ListViewChoosable" style="flex-grow: 1;" />
+            </ui:GroupBox>
+        </ui:ScrollView>
+        <ui:VisualElement name="MapViewVisualElement" style="flex-grow: 1; align-content: center; justify-content: space-around;">
+            <ui:VisualElement name="MapContainer" style="flex-grow: 1; align-self: center; justify-content: space-around; align-content: center;">
+                <ui:Image name="Map3DView" style="flex-grow: 1; align-self: center; justify-content: center; -unity-background-scale-mode: scale-and-crop;" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

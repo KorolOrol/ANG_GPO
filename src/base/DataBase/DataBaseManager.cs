@@ -1,0 +1,517 @@
+﻿using BaseClasses.Enum;
+using BaseClasses.Interface;
+using BaseClasses.Model;
+using BaseClasses.Services;
+using SliccDB.Core;
+using SliccDB.Exceptions;
+using SliccDB.Fluent;
+using SliccDB.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+
+
+
+namespace DataBase
+{
+    public class DataBaseManager
+    {
+
+        #region Fields
+
+        /// <summary>
+        /// Подключение к базе данных.
+        /// </summary>
+        private readonly DatabaseConnection Connection;
+
+        /// <summary>
+        /// Array of params, that contains iside IElement as a field.
+        /// </summary>
+        private static readonly string[] sourceArray = new string[] { "Description", "Time", "Name" };
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Class constructor.
+        /// </summary>
+        /// <param name="filepath">Path to db file. File extension can be text.</param>
+        public DataBaseManager(string filepath)
+        {
+            filepath ??= Path.Combine(
+                    Environment.GetFolderPath(
+                        Environment.SpecialFolder.Personal),
+                    "AGN.txt");
+            Connection = new DatabaseConnection(filepath);
+        }
+        #endregion
+
+        #region CRUD    
+
+        #region Create
+
+        /// <summary>
+        /// Store <see cref="Plot"/> instance into DB.
+        /// </summary>
+        /// <param name="plot">Plot instance to store.</param>
+        public void StorePlot(Plot plot)
+        {
+            foreach (var elem in plot.Elements)
+            {
+                Create(elem);
+            }
+        }
+
+        /// <summary>
+        /// Create a node representing IElement instance.
+        /// </summary>
+        /// <param name="element">IElement to store in db.</param>
+        /// <returns></returns>
+        public bool Create(IElement element)
+        {
+            Node createdNode;
+            if (Connection.Nodes().Properties("Name".Value(element.Name)).FirstOrDefault() is var node && node != null)
+            {
+                Update(element);
+                createdNode = node;
+            }
+            else
+            {
+                createdNode = Connection.CreateNode(
+                    new Dictionary<string, string>() { { "Name", element.Name }, { "Description", element.Description }, { "Time", element.Time.ToString() } },
+                    new HashSet<string>() { element.Type.ToString() });
+                Update(element);
+            }
+            return true;
+        }
+
+        #endregion
+
+        #region Read
+
+        /// <summary>
+        /// Read node.
+        /// </summary>
+        /// <param name="elementName">Name of element to read.</param>
+        /// <param name="related">Is any relations needed</param>
+        /// <returns>IElement inctance.</returns>
+        /// <exception cref="Exception"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public IElement Read(string elementName, bool related = true)
+        {
+            if (Connection.Nodes.Count == 0)
+            {
+                throw new Exception("DB is empty.");
+            }
+            var elementNode = Connection.Nodes().Properties("Name".Value(elementName)).First();
+
+            if (elementNode is null) throw new ArgumentException("Element has not found.");
+
+            Element element = new Element(
+                Enum.Parse<ElemType>(elementNode.Labels.First()),
+                elementName,
+                elementNode.Properties["Description"],
+                time: Convert.ToInt32(elementNode.Properties["Time"]));
+
+            FillParams(elementNode, element);
+
+            if (related)
+            {
+                var relations = Connection.Relations.Where(x => x.SourceHash == elementNode.Hash).ToList();
+
+                foreach (var rel in relations)
+                {
+                    var relatedNode = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
+                    if (relatedNode != null)
+                    {
+                        Element relatedElement = new Element(
+                            Enum.Parse<ElemType>(relatedNode.Labels.First()),
+                            relatedNode.Properties["Name"],
+                            relatedNode.Properties["Description"],
+                            time: Convert.ToInt32(relatedNode.Properties["Time"]));
+
+                        FillParams(relatedNode, relatedElement);
+
+                        if (rel.RelationName == "Relation")
+                        {
+                            Binder.Bind(element, relatedElement, Convert.ToDouble(rel.Properties["Relation"]));
+                        }
+                        else
+                        {
+                            Binder.Bind(element, relatedElement);
+                        }
+                    }
+                }
+            }
+
+            return element;
+        }
+
+        /// <summary>
+        /// Returns a List of elements, sorted by type without relations
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
+        public List<IElement> ReadElementsByType(ElemType type)
+        {
+            var nodes = GetNodesByLabel(type.ToString());
+
+            List<IElement> elementList = new List<IElement>();
+
+            foreach (var node in nodes)
+            {
+                elementList.Add(Read(node.Properties["Name"]));
+            }
+
+            return elementList;
+        }
+
+        /// <summary>
+        /// Read whole plot.
+        /// </summary>
+        /// <returns>Filled <see cref="Plot"/> instance.</returns>
+        public Plot ReadPlot()
+        {
+            Plot plot = new Plot();
+            foreach (var node in Connection.Nodes)
+            {
+                Element elem = new Element(Enum.Parse<ElemType>(node.Labels.First()))
+                {
+                    Name = node.Properties["Name"],
+                    Description = node.Properties["Description"],
+                    Time = Convert.ToInt32(node.Properties["Time"])
+                };
+                FillParams(node, elem);
+                plot.Add(elem);
+            }
+
+            foreach (var rel in Connection.Relations)
+            {
+                var node1 = Connection.Nodes.Where(x => x.Hash == rel.SourceHash).First();
+                var node2 = Connection.Nodes.Where(x => x.Hash == rel.TargetHash).First();
+
+                if (rel.RelationName != "Relation")
+                {
+                    Binder.Bind(
+                        plot.Elements.Where(x => x.Name == node1.Properties["Name"]).First(),
+                        plot.Elements.Where(x => x.Name == node2.Properties["Name"]).First()
+                        );
+                }
+                else
+                {
+                    Binder.Bind(
+                        plot.Elements.Where(x => x.Name == node1.Properties["Name"]).First(),
+                        plot.Elements.Where(x => x.Name == node2.Properties["Name"]).First(),
+                        Convert.ToDouble(rel.Properties["Relation"])
+                        );
+                }
+            }
+            return plot;
+        }
+
+        #endregion
+
+        #region Update
+
+        /// <summary>
+        /// Add or update properties of <see cref="IElement"/> node.
+        /// </summary>
+        /// <param name="element"><see cref="IElement"/> to update.</param>
+        /// <param name="paramsName">Params to update in IElement node</param>
+        private void Update(IElement element, Node elementNode)
+        {
+            if (element == null) { throw new ArgumentNullException(); }
+
+            foreach (var prop in elementNode.Properties.Keys.ToList())
+            {
+                if (!sourceArray.Contains(prop))
+                {
+                    elementNode.Properties.Remove(prop);
+                }
+            }
+
+            foreach (var key in element.Params.Keys.Concat(sourceArray))
+            {
+                string paramValue;
+                if (key == "Name") { continue; }
+                if (key == "Description")
+                {
+                    paramValue = element.Description;
+                }
+                else if (key == "Time")
+                {
+                    paramValue = element.Time.ToString();
+                }
+                else if (element.Params[key] is IEnumerable<IElement> || 
+                    element.Params[key] is IEnumerable<BaseClasses.Model.Relation> || 
+                    element.Params[key] is IElement)
+                {
+                    continue;
+                }
+                else if (element.Params[key] is IEnumerable<object> p)
+                {
+                    paramValue = string.Join(", ", p);
+                }
+                else
+                {
+                    if (element.Params[key] != null)
+                    {
+                        paramValue = element.Params[key].ToString();
+                    }
+                    else { continue; }
+                }
+
+                elementNode.Properties[key] = paramValue;
+            }
+
+            Connection.Update(elementNode);
+            ClearNodeRelations(elementNode); // Need to refactor someday to improve performance
+            CreateRelations(element, elementNode);
+        }
+
+        /// <summary>
+        /// Update Element
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="previousName"></param>
+        public void Update(IElement element, string previousName = null)
+        {
+            if (element == null) { throw new ArgumentNullException(); }
+
+            var node = Connection.Nodes().Properties("Name".Value(previousName == null ? element.Name : previousName)).First();
+            node.Properties["Name"] = element.Name;
+            Update(element, node);
+        }
+
+        #endregion
+
+        #region Delete
+
+        /// <summary>
+        /// Delete the node of <see cref="IElement"/>.
+        /// </summary>
+        /// <param name="element">Element to delete.</param>
+        /// <exception cref="Exception">Error on deletion.</exception>
+        public void Delete(IElement element)
+        {
+            if (element == null) { throw new ArgumentNullException(); }
+
+            try
+            {
+                Connection.Delete(Connection.Nodes().Properties("Name".Value(element.Name)).FirstOrDefault());
+            }
+            catch (SliccDbException ex)
+            {
+                throw new Exception("Error on deletion:" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Delete the node of <see cref="IElement"/>.
+        /// </summary>
+        /// <param name="element">Element to delete.</param>
+        /// <exception cref="Exception">Error on deletion.</exception>
+        public void Delete(string elementName)
+        {
+            try
+            {
+                Connection.Delete(Connection.Nodes().Properties("Name".Value(elementName)).FirstOrDefault());
+            }
+            catch (SliccDbException ex)
+            {
+                throw new Exception("Error on deletion:" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Clears db.
+        /// </summary>
+        public void DeletePlot()
+        {
+            Connection.ClearDatabase();
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Private methods
+
+        /// <summary>
+        /// Create relations with two nodes with additional params.
+        /// </summary>
+        /// <param name="node1"></param>
+        /// <param name="node2"></param>
+        /// <param name="additionalParams"></param>
+        /// <exception cref="ArgumentException"></exception>
+        private void CreateRelations(Node node1, Node node2, string relationLabel, Dictionary<string, string> additionalParams = null)
+        {
+            if (node1 == null) { throw new ArgumentNullException(); }
+            if (node2 == null) { throw new ArgumentNullException(); }
+
+            if (Connection.Nodes.Contains(node1) && Connection.Nodes.Contains(node2))
+            {
+                try
+                {
+                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node1.Hash), tn => tn.First(x => x.Hash == node2.Hash), additionalParams);
+                }
+                catch (RelationExistsException)
+                {
+                    Connection.Relations.Where(sn => sn.SourceHash == node1.Hash && sn.TargetHash == node2.Hash).First().RelationName = relationLabel;
+                }
+
+                try
+                {
+                    Connection.CreateRelation(relationLabel, sn => sn.First(x => x.Hash == node2.Hash), tn => tn.First(x => x.Hash == node1.Hash), additionalParams);
+                }
+                catch (RelationExistsException)
+                { }
+            }
+            else
+            {
+                throw new ArgumentException("Node is not in database.");
+            }
+        }
+
+        /// <summary>
+        /// Creates all relations of node with nodes, that has only Name.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="centralNode"></param>
+        private void CreateRelations(IElement element, Node centralNode)
+        {
+            if (element == null) { throw new ArgumentNullException(); }
+            if (centralNode == null) { throw new ArgumentNullException(); }
+
+            foreach (var param in element.Params.Keys)
+            {
+                Node newNode;
+                if (element.Params[param] is IEnumerable<IElement> elements)
+                {
+                    foreach (var relement in elements)
+                    {
+                        if (Connection.Nodes().Properties("Name".Value(relement.Name)).FirstOrDefault() is var node && node != null)
+                        {
+                            if (Connection.Relations.Where(x => x.SourceHash == centralNode.Hash && x.TargetHash == node.Hash).Any())
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                newNode = node;
+                            }
+                        }
+                        else
+                        {
+                            newNode = Connection.CreateNode(
+                                new Dictionary<string, string>() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
+                                new HashSet<string>() { relement.Type.ToString() });
+                        }
+                        CreateRelations(centralNode, newNode, param);
+                    }
+                }
+                else if (element.Params[param] is IElement relement)
+                {
+                    if (Connection.Nodes().Properties("Name".Value(relement.Name)).FirstOrDefault() is var node && node != null)
+                    {
+                        if (Connection.Relations.Where(x => x.SourceHash == centralNode.Hash && x.TargetHash == node.Hash).Any())
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            newNode = node;
+                        }
+                    }
+                    else
+                    {
+                        newNode = Connection.CreateNode(
+                                new Dictionary<string, string>() { { "Name", relement.Name }, { "Description", relement.Description }, { "Time", relement.Time.ToString() } },
+                                new HashSet<string>() { relement.Type.ToString() });
+                    }
+                    CreateRelations(centralNode, newNode, param);
+                }
+                else if (element.Params[param] is IEnumerable<BaseClasses.Model.Relation> rels && rels != null)
+                {
+                    foreach (var rel in rels)
+                    {
+                        var relationProps = new Dictionary<string, string>
+                                    {
+                                        { "Relation", rel.Value.ToString() }
+                                    };
+
+                        if (Connection.Nodes().Properties("Name".Value(rel.Character.Name)).FirstOrDefault() is var node && node != null)
+                        {
+                            newNode = node;
+                        }
+                        else
+                        {
+                            newNode = Connection.CreateNode(
+                                new Dictionary<string, string>() { { "Name", rel.Character.Name }, { "Description", rel.Character.Description }, { "Time", rel.Character.Time.ToString() } },
+                                new HashSet<string>() { rel.Character.Type.ToString() });
+                        }
+
+                        try
+                        {
+                            Connection.CreateRelation(param.Substring(0, param.Length - 1), sn => sn.First(x => x.Hash == centralNode.Hash), tn => tn.First(x => x.Hash == newNode.Hash), relationProps);
+                        }
+                        catch (RelationExistsException) { }
+                    }
+                    continue;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes all outgoing relations from the node.
+        /// </summary>
+        /// <param name="centralnode"></param>
+        private void ClearNodeRelations(Node centralnode)
+        {
+            foreach (var rel in Connection.Relations.Where(x => x.SourceHash == centralnode.Hash).ToList())
+            {
+                Connection.Relations.Remove(rel);
+            }
+        }
+
+        /// <summary>
+        /// Fill params of element from node data.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="element"></param>
+        private static void FillParams(Node node, IElement element)
+        {
+            foreach (var prop in node.Properties.Keys)
+            {
+                if (prop == "Description" || prop == "Name" || prop == "Time") { continue; }
+
+                var values = node.Properties[prop]
+                        .Trim('[', ']').Split(',')
+                        .Select(s => s.Trim()).ToList();
+
+                if (values.Count == 1)
+                {
+                    element.Params.Add(prop, values[0]);
+                }
+                else
+                {
+                    element.Params.Add(prop, values);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get nodes that has some tag(label).
+        /// </summary>
+        /// <param name="label"></param>
+        /// <returns></returns>
+        private IEnumerable<Node> GetNodesByLabel(string label)
+        {
+            return Connection.Nodes().Where(x => x.Labels.Contains(label));
+        }
+        #endregion
+    }
+}
