@@ -249,3 +249,4 @@ src/Demo_app/Assembly-CSharp-Editor.csproj
 src/Demo_app/Assembly-CSharp.csproj
 /src/AI/AIGenerator/.idea
 /src/procedural/.idea
+/src/StructuredNarrative/.idea
