@@ -8,45 +8,56 @@ namespace StructuredNarrative.Data;
 /// </summary>
 public static class ProppFunctionRegistry
 {
-    private static readonly List<ProppFunction> _All = new List<ProppFunction>();
+    /// <summary>
+    /// Словарь всех функций Проппа, сгруппированных по порядковому номеру.
+    /// </summary>
+    private static readonly Dictionary<int, List<ProppFunction>> _All = new Dictionary<int, List<ProppFunction>>();
 
     /// <summary>
-    /// Все функция Проппа в канонической последовательности
+    /// Список всех ролей, участвующих в функциях Проппа.
     /// </summary>
-    public static IReadOnlyList<ProppFunction> All => _All.AsReadOnly();
+    private static readonly List<string> _Roles = new List<string>();
+    
+    /// <summary>
+    /// Все функция Проппа в канонической последовательности.
+    /// </summary>
+    public static IReadOnlyList<ProppFunction> All => _All.Values.SelectMany(f => f).ToList();
+    
+    /// <summary>
+    /// Все роли, участвующие в функциях Проппа (Hero, Villain, Helper и т.д.).
+    /// </summary>
+    public static IReadOnlyList<string> Roles => _Roles;
 
     /// <summary>
-    /// Получить функцию по порядковому номеру
+    /// Получить функции по порядковому номеру.
     /// </summary>
-    public static ProppFunction? ByOrder(int order)
+    public static List<ProppFunction> ByOrder(int order)
     {
-        return _All.FirstOrDefault(f => f.Order == order);
+        return _All.TryGetValue(order, out var value) ? value : new List<ProppFunction>();
     }
 
     /// <summary>
-    /// Получить функцию по символу
+    /// Получить функцию по символу.
     /// </summary>
     public static ProppFunction? BySymbol(string symbol)
     {
-        return _All.FirstOrDefault(f => f.Symbol == symbol);
+        return All.FirstOrDefault(f => f.Symbol.Equals(symbol, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
-    /// Получить все функции указанного акта
+    /// Получить все функции указанного акта.
     /// </summary>
     public static List<ProppFunction> ByPhase(NarrativePhase phase)
     {
-        return _All.Where(f => f.Phase == phase).ToList();
+        return All.Where(f => f.Phase == phase).ToList();
     }
 
     /// <summary>
-    /// Получить все функции, в которых участвует указанная роль
+    /// Получить все функции, в которых участвует указанная роль.
     /// </summary>
-    public static List<ProppFunction> ByRole(ProppRoleType role)
+    public static List<ProppFunction> ByRole(string role)
     {
-        return _All.Where(f =>
-            f.PrimaryRoles.Contains(role) ||
-            f.SecondaryRoles.Contains(role)).ToList();
+        return All.Where(f => f.PrimaryRoles.Contains(role) || f.SecondaryRoles.Contains(role)).ToList();
     }
 
     /// <summary>
@@ -60,12 +71,20 @@ public static class ProppFunctionRegistry
         }
 
         var lines = File.ReadAllLines(path);
-        foreach (var line in lines)
+        var rolesLine = lines.First();
+        var roles = System.Text.Json.JsonSerializer.Deserialize<List<string>>(rolesLine);
+        if (roles != null) _Roles.AddRange(roles);
+        foreach (var line in lines.Skip(1))
         {
             try
             {
                 var function = System.Text.Json.JsonSerializer.Deserialize<ProppFunction>(line);
-                if (function != null) _All.Add(function);
+                if (function == null) continue;
+                if (!_All.ContainsKey(function.Order))
+                {
+                    _All[function.Order] = new List<ProppFunction>();
+                }
+                _All[function.Order].Add(function);
             }
             catch (Exception ex)
             {
@@ -73,6 +92,5 @@ public static class ProppFunctionRegistry
                 Console.WriteLine(ex.Message);
             }
         }
-        _All.Sort((f1, f2) => f1.Order.CompareTo(f2.Order));
     }
 }

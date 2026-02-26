@@ -1,4 +1,5 @@
 using BaseClasses.Enum;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Services;
 using StructuredNarrative.Enum;
@@ -42,23 +43,28 @@ public class ProppFunction
     /// (некоторые функции у Проппа факультативны)
     /// </summary>
     public bool IsOptional { get; init; }
-
-    /// <summary>
-    /// Порядковые номера функций, которые должны присутствовать, если присутствует данная функция.
-    /// </summary>
-    public List<int> DependentFunctions { get; init; }
     
     /// <summary>
     /// Роли, являющиеся главными действующими лицами данной функции.
     /// Например, для «Борьба» — Hero и Villain.
     /// </summary>
-    public List<ProppRoleType> PrimaryRoles { get; init; }
+    public List<string> PrimaryRoles { get; init; }
 
     /// <summary>
     /// Роли, которые могут участвовать, но не обязательны.
     /// Например, Helper может присутствовать в «Борьбе».
     /// </summary>
-    public List<ProppRoleType> SecondaryRoles { get; init; }
+    public List<string> SecondaryRoles { get; init; }
+
+    /// <summary>
+    /// Символы функций, которые должны присутствовать после данной функции.
+    /// </summary>
+    public List<string> RequiredNextFunctions { get; init; }
+    
+    /// <summary>
+    /// Символы функций, которые должны присутствовать до данной функции.
+    /// </summary>
+    public List<string> RequiredPreviousFunctions { get; init; }
     
     /// <summary>
     /// Создаёт заготовку Element(ElemType.Event) для данной функции.
@@ -74,9 +80,9 @@ public class ProppFunction
             { "ProppSymbol", Symbol },
             { "NarrativePhase", Phase.ToString() },
             { "FunctionOrder", Order },
-            { "Characters", new List<BaseClasses.Interface.IElement>() },
-            { "Items", new List<BaseClasses.Interface.IElement>() },
-            { "Locations", new List<BaseClasses.Interface.IElement>() }
+            { "Characters", new List<IElement>() },
+            { "Items", new List<IElement>() },
+            { "Locations", new List<IElement>() }
         };
 
         var functionEvent = new Element(ElemType.Event, Name, Description, @params);
@@ -86,14 +92,14 @@ public class ProppFunction
             var roledElement = 
                 plot.Characters.FirstOrDefault(c => c != null
                                                     && c.Params.ContainsKey("ProppRole")
-                                                    && c.Params["ProppRole"].ToString() == primaryRole.ToString(),
+                                                    && (string)c.Params["ProppRole"] == primaryRole,
                 null) 
                 ?? new Element(ElemType.Character, 
                     primaryRole.ToString(), 
                     $"Персонаж в роли {primaryRole}", 
                     new Dictionary<string, object>
             {
-                { "ProppRole", primaryRole.ToString() }
+                { "ProppRole", primaryRole }
             });
             Binder.Bind(functionEvent, roledElement);
             plot.Add(roledElement);
@@ -104,7 +110,7 @@ public class ProppFunction
             var roledElement =
                 plot.Characters.FirstOrDefault(c => c != null 
                                                     && c.Params.ContainsKey("ProppRole")
-                                                    && c.Params["ProppRole"].ToString() == secondaryRole.ToString(),
+                                                    && (string)c.Params["ProppRole"] == secondaryRole,
                     null);
             if (roledElement == null) continue;
             Binder.Bind(functionEvent, roledElement);
@@ -121,21 +127,23 @@ public class ProppFunction
     /// <param name="symbol">Символ по Проппу</param>
     /// <param name="name">Название</param>
     /// <param name="description">Описание</param>
-    /// <param name="dependentFunctions">Порядковые номера функций, от которых зависит данная функция</param>
     /// <param name="phase">Акт</param>
     /// <param name="isOptional">Факультативность функции</param>
     /// <param name="primaryRoles">Главные участвующие роли</param>
     /// <param name="secondaryRoles">Необязательные участвующие роли</param>
+    /// <param name="requiredNextFunctions">Символы функций, которые должны следовать после данной</param>
+    /// <param name="requiredPreviousFunctions">Символы функций, которые должны предшествовать данной</param>
     public ProppFunction(
         int order,
         string symbol,
         string name,
         string description,
-        bool isOptional,
-        List<int> dependentFunctions,
         NarrativePhase phase,
-        List<ProppRoleType> primaryRoles,
-        List<ProppRoleType>? secondaryRoles = null
+        bool isOptional,
+        List<string>? primaryRoles = null,
+        List<string>? secondaryRoles = null,
+        List<string>? requiredNextFunctions = null,
+        List<string>? requiredPreviousFunctions = null
         )
     {
         Order = order;
@@ -144,9 +152,10 @@ public class ProppFunction
         Description = description;
         Phase = phase;
         IsOptional = isOptional;
-        DependentFunctions = dependentFunctions;
-        PrimaryRoles = primaryRoles;
-        SecondaryRoles = secondaryRoles ?? new List<ProppRoleType>();
+        PrimaryRoles = primaryRoles ?? new List<string>();
+        SecondaryRoles = secondaryRoles ?? new List<string>();
+        RequiredNextFunctions = requiredNextFunctions ?? new List<string>();
+        RequiredPreviousFunctions = requiredPreviousFunctions ?? new List<string>();
     }
     
     public override string ToString()
