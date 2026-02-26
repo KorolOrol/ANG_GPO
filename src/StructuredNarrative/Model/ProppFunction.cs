@@ -87,32 +87,27 @@ public class ProppFunction
 
         var functionEvent = new Element(ElemType.Event, Name, Description, @params);
 
-        foreach (var primaryRole in PrimaryRoles)
+        foreach (var roledElement in 
+                 PrimaryRoles.Select(primaryRole => plot.Characters.FirstOrDefault(c => c != null 
+                                                            && c.Params.ContainsKey("ProppRole") 
+                                                            && (string)c.Params["ProppRole"] == primaryRole, 
+                                                        null) 
+                                                    ?? new Element(ElemType.Character, 
+                                                        primaryRole, 
+                                                        $"Персонаж в роли {primaryRole}", 
+                                                        new Dictionary<string, object> 
+                                                        { { "ProppRole", primaryRole } })))
         {
-            var roledElement = 
-                plot.Characters.FirstOrDefault(c => c != null
-                                                    && c.Params.ContainsKey("ProppRole")
-                                                    && (string)c.Params["ProppRole"] == primaryRole,
-                null) 
-                ?? new Element(ElemType.Character, 
-                    primaryRole.ToString(), 
-                    $"Персонаж в роли {primaryRole}", 
-                    new Dictionary<string, object>
-            {
-                { "ProppRole", primaryRole }
-            });
             Binder.Bind(functionEvent, roledElement);
             plot.Add(roledElement);
         }
 
-        foreach (var secondaryRole in SecondaryRoles)
+        foreach (var roledElement in SecondaryRoles.Select(secondaryRole => 
+                     plot.Characters.FirstOrDefault(c => c != null 
+                         && c.Params.ContainsKey("ProppRole")
+                         && (string)c.Params["ProppRole"] == secondaryRole,
+                     null)).OfType<IElement>())
         {
-            var roledElement =
-                plot.Characters.FirstOrDefault(c => c != null 
-                                                    && c.Params.ContainsKey("ProppRole")
-                                                    && (string)c.Params["ProppRole"] == secondaryRole,
-                    null);
-            if (roledElement == null) continue;
             Binder.Bind(functionEvent, roledElement);
         }
 
