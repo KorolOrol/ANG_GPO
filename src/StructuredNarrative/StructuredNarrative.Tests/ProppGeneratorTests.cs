@@ -6,15 +6,8 @@ using Xunit.Abstractions;
 
 namespace StructuredNarrative.Tests;
 
-public class ProppGeneratorTests
+public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public ProppGeneratorTests(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     [Fact]
     public async Task FullGeneration()
     {
@@ -27,7 +20,24 @@ public class ProppGeneratorTests
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
-        var startEvent = (Element)await generator.GenerateChainAsync(plot, new Element(ElemType.Event));
-        _testOutputHelper.WriteLine(plot.FullInfo());
+        await generator.GenerateChainAsync(plot, new Element(ElemType.Event));
+        testOutputHelper.WriteLine(plot.FullInfo());
+    }
+
+    [Fact]
+    public async Task GenerationWithSkipping()
+    {
+        Plot plot = new();
+        ProppFunctionRegistry.Load("/home/korolorol/src/ANG_GPO/src/StructuredNarrative/Data/Propp.jsonl");
+        ProppGenerator generator = new() { SkipProbability = 0.8 };
+        foreach (var role in ProppFunctionRegistry.Roles)
+        {
+            var roledCharacter = new Element(ElemType.Character, role);
+            roledCharacter.Params.Add("ProppRole", role);
+            plot.Add(roledCharacter);
+        }
+
+        await generator.GenerateChainAsync(plot, new Element(ElemType.Event));
+        testOutputHelper.WriteLine(plot.FullInfo());
     }
 }

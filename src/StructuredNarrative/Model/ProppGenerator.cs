@@ -27,25 +27,22 @@ public class ProppGenerator : IChainGenerator
         for (var i = from; i <= to; i++)
         {
             var functions = ProppFunctionRegistry.ByOrder(i);
+            foreach (var func in functions.ToList().Where(func =>
+                         func.RequiredPreviousFunctions.Count != 0 &&
+                         func.RequiredPreviousFunctions.All(reqFunc =>
+                             chosenFunctions.FirstOrDefault(f => f.Symbol == reqFunc) == null)))
+            {
+                functions.Remove(func);
+            }
             if (functions.Count == 0) continue;
             if (requiredFunctions.Count > 0)
             {
                 var foundReqFunctions = functions.FindAll(f
                     => requiredFunctions.Contains(f.Symbol));
-                var fullCompatibleFunctions = new List<ProppFunction>();
-                foreach (var reqFunc in foundReqFunctions)
-                {
-                    foreach (var prevReqFunc in reqFunc.RequiredPreviousFunctions)
-                    {
-                        if (chosenFunctions.FirstOrDefault(f => f.Symbol == prevReqFunc) == null) continue;
-                        fullCompatibleFunctions.Add(reqFunc);
-                        break;
-                    }
-                }
 
-                if (fullCompatibleFunctions.Count > 0)
+                if (foundReqFunctions.Count > 0)
                 {
-                    var selectedReqFunction = fullCompatibleFunctions[_Random.Next(fullCompatibleFunctions.Count)];
+                    var selectedReqFunction = foundReqFunctions[_Random.Next(foundReqFunctions.Count)];
                     chosenFunctions.Add(selectedReqFunction);
                     requiredFunctions.AddRange(selectedReqFunction.RequiredNextFunctions);
                     foreach (var reqFunc in foundReqFunctions)
