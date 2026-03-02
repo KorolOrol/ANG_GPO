@@ -1,3 +1,4 @@
+using System.Text.Json;
 using StructuredNarrative.Enum;
 using StructuredNarrative.Model;
 
@@ -17,6 +18,14 @@ public static class ProppFunctionRegistry
     /// Список всех ролей, участвующих в функциях Проппа.
     /// </summary>
     private static readonly List<string> _Roles = new List<string>();
+
+    /// <summary>
+    /// Настройки десериализации JSON (camelCase).
+    /// </summary>
+    private static readonly JsonSerializerOptions _JsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
     
     /// <summary>
     /// Все функция Проппа в канонической последовательности.
@@ -72,13 +81,13 @@ public static class ProppFunctionRegistry
 
         var lines = File.ReadAllLines(path);
         var rolesLine = lines.First();
-        var roles = System.Text.Json.JsonSerializer.Deserialize<List<string>>(rolesLine);
+        var roles = JsonSerializer.Deserialize<List<string>>(rolesLine, _JsonOptions);
         if (roles != null) _Roles.AddRange(roles);
         foreach (var line in lines.Skip(1))
         {
             try
             {
-                var function = System.Text.Json.JsonSerializer.Deserialize<ProppFunction>(line);
+                var function = JsonSerializer.Deserialize<ProppFunction>(line, _JsonOptions);
                 if (function == null) continue;
                 if (!_All.ContainsKey(function.Order))
                 {

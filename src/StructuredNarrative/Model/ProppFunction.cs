@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
@@ -111,7 +112,6 @@ public class ProppFunction
             Binder.Bind(functionEvent, roledElement);
         }
 
-        plot.Add(functionEvent);
         return functionEvent;
     }
 
@@ -128,6 +128,7 @@ public class ProppFunction
     /// <param name="secondaryRoles">Необязательные участвующие роли</param>
     /// <param name="requiredNextFunctions">Символы функций, которые должны следовать после данной</param>
     /// <param name="requiredPreviousFunctions">Символы функций, которые должны предшествовать данной</param>
+    [JsonConstructor]
     public ProppFunction(
         int order,
         string symbol,

@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredNarrative", "Stru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses", "..\base\BaseClasses\BaseClasses.csproj", "{26386CC6-E243-4440-9BE8-8E7A99805D42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredNarrative.Tests", "StructuredNarrative.Tests\StructuredNarrative.Tests.csproj", "{6F9957CB-9991-4692-995E-91DD4BAA5344}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{26386CC6-E243-4440-9BE8-8E7A99805D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26386CC6-E243-4440-9BE8-8E7A99805D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26386CC6-E243-4440-9BE8-8E7A99805D42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
