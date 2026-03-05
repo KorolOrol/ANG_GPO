@@ -19,6 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\AI\AIGenerator\AIGenerator.csproj" />
       <ProjectReference Include="..\..\base\BaseClasses\BaseClasses.csproj" />
       <ProjectReference Include="..\StructuredNarrative.csproj" />
     </ItemGroup>

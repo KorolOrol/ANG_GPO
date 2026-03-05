@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses", "..\base\Base
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredNarrative.Tests", "StructuredNarrative.Tests\StructuredNarrative.Tests.csproj", "{6F9957CB-9991-4692-995E-91DD4BAA5344}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIGenerator", "..\AI\AIGenerator\AIGenerator.csproj", "{2F675F89-46BB-4FD6-9549-356B051A0126}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F9957CB-9991-4692-995E-91DD4BAA5344}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F675F89-46BB-4FD6-9549-356B051A0126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F675F89-46BB-4FD6-9549-356B051A0126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F675F89-46BB-4FD6-9549-356B051A0126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F675F89-46BB-4FD6-9549-356B051A0126}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
