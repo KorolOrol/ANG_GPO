@@ -21,7 +21,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
-        await generator.GenerateChainAsync(plot, new Element(ElemType.Event));
+        await generator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:31);
         testOutputHelper.WriteLine(plot.FullInfo());
     }
 
@@ -37,7 +37,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
-        await generator.GenerateChainAsync(plot, new Element(ElemType.Event));
+        await generator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
         testOutputHelper.WriteLine(plot.FullInfo());
     }
     
@@ -46,26 +46,32 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
     {
         Plot plot = new();
         ProppFunctionRegistry.Load("/home/korolorol/src/ANG_GPO/src/StructuredNarrative/Data/Propp.jsonl");
-        ProppGenerator proppGenerator = new() { SkipProbability = 0.8 };
+        ProppGenerator proppGenerator = new() { SkipProbability = 1 };
         foreach (var role in ProppFunctionRegistry.Roles)
         {
             var roledCharacter = new Element(ElemType.Character, role);
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
-        await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event));
+        await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
         testOutputHelper.WriteLine(plot.FullInfo());
         var llmAiGenerator =
             new LlmAiGenerator("/home/korolorol/src/ANG_GPO/src/AI/AIGenerator/SystemPromptExample.json")
+            {
+                // TextAiGenerator =
+                // {
+                //     Endpoint = "https://neuroapi.host/v1",
+                //     Model = "gpt-5-nano"
+                // },
+                TextAiGenerator =
                 {
-                    TextAiGenerator =
-                    {
-                        Endpoint = "http://127.0.0.1:1234/v1",
-                        Model = "qwen3.5-4b"
-                    },
-                    AIPriority = true,
-                    UseStructuredOutput = true
-                };
+                    Endpoint = "http://localhost:1234/v1",
+                    Model = "qwen3.5-4b"
+                },
+                AIPriority = true,
+                UseStructuredOutput = true
+            };
+        // ((OpenAIGenerator)llmAiGenerator.TextAiGenerator).GetApiKeyFromEnvironment("NeuroApiKey");
         for (int i = 0; i < plot.Elements.Count; i++)
         {
             try

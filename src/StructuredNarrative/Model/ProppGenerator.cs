@@ -26,6 +26,7 @@ public class ProppGenerator : IChainGenerator
         var chosenFunctions = new List<ProppFunction>();
         for (var i = from; i <= to; i++)
         {
+            if (chosenFunctions.Count == recursion) break;
             var functions = ProppFunctionRegistry.ByOrder(i);
             FilterFunctionsByRequiredPreviousFunctions(functions, chosenFunctions);
             if (functions.Count == 0) continue;
