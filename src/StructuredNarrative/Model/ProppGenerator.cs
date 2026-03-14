@@ -22,7 +22,7 @@ public class ProppGenerator : IChainGenerator
             throw new ArgumentException($"Element {preparedElement.Type} is not an event");
         var from = ProppFunctionRegistry.All.Min(f => f.Order);
         var to = ProppFunctionRegistry.All.Max(f => f.Order);
-        var requiredFunctions = new List<string>();
+        var requiredFunctions = new List<ProppFunction>();
         var chosenFunctions = new List<ProppFunction>();
         for (var i = from; i <= to; i++)
         {
@@ -30,6 +30,11 @@ public class ProppGenerator : IChainGenerator
             var functions = ProppFunctionRegistry.ByOrder(i);
             FilterFunctionsByRequiredPreviousFunctions(functions, chosenFunctions);
             if (functions.Count == 0) continue;
+
+            // Если среди обязательных есть функции текущего порядка, выбирать нужно только из них.
+            if (TryChooseRequiredFunctionsByCurrentOrder(functions, requiredFunctions, chosenFunctions, i))
+                continue;
+
             if (requiredFunctions.Count > 0 &&
                 FilterAndChooseFunctionsByRequiredNextFunctions(functions, requiredFunctions, chosenFunctions)) 
                 continue;
@@ -65,20 +70,45 @@ public class ProppGenerator : IChainGenerator
         }
     }
 
-    private static bool FilterAndChooseFunctionsByRequiredNextFunctions(List<ProppFunction> functions, List<string> requiredFunctions, List<ProppFunction> chosenFunctions)
+    private static bool TryChooseRequiredFunctionsByCurrentOrder(
+        List<ProppFunction> functions,
+        List<ProppFunction> requiredFunctions,
+        List<ProppFunction> chosenFunctions,
+        int currentOrder)
+    {
+        var requiredCurrentOrder = requiredFunctions
+            .Where(f => f.Order == currentOrder)
+            .ToList();
+
+        if (requiredCurrentOrder.Count == 0)
+            return false;
+
+        var availableRequiredFunctions = functions
+            .Where(f => requiredCurrentOrder.Any(req => req.Symbol == f.Symbol))
+            .ToList();
+
+        if (availableRequiredFunctions.Count == 0)
+            return false;
+
+        var selectedRequiredFunction = availableRequiredFunctions[_Random.Next(availableRequiredFunctions.Count)];
+        chosenFunctions.Add(selectedRequiredFunction);
+        AddRequiredNextFunctions(selectedRequiredFunction, requiredFunctions);
+        RemoveRequiredFunctionsByOrder(requiredFunctions, currentOrder);
+        return true;
+    }
+
+    private static bool FilterAndChooseFunctionsByRequiredNextFunctions(List<ProppFunction> functions, List<ProppFunction> requiredFunctions, List<ProppFunction> chosenFunctions)
     {
         var foundReqFunctions = functions.FindAll(f
-            => requiredFunctions.Contains(f.Symbol));
+            => requiredFunctions.Any(req => req.Symbol == f.Symbol));
 
         if (foundReqFunctions.Count > 0)
         {
             var selectedReqFunction = foundReqFunctions[_Random.Next(foundReqFunctions.Count)];
             chosenFunctions.Add(selectedReqFunction);
-            requiredFunctions.AddRange(selectedReqFunction.RequiredNextFunctions);
+            AddRequiredNextFunctions(selectedReqFunction, requiredFunctions);
             foreach (var reqFunc in foundReqFunctions)
-            {
-                requiredFunctions.Remove(reqFunc.Symbol);
-            }
+                requiredFunctions.RemoveAll(f => f.Symbol == reqFunc.Symbol);
 
             return true;
         }
@@ -86,11 +116,27 @@ public class ProppGenerator : IChainGenerator
         return false;
     }
 
-    private void ChooseFunction(List<ProppFunction> functions, List<ProppFunction> chosenFunctions, List<string> requiredFunctions)
+    private static void AddRequiredNextFunctions(ProppFunction function, List<ProppFunction> requiredFunctions)
+    {
+        foreach (var requiredSymbol in function.RequiredNextFunctions)
+        {
+            var requiredFunction = ProppFunctionRegistry.BySymbol(requiredSymbol);
+            if (requiredFunction == null) continue;
+            if (requiredFunctions.All(f => f.Symbol != requiredFunction.Symbol))
+                requiredFunctions.Add(requiredFunction);
+        }
+    }
+
+    private static void RemoveRequiredFunctionsByOrder(List<ProppFunction> requiredFunctions, int order)
+    {
+        requiredFunctions.RemoveAll(f => f.Order == order);
+    }
+
+    private void ChooseFunction(List<ProppFunction> functions, List<ProppFunction> chosenFunctions, List<ProppFunction> requiredFunctions)
     {
         if (functions.First().IsOptional && _Random.NextDouble() < SkipProbability) return;
         var function = functions[_Random.Next(functions.Count)];
         chosenFunctions.Add(function);
-        requiredFunctions.AddRange(function.RequiredNextFunctions);
+        AddRequiredNextFunctions(function, requiredFunctions);
     }
 }
