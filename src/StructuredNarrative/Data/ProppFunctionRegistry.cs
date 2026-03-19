@@ -102,13 +102,18 @@ namespace StructuredNarrative.Data
                     _Roles.Add(roleLine);
                 }
             }
+            
+            var knownSymbols = new HashSet<string>(
+                _All.Values.SelectMany(list => list).Select(f => f.Symbol)
+                );
+            
             foreach (var line in nonEmptyLines.Skip(1))
             {
                 try
                 {
                     var function = JsonSerializer.Deserialize<ProppFunction>(line, _JsonOptions);
                     if (function == null) continue;
-                    if (BySymbol(function.Symbol) != null) continue;
+                    if (!knownSymbols.Add(function.Symbol)) continue;
                     if (!_All.ContainsKey(function.Order))
                     {
                         _All[function.Order] = new List<ProppFunction>();
