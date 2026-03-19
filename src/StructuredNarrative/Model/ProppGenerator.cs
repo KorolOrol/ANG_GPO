@@ -39,6 +39,9 @@ namespace StructuredNarrative.Model
             Queue<(IElement, IElement, int)> generationQueue = null,
             int recursion = 3)
         {
+            if (plot == null)
+                throw new ArgumentNullException(nameof(plot));
+
             if (preparedElement == null) 
                 throw new ArgumentNullException(nameof(preparedElement));
             if (preparedElement.Type != ElemType.Event)
