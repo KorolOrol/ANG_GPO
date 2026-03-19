@@ -4,16 +4,46 @@ using BaseClasses.Model;
 using StructuredNarrative.Data;
 using StructuredNarrative.Model;
 using Xunit.Abstractions;
+using System;
+using System.IO;
 
 namespace StructuredNarrative.Tests;
 
 public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
 {
+    private static string GetProppJsonlPath()
+    {
+        return Path.GetFullPath(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "..",
+                "..",
+                "..",
+                "..",
+                "Data",
+                "Propp.jsonl"));
+    }
+
+    private static string GetSystemPromptExamplePath()
+    {
+        return Path.GetFullPath(
+            Path.Combine(
+                AppContext.BaseDirectory,
+                "..",
+                "..",
+                "..",
+                "..",
+                "..",
+                "AI",
+                "AIGenerator",
+                "SystemPromptExample.json"));
+    }
+
     [Fact]
     public async Task FullGeneration()
     {
         Plot plot = new();
-        ProppFunctionRegistry.Load("/home/korolorol/src/ANG_GPO/src/StructuredNarrative/Data/Propp.jsonl");
+        ProppFunctionRegistry.Load(GetProppJsonlPath());
         ProppGenerator generator = new() { SkipProbability = 0 };
         foreach (var role in ProppFunctionRegistry.Roles)
         {
@@ -29,7 +59,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
     public async Task GenerationWithSkipping()
     {
         Plot plot = new();
-        ProppFunctionRegistry.Load("/home/korolorol/src/ANG_GPO/src/StructuredNarrative/Data/Propp.jsonl");
+        ProppFunctionRegistry.Load(GetProppJsonlPath());
         ProppGenerator generator = new() { SkipProbability = 0.8 };
         foreach (var role in ProppFunctionRegistry.Roles)
         {
@@ -45,7 +75,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
     public async Task GenerationWithAiUpgrade()
     {
         Plot plot = new();
-        ProppFunctionRegistry.Load("/home/korolorol/src/ANG_GPO/src/StructuredNarrative/Data/Propp.jsonl");
+        ProppFunctionRegistry.Load(GetProppJsonlPath());
         ProppGenerator proppGenerator = new() { SkipProbability = 0.8 };
         // foreach (var role in ProppFunctionRegistry.Roles)
         // {
@@ -56,7 +86,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
         testOutputHelper.WriteLine(plot.FullInfo());
         var llmAiGenerator =
-            new LlmAiGenerator("/home/korolorol/src/ANG_GPO/src/AI/AIGenerator/SystemPromptExample.json")
+            new LlmAiGenerator(GetSystemPromptExamplePath())
             {
                 // TextAiGenerator =
                 // {
