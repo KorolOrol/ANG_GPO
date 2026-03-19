@@ -110,6 +110,13 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
             return;
         }
 
+        var runLlmTests = Environment.GetEnvironmentVariable("RUN_LLM_TESTS");
+        if (!string.Equals(runLlmTests, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            testOutputHelper.WriteLine("Skipping AI upgrade test because RUN_LLM_TESTS is not set to 'true'.");
+            return;
+        }
+
         var llmAiGenerator =
             new LlmAiGenerator(GetSystemPromptExamplePath())
             {
