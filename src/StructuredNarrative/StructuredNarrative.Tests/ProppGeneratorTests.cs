@@ -103,6 +103,13 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
         testOutputHelper.WriteLine(plot.FullInfo());
 
+        var endpoint = Environment.GetEnvironmentVariable("LLM_ENDPOINT");
+        if (string.IsNullOrWhiteSpace(endpoint))
+        {
+            testOutputHelper.WriteLine("Skipping AI upgrade test because LLM_ENDPOINT is not configured.");
+            return;
+        }
+
         var llmAiGenerator =
             new LlmAiGenerator(GetSystemPromptExamplePath())
             {
@@ -113,7 +120,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
                 // },
                 TextAiGenerator =
                 {
-                    Endpoint = "http://localhost:1234/v1",
+                    Endpoint = endpoint,
                     Model = "qwen3.5-4b"
                 },
                 AIPriority = true,
