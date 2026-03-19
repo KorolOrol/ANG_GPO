@@ -15,7 +15,7 @@ namespace StructuredNarrative.Model
         /// <summary>
         /// Генератор случайных чисел для выбора функций и принятия решений о пропуске опциональных функций.
         /// </summary>
-        private static readonly Random _Random = new Random();
+        private static readonly Random _Random = Random.Shared;
     
         /// <summary>
         /// Вероятность пропуска опциональной функции Проппа при генерации цепочки.
