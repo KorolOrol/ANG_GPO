@@ -34,7 +34,10 @@ namespace StructuredNarrative.Data
         /// <summary>
         /// Все функция Проппа в канонической последовательности.
         /// </summary>
-        public static IReadOnlyList<ProppFunction> All => _All.Values.SelectMany(f => f).ToList();
+        public static IReadOnlyList<ProppFunction> All => _All
+            .OrderBy(kvp => kvp.Key)
+            .SelectMany(kvp => kvp.Value)
+            .ToList();
     
         /// <summary>
         /// Все роли, участвующие в функциях Проппа (Hero, Villain, Helper и т.д.).
