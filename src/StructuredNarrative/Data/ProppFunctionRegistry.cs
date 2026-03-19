@@ -32,7 +32,7 @@ namespace StructuredNarrative.Data
         };
     
         /// <summary>
-        /// Все функция Проппа в канонической последовательности.
+        /// Все функции Проппа в канонической последовательности.
         /// </summary>
         public static IReadOnlyList<ProppFunction> All => _All
             .OrderBy(kvp => kvp.Key)
