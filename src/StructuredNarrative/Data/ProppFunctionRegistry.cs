@@ -86,13 +86,20 @@ namespace StructuredNarrative.Data
             var lines = File.ReadAllLines(path);
             var rolesLine = lines.First();
             var roles = JsonSerializer.Deserialize<List<string>>(rolesLine, _JsonOptions);
-            if (roles != null) _Roles.AddRange(roles);
+            if (roles != null)
+            {
+                foreach (var roleLine in roles.Where(roleLine => !_Roles.Contains(roleLine)))
+                {
+                    _Roles.Add(roleLine);
+                }
+            }
             foreach (var line in lines.Skip(1))
             {
                 try
                 {
                     var function = JsonSerializer.Deserialize<ProppFunction>(line, _JsonOptions);
                     if (function == null) continue;
+                    if (BySymbol(function.Symbol) != null) continue;
                     if (!_All.ContainsKey(function.Order))
                     {
                         _All[function.Order] = new List<ProppFunction>();

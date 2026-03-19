@@ -130,6 +130,9 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
 
         var countBeforeUpgrade = plot.Elements.Count;
 
+        int maxTries = 3;
+        int tries = 0;
+
         for (int i = 0; i < plot.Elements.Count; i++)
         {
             try
@@ -137,11 +140,15 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
                 var element = plot.Elements[i];
                 await llmAiGenerator.GenerateAsync(plot, element);
                 testOutputHelper.WriteLine($"Upgraded {i} from {plot.Elements.Count}:\n" + element.FullInfo());
+                tries = 0;
             }
             catch (Exception ex)
             {
-                testOutputHelper.WriteLine($"Error upgrading element {i}: {ex.Message}");
-                i--;
+                if (tries++ > maxTries)
+                {
+                    testOutputHelper.WriteLine($"Error upgrading element {i}: {ex.Message}");
+                    i--;
+                }
             }
         }
 

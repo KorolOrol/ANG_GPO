@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
@@ -15,8 +16,8 @@ namespace StructuredNarrative.Model
         /// <summary>
         /// Генератор случайных чисел для выбора функций и принятия решений о пропуске опциональных функций.
         /// </summary>
-        private static readonly Random _Random = Random.Shared;
-    
+        private static readonly ThreadLocal<Random> _Random = new ThreadLocal<Random>(() => new Random());
+        
         /// <summary>
         /// Вероятность пропуска опциональной функции Проппа при генерации цепочки.
         /// </summary>
@@ -129,7 +130,7 @@ namespace StructuredNarrative.Model
             if (availableRequiredFunctions.Count == 0)
                 return false;
 
-            var selectedRequiredFunction = availableRequiredFunctions[_Random.Next(availableRequiredFunctions.Count)];
+            var selectedRequiredFunction = availableRequiredFunctions[_Random.Value!.Next(availableRequiredFunctions.Count)];
             chosenFunctions.Add(selectedRequiredFunction);
             AddRequiredNextFunctions(selectedRequiredFunction, requiredFunctions);
             RemoveRequiredFunctionsByOrder(requiredFunctions, currentOrder);
@@ -153,7 +154,7 @@ namespace StructuredNarrative.Model
 
             if (foundReqFunctions.Count > 0)
             {
-                var selectedReqFunction = foundReqFunctions[_Random.Next(foundReqFunctions.Count)];
+                var selectedReqFunction = foundReqFunctions[_Random.Value!.Next(foundReqFunctions.Count)];
                 chosenFunctions.Add(selectedReqFunction);
                 AddRequiredNextFunctions(selectedReqFunction, requiredFunctions);
                 foreach (var reqFunc in foundReqFunctions)
@@ -205,8 +206,8 @@ namespace StructuredNarrative.Model
         private void ChooseFunction(List<ProppFunction> functions, List<ProppFunction> chosenFunctions,
             List<ProppFunction> requiredFunctions)
         {
-            if (functions.First().IsOptional && _Random.NextDouble() < SkipProbability) return;
-            var function = functions[_Random.Next(functions.Count)];
+            if (functions.First().IsOptional && _Random.Value!.NextDouble() < SkipProbability) return;
+            var function = functions[_Random.Value!.Next(functions.Count)];
             chosenFunctions.Add(function);
             AddRequiredNextFunctions(function, requiredFunctions);
         }
