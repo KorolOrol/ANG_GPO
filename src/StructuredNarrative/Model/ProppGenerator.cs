@@ -46,10 +46,11 @@ namespace StructuredNarrative.Model
                 throw new ArgumentNullException(nameof(preparedElement));
             if (preparedElement.Type != ElemType.Event)
                 throw new ArgumentException($"Element {preparedElement.Type} is not an event");
-            if (ProppFunctionRegistry.All.Count == 0)
+            var allFunctions = ProppFunctionRegistry.All;
+            if (allFunctions.Count == 0)
                 throw new InvalidOperationException("ProppFunctionRegistry is empty. Load functions before generating.");
-            var from = ProppFunctionRegistry.All.Min(f => f.Order);
-            var to = ProppFunctionRegistry.All.Max(f => f.Order);
+            var from = allFunctions.Min(f => f.Order);
+            var to = allFunctions.Max(f => f.Order);
             var requiredFunctions = new List<ProppFunction>();
             var chosenFunctions = new List<ProppFunction>();
             for (var i = from; i <= to; i++)
