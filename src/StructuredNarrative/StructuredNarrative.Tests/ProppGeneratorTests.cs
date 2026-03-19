@@ -37,7 +37,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
-        await generator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
+        await generator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:31);
         testOutputHelper.WriteLine(plot.FullInfo());
     }
     
@@ -46,13 +46,13 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
     {
         Plot plot = new();
         ProppFunctionRegistry.Load("/home/korolorol/src/ANG_GPO/src/StructuredNarrative/Data/Propp.jsonl");
-        ProppGenerator proppGenerator = new() { SkipProbability = 1 };
-        foreach (var role in ProppFunctionRegistry.Roles)
-        {
-            var roledCharacter = new Element(ElemType.Character, role);
-            roledCharacter.Params.Add("ProppRole", role);
-            plot.Add(roledCharacter);
-        }
+        ProppGenerator proppGenerator = new() { SkipProbability = 0.8 };
+        // foreach (var role in ProppFunctionRegistry.Roles)
+        // {
+        //     var roledCharacter = new Element(ElemType.Character, role);
+        //     roledCharacter.Params.Add("ProppRole", role);
+        //     plot.Add(roledCharacter);
+        // }
         await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
         testOutputHelper.WriteLine(plot.FullInfo());
         var llmAiGenerator =

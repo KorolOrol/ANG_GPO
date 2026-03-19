@@ -8,10 +8,27 @@ namespace StructuredNarrative.Model;
 
 public class ProppGenerator : IChainGenerator
 {
+    /// <summary>
+    /// Генератор случайных чисел для выбора функций и принятия решений о пропуске опциональных функций.
+    /// </summary>
     private static readonly Random _Random = new();
     
+    /// <summary>
+    /// Вероятность пропуска опциональной функции Проппа при генерации цепочки.
+    /// </summary>
     public double SkipProbability { get; set; } = 0.2;
 
+    /// <summary>
+    /// Генерация цепочки событий на основе функций Проппа.
+    /// </summary>
+    /// <param name="plot">Сюжет</param>
+    /// <param name="preparedElement">Начальное событие,
+    /// к которому будет добавляться цепочка функций Проппа. Должно быть типа Event.</param>
+    /// <param name="generationQueue">Внутренняя очередь для рекурсивной генерации,
+    /// обычно не передаётся при первом вызове.</param>
+    /// <param name="recursion">Максимальное количество функций Проппа в цепочке (глубина рекурсии).</param>
+    /// <returns>Элемент с добавленной цепочкой событий по функциям Проппа.</returns>
+    /// <exception cref="ArgumentException">Если preparedElement не является событием.</exception>
     public Task<IElement> GenerateChainAsync(Plot plot,
         IElement preparedElement,
         Queue<(IElement, IElement, int)> generationQueue = null,
@@ -59,7 +76,13 @@ public class ProppGenerator : IChainGenerator
         return Task.FromResult(preparedElement);
     }
     
-    private static void FilterFunctionsByRequiredPreviousFunctions(List<ProppFunction> functions, List<ProppFunction> chosenFunctions)
+    /// <summary>
+    /// Удаляет из списка функций те, которые имеют в RequiredPreviousFunctions функции, не входящие в chosenFunctions.
+    /// </summary>
+    /// <param name="functions">Список функций для фильтрации.</param>
+    /// <param name="chosenFunctions">Список уже выбранных функций, которые могут быть необходимы для текущих.</param>
+    private static void FilterFunctionsByRequiredPreviousFunctions(List<ProppFunction> functions,
+        List<ProppFunction> chosenFunctions)
     {
         foreach (var func in functions.ToList().Where(func =>
                      func.RequiredPreviousFunctions.Count != 0 &&
@@ -70,6 +93,15 @@ public class ProppGenerator : IChainGenerator
         }
     }
 
+    /// <summary>
+    /// Если среди обязательных функций есть функции текущего порядка, выбирает случайную из них,
+    /// добавляет её в цепочку и обновляет список обязательных функций.
+    /// </summary>
+    /// <param name="functions">Список доступных функций текущего порядка.</param>
+    /// <param name="requiredFunctions">Список обязательных функций, которые должны быть включены в цепочку.</param>
+    /// <param name="chosenFunctions">Список уже выбранных функций, к которому будет добавлена выбранная функция.</param>
+    /// <param name="currentOrder">Порядковый номер функций, которые нужно проверить на обязательность.</param>
+    /// <returns></returns>
     private static bool TryChooseRequiredFunctionsByCurrentOrder(
         List<ProppFunction> functions,
         List<ProppFunction> requiredFunctions,
@@ -97,7 +129,17 @@ public class ProppGenerator : IChainGenerator
         return true;
     }
 
-    private static bool FilterAndChooseFunctionsByRequiredNextFunctions(List<ProppFunction> functions, List<ProppFunction> requiredFunctions, List<ProppFunction> chosenFunctions)
+    /// <summary>
+    /// Если среди доступных функций есть те, которые являются обязательными для уже выбранных функций
+    /// (т.е. входят в их RequiredNextFunctions), выбирает случайную из них,
+    /// добавляет её в цепочку и обновляет список обязательных функций.
+    /// </summary>
+    /// <param name="functions">Список доступных функций текущего порядка.</param>
+    /// <param name="requiredFunctions">Список обязательных функций, которые должны быть включены в цепочку.</param>
+    /// <param name="chosenFunctions">Список уже выбранных функций, к которому будет добавлена выбранная функция.</param>
+    /// <returns></returns>
+    private static bool FilterAndChooseFunctionsByRequiredNextFunctions(List<ProppFunction> functions,
+        List<ProppFunction> requiredFunctions, List<ProppFunction> chosenFunctions)
     {
         var foundReqFunctions = functions.FindAll(f
             => requiredFunctions.Any(req => req.Symbol == f.Symbol));
@@ -116,6 +158,12 @@ public class ProppGenerator : IChainGenerator
         return false;
     }
 
+    /// <summary>
+    /// Добавляет в список обязательных функций функции,
+    /// символы которых указаны в RequiredNextFunctions у переданной функции.
+    /// </summary>
+    /// <param name="function">Функция, у которой нужно проверить RequiredNextFunctions.</param>
+    /// <param name="requiredFunctions">Список обязательных функций, в который будут добавлены найденные функции.</param>
     private static void AddRequiredNextFunctions(ProppFunction function, List<ProppFunction> requiredFunctions)
     {
         foreach (var requiredSymbol in function.RequiredNextFunctions)
@@ -127,12 +175,28 @@ public class ProppGenerator : IChainGenerator
         }
     }
 
+    /// <summary>
+    /// Удаляет из списка обязательных функций все функции с указанным порядковым номером.
+    /// </summary>
+    /// <param name="requiredFunctions">Список обязательных функций,
+    /// из которого будут удалены функции с указанным порядковым номером.</param>
+    /// <param name="order">Порядковый номер функций, которые нужно удалить из списка обязательных.</param>
     private static void RemoveRequiredFunctionsByOrder(List<ProppFunction> requiredFunctions, int order)
     {
         requiredFunctions.RemoveAll(f => f.Order == order);
     }
 
-    private void ChooseFunction(List<ProppFunction> functions, List<ProppFunction> chosenFunctions, List<ProppFunction> requiredFunctions)
+    /// <summary>
+    /// Выбирает случайную функцию из списка доступных функций,
+    /// добавляет её в цепочку и обновляет список обязательных функций.
+    /// </summary>
+    /// <param name="functions">Список доступных функций текущего порядка,
+    /// из которых будет выбрана функция для добавления в цепочку.</param>
+    /// <param name="chosenFunctions">Список уже выбранных функций, к которому будет добавлена выбранная функция.</param>
+    /// <param name="requiredFunctions">Список обязательных функций,
+    /// который будет обновлён на основе RequiredNextFunctions у выбранной функции.</param>
+    private void ChooseFunction(List<ProppFunction> functions, List<ProppFunction> chosenFunctions,
+        List<ProppFunction> requiredFunctions)
     {
         if (functions.First().IsOptional && _Random.NextDouble() < SkipProbability) return;
         var function = functions[_Random.Next(functions.Count)];
