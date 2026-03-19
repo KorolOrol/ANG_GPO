@@ -84,7 +84,13 @@ namespace StructuredNarrative.Data
             }
 
             var lines = File.ReadAllLines(path);
-            var rolesLine = lines.First();
+            var nonEmptyLines = lines.Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
+            if (nonEmptyLines.Length == 0)
+            {
+                throw new InvalidDataException($"Файл с данными о функциях Проппа пуст или содержит только пустые строки: {path}");
+            }
+
+            var rolesLine = nonEmptyLines.First();
             var roles = JsonSerializer.Deserialize<List<string>>(rolesLine, _JsonOptions);
             if (roles != null)
             {
@@ -93,7 +99,7 @@ namespace StructuredNarrative.Data
                     _Roles.Add(roleLine);
                 }
             }
-            foreach (var line in lines.Skip(1))
+            foreach (var line in nonEmptyLines.Skip(1))
             {
                 try
                 {
