@@ -3,6 +3,7 @@ using BaseClasses.Enum;
 using BaseClasses.Model;
 using StructuredNarrative.Data;
 using StructuredNarrative.Model;
+using Xunit;
 using Xunit.Abstractions;
 using System;
 using System.IO;
@@ -51,7 +52,16 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
+
+        var initialCount = plot.Elements.Count;
+
         await generator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:31);
+
+        // Basic deterministic assertions: generation should not remove elements and should
+        // produce at least one event element when no skipping is allowed.
+        Assert.True(plot.Elements.Count >= initialCount);
+        Assert.Contains(plot.Elements, e => e.Type == ElemType.Event);
+
         testOutputHelper.WriteLine(plot.FullInfo());
     }
 
@@ -67,7 +77,14 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
             roledCharacter.Params.Add("ProppRole", role);
             plot.Add(roledCharacter);
         }
+
+        var initialCount = plot.Elements.Count;
+
         await generator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:31);
+
+        // With skipping enabled, we at least expect generation not to remove elements.
+        Assert.True(plot.Elements.Count >= initialCount);
+
         testOutputHelper.WriteLine(plot.FullInfo());
     }
     
@@ -85,6 +102,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         // }
         await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
         testOutputHelper.WriteLine(plot.FullInfo());
+
         var llmAiGenerator =
             new LlmAiGenerator(GetSystemPromptExamplePath())
             {
@@ -102,6 +120,9 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
                 UseStructuredOutput = true
             };
         // ((OpenAIGenerator)llmAiGenerator.TextAiGenerator).GetApiKeyFromEnvironment("NeuroApiKey");
+
+        var countBeforeUpgrade = plot.Elements.Count;
+
         for (int i = 0; i < plot.Elements.Count; i++)
         {
             try
@@ -116,5 +137,8 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
                 i--;
             }
         }
+
+        // Upgrading elements in place should not change the number of plot elements.
+        Assert.Equal(countBeforeUpgrade, plot.Elements.Count);
     }
 }
