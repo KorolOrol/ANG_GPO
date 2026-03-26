@@ -29,14 +29,14 @@ namespace StructuredNarrative.Model
         /// <param name="plot">Сюжет</param>
         /// <param name="preparedElement">Начальное событие,
         /// к которому будет добавляться цепочка функций Проппа. Должно быть типа Event.</param>
-        /// <param name="generationQueue">Внутренняя очередь для рекурсивной генерации,
-        /// обычно не передаётся при первом вызове.</param>
+        /// <param name="generationQueue">Внутренняя очередь для рекурсивной генерации
+        /// (в данной реализации не используется; обычно не передаётся при первом вызове).</param>
         /// <param name="recursion">Максимальное количество функций Проппа в цепочке (глубина рекурсии).</param>
         /// <returns>Элемент с добавленной цепочкой событий по функциям Проппа.</returns>
         /// <exception cref="ArgumentException">Если preparedElement не является событием.</exception>
         public Task<IElement> GenerateChainAsync(Plot plot,
             IElement preparedElement,
-            Queue<(IElement, IElement, int)> generationQueue = null,
+            Queue<(IElement, IElement, int)>? generationQueue = null,
             int recursion = 3)
         {
             if (plot == null)
