@@ -76,8 +76,8 @@ namespace StructuredNarrative.Model
             {
                 var functionEvent = firstFunction.CreateEventSkeleton(plot);
                 Merger.Merge(preparedElement, functionEvent, false);
-                plot.Add(preparedElement);
             }
+            plot.Add(preparedElement);
 
             foreach (var function in chosenFunctions.Skip(1))
             {
