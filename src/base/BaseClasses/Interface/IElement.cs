@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BaseClasses.Enum;
 using BaseClasses.Model;
-using System.Text.Json.Serialization;
+using BaseClasses.Model.Params;
 
 namespace BaseClasses.Interface
 {
@@ -24,11 +25,14 @@ namespace BaseClasses.Interface
         /// Описание элемента
         /// </summary>
         public string Description { get; set; }
+        
+        public ParamBag TypedParams { get; }
 
         /// <summary>
         /// Параметры элемента
         /// </summary>
-        public Dictionary<string, object> Params { get; set; }
+        [Obsolete("Используйте TypedParams вместо Params для новых разработок.")]
+        public IDictionary<string, object> Params { get; set; }
 
         /// <summary>
         /// Время создания элемента

@@ -4,6 +4,7 @@ using BaseClasses.Interface;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using BaseClasses.Model.Params;
 
 namespace BaseClasses.Model
 {
@@ -12,15 +13,13 @@ namespace BaseClasses.Model
     /// </summary>
     public class Element : IElement, IEquatable<Element>
     {
-        /// <summary>
-        /// Тип элемента
-        /// </summary>
-        private readonly ElemType _type;
+        [Obsolete("Используйте TypedParams вместо Params для новых разработок.")]
+        private IDictionary<string, object> _params = null!;
 
         /// <summary>
         /// Тип элемента
         /// </summary>
-        public ElemType Type { get { return _type; } }
+        public ElemType Type { get; }
 
         /// <summary>
         /// Название элемента
@@ -33,9 +32,22 @@ namespace BaseClasses.Model
         public string Description { get; set; }
 
         /// <summary>
+        /// Типизированные параметры элемента
+        /// </summary>
+        public ParamBag TypedParams { get; }
+
+        /// <summary>
         /// Параметры элемента
         /// </summary>
-        public Dictionary<string, object> Params { get; set; }
+        [Obsolete("Используйте TypedParams вместо Params для новых разработок.")]
+        public IDictionary<string, object> Params
+        {
+            get => _params;
+            set
+            {
+                _params = value as LegacyParamsDictionary ?? new LegacyParamsDictionary(TypedParams, value);
+            }
+        }
 
         /// <summary>
         /// Время создания элемента
@@ -51,12 +63,13 @@ namespace BaseClasses.Model
         /// <param name="params">Параметры элемента</param>
         /// <param name="time">Время создания элемента</param>
         public Element(ElemType type, string name = "", string description = "",
-                       Dictionary<string, object> @params = null, int time = -1)
+                       IDictionary<string, object>? @params = null, int time = -1)
         {
-            _type = type;
+            Type = type;
             Name = name;
             Description = description;
-            Params = @params ?? new Dictionary<string, object>();
+            TypedParams = new ParamBag();
+            Params = new LegacyParamsDictionary(TypedParams, @params);
             Time = time;
         }
 
@@ -99,17 +112,20 @@ namespace BaseClasses.Model
         /// </summary>
         /// <param name="value">Значение параметра</param>
         /// <returns>Строка значения параметра</returns>
-        private string GetValueString(object value)
+        private static string GetValueString(object value)
         {
-            if (value is IEnumerable enumerable && value.GetType() != typeof(string))
+            return (value switch
             {
-                return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString()))}]";
-            }
-            if (value is null)
-            {
-                return "null";
-            }
-            return value.ToString();
+                IEnumerable enumerable when value.GetType() != typeof(string) =>
+                    $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString()))}]",
+                null => "null",
+                _ => value.ToString() ?? string.Empty
+            });
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj?.GetType() == GetType() && Equals((Element)obj);
         }
 
         public bool Equals(Element? other)
