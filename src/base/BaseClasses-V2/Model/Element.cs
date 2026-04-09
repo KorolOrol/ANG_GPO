@@ -1,5 +1,6 @@
 ﻿using BaseClasses_V2.Enum;
 using System.Collections;
+using BaseClasses_V2.Interface;
 using MessagePack;
 
 namespace BaseClasses_V2.Model
@@ -8,7 +9,7 @@ namespace BaseClasses_V2.Model
     /// Элемент истории
     /// </summary>
     [MessagePackObject(keyAsPropertyName: true)]
-    public class Element : PlotEntity, IEquatable<Element>
+    public class Element : IElement
     {
         /// <summary>
         /// Тип элемента
@@ -66,6 +67,11 @@ namespace BaseClasses_V2.Model
             Description = description;
             Params = @params ?? new Dictionary<string, object>();
             Time = time;
+        }
+
+        public bool Equals(IElement? other)
+        {
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>
@@ -137,5 +143,9 @@ namespace BaseClasses_V2.Model
                    Description == other.Description &&
                    Time == other.Time;
         }
+
+        public Dictionary<string, object> Params { get; set; }
+        public HashSet<string> Labels { get; set; }
+        public string Hash { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using BaseClasses_V2.Interface;
+using MessagePack;
 
 namespace BaseClasses_V2.Model
 {
@@ -6,7 +7,7 @@ namespace BaseClasses_V2.Model
     /// Отношение персонажа с другим персонажем
     /// </summary>
     [MessagePackObject(keyAsPropertyName: true)]
-    public class Relation : PlotEntity, IComparable<Relation>, IEquatable<Relation>
+    public class Relation : IPlotEntity, IComparable<Relation>, IEquatable<Relation>
     {
         public virtual string RelationType { get; set; }
         
@@ -54,5 +55,9 @@ namespace BaseClasses_V2.Model
             if (obj.GetType() != this.GetType()) return false;
             return Equals((Relation) obj);
         }
+
+        public Dictionary<string, object> Params { get; set; }
+        public HashSet<string> Labels { get; set; }
+        public string Hash { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BaseClasses_V2.Enum;
 using BaseClasses_V2.Fluent;
+using BaseClasses_V2.Interface;
 using MessagePack;
 using ObservableCollections;
 
@@ -157,7 +158,7 @@ namespace BaseClasses_V2.Model
             }
         }
         
-        public void Update(PlotEntity entity)
+        public void Update(IPlotEntity entity)
         {
             if (entity is Element element)
             {
@@ -173,7 +174,7 @@ namespace BaseClasses_V2.Model
             }
         }
 
-        public void BulkUpdate(List<PlotEntity> entities)
+        public void BulkUpdate(List<IPlotEntity> entities)
         {
             foreach (var entity in entities)
             {
@@ -192,7 +193,7 @@ namespace BaseClasses_V2.Model
             }
         }
 
-        public void Delete(PlotEntity entity)
+        public void Delete(IPlotEntity entity)
         {
             if (entity is Element)
             {
