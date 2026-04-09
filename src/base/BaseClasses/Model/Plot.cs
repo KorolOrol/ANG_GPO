@@ -14,7 +14,12 @@ namespace BaseClasses.Model
         /// <summary>
         /// Элементы истории
         /// </summary>
-        public List<IElement> Elements { get; set; } = new List<IElement>();
+        public HashSet<IElement> Elements { get; } = new HashSet<IElement>();
+        
+        /// <summary>
+        /// Связи между элементами истории
+        /// </summary>
+        public HashSet<Relation> Relations { get; } = new HashSet<Relation>();
 
         /// <summary>
         /// Добавление элемента в историю
@@ -68,32 +73,6 @@ namespace BaseClasses.Model
         /// <summary>
         /// Время
         /// </summary>
-        public int Time { get; set; } = 0;
-
-        /// <summary>
-        /// Полная информация об истории
-        /// </summary>
-        /// <returns>Полная информация об истории</returns>
-        public string FullInfo()
-        {
-            string info = "";
-            foreach (var c in Characters)
-            {
-                info += c.FullInfo() + "\n";
-            }
-            foreach (var l in Locations)
-            {
-                info += l.FullInfo() + "\n";
-            }
-            foreach (var i in Items)
-            {
-                info += i.FullInfo() + "\n";
-            }
-            foreach (var e in Events)
-            {
-                info += e.FullInfo() + "\n";
-            }
-            return info;
-        }
+        public int Time { get; set; }
     }
 }

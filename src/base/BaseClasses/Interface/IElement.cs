@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using BaseClasses.Enum;
-using BaseClasses.Model;
+﻿using BaseClasses.Enum;
 using BaseClasses.Model.Params;
 
 namespace BaseClasses.Interface
@@ -26,24 +23,15 @@ namespace BaseClasses.Interface
         /// </summary>
         public string Description { get; set; }
         
-        public ParamBag TypedParams { get; }
-
         /// <summary>
-        /// Параметры элемента
+        /// Типизированные параметры элемента
         /// </summary>
-        [Obsolete("Используйте TypedParams вместо Params для новых разработок.")]
-        public IDictionary<string, object> Params { get; set; }
+        public ParamBag Params { get; }
 
         /// <summary>
         /// Время создания элемента
         /// </summary>
         public int Time { get; set; }
-
-        /// <summary>
-        /// Полная информация об элементе
-        /// </summary>
-        /// <returns>Полная информация об элементе</returns>
-        public string FullInfo();
 
         /// <summary>
         /// Проверка на пустоту

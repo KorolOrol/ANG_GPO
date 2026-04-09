@@ -10,8 +10,6 @@ namespace BaseClasses.Model.Params
     {
         private const double Tolerance = 1e-9;
         private readonly Dictionary<IParamKey, object?> _params = new Dictionary<IParamKey, object?>();
-        [Obsolete("Используйте ParamBag вместо LegacyParamsDictionary для новых разработок.")]
-        private readonly Dictionary<string, IParamKey> _legacyKeys = new Dictionary<string, IParamKey>();
 
         public Dictionary<string, object?> AsDictionary() {
             return _params.ToDictionary(
@@ -51,65 +49,6 @@ namespace BaseClasses.Model.Params
             _params.Add(key, value);
         }
 
-        [Obsolete("Используйте Set<T>(ParamKey<T> key, T value) вместо SetLegacy для новых разработок.")]
-        public void SetLegacy(string key, object? value)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Legacy param key cannot be null or whitespace.", nameof(key));
-
-            var valueType = value?.GetType() ?? typeof(object);
-            if (_legacyKeys.TryGetValue(key, out var existingKey))
-            {
-                if (existingKey.ValueType != valueType)
-                {
-                    _params.Remove(existingKey);
-                    existingKey = new LegacyParamKey(key, valueType);
-                    _legacyKeys[key] = existingKey;
-                }
-            }
-            else
-            {
-                existingKey = new LegacyParamKey(key, valueType);
-                _legacyKeys[key] = existingKey;
-            }
-
-            EnsureTypeMatch(existingKey, value);
-            _params[existingKey] = value;
-        }
-
-        [Obsolete("Используйте TryGet<T>(ParamKey<T> key, out T value) вместо TryGetLegacy " +
-                  "для новых разработок.")]
-        public bool TryGetLegacy(string key, out object? value)
-        {
-            value = null;
-            return _legacyKeys.TryGetValue(key, out var legacyKey) &&
-                   _params.TryGetValue(legacyKey, out value);
-        }
-
-        [Obsolete("Используйте ContainsKey(IParamKey key) вместо ContainsLegacy для новых разработок.")]
-        public bool ContainsLegacy(string key)
-        {
-            return _legacyKeys.ContainsKey(key);
-        }
-
-        [Obsolete("Используйте Remove(IParamKey key) вместо RemoveLegacy для новых разработок.")]
-        public bool RemoveLegacy(string key)
-        {
-            if (!_legacyKeys.TryGetValue(key, out var legacyKey))
-                return false;
-            _legacyKeys.Remove(key);
-            return _params.Remove(legacyKey);
-        }
-
-        [Obsolete("Используйте Clear() вместо ClearLegacy для новых разработок.")]
-        public void ClearLegacy()
-        {
-            foreach (var legacyKey in _legacyKeys.Values.ToList())
-            {
-                _params.Remove(legacyKey);
-            }
-            _legacyKeys.Clear();
-        }
         
         public void Clear() => _params.Clear();
         
@@ -202,39 +141,6 @@ namespace BaseClasses.Model.Params
             }
             result = list;
             return true;
-        }
-
-        [Obsolete("Используйте ParamKey<T> вместо LegacyParamKey для новых разработок.")]
-        private sealed class LegacyParamKey : IParamKey, IEquatable<LegacyParamKey>
-        {
-            public LegacyParamKey(string name, Type valueType)
-            {
-                Name = name;
-                ValueType = valueType;
-            }
-
-            public string Name { get; }
-            public Type ValueType { get; }
-            public bool IsCollection => ValueType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(ValueType);
-            public string Namespace => "Legacy";
-
-            public bool Equals(LegacyParamKey? other)
-            {
-                if (other is null) return false;
-                return Name == other.Name && ValueType == other.ValueType;
-            }
-
-            public override bool Equals(object? obj)
-            {
-                return Equals(obj as LegacyParamKey);
-            }
-
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(Name, ValueType);
-            }
-
-            public override string ToString() => Name;
         }
     }
 }
