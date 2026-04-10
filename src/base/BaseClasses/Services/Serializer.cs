@@ -151,7 +151,6 @@ namespace BaseClasses.Services
         /// <exception cref="JsonException">Исключение, если тип не определен.</exception>
         private static object ReadValue(JsonElement json, ReferenceResolver resolver)
         {
-
             switch (json.ValueKind)
             {
                 case JsonValueKind.Object:
@@ -182,6 +181,16 @@ namespace BaseClasses.Services
                                 Value = json.GetProperty("Value").GetDouble()
                             };
                             return rel;
+                        }
+                        else
+                        {
+                            var dictionary = new Dictionary<string, object>();
+                            foreach (var property in json.EnumerateObject())
+                            {
+                                if (property.Name == "$id") continue;
+                                dictionary[property.Name] = ReadValue(property.Value, resolver);
+                            }
+                            return dictionary;
                         }
                     }
                     break;
