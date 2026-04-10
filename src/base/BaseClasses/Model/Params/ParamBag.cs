@@ -1,16 +1,28 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Interface;
 
 namespace BaseClasses.Model.Params
 {
+    /// <summary>
+    /// Типизированный словарь параметров элемента истории.
+    /// </summary>
     public class ParamBag
     {
-        private const double Tolerance = 1e-9;
+        /// <summary>
+        /// Внутреннее хранилище параметров, обеспечивающее типовую безопасность при добавлении и извлечении значений.
+        /// </summary>
         private readonly Dictionary<IParamKey, object?> _params = new Dictionary<IParamKey, object?>();
 
+        /// <summary>
+        /// Преобразует содержимое ParamBag в словарь со строковыми ключами и объектными значениями,
+        /// пригодный для сериализации или других целей, требующих простых типовых представлений.
+        /// </summary>
+        /// <returns>Словарь, где ключами являются строковые представления IParamKey,
+        /// а значениями - соответствующие объекты.</returns>
+        /// <exception cref="InvalidOperationException">Если строковое представление
+        /// ключа параметра равно null.</exception>
         public Dictionary<string, object?> AsDictionary() {
             return _params.ToDictionary(
                 kvp => kvp.Key.ToString() 
@@ -18,19 +30,49 @@ namespace BaseClasses.Model.Params
                 kvp => kvp.Value);
         }
         
+        /// <summary>
+        /// Количество параметров, хранящихся в ParamBag.
+        /// </summary>
         public int Count => _params.Count;
         
+        /// <summary>
+        /// Коллекция ключей параметров, хранящихся в ParamBag.
+        /// </summary>
         public ICollection<IParamKey> Keys => _params.Keys;
         
+        /// <summary>
+        /// Проверяет, содержит ли ParamBag параметр с указанным ключом.
+        /// </summary>
+        /// <param name="key">Ключ параметра, наличие которого нужно проверить.</param>
+        /// <returns>True, если ParamBag содержит параметр с указанным ключом, иначе False.</returns>
         public bool ContainsKey(IParamKey key)
         {
             return _params.ContainsKey(key);
         }
 
+        /// <summary>
+        /// Удаляет параметр с указанным ключом из ParamBag.
+        /// </summary>
+        /// <param name="key">Ключ параметра, который нужно удалить.</param>
+        /// <returns>True, если параметр был успешно удален, иначе False.</returns>
         public bool Remove(IParamKey key) => _params.Remove(key);
         
+        /// <summary>
+        /// Получает значение параметра с указанным ключом.
+        /// </summary>
+        /// <param name="key">Ключ параметра, значение которого нужно получить.</param>
+        /// <param name="value">Параметр, в который будет записано значение, если ключ существует.</param>
+        /// <returns>True, если ParamBag содержит параметр с указанным ключом
+        /// и значение было успешно получено, иначе False.</returns>
         public bool TryGetValue(IParamKey key, out object? value) => _params.TryGetValue(key, out value);
 
+        /// <summary>
+        /// Индексатор для доступа к параметрам по ключу.
+        /// </summary>
+        /// <param name="key">Ключ параметра, значение которого нужно получить или установить.</param>
+        /// <returns>Значение параметра, связанного с указанным ключом.</returns>
+        /// <exception cref="InvalidOperationException">Если при установке значения тип нового значения
+        /// не соответствует типу, определенному в ключе параметра.</exception>
         public object? this[IParamKey key]
         {
             get => _params[key];
@@ -43,23 +85,50 @@ namespace BaseClasses.Model.Params
             }
         }
 
+        /// <summary>
+        /// Добавляет новый параметр в ParamBag.
+        /// </summary>
+        /// <param name="key">Ключ параметра, который нужно добавить.</param>
+        /// <param name="value">Значение параметра, которое нужно добавить.</param>
         public void Add(IParamKey key, object value)
         {
-            EnsureTypeMatch(key, value);
+            key.IsTypeMatch(value);
             _params.Add(key, value);
         }
 
-        
+        /// <summary>
+        /// Очищает все параметры из ParamBag, удаляя все ключи и связанные с ними значения.
+        /// </summary>
         public void Clear() => _params.Clear();
-        
-        public IEnumerable<KeyValuePair<IParamKey, object?>> Enumerate() => _params;
 
+        /// <summary>
+        /// Перечисляет все пары ключ-значение, хранящиеся в ParamBag.
+        /// </summary>
+        /// <returns>Перечисление всех пар ключ-значение, хранящихся в ParamBag.</returns>
+        public IEnumerable<KeyValuePair<IParamKey, object?>> Enumerate() => _params.AsEnumerable();
+
+        /// <summary>
+        /// Устанавливает значение параметра с указанным типизированным ключом.
+        /// </summary>
+        /// <param name="key">Типизированный ключ параметра, значение которого нужно установить.</param>
+        /// <param name="value">Значение параметра, которое нужно установить. Должно соответствовать типу,
+        /// определенному в ключе параметра.</param>
+        /// <typeparam name="T">Тип значения, связанного с ключом параметра.</typeparam>
         public void Set<T>(ParamKey<T> key, T value)
         {
-            EnsureTypeMatch(key, value);
+            key.IsTypeMatch(value);
             _params[key] = value;
         }
 
+        /// <summary>
+        /// Пытается получить значение параметра с указанным типизированным ключом.
+        /// </summary>
+        /// <param name="key">Типизированный ключ параметра, значение которого нужно получить.</param>
+        /// <param name="value">Параметр, в который будет записано значение,
+        /// если ключ существует и значение может быть приведено к типу T.</param>
+        /// <typeparam name="T">Тип значения, связанного с ключом параметра.</typeparam>
+        /// <returns>True, если ParamBag содержит параметр с указанным ключом и значение было успешно получено
+        /// и приведено к типу T, иначе False.</returns>
         public bool TryGet<T>(ParamKey<T> key, out T value)
         {
             value = default!;
@@ -74,72 +143,8 @@ namespace BaseClasses.Model.Params
                     return true;
             }
 
-            if (!TryConvertValue(raw, typeof(T), out var converted)) return false;
+            if (!key.TryConvertValue(raw, out var converted)) return false;
             value = (T)converted!;
-            return true;
-
-        }
-
-        private static void EnsureTypeMatch(IParamKey key, object? value)
-        {
-            if (value == null) return;
-            if (key.ValueType.IsInstanceOfType(value)) return;
-            if (TryConvertValue(value, key.ValueType, out _)) return;
-            throw new InvalidOperationException($"Value of type {value.GetType().Name} cannot be assigned " +
-                                                $"to key '{key}' with expected type {key.ValueType.Name}.");
-        }
-
-        private static bool TryConvertValue(object? value, Type targetType, out object? result)
-        {
-            result = null;
-            if (value == null) return true;
-            
-            var valueType = value.GetType();
-            if (!targetType.IsAssignableFrom(valueType))
-                return TryConvertPrimitive(value, targetType, out result) ||
-                       TryConvertList(value, targetType, out result);
-            result = value;
-            return true;
-
-        }
-
-        private static bool TryConvertPrimitive(object value, Type targetType, out object? result)
-        {
-            result = null;
-            switch (value)
-            {
-                case int i when targetType == typeof(double):
-                    result = (double)i;
-                    return true;
-                case double d when targetType == typeof(int):
-                    if (Math.Abs(Math.Truncate(d) - d) < Tolerance)
-                    {
-                        result = (int)d;
-                        return true;
-                    }
-                    break;
-            }
-            return false;
-        }
-
-        private static bool TryConvertList(object value, Type targetType, out object? result)
-        {
-            result = null;
-            
-            if (!targetType.IsGenericType || targetType.GetGenericTypeDefinition() != typeof(List<>))
-                return false;
-            if (!(value is IEnumerable enumerable) || value is string)
-                return false;
-            
-            var elementType = targetType.GetGenericArguments()[0];
-            var list = (IList)Activator.CreateInstance(targetType)!;
-            foreach (var item in enumerable)
-            {
-                if (!TryConvertValue(item, elementType, out var convertedItem))
-                    return false;
-                list.Add(convertedItem);
-            }
-            result = list;
             return true;
         }
     }

@@ -7,44 +7,44 @@ using BaseClasses.Model.Params;
 namespace BaseClasses.Model
 {
     /// <summary>
-    /// Элемент истории
+    /// Элемент истории.
     /// </summary>
     public class Element : IElement, IEquatable<Element>
     {
         private readonly Guid _id = Guid.NewGuid();
         
         /// <summary>
-        /// Тип элемента
+        /// Тип элемента.
         /// </summary>
         public ElemType Type { get; }
 
         /// <summary>
-        /// Название элемента
+        /// Название элемента.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Описание элемента
+        /// Описание элемента.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Типизированные параметры элемента
+        /// Типизированные параметры элемента.
         /// </summary>
         public ParamBag Params { get; }
 
         /// <summary>
-        /// Время создания элемента
+        /// Время создания элемента.
         /// </summary>
         public int Time { get; set; }
 
         /// <summary>
-        /// Конструктор элемента
+        /// Конструктор элемента.
         /// </summary>
-        /// <param name="type">Тип элемента</param>
-        /// <param name="name">Название элемента</param>
-        /// <param name="description">Описание элемента</param>
-        /// <param name="time">Время создания элемента</param>
+        /// <param name="type">Тип элемента.</param>
+        /// <param name="name">Название элемента.</param>
+        /// <param name="description">Описание элемента.</param>
+        /// <param name="time">Время создания элемента.</param>
         public Element(ElemType type, string name = "", string description = "", int time = -1)
         {
             Type = type;
@@ -54,16 +54,15 @@ namespace BaseClasses.Model
             Time = time;
         }
 
-        /// <inheritdoc/>
         public override string ToString()
         {
             return $"{Type}: {Name}";
         }
 
         /// <summary>
-        /// Проверка на пустоту элемента
+        /// Проверка на пустоту элемента.
         /// </summary>
-        /// <returns>True, если элемент пуст, иначе False</returns>
+        /// <returns>True, если элемент пуст, иначе False.</returns>
         public bool IsEmpty()
         {
             return Name == "" && Description == "" &&

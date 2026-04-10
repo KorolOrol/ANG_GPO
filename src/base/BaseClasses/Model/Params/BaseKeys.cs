@@ -3,15 +3,54 @@ using BaseClasses.Interface;
 
 namespace BaseClasses.Model.Params
 {
-    public static class BaseKeys
+    /// <summary>
+    /// Ключи параметров для стандартных видов связей.
+    /// </summary>
+    public static class BaseRelationKeys
     {
-        public static readonly ParamKey<List<Relation>> Relations = new ParamKey<List<Relation>>("Relations");
-        public static readonly ParamKey<List<IElement>> Characters = new ParamKey<List<IElement>>("Characters");
-        public static readonly ParamKey<List<IElement>> Locations = new ParamKey<List<IElement>>("Locations");
-        public static readonly ParamKey<List<IElement>> Items = new ParamKey<List<IElement>>("Items");
-        public static readonly ParamKey<List<IElement>> Events = new ParamKey<List<IElement>>("Events");
+        /// <summary>
+        /// Отношение одного персонажа к другому.
+        /// </summary>
+        public static readonly ParamKey<double> Relationship =  new ParamKey<double>("Relationship");
         
-        public static readonly ParamKey<IElement> Host = new ParamKey<IElement>("Host");
-        public static readonly ParamKey<IElement> Location = new ParamKey<IElement>("Location");
+        /// <summary>
+        /// Элемент находится на локации.
+        /// </summary>
+        public static readonly ParamKey<bool> Located = new ParamKey<bool>("Located");
+        
+        /// <summary>
+        /// Локация содержит элемент.
+        /// </summary>
+        public static readonly ParamKey<bool> Locates = new ParamKey<bool>("Locates");
+        
+        /// <summary>
+        /// Персонаж обладает предметом.
+        /// </summary>
+        public static readonly ParamKey<bool> Owns = new ParamKey<bool>("Owns");
+        
+        /// <summary>
+        /// Предмет принадлежит персонажу.
+        /// </summary>
+        public static readonly ParamKey<bool> Owned = new ParamKey<bool>("Owned");
+        
+        /// <summary>
+        /// Персонаж принимает участие в событии.
+        /// </summary>
+        public static readonly ParamKey<bool> Participates = new ParamKey<bool>("Participates");
+        
+        /// <summary>
+        /// Событие включает персонажа.
+        /// </summary>
+        public static readonly ParamKey<bool> Involves = new ParamKey<bool>("Involves");
+        
+        /// <summary>
+        /// Событие использует предмет.
+        /// </summary>
+        public static readonly ParamKey<bool> Uses = new ParamKey<bool>("Uses");
+        
+        /// <summary>
+        /// Предмет используется в событии.
+        /// </summary>
+        public static readonly ParamKey<bool> Used = new ParamKey<bool>("Used");
     }
 }

@@ -1,795 +1,118 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
-using BaseClasses.Enum;
+
 namespace BaseClasses.Services
 {
     /// <summary>
-    /// Сервис для связывания элементов истории
+    /// Сервис для связывания элементов истории.
     /// </summary>
-    public static class Binder
+    public class Binder
     {
         /// <summary>
-        /// Связывание двух частей истории
+        /// Стратегии связывания для каждой комбинации типов элементов и ключа параметра.
         /// </summary>
-        /// <param name="element1">Первая часть истории</param>
-        /// <param name="element2">Вторая часть истории</param>
-        /// <param name="param">Параметр отношений (если связываются два персонажа)</param>
-        public static void Bind(IElement element1, IElement element2, double param = 0) 
-        { 
-            switch (element1.Type)
-            {
-                case ElemType.Character:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            BindCharacters(element1, element2, param);
-                            break;
-                        case ElemType.Location:
-                            BindCharLoc(element1, element2);
-                            break;
-                        case ElemType.Item:
-                            BindCharItem(element1, element2);
-                            break;
-                        case ElemType.Event:
-                            BindCharEvent(element1, element2);
-                            break;
-                    }
-                    break;
-                case ElemType.Location:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            BindLocChar(element1, element2);
-                            break;
-                        case ElemType.Item:
-                            BindLocItem(element1, element2);
-                            break;
-                        case ElemType.Event:
-                            BindLocEvent(element1, element2);
-                            break;
-                    }
-                    break;
-                case ElemType.Item:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            BindItemChar(element1, element2);
-                            break;
-                        case ElemType.Location:
-                            BindItemLoc(element1, element2);
-                            break;
-                        case ElemType.Event:
-                            BindItemEvent(element1, element2);
-                            break;
-                    }
-                    break;
-                case ElemType.Event:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            BindEventChar(element1, element2);
-                            break;
-                        case ElemType.Location:
-                            BindEventLoc(element1, element2);
-                            break;
-                        case ElemType.Item:
-                            BindEventItem(element1, element2);
-                            break;
-                    }
-                    break;
-            }
-        }
-
+        private readonly Dictionary<RelationRoute, RelationBindingStrategy> _bindStrategies =
+            new Dictionary<RelationRoute, RelationBindingStrategy>();
+        
         /// <summary>
-        /// Разъединение двух частей истории
+        /// Стратегии отвязывания для каждой комбинации типов элементов и ключа параметра.
         /// </summary>
-        /// <param name="element1">Первая часть истории</param>
-        /// <param name="element2">Вторая часть истории</param>
-        public static void Unbind(IElement element1, IElement element2) 
-        { 
-            switch (element1.Type)
-            {
-                case ElemType.Character:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            UnbindCharacters(element1, element2);
-                            break;
-                        case ElemType.Location:
-                            UnbindCharLoc(element1, element2);
-                            break;
-                        case ElemType.Item:
-                            UnbindCharItem(element1, element2);
-                            break;
-                        case ElemType.Event:
-                            UnbindCharEvent(element1, element2);
-                            break;
-                    }
-                    break;
-                case ElemType.Location:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            UnbindLocChar(element1, element2);
-                            break;
-                        case ElemType.Item:
-                            UnbindLocItem(element1, element2);
-                            break;
-                        case ElemType.Event:
-                            UnbindLocEvent(element1, element2);
-                            break;
-                    }
-                    break;
-                case ElemType.Item:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            UnbindItemChar(element1, element2);
-                            break;
-                        case ElemType.Location:
-                            UnbindItemLoc(element1, element2);
-                            break;
-                        case ElemType.Event:
-                            UnbindItemEvent(element1, element2);
-                            break;
-                    }
-                    break;
-                case ElemType.Event:
-                    switch (element2.Type)
-                    {
-                        case ElemType.Character:
-                            UnbindEventChar(element1, element2);
-                            break;
-                        case ElemType.Location:
-                            UnbindEventLoc(element1, element2);
-                            break;
-                        case ElemType.Item:
-                            UnbindEventItem(element1, element2);
-                            break;
-                    }
-                    break;
-            }
-        }
-
+        private readonly Dictionary<RelationRoute, RelationBindingStrategy> _unbindStrategies =
+            new Dictionary<RelationRoute, RelationBindingStrategy>();
+        
         /// <summary>
-        /// Вспомогательный метод для проверки валидности связывания элементов
+        /// Регистрация стратегии связывания и отвязывания для конкретной комбинации типов элементов и ключа параметра.
         /// </summary>
-        private static bool IsValidBinding(IElement element1, IElement element2)
+        /// <param name="sourceType">Тип источника.</param>
+        /// <param name="targetType">Тип цели.</param>
+        /// <param name="paramKey">Ключ параметра.</param>
+        /// <param name="bindStrategy">Стратегия связывания.</param>
+        /// <param name="unbindStrategy">Стратегия отвязывания.</param>
+        public void Register(ElemType sourceType,
+            ElemType targetType,
+            IParamKey paramKey,
+            RelationBindingStrategy bindStrategy,
+            RelationBindingStrategy unbindStrategy)
         {
-            return element1 != null && element2 != null && element1 != element2;
-        }
-
-        /// <summary>
-        /// Связывание двух персонажей
-        /// </summary>
-        /// <param name="character1">Первый персонаж</param>
-        /// <param name="character2">Второй персонаж</param>
-        /// <param name="relations">Отношения между персонажами</param>
-        private static void BindCharacters(IElement character1, IElement character2, double relations)
-        {
-            if (!IsValidBinding(character1, character2) || relations == 0)
-            {
-                return;
-            }
-
-            List<Relation> relations1;
-            if (!character1.Params.ContainsKey("Relations"))
-            {
-                relations1 = new List<Relation>();
-                character1.Params.Add("Relations", relations1);
-            }
-            else
-            {
-                relations1 = (List<Relation>)character1.Params["Relations"];
-            }
-
-            List<Relation> relations2;
-            if (!character2.Params.ContainsKey("Relations"))
-            {
-                relations2 = new List<Relation>();
-                character2.Params.Add("Relations", relations2);
-            }
-            else
-            {
-                relations2 = (List<Relation>)character2.Params["Relations"];
-            }
-
-            var rel1 = relations1.FirstOrDefault(rel => rel.Character == character2);
-            if (rel1 != null)
-            {
-                rel1.Value = relations;
-            }
-            else
-            {
-                relations1.Add(new Relation { Character = character2, Value = relations });
-            }
-
-            var rel2 = relations2.FirstOrDefault(rel => rel.Character == character1);
-            if (rel2 != null)
-            {
-                rel2.Value = relations;
-            }
-            else
-            {
-                relations2.Add(new Relation { Character = character1, Value = relations });
-            }
-        }
-
-        /// <summary>
-        /// Разъединение двух персонажей
-        /// </summary>
-        /// <param name="character1">Первый персонаж</param>
-        /// <param name="character2">Второй персонаж</param>
-        private static void UnbindCharacters(IElement character1, IElement character2)
-        {
-            if (!IsValidBinding(character1, character2))
-            {
-                return;
-            }
-
-            if (character1.Params.ContainsKey("Relations"))
-            {
-                Relation rel1 = ((List<Relation>)character1.Params["Relations"]).
-                                FirstOrDefault(rel => rel.Character == character2);
-                if (rel1 != null)
-                {
-                    ((List<Relation>)character1.Params["Relations"]).Remove(rel1);
-                }
-            }
-
-            if (character2.Params.ContainsKey("Relations"))
-            {
-                Relation rel2 = ((List<Relation>)character2.Params["Relations"]).
-                                FirstOrDefault(rel => rel.Character == character1);
-                if (rel2 != null)
-                {
-                    ((List<Relation>)character2.Params["Relations"]).Remove(rel2);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Связывание персонажа с локацией
-        /// </summary>
-        /// <param name="character">Персонаж</param>
-        /// <param name="location">Локация</param>
-        private static void BindCharLoc(IElement character, IElement location)
-        {
-            if (!IsValidBinding(character, location))
-            {
-                return;
-            }
-
-            List<IElement> locs;
-            if (!character.Params.ContainsKey("Locations"))
-            {
-                locs = new List<IElement>();
-                character.Params.Add("Locations", locs);
-            }
-            else
-            {
-                locs = (List<IElement>)character.Params["Locations"];
-            }
-
-            List<IElement> chars;
-            if (!location.Params.ContainsKey("Characters"))
-            {
-                chars = new List<IElement>();
-                location.Params.Add("Characters", chars);
-            }
-            else
-            {
-                chars = (List<IElement>)location.Params["Characters"];
-            }
-
-            if (!locs.Contains(location))
-            {
-                locs.Add(location);
-            }
-
-            if (!chars.Contains(character))
-            {
-                chars.Add(character);
-            }
-        }
-
-        /// <summary>
-        /// Разъединение персонажа с локацией
-        /// </summary>
-        /// <param name="character">Персонаж</param>
-        /// <param name="location">Локация</param>
-        private static void UnbindCharLoc(IElement character, IElement location)
-        {
-            if (!IsValidBinding(character, location))
-            {
-                return;
-            }
-
-            if (character.Params.ContainsKey("Locations") &&
-                ((List<IElement>)character.Params["Locations"]).Contains(location))
-            {
-                ((List<IElement>)character.Params["Locations"]).Remove(location);
-            }
-
-            if (location.Params.ContainsKey("Characters") &&
-                ((List<IElement>)location.Params["Characters"]).Contains(character))
-            {
-                ((List<IElement>)location.Params["Characters"]).Remove(character);
-            }
-        }
-
-        /// <summary>
-        /// Связывание персонажа с предметом
-        /// </summary>
-        /// <param name="character">Персонаж</param>
-        /// <param name="item">Предмет</param>
-        private static void BindCharItem(IElement character, IElement item)
-        {
-            if (!IsValidBinding(character, item))
-            {
-                return;
-            }
-
-            List<IElement> items;
-            if (!character.Params.ContainsKey("Items"))
-            {
-                items = new List<IElement>();
-                character.Params.Add("Items", items);
-            }
-            else
-            {
-                items = (List<IElement>)character.Params["Items"];
-            }
-
-            if (!items.Contains(item))
-            {
-                items.Add(item);
-            }
-
-            if (!item.Params.ContainsKey("Host"))
-            {
-                item.Params.Add("Host", character);
-            }
-            else
-            {
-                if ((IElement)item.Params["Host"] != character)
-                {
-                    var prevHost = item.Params["Host"] as IElement;
-                    if (prevHost != null)
-                    {
-                        UnbindCharItem(prevHost, item);
-                    }
-                    item.Params["Host"] = character;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Разъединение персонажа с предметом
-        /// </summary>
-        /// <param name="character">Персонаж</param>
-        /// <param name="item">Предмет</param>
-        private static void UnbindCharItem(IElement character, IElement item)
-        {
-            if (!IsValidBinding(character, item))
-            {
-                return;
-            }
-
-            if (character.Params.ContainsKey("Items") &&
-                ((List<IElement>)character.Params["Items"]).Contains(item))
-            {
-                ((List<IElement>)character.Params["Items"]).Remove(item);
-            }
-
-            if (item.Params.ContainsKey("Host") &&
-                ((IElement)item.Params["Host"]) == character)
-            {
-                item.Params["Host"] = null;
-            }
-        }
-
-        /// <summary>
-        /// Связывание персонажа с событием
-        /// </summary>
-        /// <param name="character">Персонаж</param>
-        /// <param name="event">Событие</param>
-        private static void BindCharEvent(IElement character, IElement @event)
-        {
-            if (!IsValidBinding(character, @event))
-            {
-                return;
-            }
-
-            List<IElement> events;
-            if (!character.Params.ContainsKey("Events"))
-            {
-                events = new List<IElement>();
-                character.Params.Add("Events", events);
-            }
-            else
-            {
-                events = (List<IElement>)character.Params["Events"];
-            }
-
-            List<IElement> chars;
-            if (!@event.Params.ContainsKey("Characters"))
-            {
-                chars = new List<IElement>();
-                @event.Params.Add("Characters", chars);
-            }
-            else
-            {
-                chars = (List<IElement>)@event.Params["Characters"];
-            }
-
-            if (!events.Contains(@event))
-            {
-                events.Add(@event);
-            }
-
-            if (!chars.Contains(character))
-            {
-                chars.Add(character);
-            }
-        }
-
-        /// <summary>
-        /// Разъединение персонажа с событием
-        /// </summary>
-        /// <param name="character">Персонаж</param>
-        /// <param name="event">Событие</param>
-        private static void UnbindCharEvent(IElement character, IElement @event)
-        {
-            if (!IsValidBinding(character, @event))
-            {
-                return;
-            }
-
-            if (character.Params.ContainsKey("Events") &&
-                ((List<IElement>)character.Params["Events"]).Contains(@event))
-            {
-                ((List<IElement>)character.Params["Events"]).Remove(@event);
-            }
-
-            if (@event.Params.ContainsKey("Characters") &&
-                ((List<IElement>)@event.Params["Characters"]).Contains(character))
-            {
-                ((List<IElement>)@event.Params["Characters"]).Remove(character);
-            }
-        }
-
-        /// <summary>
-        /// Связывание локации с персонажем
-        /// </summary>
-        /// <param name="location">Локация</param>
-        /// <param name="character">Персонаж</param>
-        private static void BindLocChar(IElement location, IElement character)
-        {
-            BindCharLoc(character, location);
-        }
-
-        /// <summary>
-        /// Разъединение локации с персонажем
-        /// </summary>
-        /// <param name="location">Локация</param>
-        /// <param name="character">Персонаж</param>
-        private static void UnbindLocChar(IElement location, IElement character)
-        {
-            UnbindCharLoc(character, location);
-        }
-
-        /// <summary>
-        /// Связывание локации с предметом
-        /// </summary>
-        /// <param name="location">Локация</param>
-        /// <param name="item">Предмет</param>
-        private static void BindLocItem(IElement location, IElement item)
-        {
-            if (!IsValidBinding(location, item))
-            {
-                return;
-            }
-
-            List<IElement> items;
-            if (!location.Params.ContainsKey("Items"))
-            {
-                items = new List<IElement>();
-                location.Params.Add("Items", items);
-            }
-            else
-            {
-                items = (List<IElement>)location.Params["Items"];
-            }
-
-            if (!items.Contains(item))
-            {
-                items.Add(item);
-            }
-
-            if (!item.Params.ContainsKey("Location"))
-            {
-                item.Params.Add("Location", location);
-            }
-            else
-            {
-                if ((IElement)item.Params["Location"] != location)
-                {
-                    var prevLocation = item.Params["Location"] as IElement;
-                    if (prevLocation != null)
-                    {
-                        UnbindLocItem(prevLocation, item);
-                    }
-                    item.Params["Location"] = location;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Разъединение локации с предметом
-        /// </summary>
-        /// <param name="location">Локация</param>
-        /// <param name="item">Предмет</param>
-        private static void UnbindLocItem(IElement location, IElement item)
-        {
-            if (!IsValidBinding(location, item))
-            {
-                return;
-            }
-
-            if (location.Params.ContainsKey("Items") &&
-                ((List<IElement>)location.Params["Items"]).Contains(item))
-            {
-                ((List<IElement>)location.Params["Items"]).Remove(item);
-            }
-
-            if (item.Params.ContainsKey("Location") &&
-                ((IElement)item.Params["Location"]) == location)
-            {
-                item.Params["Location"] = null;
-            }
-        }
-
-        /// <summary>
-        /// Связывание локации с событием
-        /// </summary>
-        /// <param name="location">Локация</param>
-        /// <param name="event">Событие</param>
-        private static void BindLocEvent(IElement location, IElement @event)
-        {
-            if (!IsValidBinding(location, @event))
-            {
-                return;
-            }
-
-            List<IElement> events;
-            if (!location.Params.ContainsKey("Events"))
-            {
-                events = new List<IElement>();
-                location.Params.Add("Events", events);
-            }
-            else
-            {
-                events = (List<IElement>)location.Params["Events"];
-            }
-
-            List<IElement> locs;
-            if (!@event.Params.ContainsKey("Locations"))
-            {
-                locs = new List<IElement>();
-                @event.Params.Add("Locations", locs);
-            }
-            else
-            {
-                locs = (List<IElement>)@event.Params["Locations"];
-            }
-
-            if (!events.Contains(@event))
-            {
-                events.Add(@event);
-            }
-
-            if (!locs.Contains(location))
-            {
-                locs.Add(location);
-            }
-        }
-
-        /// <summary>
-        /// Разъединение локации с событием
-        /// </summary>
-        /// <param name="location">Локация</param>
-        /// <param name="event">Событие</param>
-        private static void UnbindLocEvent(IElement location, IElement @event)
-        {
-            if (!IsValidBinding(location, @event))
-            {
-                return;
-            }
-
-            if (location.Params.ContainsKey("Events") &&
-                ((List<IElement>)location.Params["Events"]).Contains(@event))
-            {
-                ((List<IElement>)location.Params["Events"]).Remove(@event);
-            }
-
-            if (@event.Params.ContainsKey("Locations") &&
-                ((List<IElement>)@event.Params["Locations"]).Contains(location))
-            {
-                ((List<IElement>)@event.Params["Locations"]).Remove(location);
-            }
-        }
-
-        /// <summary>
-        /// Связывание предмета с персонажем
-        /// </summary>
-        /// <param name="item">Предмет</param>
-        /// <param name="character">Персонаж</param>
-        private static void BindItemChar(IElement item, IElement character)
-        {
-            BindCharItem(character, item);
-        }
-
-        /// <summary>
-        /// Разъединение предмета с персонажем
-        /// </summary>
-        /// <param name="item">Предмет</param>
-        /// <param name="character">Персонаж</param>
-        private static void UnbindItemChar(IElement item, IElement character)
-        {
-            UnbindCharItem(character, item);
-        }
-
-        /// <summary>
-        /// Связывание предмета с локацией
-        /// </summary>
-        /// <param name="item">Предмет</param>
-        /// <param name="location">Локация</param>
-        private static void BindItemLoc(IElement item, IElement location)
-        {
-            BindLocItem(location, item);
-        }
-
-        /// <summary>
-        /// Разъединение предмета с локацией
-        /// </summary>
-        /// <param name="item">Предмет</param>
-        /// <param name="location">Локация</param>
-        private static void UnbindItemLoc(IElement item, IElement location)
-        {
-            UnbindLocItem(location, item);
-        }
-
-        /// <summary>
-        /// Связывание предмета с событием
-        /// </summary>
-        /// <param name="item">Предмет</param>
-        /// <param name="event">Событие</param>
-        private static void BindItemEvent(IElement item, IElement @event)
-        {
-            if (!IsValidBinding(item, @event))
-            {
-                return;
-            }
-
-            List<IElement> events;
-            if (!item.Params.ContainsKey("Events"))
-            {
-                events = new List<IElement>();
-                item.Params.Add("Events", events);
-            }
-            else
-            {
-                events = (List<IElement>)item.Params["Events"];
-            }
-
-            List<IElement> items;
-            if (!@event.Params.ContainsKey("Items"))
-            {
-                items = new List<IElement>();
-                @event.Params.Add("Items", items);
-            }
-            else
-            {
-                items = (List<IElement>)@event.Params["Items"];
-            }
-
-            if (!events.Contains(@event))
-            {
-                events.Add(@event);
-            }
-
-            if (!items.Contains(item))
-            {
-                items.Add(item);
-            }
-        }
-
-        /// <summary>
-        /// Разъединение предмета с событием
-        /// </summary>
-        /// <param name="item">Предмет</param>
-        /// <param name="event">Событие</param>
-        private static void UnbindItemEvent(IElement item, IElement @event)
-        {
-            if (!IsValidBinding(item, @event))
-            {
-                return;
-            }
-
-            if (item.Params.ContainsKey("Events") &&
-                ((List<IElement>)item.Params["Events"]).Contains(@event))
-            {
-                ((List<IElement>)item.Params["Events"]).Remove(@event);
-            }
-
-            if (@event.Params.ContainsKey("Items") &&
-                ((List<IElement>)@event.Params["Items"]).Contains(item))
-            {
-                ((List<IElement>)@event.Params["Items"]).Remove(item);
-            }
-        }
-
-        /// <summary>
-        /// Связывание события с персонажем
-        /// </summary>
-        /// <param name="event"></param>
-        /// <param name="character"></param>
-        private static void BindEventChar(IElement @event, IElement character)
-        {
-            BindCharEvent(character, @event);
+            var route = new RelationRoute(sourceType, targetType, paramKey);
+            Register(route, bindStrategy, unbindStrategy);
         }
         
         /// <summary>
-        /// Разъединение события с персонажем
+        /// Регистрация стратегии связывания и отвязывания для конкретной комбинации типов элементов и ключа параметра.
         /// </summary>
-        /// <param name="event">Событие</param>
-        /// <param name="character">Персонаж</param>
-        private static void UnbindEventChar(IElement @event, IElement character)
+        /// <param name="route">Комбинация типов элементов и ключа параметра.</param>
+        /// <param name="bindStrategy">Стратегия связывания.</param>
+        /// <param name="unbindStrategy">Стратегия отвязывания.</param>
+        /// <exception cref="ArgumentNullException">Если bindStrategy или unbindStrategy равны null.</exception>
+        public void Register(RelationRoute route,
+            RelationBindingStrategy bindStrategy,
+            RelationBindingStrategy unbindStrategy)
         {
-            UnbindCharEvent(character, @event);
+            _bindStrategies[route] = bindStrategy ?? throw new ArgumentNullException(nameof(bindStrategy));
+            _unbindStrategies[route] = unbindStrategy ?? throw new ArgumentNullException(nameof(unbindStrategy));
+        }
+        
+        /// <summary>
+        /// Удаление зарегистрированных стратегий связывания и отвязывания
+        /// для конкретной комбинации типов элементов и ключа параметра.
+        /// </summary>
+        /// <param name="sourceType">Тип источника.</param>
+        /// <param name="targetType">Тип цели.</param>
+        /// <param name="paramKey">Ключ параметра.</param>
+        /// <returns>True, если хотя бы одна из стратегий была удалена, иначе False.</returns>
+        public bool Unregister(ElemType sourceType, ElemType targetType, IParamKey paramKey)
+        {
+            var route = new RelationRoute(sourceType, targetType, paramKey);
+            return Unregister(route);
         }
 
         /// <summary>
-        /// Связывание события с локацией
+        /// Удаление зарегистрированных стратегий связывания и отвязывания
+        /// для конкретной комбинации типов элементов и ключа параметра.
         /// </summary>
-        /// <param name="event">Событие</param>
-        /// <param name="location">Локация</param>
-        private static void BindEventLoc(IElement @event, IElement location)
+        /// <param name="route">Комбинация типов элементов и ключа параметра.</param>
+        /// <returns>True, если хотя бы одна из стратегий была удалена, иначе False.</returns>
+        public bool Unregister(RelationRoute route)
         {
-            BindLocEvent(location, @event);
+            var removedBind = _bindStrategies.Remove(route);
+            var removedUnbind = _unbindStrategies.Remove(route);
+            return removedBind || removedUnbind;
         }
 
         /// <summary>
-        /// Разъединение события с локацией
+        /// Выполняет связывание между элементами на основе зарегистрированных стратегий для их типов и ключа параметра.
         /// </summary>
-        /// <param name="event">Событие</param>
-        /// <param name="location">Локация</param>
-        private static void UnbindEventLoc(IElement @event, IElement location)
+        /// <param name="source">Источник связи.</param>
+        /// <param name="target">Приемник связи.</param>
+        /// <param name="paramKey">Параметр, описывающий связь.</param>
+        /// <param name="value">Значение параметра, описывающее связь.</param>
+        /// <param name="plot">История, в которой происходит связывание.</param>
+        public void Bind(IElement source, IElement target, IParamKey paramKey, object? value, Plot plot)
         {
-            UnbindLocEvent(location, @event);
+            var route = new RelationRoute(source.Type, target.Type, paramKey);
+            if (_bindStrategies.TryGetValue(route, out var strategy))
+                strategy(source, target, paramKey, value, plot);
         }
 
         /// <summary>
-        /// Связывание события с предметом
+        /// Выполняет отвязывание между элементами на основе зарегистрированных стратегий
+        /// для их типов и ключа параметра.
         /// </summary>
-        /// <param name="event">Событие</param>
-        /// <param name="item">Предмет</param>
-        private static void BindEventItem(IElement @event, IElement item)
+        /// <param name="source">Источник связи.</param>
+        /// <param name="target">Приемник связи.</param>
+        /// <param name="paramKey">Параметр, описывающий связь.</param>
+        /// <param name="plot">История, в которой происходит отвязывание.</param>
+        public void Unbind(IElement source, IElement target, IParamKey paramKey, Plot plot)
         {
-            BindItemEvent(item, @event);
-        }
-
-        /// <summary>
-        /// Разъединение события с предметом
-        /// </summary>
-        /// <param name="event">Событие</param>
-        /// <param name="item">Предмет</param>
-        private static void UnbindEventItem(IElement @event, IElement item)
-        {
-            UnbindItemEvent(item, @event);
+            var route = new RelationRoute(source.Type, target.Type, paramKey);
+            if (_unbindStrategies.TryGetValue(route, out var strategy))
+            {
+                strategy(source, target, paramKey, null, plot);
+            }
         }
     }
 }
