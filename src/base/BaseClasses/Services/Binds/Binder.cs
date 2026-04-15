@@ -4,7 +4,7 @@ using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 
-namespace BaseClasses.Services
+namespace BaseClasses.Services.Binds
 {
     /// <summary>
     /// Сервис для связывания элементов истории.
@@ -52,8 +52,10 @@ namespace BaseClasses.Services
             RelationBindingStrategy bindStrategy,
             RelationBindingStrategy unbindStrategy)
         {
-            _bindStrategies[route] = bindStrategy ?? throw new ArgumentNullException(nameof(bindStrategy));
-            _unbindStrategies[route] = unbindStrategy ?? throw new ArgumentNullException(nameof(unbindStrategy));
+            if (bindStrategy is null) throw new ArgumentNullException(nameof(bindStrategy));
+            if (unbindStrategy is null) throw new ArgumentNullException(nameof(unbindStrategy));
+            _bindStrategies[route] = bindStrategy;
+            _unbindStrategies[route] = unbindStrategy;
         }
         
         /// <summary>
@@ -93,9 +95,15 @@ namespace BaseClasses.Services
         /// <param name="plot">История, в которой происходит связывание.</param>
         public void Bind(IElement source, IElement target, IParamKey paramKey, object? value, Plot plot)
         {
+            if (source is null) throw new ArgumentNullException(nameof(source));
+            if (target is null) throw new ArgumentNullException(nameof(target));
+            if (!paramKey.IsTypeMatch(value))
+                throw new ArgumentException($"Value {value} does not match the type defined in paramKey {paramKey}");
             var route = new RelationRoute(source.Type, target.Type, paramKey);
             if (_bindStrategies.TryGetValue(route, out var strategy))
                 strategy(source, target, paramKey, value, plot);
+            else
+                throw new ArgumentException($"No binding strategy registered for route: {route}");
         }
 
         /// <summary>
@@ -108,6 +116,8 @@ namespace BaseClasses.Services
         /// <param name="plot">История, в которой происходит отвязывание.</param>
         public void Unbind(IElement source, IElement target, IParamKey paramKey, Plot plot)
         {
+            if (source is null) throw new ArgumentNullException(nameof(source));
+            if (target is null) throw new ArgumentNullException(nameof(target));
             var route = new RelationRoute(source.Type, target.Type, paramKey);
             if (_unbindStrategies.TryGetValue(route, out var strategy))
             {

@@ -5,6 +5,7 @@ using BaseClasses.Model;
 using BaseClasses.Enum;
 using BaseClasses.Services;
 using BaseClasses.Interface;
+using BaseClasses.Services.Binds;
 using Xunit;
 
 namespace BaseClasses.Tests.Services

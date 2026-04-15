@@ -2,7 +2,7 @@ using System;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 
-namespace BaseClasses.Services
+namespace BaseClasses.Services.Binds
 {
     /// <summary>
     /// Структура для определения маршрута связи между элементами истории, включающая типы элементов и ключ параметра.
@@ -36,7 +36,12 @@ namespace BaseClasses.Services
             TargetType = targetType;
             ParamKey = paramKey;
         }
-        
+
+        public override string ToString()
+        {
+            return $"{SourceType} -> {TargetType}: {ParamKey}";
+        }
+
         public bool Equals(RelationRoute other)
         {
             return SourceType == other.SourceType && TargetType == other.TargetType && ParamKey.Equals(other.ParamKey);

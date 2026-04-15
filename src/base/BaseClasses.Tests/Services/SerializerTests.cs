@@ -5,6 +5,7 @@ using BaseClasses.Services;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using BaseClasses.Services.Binds;
 using Xunit;
 
 namespace BaseClasses.Tests.Services

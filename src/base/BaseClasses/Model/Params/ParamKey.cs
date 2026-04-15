@@ -110,7 +110,7 @@ namespace BaseClasses.Model.Params
             return true;
         }
         
-        public override string ToString() => $"{Namespace}:{Name} ({ValueType.Name})";
+        public override string ToString() => $"{Namespace}.{Name} ({ValueType.Name})";
 
         public override bool Equals(object? obj)
         {

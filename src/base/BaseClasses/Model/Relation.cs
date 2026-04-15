@@ -28,7 +28,7 @@ namespace BaseClasses.Model
         /// <summary>
         /// Значение параметра, описывающего отношение между элементами.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
         
         /// <summary>
         /// Конструктор для создания нового отношения между элементами истории.
@@ -37,7 +37,7 @@ namespace BaseClasses.Model
         /// <param name="target">Элемент, к которому направлено отношение.</param>
         /// <param name="param">Параметр, описывающий отношение между элементами.</param>
         /// <param name="value">Значение параметра, описывающего отношение между элементами.</param>
-        public Relation(IElement source, IElement target, IParamKey param, object value)
+        public Relation(IElement source, IElement target, IParamKey param, object? value)
         {
             Source = source;
             Target = target;

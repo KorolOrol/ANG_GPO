@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BaseClasses.Interface;
 using BaseClasses.Services;
+using BaseClasses.Services.Binds;
 
 namespace BaseClasses.Model
 {
@@ -15,12 +16,12 @@ namespace BaseClasses.Model
         /// Элементы истории.
         /// </summary>
         public HashSet<IElement> Elements { get; } = new HashSet<IElement>();
-        
+
         /// <summary>
         /// Связи между элементами истории.
         /// </summary>
         public HashSet<Relation> Relations { get; } = new HashSet<Relation>();
-        
+
         /// <summary>
         /// Стратегия связывания элементов истории.
         /// </summary>
@@ -35,11 +36,11 @@ namespace BaseClasses.Model
         /// Добавление элемента в историю.
         /// </summary>
         /// <param name="element">Элемент.</param>
-        public void Add(IElement element) 
+        public void Add(IElement element)
         {
             if (Elements.Contains(element)) return;
             if (element.Time == -1) element.Time = Time++;
-            Elements.Add(element); 
+            Elements.Add(element);
         }
 
         /// <summary>
@@ -49,11 +50,12 @@ namespace BaseClasses.Model
         public void Remove(IElement element)
         {
             if (!Elements.Contains(element)) return;
-            foreach (var r in Relations.Where(r => r.Source.Equals(element) 
+            foreach (var r in Relations.Where(r => r.Source.Equals(element)
                                                    || r.Target.Equals(element)).ToList())
             {
                 Binder.Unbind(r.Source, r.Target, r.Param, this);
             }
+
             Elements.Remove(element);
         }
 
@@ -70,7 +72,7 @@ namespace BaseClasses.Model
         /// определенному в paramKey.</exception>
         public void Bind(IElement source, IElement target, IParamKey paramKey, object? value)
         {
-            if (!Elements.Contains(source)) 
+            if (!Elements.Contains(source))
                 throw new KeyNotFoundException($"Source elements ({source}) must be part of the plot.");
             if (!Elements.Contains(target))
                 throw new KeyNotFoundException($"Target elements ({target}) must be part of the plot.");
@@ -94,6 +96,21 @@ namespace BaseClasses.Model
             if (!Elements.Contains(target))
                 throw new KeyNotFoundException($"Target elements ({target}) must be part of the plot.");
             Binder.Unbind(source, target, paramKey, this);
+        }
+
+        /// <summary>
+        /// Объединение двух элементов истории, с сохранением связей и приоритетом одного из элементов.
+        /// </summary>
+        /// <param name="baseElement">Базовый элемент, объект которого сохранится.</param>
+        /// <param name="targetElement">Объединяемый элемент, объект которого будет удален.</param>
+        /// <param name="basePriority">Приоритет базового элемента. Если True, то при конфликте
+        /// сохраняются данные базового элемента, иначе - объединяемого.</param>
+        public void Merge(IElement baseElement, IElement targetElement, bool basePriority = true)
+        {
+            Add(baseElement);
+            Add(targetElement);
+            Merger.Merge(baseElement, targetElement, this, basePriority);
+            Remove(targetElement);
         }
     }
 }

@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using BaseClasses.Interface;
+using BaseClasses.Model.Params;
 
-namespace BaseClasses.Model.Params
+namespace BaseClasses.Services.Binds
 {
     /// <summary>
     /// Ключи параметров для стандартных видов связей.
@@ -11,7 +10,7 @@ namespace BaseClasses.Model.Params
         /// <summary>
         /// Отношение одного персонажа к другому.
         /// </summary>
-        public static readonly ParamKey<double> Relationship =  new ParamKey<double>("Relationship");
+        public static readonly ParamKey<double> Relationship = new ParamKey<double>("Relationship");
         
         /// <summary>
         /// Элемент находится на локации.
