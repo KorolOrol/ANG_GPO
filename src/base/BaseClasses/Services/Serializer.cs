@@ -1,281 +1,297 @@
 ﻿using System;
 using BaseClasses.Interface;
 using BaseClasses.Model;
-using BaseClasses.Enum;
+using BaseClasses.Model.Params;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.Unicode;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace BaseClasses.Services
 {
     /// <summary>
-    /// Сериализатор. 
+    /// Сериализатор.
     /// </summary>
     public static class Serializer
     {
+        private static readonly FieldInfo? _ElementIdField = typeof(Element).GetField("_id",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+
         /// <summary>
-        /// Настройки сериализации. 
+        /// Настройки сериализации.
         /// </summary>
         public static JsonSerializerOptions Options { get; } = new JsonSerializerOptions
         {
-            ReferenceHandler = ReferenceHandler.Preserve,
             WriteIndented = true,
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            Converters = { new ParamBagJsonConverter(), new ElementJsonConverter() }
         };
 
         /// <summary>
-        /// Сериализация истории. 
+        /// Сериализация истории.
         /// </summary>
         /// <param name="plot">История.</param>
         /// <param name="path">Путь к файлу.</param>
         public static void Serialize(Plot plot, string path)
         {
-            var json = JsonSerializer.Serialize(plot, Options);
-            File.WriteAllText(path, json);
+            File.WriteAllText(path, SerializeToString(plot));
         }
 
         /// <summary>
-        /// Сериализация элемента истории. 
+        /// Сериализация истории в JSON-строку без записи в файл.
+        /// </summary>
+        /// <param name="plot">История.</param>
+        /// <returns>JSON-представление истории.</returns>
+        public static string SerializeToString(Plot plot)
+        {
+            return JsonSerializer.Serialize(ToPlotDto(plot), Options);
+        }
+
+        /// <summary>
+        /// Сериализация элемента истории.
         /// </summary>
         /// <param name="element">Элемент.</param>
         /// <param name="path">Путь к файлу.</param>
         public static void Serialize(IElement element, string path)
         {
-            var json = JsonSerializer.Serialize(element, Options);
-            File.WriteAllText(path, json);
+            File.WriteAllText(path, SerializeToString(element));
         }
 
         /// <summary>
-        /// Десериализация. 
+        /// Сериализация элемента истории в JSON-строку без записи в файл.
+        /// </summary>
+        /// <param name="element">Элемент.</param>
+        /// <returns>JSON-представление элемента.</returns>
+        public static string SerializeToString(IElement element)
+        {
+            if (!(element is Element concreteElement))
+            {
+                throw new ArgumentException($"Only {nameof(Element)} is supported for serialization.", nameof(element));
+            }
+
+            return JsonSerializer.Serialize(concreteElement, Options);
+        }
+
+        /// <summary>
+        /// Десериализация.
         /// </summary>
         /// <typeparam name="T">Тип объекта.</typeparam>
         /// <param name="path">Путь к файлу.</param>
         /// <returns>Объект.</returns>
         public static T Deserialize<T>(string path)
         {
-            var resolver = new ElementsReferenceResolver();
             var json = File.ReadAllText(path);
-            var document = JsonDocument.Parse(json);
-            var rootElement = document.RootElement;
-            if (typeof(T) == typeof(Plot) && MatchesProperties(typeof(Plot), rootElement))
+
+            if (typeof(T) == typeof(Plot))
             {
-                Plot plot = ReadPlot(rootElement, resolver);
+                var dto = JsonSerializer.Deserialize<PlotDto>(json, Options)
+                          ?? throw new JsonException("Failed to deserialize plot JSON.");
+                var plot = FromPlotDto(dto);
                 return (T)Convert.ChangeType(plot, typeof(T));
             }
-            else if (typeof(T) == typeof(Element) && MatchesProperties(typeof(Element), rootElement))
+
+            if (typeof(T) == typeof(Element))
             {
-                Element element = ReadElement(rootElement, resolver) as Element;
+                var element = JsonSerializer.Deserialize<Element>(json, Options)
+                              ?? throw new JsonException("Failed to deserialize element JSON.");
                 return (T)Convert.ChangeType(element, typeof(T));
             }
-            else
-            {
-                throw new ArgumentException($"Deserialization failed: Only 'Plot' and 'Element' types " +
-                    $"are supported by this method. " 
-                    + $"Attempted to deserialize type '{typeof(T).Name}', which is not supported. " +
-                    $"JSON root properties: [{ string.Join(", ", rootElement .EnumerateObject() .Select(p => p.Name))}]");
-            }
+
+            throw new ArgumentException(
+                $"Only '{nameof(Plot)}' and '{nameof(Element)}' types are supported by this method. " +
+                $"Attempted to deserialize '{typeof(T).Name}'.");
         }
 
         /// <summary>
-        /// Чтение истории. 
-        /// </summary>
-        /// <param name="json">Json элемент.</param>
-        /// <param name="resolver">Разрешитель ссылок.</param>
-        /// <returns>История.</returns>
-        private static Plot ReadPlot(JsonElement json, ReferenceResolver resolver)
-        {
-            var elementsProperty = json.GetProperty("Elements");
-            var timeProperty = json.GetProperty("Time");
-
-            var plot = new Plot();
-            plot.Time = timeProperty.GetInt32();
-
-            foreach (var element in elementsProperty.GetProperty("$values").EnumerateArray())
-            {
-                 var value = ReadValue(element, resolver);
-                 if (value is Element el)
-                 {
-                     plot.Add(el);
-                 }
-                 else
-                 {
-                     throw new InvalidCastException("ReadValue did not return an Element as expected.");
-                 }
-            }
-
-            return plot;
-        }
-
-        /// <summary>
-        /// Чтение элемента. 
-        /// </summary>
-        /// <param name="json">Json элемент. </param>
-        /// <param name="resolver">Разрешитель ссылок.</param>
-        /// <returns>Элемент. </returns>
-        private static IElement ReadElement(JsonElement json, ReferenceResolver resolver)
-        {
-            var typeProperty = json.GetProperty("Type");
-            var nameProperty = json.GetProperty("Name");
-            var descriptionProperty = json.GetProperty("Description");
-            var timeProperty = json.GetProperty("Time");
-            var id = json.GetProperty("$id");
-
-            var plotElement = new Element((ElemType)typeProperty.GetInt32());
-            plotElement.Name = nameProperty.GetString();
-            plotElement.Description = descriptionProperty.GetString();
-            plotElement.Time = timeProperty.GetInt32();
-
-            resolver.AddReference(id.GetString(), plotElement);
-
-            var @params = plotElement.Params;
-            foreach (var param in json.GetProperty("Params").EnumerateObject())
-            {
-                if (param.Name == "$id") continue;
-                @params.Add(param.Name, ReadValue(param.Value, resolver));
-            }
-
-            return plotElement;
-        }
-
-        /// <summary>
-        /// Чтение значения. 
-        /// </summary>
-        /// <param name="json">Json элемент.</param>
-        /// <param name="resolver">Разрешитель ссылок.</param>
-        /// <returns>Значение.</returns>
-        /// <exception cref="JsonException">Исключение, если тип не определен.</exception>
-        private static object ReadValue(JsonElement json, ReferenceResolver resolver)
-        {
-            switch (json.ValueKind)
-            {
-                case JsonValueKind.Object:
-                    if (json.TryGetProperty("$values", out JsonElement arrayJson))
-                    {
-                        List<object> values = new List<object>();
-                        foreach (var elem in arrayJson.EnumerateArray())
-                        {
-                            values.Add(ReadValue(elem, resolver));
-                        }
-                        return ConvertList(values);
-                    }
-                    else if (json.TryGetProperty("$ref", out JsonElement @ref))
-                    {
-                        return resolver.ResolveReference(@ref.GetString());
-                    }
-                    else
-                    {
-                        if (MatchesProperties(typeof(Element), json))
-                        {
-                            return ReadElement(json, resolver);
-                        }
-                        else if (MatchesProperties(typeof(Relation), json))
-                        {
-                            Relation rel = new Relation()
-                            {
-                                Character = ReadValue(json.GetProperty("Character"), resolver) as IElement,
-                                Value = json.GetProperty("Value").GetDouble()
-                            };
-                            return rel;
-                        }
-                        else
-                        {
-                            var dictionary = new Dictionary<string, object>();
-                            foreach (var property in json.EnumerateObject())
-                            {
-                                if (property.Name == "$id") continue;
-                                dictionary[property.Name] = ReadValue(property.Value, resolver);
-                            }
-                            return dictionary;
-                        }
-                    }
-                    break;
-                case JsonValueKind.String:
-                    if (DateTime.TryParse(json.GetString(), out DateTime date))
-                    {
-                        return date;
-                    }
-                    return json.GetString();
-                case JsonValueKind.Number:
-                    return json.GetDouble();
-                case JsonValueKind.Null:
-                    return null;
-            }
-            throw new JsonException($"Could not determine or deserialize type from JSON value. ValueKind: {json.ValueKind}, Value: {json.ToString()}");
-        }
-
-        /// <summary>
-        /// Печать информации об истории. 
+        /// Печать информации об истории.
         /// </summary>
         /// <param name="plot">История.</param>
         /// <param name="path">Путь к файлу.</param>
         public static void Print(Plot plot, string path)
         {
-            string data = plot.FullInfo();
-            File.WriteAllText(path, data);
+            File.WriteAllText(path, PrintToString(plot));
         }
 
         /// <summary>
-        /// Печать информации об элементе истории. 
+        /// Формирование текстового представления истории без записи в файл.
+        /// </summary>
+        /// <param name="plot">История.</param>
+        /// <returns>Текстовое представление истории.</returns>
+        public static string PrintToString(Plot plot)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"Time: {plot.Time}");
+            sb.AppendLine("Elements:");
+            foreach (var element in plot.Elements)
+            {
+                sb.AppendLine($"- {element.Type}: {element.Name} ({element.Time})");
+            }
+
+            sb.AppendLine("Relations:");
+            foreach (var relation in plot.Relations)
+            {
+                sb.AppendLine($"- {relation}");
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Печать информации об элементе истории.
         /// </summary>
         /// <param name="element">Элемент.</param>
         /// <param name="path">Путь к файлу.</param>
         public static void Print(IElement element, string path)
         {
-            string data = element.FullInfo();
-            File.WriteAllText(path, data);
+            File.WriteAllText(path, PrintToString(element));
         }
 
         /// <summary>
-        /// Конвертация списка в типизированный список. 
+        /// Формирование текстового представления элемента без записи в файл.
         /// </summary>
-        /// <param name="obj">Конвертируемый объект.</param>
-        /// <returns>Типизированный список или оригинальный объект, если это не список.</returns>
-        private static object ConvertList(object obj)
+        /// <param name="element">Элемент.</param>
+        /// <returns>Текстовое представление элемента.</returns>
+        public static string PrintToString(IElement element)
         {
-            if (obj is IList list && list.Count > 0)
-            {
-                Type elementType = list[0].GetType();
-                Type listType;
-                if (elementType == typeof(Element))
-                {
-                    listType = typeof(List<>).MakeGenericType(typeof(IElement));
-                }
-                else
-                {
-                    listType = typeof(List<>).MakeGenericType(elementType);
-                }
-                IList typedList = (IList)Activator.CreateInstance(listType);
-                foreach (var item in list)
-                {
-                    typedList.Add(item);
-                }
-                return typedList;
-            }
-            return obj;
+            return $"{element.Type}: {element.Name}{Environment.NewLine}{element.Description}";
         }
 
-        /// <summary>
-        /// Проверка на соответствие свойств.
-        /// </summary>
-        /// <param name="type">Тип.</param>
-        /// <param name="json">Json элемент.</param>
-        /// <returns>True, если свойства совпадают, иначе False.</returns>
-        private static bool MatchesProperties(Type type, JsonElement json)
+        private static PlotDto ToPlotDto(Plot plot)
         {
-            foreach (var property in type.GetProperties()
-                .Where(p => !p.IsDefined(typeof(JsonIgnoreAttribute), true)))
+            var elements = plot.Elements.Select(RequireElement).ToList();
+            var relations = plot.Relations.Select(r => new RelationDto
             {
-                if (!json.TryGetProperty(property.Name, out _))
-                {
-                    return false;
-                }
+                Source = GetElementId(RequireElement(r.Source)),
+                Target = GetElementId(RequireElement(r.Target)),
+                Namespace = r.Param.Namespace,
+                Name = r.Param.Name,
+                Type = r.Param.ValueType.AssemblyQualifiedName ?? r.Param.ValueType.FullName ?? r.Param.ValueType.Name,
+                Value = r.Value
+            }).ToList();
+
+            return new PlotDto
+            {
+                Time = plot.Time,
+                Elements = elements,
+                Relations = relations
+            };
+        }
+
+        private static Plot FromPlotDto(PlotDto dto)
+        {
+            var plot = new Plot { Time = dto.Time };
+            var elementsById = new Dictionary<Guid, IElement>();
+
+            foreach (var element in dto.Elements)
+            {
+                var concreteElement = RequireElement(element);
+                plot.Add(concreteElement);
+                elementsById[GetElementId(concreteElement)] = concreteElement;
             }
-            return true;
+
+            foreach (var relationDto in dto.Relations)
+            {
+                if (!elementsById.TryGetValue(relationDto.Source, out var source))
+                {
+                    throw new JsonException($"Relation source '{relationDto.Source}' was not found in Elements.");
+                }
+
+                if (!elementsById.TryGetValue(relationDto.Target, out var target))
+                {
+                    throw new JsonException($"Relation target '{relationDto.Target}' was not found in Elements.");
+                }
+
+                var valueType = ResolveType(relationDto.Type);
+                var key = CreateParamKey(relationDto.Name, relationDto.Namespace, valueType);
+                var rawValue = DeserializeTypedValue(relationDto.Value, valueType);
+
+                if (!key.TryConvertValue(rawValue, out var convertedValue))
+                {
+                    throw new JsonException(
+                        $"Relation value for key '{relationDto.Namespace}.{relationDto.Name}' " +
+                        $"cannot be converted to '{valueType.FullName}'.");
+                }
+
+                plot.Relations.Add(new Relation(source, target, key, convertedValue));
+            }
+
+            return plot;
+        }
+
+        private static Element RequireElement(IElement element)
+        {
+            if (element is Element concreteElement)
+            {
+                return concreteElement;
+            }
+
+            throw new JsonException($"Only {nameof(Element)} implementations of {nameof(IElement)} are supported.");
+        }
+
+        private static Guid GetElementId(Element element)
+        {
+            if (_ElementIdField == null)
+            {
+                throw new JsonException("Element id field was not found.");
+            }
+
+            if (_ElementIdField.GetValue(element) is Guid id)
+            {
+                return id;
+            }
+
+            throw new JsonException("Element id field contains invalid value.");
+        }
+
+        private static Type ResolveType(string typeName)
+        {
+            return Type.GetType(typeName, throwOnError: false)
+                   ?? throw new JsonException($"Unable to resolve relation type '{typeName}'.");
+        }
+
+        private static IParamKey CreateParamKey(string name, string @namespace, Type valueType)
+        {
+            var keyType = typeof(ParamKey<>).MakeGenericType(valueType);
+            return (IParamKey?)Activator.CreateInstance(keyType, name, @namespace)
+                   ?? throw new JsonException($"Unable to create relation key '{@namespace}.{name}'.");
+        }
+
+        private static object? DeserializeTypedValue(object? valueToken, Type valueType)
+        {
+            switch (valueToken)
+            {
+                case null:
+                case JsonElement jsonElement when jsonElement.ValueKind == JsonValueKind.Null ||
+                                                  jsonElement.ValueKind == JsonValueKind.Undefined:
+                    return null;
+                case JsonElement jsonElement:
+                    return JsonSerializer.Deserialize(jsonElement.GetRawText(), valueType, Options);
+            }
+
+            return valueType.IsInstanceOfType(valueToken)
+                ? valueToken
+                : JsonSerializer.Deserialize(JsonSerializer.Serialize(valueToken, Options), valueType, Options);
+        }
+
+        private sealed class PlotDto
+        {
+            public int Time { get; set; }
+            public List<Element> Elements { get; set; } = new List<Element>();
+            public List<RelationDto> Relations { get; set; } = new List<RelationDto>();
+        }
+
+        private sealed class RelationDto
+        {
+            public Guid Source { get; set; }
+            public Guid Target { get; set; }
+            public string Namespace { get; set; } = string.Empty;
+            public string Name { get; set; } = string.Empty;
+            public string Type { get; set; } = string.Empty;
+            public object? Value { get; set; }
         }
     }
 }
