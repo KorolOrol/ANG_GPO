@@ -22,6 +22,17 @@ namespace BaseClasses.Services.Binds
         /// </summary>
         private readonly Dictionary<RelationRoute, RelationBindingStrategy> _unbindStrategies =
             new Dictionary<RelationRoute, RelationBindingStrategy>();
+
+        /// <summary>
+        /// Инициализация сервиса с предопределенными стратегиями связывания и отвязывания из StandardBindingStrategies.
+        /// </summary>
+        public Binder()
+        {
+            foreach (var kvp in StandardBindingStrategies.Routes)
+            {
+                Register(kvp.Key, kvp.Value.Item1, kvp.Value.Item2);
+            }
+        }
         
         /// <summary>
         /// Регистрация стратегии связывания и отвязывания для конкретной комбинации типов элементов и ключа параметра.
