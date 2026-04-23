@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\base\BaseClasses\BaseClasses.csproj" />
+      <ProjectReference Include="..\base\BaseClasses\BaseClasses.csproj" />
     </ItemGroup>
 
 </Project>
