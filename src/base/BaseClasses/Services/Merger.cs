@@ -37,23 +37,33 @@ namespace BaseClasses.Services
                 baseElement.Description = mergedElement.Description;
             }
 
-            foreach (var r in plot.Relations
-                         .Where(r => r.Source.Equals(mergedElement) || r.Target.Equals(mergedElement))
-                         .ToList())
+            var relationsToMove = plot.Relations
+                .Where(r => r.Source.Equals(mergedElement) || r.Target.Equals(mergedElement))
+                .ToList();
+
+            foreach (var relation in relationsToMove)
             {
-                var other = r.Source.Equals(mergedElement) ? r.Target : r.Source;
-                var param = r.Param;
-                var value = r.Value;
-                plot.Unbind(r.Source, r.Target, param);
-                if (plot.Relations.Any(check =>
-                        check.Param.Equals(param) &&
-                        (check.Source.Equals(baseElement) || check.Target.Equals(baseElement)))
-                    && basePriority)
+                // Удаляем старую связь с mergedElement и затем пересоздаем ее на baseElement.
+                plot.Relations.Remove(relation);
+
+                var newSource = relation.Source.Equals(mergedElement) ? baseElement : relation.Source;
+                var newTarget = relation.Target.Equals(mergedElement) ? baseElement : relation.Target;
+
+                var conflict = plot.Relations.FirstOrDefault(existing =>
+                    existing.Source.Equals(newSource) &&
+                    existing.Target.Equals(newTarget) &&
+                    existing.Param.Equals(relation.Param));
+
+                if (conflict is null)
+                {
+                    plot.Relations.Add(new Relation(newSource, newTarget, relation.Param, relation.Value));
                     continue;
-                if (r.Source.Equals(mergedElement))
-                    plot.Bind(baseElement, other, param, value);
-                else
-                    plot.Bind(other, baseElement, param, value);
+                }
+
+                if (!basePriority)
+                {
+                    conflict.Value = relation.Value;
+                }
             }
 
             baseElement.Time = Math.Max(baseElement.Time, mergedElement.Time);

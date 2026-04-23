@@ -48,7 +48,7 @@ namespace BaseClasses.Model
         public override string ToString()
         {
             return $"From {Source.Type}:{Source.Name} to {Target.Type}:{Target.Name} " +
-                   $"with {Param.Namespace}:{Param.Name} = {Value}";
+                   $"with {Param.Namespace}.{Param.Name} = {Value}";
         }
 
 
@@ -63,8 +63,7 @@ namespace BaseClasses.Model
         {
             if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((Relation)obj);
+            return obj.GetType() == GetType() && Equals((Relation)obj);
         }
 
         public override int GetHashCode()

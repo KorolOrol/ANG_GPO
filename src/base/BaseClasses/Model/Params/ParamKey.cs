@@ -62,7 +62,7 @@ namespace BaseClasses.Model.Params
         /// <param name="value">Значение, которое нужно попытаться преобразовать.</param>
         /// <param name="result">Параметр, в который будет записан результат преобразования, если оно успешно.</param>
         /// <returns>True, если преобразование было успешным, иначе False.</returns>
-        private  bool TryConvertPrimitive(object value, out object? result)
+        private bool TryConvertPrimitive(object value, out object? result)
         {
             result = null;
             switch (value)

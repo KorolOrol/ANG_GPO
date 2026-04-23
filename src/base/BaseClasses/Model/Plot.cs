@@ -12,6 +12,8 @@ namespace BaseClasses.Model
     /// </summary>
     public class Plot
     {
+        private readonly Action<IElement, IElement, Plot, bool> _mergeAction;
+
         /// <summary>
         /// Элементы истории.
         /// </summary>
@@ -25,12 +27,24 @@ namespace BaseClasses.Model
         /// <summary>
         /// Стратегия связывания элементов истории.
         /// </summary>
-        public Binder Binder { get; } = new Binder();
+        public Binder Binder { get; }
 
         /// <summary>
         /// Время.
         /// </summary>
         public int Time { get; set; }
+
+        /// <summary>
+        /// Создание истории.
+        /// </summary>
+        /// <param name="binder">Пользовательский binder для тестов/кастомной логики.</param>
+        /// <param name="mergeAction">Пользовательская логика объединения элементов.</param>
+        public Plot(Binder? binder = null, Action<IElement, IElement, Plot, bool>? mergeAction = null)
+        {
+            Binder = binder ?? new Binder();
+            _mergeAction = mergeAction ?? ((baseElement, targetElement, plot, basePriority) =>
+                Merger.Merge(baseElement, targetElement, plot, basePriority));
+        }
 
         /// <summary>
         /// Добавление элемента в историю.
@@ -109,7 +123,7 @@ namespace BaseClasses.Model
         {
             Add(baseElement);
             Add(targetElement);
-            Merger.Merge(baseElement, targetElement, this, basePriority);
+            _mergeAction(baseElement, targetElement, this, basePriority);
             Remove(targetElement);
         }
     }

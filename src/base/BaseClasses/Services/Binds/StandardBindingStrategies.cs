@@ -179,12 +179,12 @@ namespace BaseClasses.Services.Binds
         
         public static readonly RelationBindingStrategy BindEventLoc = (source, target, _, value, plot) =>
         {
-            BindLocEvent(target, source, BaseRelationKeys.Located, value, plot);
+            BindLocEvent(target, source, BaseRelationKeys.Locates, value, plot);
         };
         
         public static readonly RelationBindingStrategy UnbindEventLoc = (source, target, _, value, plot) =>
         {
-            UnbindLocEvent(target, source, BaseRelationKeys.Located, value, plot);
+            UnbindLocEvent(target, source, BaseRelationKeys.Locates, value, plot);
         };
         
         public static readonly Dictionary<RelationRoute, (RelationBindingStrategy, RelationBindingStrategy)> Routes =
