@@ -2,9 +2,9 @@ using System.Text.Json;
 using BaseClasses.Model;
 using BaseClasses.Interface;
 using BaseClasses.Model.Params;
-using static Procedural_v2.GenerationMethods;
+using static ProceduralGenerator.GenerationMethods;
 
-namespace Procedural_v2;
+namespace ProceduralGenerator;
 
 public class ProceduralGenerator : IGenerator
 {
@@ -27,6 +27,11 @@ public class ProceduralGenerator : IGenerator
     private Dictionary<string, List<string>> _phobias = new Dictionary<string, List<string>>();
     private int[,]? _traitTable = null;
     private int[,]? _relatedTraitTable = null;
+    
+    private List<string> _traitKeys = new List<string>();
+    private List<string> _phobiaKeys = new List<string>();
+    
+    private const int MaxAttempts = 1000;
 
     #endregion
 
@@ -62,10 +67,10 @@ public class ProceduralGenerator : IGenerator
         switch (GenerationMethod)
         {
             case ChaoticRandom:
-                futureTraits = GenChaoticRandom(plot, preparedElement);
+                futureTraits = GenChaoticRandom();
                 break;
             case LogicRandom:
-                futureTraits = GenLogicRandom(plot, preparedElement);
+                futureTraits = GenLogicRandom();
                 break;
             case TwoParentsHalfRandom:
                 futureTraits = GenTwoParentsHalfRandom(plot, preparedElement);
@@ -101,11 +106,13 @@ public class ProceduralGenerator : IGenerator
         if (rootElement.TryGetProperty("traits", out var traitsElement))
         {
             _traits = ParseTraits(traitsElement);
+            _traitKeys = _traits.Keys.ToList();
         }
 
         if (rootElement.TryGetProperty("phobias", out var phobiasElement))
         {
             _phobias = ParseTraits(phobiasElement);
+            _phobiaKeys = _phobias.Keys.ToList();
         }
 
         if (rootElement.TryGetProperty("traitTable", out var traitTableElement))
@@ -130,10 +137,17 @@ public class ProceduralGenerator : IGenerator
             var traitValue = new List<string>();
             foreach (var desc in traitDescriptions.EnumerateArray())
             {
-                traitValue.Add(desc.GetString());
+                var descString = desc.GetString();
+                if (!string.IsNullOrEmpty(descString))
+                {
+                    traitValue.Add(descString);
+                }
             }
             
-            output.Add(traitName, traitValue);
+            if (traitValue.Count > 0)
+            {
+                output.Add(traitName, traitValue);
+            }
         }
 
         return output;
@@ -142,7 +156,7 @@ public class ProceduralGenerator : IGenerator
     private static int[,] ParseTable(JsonElement tableElement)
     {
         var rows = tableElement.GetArrayLength();
-        var cols = tableElement.GetArrayLength();
+        var cols = rows > 0 ? tableElement[0].GetArrayLength() : 0;
         
         var output = new int[rows, cols];
 
@@ -151,50 +165,63 @@ public class ProceduralGenerator : IGenerator
             var row = tableElement[i];
             for (var j = 0; j < cols; j++)
             {
-                output[i, j] = row.GetInt32();
+                output[i, j] = row[j].GetInt32();
             }
         }
         
         return output;
     }
 
-    private List<Dictionary<string, object>> GenChaoticRandom(Plot plot, IElement preparedElement)
+    private List<Dictionary<string, object>> GenChaoticRandom()
     {
-        if (preparedElement == null) throw new ArgumentNullException(nameof(preparedElement));
-
         var possibleTraits = DeepClone(_traits);
+        var possibleKeys = possibleTraits.Keys.ToList();
         var futureTraits = new List<Dictionary<string, object>>();
-            
-        for (int i = 0; i < NumberOfTraits; i++)
+        
+        var traitsToGenerate = Math.Min(NumberOfTraits, possibleKeys.Count);
+        
+        for (int i = 0; i < traitsToGenerate; i++)
         {
-            var traitKey = possibleTraits.Keys.ToList()[Random.Next(possibleTraits.Count)];
+            var randomIndex = Random.Next(possibleKeys.Count);
+            var traitKey = possibleKeys[randomIndex];
             
             futureTraits.Add(BuildTrait(possibleTraits, traitKey));
             possibleTraits.Remove(traitKey);
+            possibleKeys.RemoveAt(randomIndex);
         }
 
         return futureTraits;
     }
     
-    private List<Dictionary<string, object>> GenLogicRandom(Plot plot, IElement preparedElement)
+    private List<Dictionary<string, object>> GenLogicRandom()
     {
-        if (preparedElement == null) throw new ArgumentNullException(nameof(preparedElement));
-        
         var futureTraits = new List<Dictionary<string, object>>();
+        var attempts = 0;
         
-        for (int i = 0; i < NumberOfTraits; i++)
+        while (futureTraits.Count < NumberOfTraits && attempts < MaxAttempts)
         {
-            var traitKey = _traits.Keys.ToList()[Random.Next(_traits.Count)];
+            var traitKey = _traitKeys[Random.Next(_traitKeys.Count)];
 
             if (futureTraits.Count == 0 || CheckTraitTable(futureTraits, traitKey))
             {
                 futureTraits.Add(BuildTrait(_traits, traitKey));
+                attempts = 0;
             }
-            else
+            
+            attempts++;
+            
+            if (attempts >= MaxAttempts && futureTraits.Count < NumberOfTraits)
             {
-                i--;
+                var fallbackKey = _traitKeys.FirstOrDefault(k => futureTraits.All(t => t["Title"] as string != Capitalize(k)));
+                
+                if (fallbackKey != null)
+                {
+                    futureTraits.Add(BuildTrait(_traits, fallbackKey));
+                }
+                attempts = 0;
             }
         }
+        
         return futureTraits;
     }
     
@@ -207,33 +234,45 @@ public class ProceduralGenerator : IGenerator
         var futureTraits = new List<Dictionary<string, object>>();
         if (traitsCount == NumberOfTraits)
         {
-            GenTwoParentsHalf(plot, preparedElement, combinedTraits);
+            return GenTwoParentsHalf(combinedTraits);
         }
         else
         {
-            for (int i = 0; i < combinedTraits.Count / 2; i++)
+            var availableParentTraits = new List<Dictionary<string, object>>(combinedTraits);
+            var attempts = 0;
+            
+            for (int i = 0; i < combinedTraits.Count / 2 && futureTraits.Count < NumberOfTraits && attempts < MaxAttempts; i++)
             {
-                var newTraitKey = combinedTraits[Random.Next(combinedTraits.Count)]["Title"] as string;
-                if (futureTraits.Count == 0 || CheckTraitTable(futureTraits, newTraitKey))
+                var randomIndex = Random.Next(availableParentTraits.Count);
+                var selectedTrait = availableParentTraits[randomIndex];
+                var newTraitKey = selectedTrait["Title"] as string;
+                
+                if (!string.IsNullOrEmpty(newTraitKey) && 
+                    (futureTraits.Count == 0 || CheckTraitTable(futureTraits, newTraitKey)))
                 {
                     futureTraits.Add(BuildTrait(_traits, newTraitKey));
+                    availableParentTraits.RemoveAt(randomIndex);
+                    attempts = 0;
                 }
                 else
                 {
                     i--;
+                    attempts++;
                 }
             }
 
-            if (futureTraits.Count > NumberOfTraits)
+            while (futureTraits.Count < NumberOfTraits)
+            {
+                var traitKey = _traitKeys[Random.Next(_traitKeys.Count)];
+                if (futureTraits.All(t => t["Title"] as string != Capitalize(traitKey)))
+                {
+                    futureTraits.Add(BuildTrait(_traits, traitKey));
+                }
+            }
+
+            while (futureTraits.Count > NumberOfTraits)
             {
                 futureTraits.RemoveAt(Random.Next(futureTraits.Count));
-            }
-            else
-            {
-                for (var i = futureTraits.Count; i < NumberOfTraits; i++)
-                {
-                    futureTraits.Add(BuildTrait(_traits, _traits.Keys.ToList()[Random.Next(_traits.Count)]));
-                }
             }
         }
         return futureTraits;
@@ -242,111 +281,142 @@ public class ProceduralGenerator : IGenerator
     private List<Dictionary<string, object>> GenTwoParentsHalf(Plot plot, IElement preparedElement)
     {
         var combinedTraits = GetParentsTraits(plot, preparedElement);
-        
-        return GenTwoParentsHalf(plot, preparedElement, combinedTraits);
+        return GenTwoParentsHalf(combinedTraits);
     }
     
-    private List<Dictionary<string, object>> GenTwoParentsHalf(Plot plot, IElement preparedElement, List<Dictionary<string, object>> traitList)
+    private List<Dictionary<string, object>> GenTwoParentsHalf(List<Dictionary<string, object>> traitList)
     {
         var futureTraits = new List<Dictionary<string, object>>();
+        var availableTraits = new List<Dictionary<string, object>>(traitList);
+        var attempts = 0;
+
+        var traitsToInherit = traitList.Count / 2;
         
-        for (var i = 0; i < traitList.Count / 2; i++)
+        while (futureTraits.Count < traitsToInherit && availableTraits.Count > 0 && attempts < MaxAttempts)
         {
-            if (traitList.ElementAt(Random.Next(traitList.Count))["Title"] is string newTraitKey &&
+            var randomIndex = Random.Next(availableTraits.Count);
+            var selectedTrait = availableTraits[randomIndex];
+            
+            if (selectedTrait["Title"] is string newTraitKey &&
                 (futureTraits.Count == 0 || CheckTraitTable(futureTraits, newTraitKey)))
             {
-                futureTraits.Add(BuildTrait(_traits, newTraitKey));
+                if (futureTraits.All(t => t["Title"] as string != Capitalize(newTraitKey)))
+                {
+                    futureTraits.Add(BuildTrait(_traits, newTraitKey));
+                    attempts = 0;
+                }
+                availableTraits.RemoveAt(randomIndex);
             }
             else
             {
-                i--;
+                attempts++;
             }
         }
+        
         return futureTraits;
     }
     
     private List<Dictionary<string, object>> GenTwoParentsLogicRandom(Plot plot, IElement preparedElement)
     {
         var combinedTraits = GetParentsTraits(plot, preparedElement);
-        combinedTraits = combinedTraits.OrderBy(x => Convert.ToDouble(x["Affection"])).ToList();
+        combinedTraits = combinedTraits.OrderByDescending(GetAffectionValue).ToList();
 
         var futureTraits = new List<Dictionary<string, object>>();
-        for (var i = 0; combinedTraits.Count != 0 && i < combinedTraits.Count / 2; i++)
+        var availableTraits = new List<Dictionary<string, object>>(combinedTraits);
+        var attempts = 0;
+        
+        while (availableTraits.Count > 0 && futureTraits.Count < NumberOfTraits && attempts < MaxAttempts)
         {
-            if (futureTraits.Count != NumberOfTraits)
+            var probability = Random.NextDouble();
+            var selectedTrait = availableTraits[0];
+            
+            if (selectedTrait["Title"] is string newTraitKey &&
+                (futureTraits.Count == 0 || CheckTraitTable(futureTraits, newTraitKey)) && 
+                probability <= 0.85)
             {
-                var probability = Math.Round(Random.NextDouble(), 3);
-                if (combinedTraits[i]["Title"] is string newTraitKey &&
-                    (futureTraits.Count == 0 || CheckTraitTable(futureTraits, newTraitKey)) && 
-                    probability <= 0.85d)
+                if (futureTraits.All(t => t["Title"] as string != Capitalize(newTraitKey)))
                 {
                     futureTraits.Add(BuildTrait(_traits, newTraitKey));
-                }
-                else
-                {
-                    combinedTraits.RemoveAt(i);
-                    i--;
+                    attempts = 0;
                 }
             }
+            
+            availableTraits.RemoveAt(0);
+            attempts++;
         }
 
-        for (var i = futureTraits.Count; i < NumberOfTraits; i++)
+        while (futureTraits.Count < NumberOfTraits)
         {
-            var traitKey = _traits.Keys.ToList()[Random.Next(_traits.Count)];
+            var traitKey = _traitKeys[Random.Next(_traitKeys.Count)];
 
             if (futureTraits.Count == 0 || CheckTraitTable(futureTraits, traitKey))
             {
-                futureTraits.Add(BuildTrait(_traits, traitKey));
-            }
-            else
-            {
-                i--;
+                if (futureTraits.All(t => t["Title"] as string != Capitalize(traitKey)))
+                {
+                    futureTraits.Add(BuildTrait(_traits, traitKey));
+                }
             }
         }
+        
         return futureTraits;
     }
     
     private List<Dictionary<string, object>> GenTwoParentsLogic(Plot plot, IElement preparedElement)
     {
         var combinedTraits = GetParentsTraits(plot, preparedElement);
-        combinedTraits = combinedTraits.OrderBy(x => Convert.ToDouble(x["Affection"])).ToList();
+        combinedTraits = combinedTraits.OrderByDescending(GetAffectionValue).ToList();
 
         var futureTraits = new List<Dictionary<string, object>>();
-        for (var i = 0; i < combinedTraits.Count / 2; i++)
+        var availableTraits = new List<Dictionary<string, object>>(combinedTraits);
+        
+        while (availableTraits.Count > 0 && futureTraits.Count < NumberOfTraits)
         {
-            var probability = Math.Round(Random.NextDouble(), 3);
-            if (combinedTraits[i]["Title"] is string newTraitKey &&
+            var probability = Random.NextDouble();
+            var selectedTrait = availableTraits[0];
+            
+            if (selectedTrait["Title"] is string newTraitKey &&
                 (futureTraits.Count == 0 || CheckTraitTable(futureTraits, newTraitKey)) && 
-                probability <= 0.85d)
+                probability <= 0.85)
             {
-                futureTraits.Add(BuildTrait(_traits, newTraitKey));
+                if (futureTraits.All(t => t["Title"] as string != Capitalize(newTraitKey)))
+                {
+                    futureTraits.Add(BuildTrait(_traits, newTraitKey));
+                }
             }
-            else
-            {
-                combinedTraits.RemoveAt(i);
-                i--;
-            }
+            
+            availableTraits.RemoveAt(0);
         }
+        
         return futureTraits;
     }
     
     private List<Dictionary<string, object>> GenPhobias()
     {
         var futurePhobias = new List<Dictionary<string, object>>();
-        for (var i = 0; i < NumberOfPhobias; i++)
+        var availablePhobias = new List<string>(_phobiaKeys);
+        
+        for (var i = 0; i < Math.Min(NumberOfPhobias, availablePhobias.Count); i++)
         {
-            futurePhobias.Add(BuildTrait(_phobias, _phobias.Keys.ToList()[Random.Next(_phobias.Count)]));
+            var randomIndex = Random.Next(availablePhobias.Count);
+            var phobiaKey = availablePhobias[randomIndex];
+            
+            futurePhobias.Add(BuildTrait(_phobias, phobiaKey));
+            availablePhobias.RemoveAt(randomIndex);
         }
+        
         return futurePhobias;
     }
 
     private static Dictionary<string, object> BuildTrait(Dictionary<string, List<string>> possibleTraits, string traitKey)
     {
+        var descriptions = possibleTraits[traitKey];
+        var description = descriptions.Count > 0 ? descriptions[Random.Next(descriptions.Count)] : string.Empty;
+        
         return new Dictionary<string, object>()
         {
             { "Title", Capitalize(traitKey) },
             { "Affection", Math.Round(Random.NextDouble(), 3) },
-            { "Description", possibleTraits[traitKey][Random.Next(possibleTraits[traitKey].Count)] },
+            { "Description", description },
         };
     }
     
@@ -364,16 +434,47 @@ public class ProceduralGenerator : IGenerator
         return char.ToUpper(input[0]) + input[1..].ToLower();
     }
     
+    private double GetAffectionValue(Dictionary<string, object> trait)
+    {
+        if (trait.TryGetValue("Affection", out var value))
+        {
+            try
+            {
+                return Convert.ToDouble(value);
+            }
+            catch
+            {
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
+    
     private bool CheckTraitTable(List<Dictionary<string, object>> traitList, string newTraitKey)
     {
-        int column = _traits.Keys.ToList().IndexOf(newTraitKey);
+        if (_traitTable == null) return true;
+        
+        var newTraitIndex = _traitKeys.IndexOf(newTraitKey);
+        if (newTraitIndex == -1) return true;
         
         foreach (var trait in traitList)
         {
-            int row = _traits.Keys.ToList().IndexOf((trait["Title"] as string)?.ToLower());
-            if (_traitTable[row, column] == 0)
+            var existingTraitTitle = trait["Title"] as string;
+            if (string.IsNullOrEmpty(existingTraitTitle)) continue;
+            
+            var existingTraitKey = existingTraitTitle.ToLower();
+            var existingTraitIndex = _traitKeys.IndexOf(existingTraitKey);
+            
+            if (existingTraitIndex == -1) continue;
+            
+            // Проверяем, не выходим ли за границы таблицы
+            if (existingTraitIndex < _traitTable.GetLength(0) && 
+                newTraitIndex < _traitTable.GetLength(1))
             {
-                return false;
+                if (_traitTable[existingTraitIndex, newTraitIndex] == 0)
+                {
+                    return false;
+                }
             }
         }
         
@@ -400,16 +501,13 @@ public class ProceduralGenerator : IGenerator
             .ToList()
             .Select(x => x.Source)
             .ToList();
-        
-        if (parents.Count < 2)
+
+        return parents.Count switch
         {
-            throw new ArgumentException("Character doesn't have one or both parent elements");
-        }
-        else if (parents.Count > 2)
-        {
-            throw new  ArgumentException("Character have more then two parent elements");
-        }
-        return parents;
+            < 2 => throw new ArgumentException("Character doesn't have one or both parent elements"),
+            > 2 => throw new ArgumentException("Character have more then two parent elements"),
+            _ => parents
+        };
     }
 
     private List<Dictionary<string, object>> GetParentsTraits(Plot plot, IElement child)

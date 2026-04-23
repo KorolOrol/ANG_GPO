@@ -1,4 +1,4 @@
-namespace Procedural_v2;
+namespace ProceduralGenerator;
 
 public enum GenerationMethods
 {
