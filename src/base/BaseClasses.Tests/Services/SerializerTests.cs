@@ -152,13 +152,13 @@ namespace BaseClasses.Tests.Services
                     r.Source.Type == ElemType.Character &&
                     r.Target.Type == ElemType.Item &&
                     r.Param.Equals(BaseRelationKeys.Owns) &&
-                    r.Value is bool owns && owns);
+                    r.Value is true);
 
                 Assert.Contains(actual.Relations, r =>
                     r.Source.Type == ElemType.Item &&
                     r.Target.Type == ElemType.Character &&
                     r.Param.Equals(BaseRelationKeys.Owned) &&
-                    r.Value is bool owned && owned);
+                    r.Value is true);
 
                 Assert.Contains(actual.Relations, r =>
                     r.Source.Type == ElemType.Item &&
