@@ -7,14 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseClasses", "BaseClasses.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses.Tests", "..\BaseClasses.Tests\BaseClasses.Tests.csproj", "{360EF669-9ABB-4CBF-BA1C-F9759D82F048}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBase", "..\DataBase\DataBase.csproj", "{EF187345-D1BC-4E4B-B68B-F3052F1FD1BA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SliccDB", "..\SliccDB\SliccDB.csproj", "{5362FE57-58B4-9BC0-877C-5D3A49FF9A1D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataBase.Tests", "..\DataBase.Tests\DataBase.Tests.csproj", "{2F2C2796-9C89-4A38-B47B-F54BE67FCE39}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses-V2", "..\BaseClasses-V2\BaseClasses-V2.csproj", "{0E706547-401C-47C5-B622-343B533F3720}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
