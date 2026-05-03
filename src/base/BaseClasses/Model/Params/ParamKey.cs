@@ -36,10 +36,7 @@ namespace BaseClasses.Model.Params
         public bool IsTypeMatch(object? value)
         {
             if (value == null) return true;
-            if (ValueType.IsInstanceOfType(value)) return true;
-            if (TryConvertValue(value, out _)) return true;
-            throw new InvalidOperationException($"Value of type {value.GetType().Name} cannot be assigned " +
-                                                $"to key '{this}' with expected type {ValueType.Name}.");
+            return ValueType.IsInstanceOfType(value) || TryConvertValue(value, out _);
         }
         
         public bool TryConvertValue(object? value, out object? result)

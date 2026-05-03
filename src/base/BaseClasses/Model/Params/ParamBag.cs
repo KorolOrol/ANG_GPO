@@ -78,9 +78,9 @@ namespace BaseClasses.Model.Params
             get => _params[key];
             set
             {
-                if (value != null && key.ValueType != value.GetType())
-                    throw new InvalidOperationException($"Value of type {value.GetType().Name} cannot be assigned " +
-                                                        $"to key '{key}' with expected type {key.ValueType.Name}.");
+                if (!key.IsTypeMatch(value))
+                    throw new InvalidOperationException($"Value of type {value?.GetType().Name} cannot be assigned " +
+                                                        $"to key '{this}' with expected type {key.ValueType.Name}.");
                 _params[key] = value;
             }
         }
@@ -92,7 +92,9 @@ namespace BaseClasses.Model.Params
         /// <param name="value">Значение параметра, которое нужно добавить.</param>
         public void Add(IParamKey key, object value)
         {
-            key.IsTypeMatch(value);
+            if (!key.IsTypeMatch(value))
+                throw new InvalidOperationException($"Value of type {value.GetType().Name} cannot be assigned " +
+                                                    $"to key '{this}' with expected type {key.ValueType.Name}.");
             _params.Add(key, value);
         }
 
@@ -116,7 +118,9 @@ namespace BaseClasses.Model.Params
         /// <typeparam name="T">Тип значения, связанного с ключом параметра.</typeparam>
         public void Set<T>(ParamKey<T> key, T value)
         {
-            key.IsTypeMatch(value);
+            if (!key.IsTypeMatch(value))
+                throw new InvalidOperationException($"Value of type {value?.GetType().Name} cannot be assigned " +
+                                                    $"to key '{this}' with expected type {key.ValueType.Name}.");
             _params[key] = value;
         }
 

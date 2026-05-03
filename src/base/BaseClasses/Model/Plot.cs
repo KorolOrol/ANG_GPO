@@ -42,8 +42,7 @@ namespace BaseClasses.Model
         public Plot(Binder? binder = null, Action<IElement, IElement, Plot, bool>? mergeAction = null)
         {
             Binder = binder ?? new Binder();
-            _mergeAction = mergeAction ?? ((baseElement, targetElement, plot, basePriority) =>
-                Merger.Merge(baseElement, targetElement, plot, basePriority));
+            _mergeAction = mergeAction ?? (Merger.Merge);
         }
 
         /// <summary>
