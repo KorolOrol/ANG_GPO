@@ -68,9 +68,9 @@ namespace BaseClasses.Model.Params
                     result = (double)i;
                     return true;
                 case double d when ValueType == typeof(int):
-                    if (Math.Abs(Math.Truncate(d) - d) < Tolerance)
+                    if (Math.Abs(Math.Round(d) - d) < Tolerance)
                     {
-                        result = (int)d;
+                        result = (int)Math.Round(d);
                         return true;
                     }
                     break;

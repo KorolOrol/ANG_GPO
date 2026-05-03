@@ -94,7 +94,7 @@ namespace BaseClasses.Tests.Services
             var source = new Element(ElemType.Character, "S");
             var target = new Element(ElemType.Character, "T");
 
-            Assert.Throws<InvalidOperationException>(() =>
+            Assert.Throws<ArgumentException>(() =>
                 binder.Bind(source, target, BaseRelationKeys.Relationship, "bad", plot));
         }
 

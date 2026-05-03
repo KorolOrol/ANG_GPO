@@ -86,6 +86,8 @@ namespace BaseClasses.Model.Params
             if (!key.IsTypeMatch(value))
                 throw new InvalidOperationException($"Value of type {value?.GetType().Name} cannot be assigned " +
                                                     $"to key '{this}' with expected type {key.ValueType.Name}.");
+            if (ContainsKey(key))
+                throw new ArgumentException($"A parameter with key '{key}' already exists in the ParamBag.");
             _params.Add(key, value);
         }
 
@@ -127,8 +129,6 @@ namespace BaseClasses.Model.Params
             if (!key.IsTypeMatch(value))
                 throw new InvalidOperationException($"Value of type {value?.GetType().Name} cannot be assigned " +
                                                     $"to key '{this}' with expected type {key.ValueType.Name}.");
-            if (!ContainsKey(key))
-                throw new KeyNotFoundException($"Key '{key}' not found in ParamBag.");
             _params[key] = value;
         }
 

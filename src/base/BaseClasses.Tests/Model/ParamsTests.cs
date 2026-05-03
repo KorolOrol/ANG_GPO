@@ -65,9 +65,9 @@ namespace BaseClasses.Tests.Model
 
             [Theory]
             [MemberData(nameof(IsTypeMatchNegativeCases))]
-            public void ParamKey_IsTypeMatch_Throws_ForInvalidValues(IParamKey key, object value)
+            public void ParamKey_IsTypeMatch_ReturnsFalse_ForInvalidValues(IParamKey key, object value)
             {
-                Assert.Throws<InvalidOperationException>(() => key.IsTypeMatch(value));
+                Assert.False(key.IsTypeMatch(value));
             }
 
             [Theory]
@@ -93,6 +93,9 @@ namespace BaseClasses.Tests.Model
                 Assert.False(intPk.TryConvertValue(1.5d, out _));
 
                 Assert.True(intPk.TryConvertValue(1.0d + 5e-10, out intResult));
+                Assert.Equal(1, intResult);
+                
+                Assert.True(intPk.TryConvertValue(1.0d - 5e-10, out intResult));
                 Assert.Equal(1, intResult);
 
                 Assert.True(doublePk.TryConvertValue(1, out var doubleResult));
