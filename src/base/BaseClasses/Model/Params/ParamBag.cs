@@ -56,15 +56,6 @@ namespace BaseClasses.Model.Params
         /// <param name="key">Ключ параметра, который нужно удалить.</param>
         /// <returns>True, если параметр был успешно удален, иначе False.</returns>
         public bool Remove(IParamKey key) => _params.Remove(key);
-        
-        /// <summary>
-        /// Получает значение параметра с указанным ключом.
-        /// </summary>
-        /// <param name="key">Ключ параметра, значение которого нужно получить.</param>
-        /// <param name="value">Параметр, в который будет записано значение, если ключ существует.</param>
-        /// <returns>True, если ParamBag содержит параметр с указанным ключом
-        /// и значение было успешно получено, иначе False.</returns>
-        public bool TryGetValue(IParamKey key, out object? value) => _params.TryGetValue(key, out value);
 
         /// <summary>
         /// Индексатор для доступа к параметрам по ключу.
@@ -90,12 +81,24 @@ namespace BaseClasses.Model.Params
         /// </summary>
         /// <param name="key">Ключ параметра, который нужно добавить.</param>
         /// <param name="value">Значение параметра, которое нужно добавить.</param>
-        public void Add(IParamKey key, object value)
+        public void Add(IParamKey key, object? value)
         {
             if (!key.IsTypeMatch(value))
-                throw new InvalidOperationException($"Value of type {value.GetType().Name} cannot be assigned " +
+                throw new InvalidOperationException($"Value of type {value?.GetType().Name} cannot be assigned " +
                                                     $"to key '{this}' with expected type {key.ValueType.Name}.");
             _params.Add(key, value);
+        }
+
+        /// <summary>
+        /// Добавляет новый параметр в ParamBag с использованием типизированного ключа ParamKey&lt;T&gt;.
+        /// </summary>
+        /// <param name="key">Типизированный ключ параметра, который нужно добавить.</param>
+        /// <param name="value">Значение параметра, которое нужно добавить.
+        /// Должно соответствовать типу, определенному в ключе ParamKey&lt;T&gt;.</param>
+        /// <typeparam name="T">Тип значения, связанного с ключом параметра.</typeparam>
+        public void Add<T>(ParamKey<T> key, T value)
+        {
+            Add((IParamKey)key, value);
         }
 
         /// <summary>
@@ -108,21 +111,51 @@ namespace BaseClasses.Model.Params
         /// </summary>
         /// <returns>Перечисление всех пар ключ-значение, хранящихся в ParamBag.</returns>
         public IEnumerable<KeyValuePair<IParamKey, object?>> Enumerate() => _params.AsEnumerable();
-
+        
         /// <summary>
-        /// Устанавливает значение параметра с указанным типизированным ключом.
+        /// Устанавливает значение параметра с указанным ключом.
         /// </summary>
-        /// <param name="key">Типизированный ключ параметра, значение которого нужно установить.</param>
-        /// <param name="value">Значение параметра, которое нужно установить. Должно соответствовать типу,
+        /// <param name="key">Ключ параметра, значение которого нужно установить.
+        /// Должен уже существовать в ParamBag.</param>
+        /// <param name="value">Новое значение параметра, которое нужно установить. Должно соответствовать типу,
         /// определенному в ключе параметра.</param>
-        /// <typeparam name="T">Тип значения, связанного с ключом параметра.</typeparam>
-        public void Set<T>(ParamKey<T> key, T value)
+        /// <exception cref="InvalidOperationException">Если тип нового значения не соответствует типу,
+        /// определенному в ключе параметра.</exception>
+        /// <exception cref="KeyNotFoundException">Если ключ параметра не найден в ParamBag.</exception>
+        public void Set(IParamKey key, object? value)
         {
             if (!key.IsTypeMatch(value))
                 throw new InvalidOperationException($"Value of type {value?.GetType().Name} cannot be assigned " +
                                                     $"to key '{this}' with expected type {key.ValueType.Name}.");
+            if (!ContainsKey(key))
+                throw new KeyNotFoundException($"Key '{key}' not found in ParamBag.");
             _params[key] = value;
         }
+
+        /// <summary>
+        /// Устанавливает значение параметра с указанным типизированным ключом ParamKey&lt;T&gt;.
+        /// </summary>
+        /// <param name="key">Типизированный ключ параметра, значение которого нужно установить.
+        /// Должен уже существовать в ParamBag.</param>
+        /// <param name="value">Новое значение параметра, которое нужно установить. Должно соответствовать типу,
+        /// определенному в ключе ParamKey&lt;T&gt;.</param>
+        /// <exception cref="InvalidOperationException">Если тип нового значения не соответствует типу,
+        /// определенному в ключе ParamKey&lt;T&gt;.</exception>
+        /// <exception cref="KeyNotFoundException">Если ключ параметра не найден в ParamBag.</exception>
+        /// <typeparam name="T">Тип значения, связанного с ключом параметра.</typeparam>
+        public void Set<T>(ParamKey<T> key, T value)
+        {
+            Set((IParamKey)key, value);
+        }
+        
+        /// <summary>
+        /// Получает значение параметра с указанным ключом.
+        /// </summary>
+        /// <param name="key">Ключ параметра, значение которого нужно получить.</param>
+        /// <param name="value">Параметр, в который будет записано значение, если ключ существует.</param>
+        /// <returns>True, если ParamBag содержит параметр с указанным ключом
+        /// и значение было успешно получено, иначе False.</returns>
+        public bool TryGetValue(IParamKey key, out object? value) => _params.TryGetValue(key, out value);
 
         /// <summary>
         /// Пытается получить значение параметра с указанным типизированным ключом.
