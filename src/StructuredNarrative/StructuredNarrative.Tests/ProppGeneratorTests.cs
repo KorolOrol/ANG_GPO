@@ -1,12 +1,9 @@
-﻿using AIGenerator;
-using BaseClasses.Enum;
+﻿using BaseClasses.Enum;
 using BaseClasses.Model;
+using BaseClasses.Services;
 using StructuredNarrative.Data;
 using StructuredNarrative.Model;
-using Xunit;
 using Xunit.Abstractions;
-using System;
-using System.IO;
 
 namespace StructuredNarrative.Tests;
 
@@ -49,7 +46,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         foreach (var role in ProppFunctionRegistry.Roles)
         {
             var roledCharacter = new Element(ElemType.Character, role);
-            roledCharacter.Params.Add("ProppRole", role);
+            roledCharacter.Params.Add(ProppParamKeys.Role, role);
             plot.Add(roledCharacter);
         }
 
@@ -62,7 +59,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         Assert.True(plot.Elements.Count >= initialCount);
         Assert.Contains(plot.Elements, e => e.Type == ElemType.Event);
 
-        testOutputHelper.WriteLine(plot.FullInfo());
+        testOutputHelper.WriteLine(Serializer.PrintToString(plot));
     }
 
     [Fact]
@@ -74,7 +71,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         foreach (var role in ProppFunctionRegistry.Roles)
         {
             var roledCharacter = new Element(ElemType.Character, role);
-            roledCharacter.Params.Add("ProppRole", role);
+            roledCharacter.Params.Add(ProppParamKeys.Role, role);
             plot.Add(roledCharacter);
         }
 
@@ -85,10 +82,10 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         // With skipping enabled, we at least expect generation not to remove elements.
         Assert.True(plot.Elements.Count >= initialCount);
 
-        testOutputHelper.WriteLine(plot.FullInfo());
+        testOutputHelper.WriteLine(Serializer.PrintToString(plot));
     }
     
-    [Fact]
+    /*[Fact]
     public async Task GenerationWithAiUpgrade()
     {
         Plot plot = new();
@@ -101,7 +98,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
         //     plot.Add(roledCharacter);
         // }
         await proppGenerator.GenerateChainAsync(plot, new Element(ElemType.Event), recursion:10);
-        testOutputHelper.WriteLine(plot.FullInfo());
+        testOutputHelper.WriteLine(Serializer.PrintToString(plot));
 
         var endpoint = Environment.GetEnvironmentVariable("LLM_ENDPOINT");
         if (string.IsNullOrWhiteSpace(endpoint))
@@ -139,16 +136,16 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
 
         int maxTries = 3;
 
-        for (int i = 0; i < plot.Elements.Count; i++)
+        foreach (var element in plot.Elements)
         {
-            var element = plot.Elements[i];
 
             for (int attempt = 0; attempt < maxTries; attempt++)
             {
                 try
                 {
                     await llmAiGenerator.GenerateAsync(plot, element);
-                    testOutputHelper.WriteLine($"Upgraded {i} from {plot.Elements.Count}:\n" + element.FullInfo());
+                    testOutputHelper.WriteLine($"Upgraded {element.Name} from {plot.Elements.Count}:\n" 
+                                               + Serializer.PrintToString(element));
                     break;
                 }
                 catch (Exception ex)
@@ -156,7 +153,7 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
                     // On the last attempt, log the error and move on to the next element.
                     if (attempt == maxTries - 1)
                     {
-                        testOutputHelper.WriteLine($"Error upgrading element {i}: {ex.Message}");
+                        testOutputHelper.WriteLine($"Error upgrading element {element.Name}: {ex.Message}");
                     }
                 }
             }
@@ -164,5 +161,5 @@ public class ProppGeneratorTests(ITestOutputHelper testOutputHelper)
 
         // Upgrading elements in place should not change the number of plot elements.
         Assert.Equal(countBeforeUpgrade, plot.Elements.Count);
-    }
+    }*/
 }

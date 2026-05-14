@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using BaseClasses.Enum;
-using BaseClasses.Interface;
 using BaseClasses.Model;
-using BaseClasses.Services;
+using BaseClasses.Services.Binds;
+using StructuredNarrative.Data;
 using StructuredNarrative.Enum;
 
 namespace StructuredNarrative.Model
@@ -77,43 +77,53 @@ namespace StructuredNarrative.Model
         /// <returns>Элемент-событие с параметрами функции</returns>
         public Element CreateEventSkeleton(Plot plot)
         {
-            var @params = new Dictionary<string, object>
-            {
-                { "ProppFunction", Name },
-                { "ProppSymbol", Symbol },
-                { "NarrativePhase", Phase.ToString() },
-                { "FunctionOrder", Order },
-                { "Characters", new List<IElement>() },
-                { "Items", new List<IElement>() },
-                { "Locations", new List<IElement>() }
-            };
+            var functionEvent = new Element(ElemType.Event, Name, Description);
+            functionEvent.Params.Set(ProppParamKeys.Function, Name);
+            functionEvent.Params.Set(ProppParamKeys.Symbol, Symbol);
+            functionEvent.Params.Set(ProppParamKeys.NarrativePhase, Phase.ToString());
+            functionEvent.Params.Set(ProppParamKeys.Order, Order);
+            
+            plot.Add(functionEvent);
 
-            var functionEvent = new Element(ElemType.Event, Name, Description, @params);
-
-            foreach (var roledElement in 
-                     PrimaryRoles.Select(primaryRole => plot.Characters.FirstOrDefault(c => c != null 
-                                                                && c.Params.ContainsKey("ProppRole") 
-                                                                && (string)c.Params["ProppRole"] == primaryRole) 
-                                                        ?? new Element(ElemType.Character, 
-                                                            primaryRole, 
-                                                            $"Персонаж в роли {primaryRole}", 
-                                                            new Dictionary<string, object> 
-                                                                { { "ProppRole", primaryRole } })))
+            foreach (var roledElement in PrimaryRoles.Select(primaryRole => GetCharacterByRole(primaryRole,
+                         plot,
+                         true)!))
             {
-                Binder.Bind(functionEvent, roledElement);
-                plot.Add(roledElement);
+                plot.Bind(functionEvent, roledElement, BaseRelationKeys.Involves, true);
             }
 
-            foreach (var roledElement in SecondaryRoles.Select(secondaryRole => 
-                         plot.Characters.FirstOrDefault(c => c != null 
-                                                             && c.Params.ContainsKey("ProppRole")
-                                                             && (string)c.Params["ProppRole"] == secondaryRole)
-                         ))
+            foreach (var roledElement in SecondaryRoles.Select(secondaryRole => GetCharacterByRole(secondaryRole,
+                             plot,
+                             false))
+                         .OfType<Element>())
             {
-                if (roledElement != null) Binder.Bind(functionEvent, roledElement);
+                plot.Bind(functionEvent, roledElement, BaseRelationKeys.Involves, false);
             }
 
             return functionEvent;
+        }
+        
+        private static Element? GetCharacterByRole(string role, Plot plot, bool createIfMissing)
+        {
+            var element = plot.Elements.FirstOrDefault(c => c is { Type: ElemType.Character } &&
+                                                            c.Params.TryGet(ProppParamKeys.Role, out var existingRole) &&
+                                                            existingRole == role) as Element;
+
+            if (element != null || !createIfMissing)
+            {
+                return element;
+            }
+
+            element = new Element(ElemType.Character, role, $"Персонаж в роли {role}")
+            {
+                Params =
+                {
+                    [ProppParamKeys.Role] = role
+                }
+            };
+
+            plot.Add(element);
+            return element;
         }
 
         /// <summary>
