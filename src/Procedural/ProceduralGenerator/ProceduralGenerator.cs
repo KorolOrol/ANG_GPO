@@ -434,20 +434,17 @@ public class ProceduralGenerator : IGenerator
         return char.ToUpper(input[0]) + input[1..].ToLower();
     }
     
-    private double GetAffectionValue(Dictionary<string, object> trait)
+    private static double GetAffectionValue(Dictionary<string, object> trait)
     {
-        if (trait.TryGetValue("Affection", out var value))
+        if (!trait.TryGetValue("Affection", out var value)) return 0.0;
+        try
         {
-            try
-            {
-                return Convert.ToDouble(value);
-            }
-            catch
-            {
-                return 0.0;
-            }
+            return Convert.ToDouble(value);
         }
-        return 0.0;
+        catch
+        {
+            return 0.0;
+        }
     }
     
     private bool CheckTraitTable(List<Dictionary<string, object>> traitList, string newTraitKey)
@@ -494,18 +491,17 @@ public class ProceduralGenerator : IGenerator
         }
     }
     
-    private List<IElement> GetParents(Plot plot, IElement child)
+    private static List<IElement> GetParents(Plot plot, IElement child)
     {
         var parents = plot.Relations.Where(x => Equals(x.Target, child) &&
                                                 x.Param.Name.ToLower() == "child")
-            .ToList()
             .Select(x => x.Source)
             .ToList();
 
         return parents.Count switch
         {
             < 2 => throw new ArgumentException("Character doesn't have one or both parent elements"),
-            > 2 => throw new ArgumentException("Character have more then two parent elements"),
+            > 2 => throw new ArgumentException("Character have more than two parent elements"),
             _ => parents
         };
     }

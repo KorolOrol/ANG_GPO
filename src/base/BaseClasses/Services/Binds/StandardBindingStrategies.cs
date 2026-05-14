@@ -7,7 +7,7 @@ namespace BaseClasses.Services.Binds
 {
     public static class StandardBindingStrategies
     {
-        private static readonly RelationBindingStrategy _BindOneSide = (source, target, key, value, plot) =>
+        public static readonly RelationBindingStrategy BindOneSide = (source, target, key, value, plot) =>
         {
             var rel = plot.Relations.FirstOrDefault(r =>
                 r.Source.Equals(source) && r.Target.Equals(target) && r.Param.Equals(key));
@@ -17,7 +17,7 @@ namespace BaseClasses.Services.Binds
                 rel.Value = value;
         };
         
-        private static readonly RelationBindingStrategy _UnbindOneSide = (source, target, key, _, plot) =>
+        public static readonly RelationBindingStrategy UnbindOneSide = (source, target, key, _, plot) =>
         {
             var rel = plot.Relations.FirstOrDefault(r =>
                 r.Source.Equals(source) && r.Target.Equals(target) && r.Param.Equals(key));
@@ -27,14 +27,14 @@ namespace BaseClasses.Services.Binds
         
         public static readonly RelationBindingStrategy BindCharacters = (source, target, key, value, plot) =>
         {
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, key, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, key, value, plot);
         };
 
         public static readonly RelationBindingStrategy UnbindCharacters = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, key, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, key, value, plot);
         };
 
         public static readonly RelationBindingStrategy BindCharItem = (source, target, key, value, plot) =>
@@ -44,8 +44,8 @@ namespace BaseClasses.Services.Binds
                 ?.Target ?? plot.Relations.FirstOrDefault(r =>
                     r.Target.Equals(target) && r.Param.Equals(BaseRelationKeys.Owns))
                 ?.Source;
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, BaseRelationKeys.Owned, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, BaseRelationKeys.Owned, value, plot);
             if (!(other is null))
             {
                 UnbindCharItem?.Invoke(other, target, key, null, plot);
@@ -54,8 +54,8 @@ namespace BaseClasses.Services.Binds
 
         public static readonly RelationBindingStrategy UnbindCharItem = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, BaseRelationKeys.Owned, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, BaseRelationKeys.Owned, value, plot);
         };
 
         public static readonly RelationBindingStrategy BindItemChar = (source, target, _, value, plot) =>
@@ -70,14 +70,14 @@ namespace BaseClasses.Services.Binds
 
         public static readonly RelationBindingStrategy BindCharLoc = (source, target, key, value, plot) =>
         {
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
         };
 
         public static readonly RelationBindingStrategy UnbindCharLoc = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
         };
         
         public static readonly RelationBindingStrategy BindLocChar = (source, target, _, value, plot) =>
@@ -92,14 +92,14 @@ namespace BaseClasses.Services.Binds
 
         public static readonly RelationBindingStrategy BindCharEvent = (source, target, key, value, plot) =>
         {
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, BaseRelationKeys.Involves, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, BaseRelationKeys.Involves, value, plot);
         };
         
         public static readonly RelationBindingStrategy UnbindCharEvent = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, BaseRelationKeys.Involves, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, BaseRelationKeys.Involves, value, plot);
         };
         
         public static readonly RelationBindingStrategy BindEventChar = (source, target, _, value, plot) =>
@@ -119,8 +119,8 @@ namespace BaseClasses.Services.Binds
                 ?.Target ?? plot.Relations.FirstOrDefault(r =>
                     r.Target.Equals(source) && r.Param.Equals(BaseRelationKeys.Locates))
                 ?.Source;
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
             if (!(other is null))
             {
                 UnbindItemLoc?.Invoke(source, other, BaseRelationKeys.Located, null, plot);
@@ -129,8 +129,8 @@ namespace BaseClasses.Services.Binds
 
         public static readonly RelationBindingStrategy UnbindItemLoc = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, BaseRelationKeys.Locates, value, plot);
         };
         
         public static readonly RelationBindingStrategy BindLocItem = (source, target, _, value, plot) =>
@@ -145,14 +145,14 @@ namespace BaseClasses.Services.Binds
 
         public static readonly RelationBindingStrategy BindItemEvent = (source, target, key, value, plot) =>
         {
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, BaseRelationKeys.Uses, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, BaseRelationKeys.Uses, value, plot);
         };
         
         public static readonly RelationBindingStrategy UnbindItemEvent = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, BaseRelationKeys.Uses, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, BaseRelationKeys.Uses, value, plot);
         };
         
         public static readonly RelationBindingStrategy BindEventItem = (source, target, _, value, plot) =>
@@ -167,14 +167,14 @@ namespace BaseClasses.Services.Binds
 
         public static readonly RelationBindingStrategy BindLocEvent = (source, target, key, value, plot) =>
         {
-            _BindOneSide(source, target, key, value, plot);
-            _BindOneSide(target, source, BaseRelationKeys.Located, value, plot);
+            BindOneSide(source, target, key, value, plot);
+            BindOneSide(target, source, BaseRelationKeys.Located, value, plot);
         };
         
         public static readonly RelationBindingStrategy UnbindLocEvent = (source, target, key, value, plot) =>
         {
-            _UnbindOneSide(source, target, key, value, plot);
-            _UnbindOneSide(target, source, BaseRelationKeys.Located, value, plot);
+            UnbindOneSide(source, target, key, value, plot);
+            UnbindOneSide(target, source, BaseRelationKeys.Located, value, plot);
         };
         
         public static readonly RelationBindingStrategy BindEventLoc = (source, target, _, value, plot) =>

@@ -56,5 +56,15 @@ namespace BaseClasses.Services.Binds
         {
             return HashCode.Combine((int)SourceType, (int)TargetType, ParamKey);
         }
+
+        public static bool operator ==(RelationRoute left, RelationRoute right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(RelationRoute left, RelationRoute right)
+        {
+            return !(left == right);
+        }
     }
 }

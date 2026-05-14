@@ -25,7 +25,7 @@ namespace BaseClasses.Model
         public HashSet<Relation> Relations { get; } = new HashSet<Relation>();
 
         /// <summary>
-        /// Стратегия связывания элементов истории.
+        /// Сервис для связывания элементов истории.
         /// </summary>
         public Binder Binder { get; }
 

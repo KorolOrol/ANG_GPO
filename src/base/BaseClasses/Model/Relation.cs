@@ -10,6 +10,8 @@ namespace BaseClasses.Model
     /// </summary>
     public class Relation : IEquatable<Relation>
     {
+        private object? _value;
+
         /// <summary>
         /// Элемент, от которого исходит отношение.
         /// </summary>
@@ -28,7 +30,18 @@ namespace BaseClasses.Model
         /// <summary>
         /// Значение параметра, описывающего отношение между элементами.
         /// </summary>
-        public object? Value { get; set; }
+        public object? Value
+        {
+            get => _value;
+            set
+            {
+                if (!Param.IsTypeMatch(value))
+                {
+                    throw new ArgumentException($"Value must be of type {Param.ValueType.FullName}.");
+                }
+                _value = value;
+            }
+        }
         
         /// <summary>
         /// Конструктор для создания нового отношения между элементами истории.
