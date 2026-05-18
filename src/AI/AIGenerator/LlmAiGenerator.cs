@@ -104,9 +104,9 @@ namespace AIGenerator
         /// <param name="preparedElement">Заготовленный компонент</param>
         /// <param name="aiElement">Сгенерированный компонент</param>
         /// <returns>Объединенный компонент</returns>
-        private IElement Merge(IElement preparedElement, IElement aiElement)
+        private IElement Merge(Plot plot, IElement preparedElement, IElement aiElement)
         {
-            Merger.Merge(preparedElement, aiElement, !AIPriority);
+            plot.Merge(preparedElement, aiElement, !AIPriority);
             return preparedElement;
         }
 
@@ -126,48 +126,52 @@ namespace AIGenerator
             }
             prompts.Add(SystemPrompt["Setting"]);
             prompts.Add(SystemPrompt[$"{element.Type}Start"]);
-            if (plot.Characters.Count != 0)
+            var characters = plot.Elements.Where(e => e.Type == ElemType.Character).ToList();
+            if (characters.Count != 0)
             {
-                foreach (var character in plot.Characters)
+                foreach (var character in characters)
                 {
                     prompts.Add(string.Format(SystemPrompt["CharacterUsage"],
-                        JsonSerializer.Serialize(new AiElement(character), settings)));
+                        JsonSerializer.Serialize(new AiElement(character, plot), settings)));
                 }
             }
             else
             {
                 prompts.Add(SystemPrompt["CharacterEmpty"]);
             }
-            if (plot.Locations.Count != 0)
+            var locations = plot.Elements.Where(e => e.Type == ElemType.Location).ToList();
+            if (locations.Count != 0)
             {
-                foreach (var location in plot.Locations)
+                foreach (var location in locations)
                 {
                     prompts.Add(string.Format(SystemPrompt["LocationUsage"],
-                        JsonSerializer.Serialize(new AiElement(location), settings)));
+                        JsonSerializer.Serialize(new AiElement(location, plot), settings)));
                 }
             }
             else
             {
                 prompts.Add(SystemPrompt["LocationEmpty"]);
             }
-            if (plot.Items.Count != 0)
+            var items = plot.Elements.Where(e => e.Type == ElemType.Item).ToList();
+            if (items.Count != 0)
             {
-                foreach (var item in plot.Items)
+                foreach (var item in items)
                 {
                     prompts.Add(string.Format(SystemPrompt["ItemUsage"],
-                        JsonSerializer.Serialize(new AiElement(item), settings)));
+                        JsonSerializer.Serialize(new AiElement(item, plot), settings)));
                 }
             }
             else
             {
                 prompts.Add(SystemPrompt["ItemEmpty"]);
             }
-            if (plot.Events.Count != 0)
+            var events = plot.Elements.Where(e => e.Type == ElemType.Event).ToList();
+            if (events.Count != 0)
             {
-                foreach (var ev in plot.Events)
+                foreach (var ev in events)
                 {
                     prompts.Add(string.Format(SystemPrompt["EventUsage"],
-                        JsonSerializer.Serialize(new AiElement(ev), settings)));
+                        JsonSerializer.Serialize(new AiElement(ev, plot), settings)));
                 }
             }
             else
@@ -177,7 +181,7 @@ namespace AIGenerator
             if (!element.IsEmpty())
             {
                 prompts.Add(string.Format(SystemPrompt[$"{element.Type}Prepared"],
-                    JsonSerializer.Serialize(new AiElement(element), settings)));
+                    JsonSerializer.Serialize(new AiElement(element, plot), settings)));
             }
             prompts.Add(SystemPrompt[$"{element.Type}End"]);
             return prompts;
@@ -199,7 +203,7 @@ namespace AIGenerator
                 AiElement aiElement =
                     JsonSerializer.Deserialize<AiElement>(response)!;
                 aiElement.ParamsJsonToSystem();
-                IElement element = Merge(preparedElement, aiElement.Element(plot));
+                IElement element = Merge(plot, preparedElement, aiElement.Element(plot));
                 plot.Add(element);
                 return element;
             }
@@ -207,6 +211,21 @@ namespace AIGenerator
             {
                 throw new Exception(response, e);
             }
+        }
+
+        public IElement Generate(Plot plot, IElement preparedElement)
+        {
+            return GenerateAsync(plot, preparedElement).GetAwaiter().GetResult();
+        }
+
+        public Task<IElement> GenerateChainAsync(Plot plot, IElement preparedElement, int recursion = 3)
+        {
+            return GenerateChainAsync(plot, preparedElement, null, recursion);
+        }
+
+        public IElement GenerateChain(Plot plot, IElement preparedElement, int recursion = 3)
+        {
+            return GenerateChainAsync(plot, preparedElement, null, recursion).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -218,7 +237,7 @@ namespace AIGenerator
         /// <param name="recursion">Глубина рекурсии</param>
         /// <returns>Сгенерированный элемент истории</returns>
         /// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
-        public async Task<IElement> GenerateChainAsync(Plot plot,
+        private async Task<IElement> GenerateChainAsync(Plot plot,
             IElement preparedElement,
             Queue<(IElement, IElement, int)>? generationQueue = null,
             int recursion = 3)
@@ -232,32 +251,35 @@ namespace AIGenerator
                 AiElement aiElement =
                     JsonSerializer.Deserialize<AiElement>(response)!;
                 aiElement.ParamsJsonToSystem();
-                IElement element = Merge(preparedElement, aiElement.Element(plot));
+                IElement element = Merge(plot, preparedElement, aiElement.Element(plot));
                 plot.Add(element);
                 if (recursion > 0)
                 {
+                    var registry = ParamKeyRegistry.Default;
                     foreach (var (type, list) in aiElement.NewElements(plot))
                     {
                         foreach (string e in list)
                         {
-                            double relation = 0;
-                            if (aiElement.Params.ContainsKey("Relations") &&
-                                ((Dictionary<string, double>)aiElement.Params["Relations"])
-                                .ContainsKey(e))
-                            {
-                                relation = 
-                                    ((Dictionary<string, double>)aiElement.Params["Relations"])[e];
-                            }
                             var queuedTuple = generationQueue.FirstOrDefault(q => q.Item1.Name == e);
                             IElement? queuedElement = queuedTuple.Item1;
                             if (queuedElement != null)
                             {
-                                Binder.Bind(queuedElement, element, relation);
+                                if (aiElement.TryGetRelationBinding(queuedElement.Type,
+                                        queuedElement.Name, out var paramKey, out var value, registry))
+                                {
+                                    plot.Add(queuedElement);
+                                    plot.Bind(element, queuedElement, paramKey, value);
+                                }
                             }
                             else 
                             {
                                 Element newElement = new Element(type, e);
-                                Binder.Bind(element, newElement, relation);
+                                if (aiElement.TryGetRelationBinding(newElement.Type,
+                                        newElement.Name, out var paramKey, out var value, registry))
+                                {
+                                    plot.Add(newElement);
+                                    plot.Bind(element, newElement, paramKey, value);
+                                }
                                 generationQueue.Enqueue((newElement, element, recursion - 1));
                             }
                         }

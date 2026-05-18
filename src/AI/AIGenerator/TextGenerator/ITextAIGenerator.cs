@@ -29,10 +29,6 @@ namespace AIGenerator.TextGenerator
         /// </summary>
         /// <param name="messages">Список сообщений</param>
         /// <returns>Сгенерированный текст</returns>
-        public async Task<string> GenerateTextAsync(List<string> messages)
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
+        public Task<string> GenerateTextAsync(List<string> messages);
     }
 }

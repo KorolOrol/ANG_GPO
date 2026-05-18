@@ -75,23 +75,62 @@ namespace BaseClasses.Services
 
             return JsonSerializer.Serialize(concreteElement, Options);
         }
+        
+        /// <summary>
+        /// Сериализация связи между элементами истории.
+        /// </summary>
+        /// <param name="relation">Связь между элементами истории.</param>
+        /// <param name="path">Путь к файлу.</param>
+        public static void Serialize(Relation relation, string path)
+        {
+            File.WriteAllText(path, SerializeToString(relation));
+        }
+
+        /// <summary>
+        /// Сериализация связи между элементами истории в JSON-строку без записи в файл.
+        /// </summary>
+        /// <param name="relation">Связь между элементами истории.</param>
+        /// <returns>>JSON-представление связи между элементами истории.</returns>
+        public static string SerializeToString(Relation relation)
+        {
+            return JsonSerializer.Serialize(ToRelationDto(relation), Options);
+        }
 
         /// <summary>
         /// Десериализация.
         /// </summary>
         /// <typeparam name="T">Тип объекта.</typeparam>
         /// <param name="path">Путь к файлу.</param>
+        /// <param name="plot">История, необходимая для корректного восстановления
+        /// связей между элементами при десериализации отношений.</param>
         /// <returns>Объект.</returns>
-        public static T Deserialize<T>(string path)
+        public static T Deserialize<T>(string path, Plot? plot = null)
         {
             var json = File.ReadAllText(path);
+            return DeserializeString<T>(json, plot);
+        }
 
+        /// <summary>
+        /// Десериализация из JSON-строки.
+        /// </summary>
+        /// <param name="json">JSON-строка, представляющая сериализованный объект.</param>
+        /// <param name="plot">История, необходимая для корректного восстановления
+        /// связей между элементами при десериализации отношений.</param>
+        /// <typeparam name="T">Тип объекта.</typeparam>
+        /// <returns>Объект.</returns>
+        /// <exception cref="JsonException">Выбрасывается при ошибках десериализации,
+        /// таких как несоответствие типов, отсутствие необходимых полей или некорректные значения.</exception>
+        /// <exception cref="ArgumentNullException">Выбрасывается, если для десериализации отношения
+        /// не была предоставлена история.</exception>
+        /// <exception cref="ArgumentException">Выбрасывается, если тип T не поддерживается для десериализации.</exception>
+        public static T DeserializeString<T>(string json, Plot? plot = null)
+        {
             if (typeof(T) == typeof(Plot))
             {
                 var dto = JsonSerializer.Deserialize<PlotDto>(json, Options)
                           ?? throw new JsonException("Failed to deserialize plot JSON.");
-                var plot = FromPlotDto(dto);
-                return (T)Convert.ChangeType(plot, typeof(T));
+                var plotFromDto = FromPlotDto(dto);
+                return (T)Convert.ChangeType(plotFromDto, typeof(T));
             }
 
             if (typeof(T) == typeof(Element))
@@ -101,8 +140,21 @@ namespace BaseClasses.Services
                 return (T)Convert.ChangeType(element, typeof(T));
             }
 
+            if (typeof(T) == typeof(Relation))
+            {
+                if (plot == null)
+                {
+                    throw new ArgumentNullException(nameof(plot), "Plot must be provided to deserialize a Relation.");
+                }
+                var dto = JsonSerializer.Deserialize<RelationDto>(json, Options)
+                          ?? throw new JsonException("Failed to deserialize relation JSON.");
+                var relation = FromRelationDto(dto, plot);
+                return (T)Convert.ChangeType(relation, typeof(T));
+            }
+
             throw new ArgumentException(
-                $"Only '{nameof(Plot)}' and '{nameof(Element)}' types are supported by this method. " +
+                $"Only '{nameof(Plot)}', '{nameof(Element)}' and '{nameof(Relation)}' " +
+                $"types are supported by this method. " +
                 $"Attempted to deserialize '{typeof(T).Name}'.");
         }
 
@@ -160,18 +212,36 @@ namespace BaseClasses.Services
             return $"{element.Type}: {element.Name}{Environment.NewLine}{element.Description}";
         }
 
+        private static RelationDto ToRelationDto(Relation relation)
+        {
+            return new RelationDto
+            {
+                Source = GetElementId(RequireElement(relation.Source)),
+                Target = GetElementId(RequireElement(relation.Target)),
+                Namespace = relation.Param.Namespace,
+                Name = relation.Param.Name,
+                Type = relation.Param.ValueType.AssemblyQualifiedName ??
+                       relation.Param.ValueType.FullName ?? relation.Param.ValueType.Name,
+                Value = relation.Value
+            };
+        }
+
+        private static Relation FromRelationDto(RelationDto dto, Plot plot)
+        {
+            return new Relation(
+                RequireElement(plot.Elements.FirstOrDefault(e => GetElementId(e) == dto.Source)
+                               ?? throw new JsonException($"Relation source with id '{dto.Source}' was not found.")),
+                RequireElement(plot.Elements.FirstOrDefault(e => GetElementId(e) == dto.Target)
+                               ?? throw new JsonException($"Relation target with id '{dto.Target}' was not found.")),
+                CreateParamKey(dto.Name, dto.Namespace, ResolveType(dto.Type)),
+                DeserializeTypedValue(dto.Value, ResolveType(dto.Type))
+            );
+        }
+
         private static PlotDto ToPlotDto(Plot plot)
         {
             var elements = plot.Elements.Select(RequireElement).ToList();
-            var relations = plot.Relations.Select(r => new RelationDto
-            {
-                Source = GetElementId(RequireElement(r.Source)),
-                Target = GetElementId(RequireElement(r.Target)),
-                Namespace = r.Param.Namespace,
-                Name = r.Param.Name,
-                Type = r.Param.ValueType.AssemblyQualifiedName ?? r.Param.ValueType.FullName ?? r.Param.ValueType.Name,
-                Value = r.Value
-            }).ToList();
+            var relations = plot.Relations.Select(ToRelationDto).ToList();
 
             return new PlotDto
             {
@@ -232,14 +302,16 @@ namespace BaseClasses.Services
             throw new JsonException($"Only {nameof(Element)} implementations of {nameof(IElement)} are supported.");
         }
 
-        private static Guid GetElementId(Element element)
+        private static Guid GetElementId(IElement element)
         {
+            var re = RequireElement(element);
+            
             if (_ElementIdField == null)
             {
                 throw new JsonException("Element id field was not found.");
             }
 
-            if (_ElementIdField.GetValue(element) is Guid id)
+            if (_ElementIdField.GetValue(re) is Guid id)
             {
                 return id;
             }

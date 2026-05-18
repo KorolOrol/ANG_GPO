@@ -54,7 +54,7 @@ namespace BaseClasses.Services
             writer.WriteStartObject();
 
             writer.WriteString("Id", GetElementId(value));
-            writer.WriteNumber("Type", (int)value.Type);
+            writer.WriteString("Type", value.Type.ToString());
             writer.WriteString("Name", value.Name);
             writer.WriteString("Description", value.Description);
             writer.WritePropertyName("Params");
