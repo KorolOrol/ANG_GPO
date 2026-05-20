@@ -84,7 +84,7 @@ namespace AIGenerator
         public LlmAiGenerator(string promptPath)
         {
             LoadSystemPrompt(promptPath);
-            TextAiGenerator = new OpenAIGenerator();
+            TextAiGenerator = new OpenAiGenerator();
         }
 
         /// <summary>

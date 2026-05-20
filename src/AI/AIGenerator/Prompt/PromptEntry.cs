@@ -13,6 +13,11 @@ namespace AIGenerator.Prompt
         /// <summary>
         /// Запрос (пользовательский промпт).
         /// </summary>
-        Request
+        Request,
+        
+        /// <summary>
+        /// Схема данных (описание формата ответа).
+        /// </summary>
+        Schema
     }
 }
