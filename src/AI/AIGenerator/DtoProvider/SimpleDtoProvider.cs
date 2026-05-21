@@ -67,67 +67,65 @@ namespace AIGenerator.DtoProvider
 
         public string GetSchema()
         {
-            return $$"""
-                     {
-                       "$schema": "https://json-schema.org/draft/2020-12/schema",
-                       "$id": "SimpleElementDto.schema.json",
-                       "title": "SimpleElementDto",
-                       "type": "object",
-                       "additionalProperties": false,
-                       "properties": {
-                         "Type": {
-                           "type": "string",
-                           "enum": ["Character", "Item", "Location", "Event"],
-                           "description": "Тип элемента, соответствующий BaseClasses.Enum.ElemType."
-                         },
-                         "Name": {
-                           "type": "string",
-                           "description": "Имя элемента."
-                         },
-                         "Description": {
-                           "type": "string",
-                           "description": "Описание элемента."
-                         },
-                         "Params": {
-                           "type": "object",
-                           "description": "Словарь параметров элемента, где ключ — имя параметра, значение — JSON-значение произвольного типа.",
-                           "additionalProperties": true
-                         },
-                         "Relations": {
-                           "type": "array",
-                           "description": "Список связей элемента.",
-                           "items": {
-                             "type": "object",
-                             "additionalProperties": false,
-                             "properties": {
-                               "Target": {
-                                 "type": "string",
-                                 "description": "Имя целевого элемента."
-                               },
-                               "Param": {
-                                 "type": "string",
-                                 "description": "Имя параметра связи."
-                               },
-                               "Value": {
-                                 "description": "Значение связи.",
-                                 "oneOf": [
-                                   { "type": "string" },
-                                   { "type": "number" },
-                                   { "type": "integer" },
-                                   { "type": "boolean" },
-                                   { "type": "null" },
-                                   { "type": "object" },
-                                   { "type": "array" }
-                                 ]
-                               }
-                             },
-                             "required": ["Target", "Param", "Value"]
-                           }
-                         }
-                       },
-                       "required": ["Type", "Name", "Description", "Params", "Relations"]
-                     }
-                     """;
+            return @"{
+  ""$schema"": ""https://json-schema.org/draft/2020-12/schema"",
+  ""$id"": ""SimpleElementDto.schema.json"",
+  ""title"": ""SimpleElementDto"",
+  ""type"": ""object"",
+  ""additionalProperties"": false,
+  ""properties"": {
+    ""Type"": {
+      ""type"": ""string"",
+      ""enum"": [""Character"", ""Item"", ""Location"", ""Event""],
+      ""description"": ""Тип элемента, соответствующий BaseClasses.Enum.ElemType.""
+    },
+    ""Name"": {
+      ""type"": ""string"",
+      ""description"": ""Имя элемента.""
+    },
+    ""Description"": {
+      ""type"": ""string"",
+      ""description"": ""Описание элемента.""
+    },
+    ""Params"": {
+      ""type"": ""object"",
+      ""description"": ""Словарь параметров элемента, где ключ — имя параметра, значение — JSON-значение произвольного типа."",
+      ""additionalProperties"": true
+    },
+    ""Relations"": {
+      ""type"": ""array"",
+      ""description"": ""Список связей элемента."",
+      ""items"": {
+        ""type"": ""object"",
+        ""additionalProperties"": false,
+        ""properties"": {
+          ""Target"": {
+            ""type"": ""string"",
+            ""description"": ""Имя целевого элемента.""
+          },
+          ""Param"": {
+            ""type"": ""string"",
+            ""description"": ""Имя параметра связи.""
+          },
+          ""Value"": {
+            ""description"": ""Значение связи."",
+            ""oneOf"": [
+              { ""type"": ""string"" },
+              { ""type"": ""number"" },
+              { ""type"": ""integer"" },
+              { ""type"": ""boolean"" },
+              { ""type"": ""null"" },
+              { ""type"": ""object"" },
+              { ""type"": ""array"" }
+            ]
+          }
+        },
+        ""required"": [""Target"", ""Param"", ""Value""]
+      }
+    }
+  },
+  ""required"": [""Type"", ""Name"", ""Description"", ""Params"", ""Relations""]
+}";
         }
 
         public List<(IElement, IParamKey, object)> GetNewElements(string dto, Plot plot)
@@ -157,7 +155,7 @@ namespace AIGenerator.DtoProvider
                     }
                 })
                 .Where(tuple => tuple.Item1 != null && tuple.Item2 != null)
-                .ToList();
+                .ToList()!;
         }
 
         private class SimpleElementDto
