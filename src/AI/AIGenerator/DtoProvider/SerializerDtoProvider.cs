@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.Json;
 using BaseClasses.Interface;
 using BaseClasses.Model;
@@ -140,6 +141,11 @@ namespace AIGenerator.DtoProvider
                        }
                      }
                      """;
+        }
+
+        public List<(IElement, IParamKey, object)> GetNewElements(string dto, Plot plot)
+        {
+            return new List<(IElement, IParamKey, object)>();
         }
     }
 }

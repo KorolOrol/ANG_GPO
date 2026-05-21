@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
@@ -22,6 +23,11 @@ namespace BaseClasses.Services.Binds
         /// </summary>
         private readonly Dictionary<RelationRoute, RelationBindingStrategy> _unbindStrategies =
             new Dictionary<RelationRoute, RelationBindingStrategy>();
+        
+        /// <summary>
+        /// Зарегистрированные маршруты связывания и отвязывания.
+        /// </summary>
+        public IReadOnlyList<RelationRoute> RegisteredRoutes => _bindStrategies.Keys.ToList().AsReadOnly();
 
         /// <summary>
         /// Инициализация сервиса с предопределенными стратегиями связывания и отвязывания из StandardBindingStrategies.

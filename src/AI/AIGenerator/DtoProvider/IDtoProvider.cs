@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 
@@ -36,5 +37,13 @@ namespace AIGenerator.DtoProvider
         /// </summary>
         /// <returns>Строка, представляющая схему формата DTO.</returns>
         public string GetSchema();
+
+        /// <summary>
+        /// Получение новых элементов из строки формата DTO.
+        /// </summary>
+        /// <param name="dto">Строка, представляющая элементы в формате DTO.</param>
+        /// <param name="plot">Сюжет, в который будут добавлены восстановленные элементы.</param>
+        /// <returns></returns>
+        public List<(IElement, IParamKey, object)> GetNewElements(string dto, Plot plot);
     }
 }

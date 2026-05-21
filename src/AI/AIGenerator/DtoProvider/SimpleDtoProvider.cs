@@ -59,9 +59,9 @@ namespace AIGenerator.DtoProvider
 
         public IElement FromDto(string dto, Plot plot)
         {
-            var se = JsonSerializer.Deserialize<SimpleElementDto>(dto);
-            if (se == null) throw new JsonException("Failed to deserialize SimpleElementDto.");
-            var element = se.ToElement(plot, _paramKeys, _relationKeys);
+            var dtoElement = JsonSerializer.Deserialize<SimpleElementDto>(dto);
+            if (dtoElement == null) throw new JsonException("Failed to deserialize SimpleElementDto.");
+            var element = dtoElement.ToElement(plot, _paramKeys, _relationKeys);
             return element;
         }
 
@@ -130,6 +130,36 @@ namespace AIGenerator.DtoProvider
                      """;
         }
 
+        public List<(IElement, IParamKey, object)> GetNewElements(string dto, Plot plot)
+        {
+            var dtoElement = JsonSerializer.Deserialize<SimpleElementDto>(dto);
+            if (dtoElement == null) throw new JsonException("Failed to deserialize SimpleElementDto.");
+            return dtoElement.Relations
+                .Where(relation => plot.Elements.All(e => e.Name != relation.Target))
+                .Select(relation =>
+                {
+                    var paramKey = _relationKeys.TryGetValue(relation.Param, out var foundKey) && foundKey != null
+                        ? foundKey
+                        : new ParamKey<JsonElement>(relation.Param, "AI.Raw");
+                    try
+                    {
+                        var expectedType = plot.Binder.RegisteredRoutes
+                            .Where(r => Equals(r.ParamKey, paramKey) &&
+                                        r.SourceType == Enum.Parse<ElemType>(dtoElement.Type))
+                            .Select(r => r.TargetType)
+                            .First();
+                        return ((IElement)new Element(expectedType, relation.Target, string.Empty), paramKey, 
+                            JsonSerializer.Deserialize(relation.Value.GetRawText(), paramKey.ValueType));
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        return (null, null, null);
+                    }
+                })
+                .Where(tuple => tuple.Item1 != null && tuple.Item2 != null)
+                .ToList();
+        }
+
         private class SimpleElementDto
         {
             public string Type { get; set; }
@@ -138,7 +168,17 @@ namespace AIGenerator.DtoProvider
             public Dictionary<string, JsonElement> Params { get; set; }
             public List<SimpleRelationDto> Relations { get; set; }
 
+            public SimpleElementDto()
+            {
+                Type = string.Empty;
+                Name = string.Empty;
+                Description = string.Empty;
+                Params = new Dictionary<string, JsonElement>();
+                Relations = new List<SimpleRelationDto>();
+            }
+
             public SimpleElementDto(IElement element, Plot? plot = null)
+                : this()
             {
                 Type = element.Type.ToString();
                 Name = element.Name;
@@ -176,8 +216,8 @@ namespace AIGenerator.DtoProvider
                 }
                 foreach (var relation in Relations)
                 {
-                    var target = plot.Elements.FirstOrDefault(e => e.Name == relation.Target) 
-                                 ?? throw new JsonException($"Target element '{relation.Target}' not found in the plot.");
+                    var target = plot.Elements.FirstOrDefault(e => e.Name == relation.Target);
+                    if  (target == null) continue;
                     var paramKey = relationKeys.TryGetValue(relation.Param, out var foundKey) && foundKey != null
                         ? foundKey
                         : new ParamKey<JsonElement>(relation.Param, "AI.Raw");
@@ -193,6 +233,12 @@ namespace AIGenerator.DtoProvider
             public string Target { get; set; }
             public string Param { get; set; }
             public JsonElement Value { get; set; }
+
+            public SimpleRelationDto()
+            {
+                Target = string.Empty;
+                Param = string.Empty;
+            }
         }
     }
 }

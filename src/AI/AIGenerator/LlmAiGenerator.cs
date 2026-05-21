@@ -1,62 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using AIGenerator.TextGenerator;
 using BaseClasses.Interface;
 using BaseClasses.Model;
-using BaseClasses.Services;
-using BaseClasses.Enum;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using AIGenerator.DtoProvider;
+using AIGenerator.Prompt;
 
 namespace AIGenerator
 {
     /// <summary>
-    /// ИИ-генератор
+    /// ИИ-генератор.
     /// </summary>
     public class LlmAiGenerator : IGenerator, IChainGenerator
     {
         /// <summary>
-        /// Генератор текста
+        /// Генератор текста.
         /// </summary>
         public ITextAiGenerator TextAiGenerator { get; set; }
-
+        
         /// <summary>
-        /// Системные подсказки
+        /// Провайдер для преобразования элементов и сюжета в DTO-формат и обратно. Необходим для передачи
+        /// информации о сюжете и элементах в ИИ в формате, который он может понять, а также для получения информации
+        /// от ИИ и преобразования ее обратно в элементы сюжета. Если не установлен, будет использоваться
+        /// SerializerDtoProvider по умолчанию.
         /// </summary>
-        public Dictionary<string, string> SystemPrompt { get; set; } = new Dictionary<string, string>();
+        public IDtoProvider DtoProvider { get; set; }
 
         /// <summary>
-        /// Настройки сериализации
+        /// Системные подсказки для генерации, загружаются из JSON-файла.
         /// </summary>
-        public JsonSerializerOptions settings = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            IgnoreReadOnlyProperties = true
-        };
+        public Dictionary<string, string> PromptTemplates { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
-        /// Приоритет ИИ над заготовленным материалом
+        /// Приоритет ИИ над заготовленным материалом.
         /// </summary>
-        public bool AIPriority { get; set; } = false;
+        public bool AiPriority { get; set; } = false;
 
         /// <summary>
-        /// Использовать структурированный вывод
+        /// Использовать структурированный вывод.
         /// </summary>
         private bool _useStructuredOutput = true;
 
         /// <summary>
-        /// Использовать структурированный вывод
+        /// Использовать структурированный вывод.
         /// </summary>
         public bool UseStructuredOutput
         {
-            get
-            {
-                return _useStructuredOutput;
-            }
+            get => _useStructuredOutput;
             set
             {
                 _useStructuredOutput = value;
@@ -68,123 +60,53 @@ namespace AIGenerator
         }
 
         /// <summary>
-        /// Загрузка системных подсказок
+        /// Загрузка шаблонов из JSON-файла по указанному пути. JSON должен представлять собой словарь,
+        /// где ключами являются строки (ключи шаблонов), а значениями - строки (тексты шаблонов).
         /// </summary>
-        /// <param name="path">Путь к файлу с подсказками</param>
-        public void LoadSystemPrompt(string path)
+        /// <param name="path">Путь к JSON-файлу, содержащему шаблоны. JSON должен представлять собой словарь,
+        /// где ключами являются строки (ключи шаблонов), а значениями - строки (тексты шаблонов).</param>
+        public void LoadPromptTemplates(string path)
         {
-            SystemPrompt =
-                JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path))!;
+            PromptTemplates = PromptBuilder.DeserializeTemplateDictionary(path) ?? new Dictionary<string, string>();
         }
 
         /// <summary>
-        /// Конструктор со стандартным ИИ
+        /// Конструктор со стандартным ИИ.
         /// </summary>
-        /// <param name="promptPath">Путь к файлу с подсказками</param>
+        /// <param name="promptPath">Путь к файлу с подсказками.</param>
         public LlmAiGenerator(string promptPath)
         {
-            LoadSystemPrompt(promptPath);
+            LoadPromptTemplates(promptPath);
             TextAiGenerator = new OpenAiGenerator();
+            DtoProvider = new SerializerDtoProvider();
         }
 
         /// <summary>
-        /// Конструктор с пользовательским ИИ
+        /// Конструктор с пользовательским ИИ.
         /// </summary>
-        /// <param name="promptPath">Путь к файлу с подсказками</param>
-        /// <param name="textAIGenerator">Генератор текста</param>
-        public LlmAiGenerator(string promptPath, ITextAiGenerator textAIGenerator)
+        /// <param name="promptPath">Путь к файлу с подсказками.</param>
+        /// <param name="textAiGenerator">Генератор текста.</param>
+        public LlmAiGenerator(string promptPath, ITextAiGenerator textAiGenerator)
         {
-            LoadSystemPrompt(promptPath);
-            TextAiGenerator = textAIGenerator;
-        }
-
-        /// <summary>
-        /// Объединение двух компонентов истории в один
-        /// </summary>
-        /// <param name="preparedElement">Заготовленный компонент</param>
-        /// <param name="aiElement">Сгенерированный компонент</param>
-        /// <returns>Объединенный компонент</returns>
-        private IElement Merge(Plot plot, IElement preparedElement, IElement aiElement)
-        {
-            plot.Merge(preparedElement, aiElement, !AIPriority);
-            return preparedElement;
+            LoadPromptTemplates(promptPath);
+            TextAiGenerator = textAiGenerator;
+            DtoProvider = new SerializerDtoProvider();
         }
 
         /// <summary>
         /// Получение подсказок для генерации
         /// </summary>
-        /// <param name="type">Тип необходимого элемента истории</param>
         /// <param name="plot">История</param>
         /// <param name="element">Подготовленный элемент истории</param>
         /// <returns>Список подсказок</returns>
-        private List<string> GetPromptForResponse(Plot plot, IElement element)
+        private List<(PromptEntry, string)> GetPromptForResponse(Plot plot, IElement element)
         {
-            List<string> prompts = new List<string>();
-            if (UseStructuredOutput)
-            {
-                prompts.Add(SystemPrompt[$"{element.Type}StructuredOutput"]);
-            }
-            prompts.Add(SystemPrompt["Setting"]);
-            prompts.Add(SystemPrompt[$"{element.Type}Start"]);
-            var characters = plot.Elements.Where(e => e.Type == ElemType.Character).ToList();
-            if (characters.Count != 0)
-            {
-                foreach (var character in characters)
-                {
-                    prompts.Add(string.Format(SystemPrompt["CharacterUsage"],
-                        JsonSerializer.Serialize(new AiElement(character, plot), settings)));
-                }
-            }
-            else
-            {
-                prompts.Add(SystemPrompt["CharacterEmpty"]);
-            }
-            var locations = plot.Elements.Where(e => e.Type == ElemType.Location).ToList();
-            if (locations.Count != 0)
-            {
-                foreach (var location in locations)
-                {
-                    prompts.Add(string.Format(SystemPrompt["LocationUsage"],
-                        JsonSerializer.Serialize(new AiElement(location, plot), settings)));
-                }
-            }
-            else
-            {
-                prompts.Add(SystemPrompt["LocationEmpty"]);
-            }
-            var items = plot.Elements.Where(e => e.Type == ElemType.Item).ToList();
-            if (items.Count != 0)
-            {
-                foreach (var item in items)
-                {
-                    prompts.Add(string.Format(SystemPrompt["ItemUsage"],
-                        JsonSerializer.Serialize(new AiElement(item, plot), settings)));
-                }
-            }
-            else
-            {
-                prompts.Add(SystemPrompt["ItemEmpty"]);
-            }
-            var events = plot.Elements.Where(e => e.Type == ElemType.Event).ToList();
-            if (events.Count != 0)
-            {
-                foreach (var ev in events)
-                {
-                    prompts.Add(string.Format(SystemPrompt["EventUsage"],
-                        JsonSerializer.Serialize(new AiElement(ev, plot), settings)));
-                }
-            }
-            else
-            {
-                prompts.Add(SystemPrompt["EventEmpty"]);
-            }
-            if (!element.IsEmpty())
-            {
-                prompts.Add(string.Format(SystemPrompt[$"{element.Type}Prepared"],
-                    JsonSerializer.Serialize(new AiElement(element, plot), settings)));
-            }
-            prompts.Add(SystemPrompt[$"{element.Type}End"]);
-            return prompts;
+            var pb = new PromptBuilder(PromptTemplates);
+            pb.AddMessageFromTemplate(PromptEntry.Context, "Setting");
+            pb.AddMessageFromTemplate(PromptEntry.Context, "Plot", DtoProvider.ToDto(plot));
+            pb.AddMessageFromTemplate(PromptEntry.Request, "Element", DtoProvider.ToDto(element));
+            pb.AddMessage(PromptEntry.Schema, DtoProvider.GetSchema());
+            return pb.Build();
         }
 
         /// <summary>
@@ -196,21 +118,11 @@ namespace AIGenerator
         /// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
         public async Task<IElement> GenerateAsync(Plot plot, IElement preparedElement)
         {
-            List<string> prompts = GetPromptForResponse(plot, preparedElement);
+            var prompts = GetPromptForResponse(plot, preparedElement);
             string response = await TextAiGenerator.GenerateTextAsync(prompts);
-            try
-            {
-                AiElement aiElement =
-                    JsonSerializer.Deserialize<AiElement>(response)!;
-                aiElement.ParamsJsonToSystem();
-                IElement element = Merge(plot, preparedElement, aiElement.Element(plot));
-                plot.Add(element);
-                return element;
-            }
-            catch (JsonException e)
-            {
-                throw new Exception(response, e);
-            }
+            var aiElement = DtoProvider.FromDto(response, plot);
+            plot.Merge(preparedElement, aiElement, AiPriority);
+            return preparedElement;
         }
 
         public IElement Generate(Plot plot, IElement preparedElement)
@@ -243,54 +155,28 @@ namespace AIGenerator
             int recursion = 3)
         {
             bool isRoot = generationQueue == null;
-            if (generationQueue == null) generationQueue = new Queue<(IElement, IElement, int)>();
-            List<string> prompts = GetPromptForResponse(plot, preparedElement);
+            generationQueue ??= new Queue<(IElement, IElement, int)>();
+            var prompts = GetPromptForResponse(plot, preparedElement);
             string response = await TextAiGenerator.GenerateTextAsync(prompts);
             try
             {
-                AiElement aiElement =
-                    JsonSerializer.Deserialize<AiElement>(response)!;
-                aiElement.ParamsJsonToSystem();
-                IElement element = Merge(plot, preparedElement, aiElement.Element(plot));
-                plot.Add(element);
+                var aiElement = DtoProvider.FromDto(response, plot);
+                plot.Merge(preparedElement, aiElement, AiPriority);
                 if (recursion > 0)
                 {
-                    var registry = ParamKeyRegistry.Default;
-                    foreach (var (type, list) in aiElement.NewElements(plot))
+                    foreach (var (element, paramKey, value) in DtoProvider.GetNewElements(response, plot))
                     {
-                        foreach (string e in list)
-                        {
-                            var queuedTuple = generationQueue.FirstOrDefault(q => q.Item1.Name == e);
-                            IElement? queuedElement = queuedTuple.Item1;
-                            if (queuedElement != null)
-                            {
-                                if (aiElement.TryGetRelationBinding(queuedElement.Type,
-                                        queuedElement.Name, out var paramKey, out var value, registry))
-                                {
-                                    plot.Add(queuedElement);
-                                    plot.Bind(element, queuedElement, paramKey, value);
-                                }
-                            }
-                            else 
-                            {
-                                Element newElement = new Element(type, e);
-                                if (aiElement.TryGetRelationBinding(newElement.Type,
-                                        newElement.Name, out var paramKey, out var value, registry))
-                                {
-                                    plot.Add(newElement);
-                                    plot.Bind(element, newElement, paramKey, value);
-                                }
-                                generationQueue.Enqueue((newElement, element, recursion - 1));
-                            }
-                        }
+                        plot.Add(element);
+                        plot.Bind(preparedElement, element, paramKey, value);
+                        generationQueue.Enqueue((element, preparedElement, recursion - 1));
                     }
                 }
                 while (isRoot && generationQueue.Count > 0)
                 {
-                    var (newElement, parent, rec) = generationQueue.Dequeue();
-                    newElement = await GenerateChainAsync(plot, newElement, generationQueue, rec);
+                    var (newElement, _, rec) = generationQueue.Dequeue();
+                    await GenerateChainAsync(plot, newElement, generationQueue, rec);
                 }
-                return element;
+                return preparedElement;
             }
             catch (JsonException e)
             {
