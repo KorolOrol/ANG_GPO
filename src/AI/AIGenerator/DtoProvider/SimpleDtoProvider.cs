@@ -116,7 +116,7 @@ namespace AIGenerator.DtoProvider
               { ""type"": ""boolean"" },
               { ""type"": ""null"" },
               { ""type"": ""object"" },
-              { ""type"": ""array"" }
+              { ""type"": ""array"", ""items"": {} }
             ]
           }
         },

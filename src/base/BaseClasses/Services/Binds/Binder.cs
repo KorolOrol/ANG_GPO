@@ -120,7 +120,7 @@ namespace BaseClasses.Services.Binds
             if (_bindStrategies.TryGetValue(route, out var strategy))
                 strategy(source, target, paramKey, value, plot);
             else
-                throw new ArgumentException($"No binding strategy registered for route: {route}");
+                StandardBindingStrategies.BindOneSide(source, target, paramKey, value, plot);
         }
 
         /// <summary>
@@ -137,9 +137,9 @@ namespace BaseClasses.Services.Binds
             if (target is null) throw new ArgumentNullException(nameof(target));
             var route = new RelationRoute(source.Type, target.Type, paramKey);
             if (_unbindStrategies.TryGetValue(route, out var strategy))
-            {
                 strategy(source, target, paramKey, null, plot);
-            }
+            else
+                StandardBindingStrategies.UnbindOneSide(source, target, paramKey, null, plot);
         }
     }
 }

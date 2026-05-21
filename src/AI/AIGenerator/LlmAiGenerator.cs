@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using AIGenerator.TextGenerator;
 using BaseClasses.Interface;
 using BaseClasses.Model;
@@ -67,7 +68,7 @@ namespace AIGenerator
         /// где ключами являются строки (ключи шаблонов), а значениями - строки (тексты шаблонов).</param>
         public void LoadPromptTemplates(string path)
         {
-            PromptTemplates = PromptBuilder.DeserializeTemplateDictionary(path) ?? new Dictionary<string, string>();
+            PromptTemplates = PromptBuilder.DeserializeTemplateDictionary(File.ReadAllText(path)) ?? new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -102,10 +103,10 @@ namespace AIGenerator
         private List<(PromptEntry, string)> GetPromptForResponse(Plot plot, IElement element)
         {
             var pb = new PromptBuilder(PromptTemplates);
+            pb.AddMessage(PromptEntry.Schema, DtoProvider.GetSchema());
             pb.AddMessageFromTemplate(PromptEntry.Context, "Setting");
             pb.AddMessageFromTemplate(PromptEntry.Context, "Plot", DtoProvider.ToDto(plot));
             pb.AddMessageFromTemplate(PromptEntry.Request, "Element", DtoProvider.ToDto(element));
-            pb.AddMessage(PromptEntry.Schema, DtoProvider.GetSchema());
             return pb.Build();
         }
 

@@ -92,7 +92,8 @@ namespace AIGenerator.DtoProvider
               },
               ""Value"": {
                 ""description"": ""Значение параметра, сериализованное согласно Type"",
-                ""type"": [""string"", ""number"", ""integer"", ""boolean"", ""object"", ""array"", ""null""]
+                ""type"": [""string"", ""number"", ""integer"", ""boolean"", ""object"", ""array"", ""null""],
+                ""items"": {}
               }
             }
           }
@@ -132,7 +133,8 @@ namespace AIGenerator.DtoProvider
           },
           ""Value"": {
             ""description"": ""Значение связи, сериализованное согласно Type"",
-            ""type"": [""string"", ""number"", ""integer"", ""boolean"", ""object"", ""array"", ""null""]
+            ""type"": [""string"", ""number"", ""integer"", ""boolean"", ""object"", ""array"", ""null""],
+            ""items"": {}
           }
         }
       }

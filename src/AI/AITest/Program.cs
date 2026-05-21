@@ -2,7 +2,12 @@
 using BaseClasses.Enum;
 using BaseClasses.Services;
 using AIGenerator;
+using AIGenerator.DtoProvider;
+using AIGenerator.Prompt;
 using AIGenerator.TextGenerator;
+using BaseClasses.Interface;
+using BaseClasses.Model.Params;
+using BaseClasses.Services.Binds;
 
 /*
 OpenAIGenerator text = new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host");
@@ -31,14 +36,17 @@ Ngen.TextAiGenerator.Model = "gpt-4o-mini";
 LlmAiGenerator Ogen = new(promptPath);
 */
 
-string promptPath = "C:\\Users\\KorolOrol\\Desktop\\TUSUR\\ANG_GPO\\src\\AI\\AIGenerator\\SystemPromptExample.json";
-string savingPath = "SavingPath\\";
+string promptPath = @"../../../../AIGenerator/ModernSystemPromptExample.json";
+string savingPath = "SavingPath/";
 LlmAiGenerator server = new(promptPath);
-server.TextAiGenerator.Endpoint = "http://127.0.0.1:1234/v1/";
-server.TextAiGenerator.Model = "saiga_nemo_12b_gguf";
-server.AIPriority = true;
+server.TextAiGenerator = new OpenAiGenerator("GHToken", "https://models.github.ai/inference")
+{
+    UseStructuredOutput = true,
+    Model = "openai/gpt-4.1"
+};
+server.DtoProvider = new SimpleDtoProvider();
+server.AiPriority = true;
 server.UseStructuredOutput = true;
-
 
 LlmAiGenerator gen = server;
 
@@ -67,59 +75,68 @@ while (true)
     switch (choice)
     {
         case "11":
-            {
-                Element character = 
-                    (Element)await gen.GenerateAsync(plot, new Element(ElemType.Character));
-                Console.WriteLine(character.FullInfo());
+        {
+                Element character = new Element(ElemType.Character);
+                var traitKey = new ParamKey<List<string>>("Traits");
+                var traits = new List<string>();
+                for (int i = 0; i < 3; i++)
+                {
+                    string trait = Console.ReadLine() ?? "";
+                    traits.Add(trait);
+                }
+                character.Params.Set(traitKey, traits);
+                plot.Add(character);
+                character = (Element)await gen.GenerateAsync(plot, character);
+                Console.WriteLine(Serializer.PrintToString(character));
                 break;
             }
         case "12":
             {
                 Element location = 
                     (Element)await gen.GenerateAsync(plot, new Element(ElemType.Location));
-                Console.WriteLine(location.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(location));
                 break;
             }
         case "13":
             {
                 Element item = 
                     (Element)await gen.GenerateAsync(plot, new Element(ElemType.Item));
-                Console.WriteLine(item.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(item));
                 break;
             }
         case "14":
             {
                 Element ev = 
                     (Element)await gen.GenerateAsync(plot, new Element(ElemType.Event));
-                Console.WriteLine(ev.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(ev));
                 break;
             }
         case "21":
             {
                 Element character = 
                     (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Character), recursion: 2);
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "22":
             {
                 Element location = 
                     (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Location));
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "23":
             {
                 Element item = 
                     (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Item));
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "24":
             {
                 Element @event = 
                     (Element)await gen.GenerateChainAsync(plot, new Element(ElemType.Event));
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "31":
@@ -128,13 +145,14 @@ while (true)
                 preparedCharacter.Name = Console.ReadLine()!;
                 preparedCharacter.Description = Console.ReadLine()!;
                 Element? foundLocation = 
-                    (Element?)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                    (Element?)plot.Elements.FirstOrDefault(l =>
+                        l.Name == Console.ReadLine() && l.Type == ElemType.Location);
                 if (foundLocation != null)
                 {
-                    Binder.Bind(preparedCharacter, foundLocation);
+                    plot.Bind(preparedCharacter, foundLocation, BaseRelationKeys.Located, true);
                 }
                 Element character = (Element)await gen.GenerateChainAsync(plot, preparedCharacter);
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "32":
@@ -143,13 +161,14 @@ while (true)
                 preparedLocation.Name = Console.ReadLine()!;
                 preparedLocation.Description = Console.ReadLine()!;
                 Element? foundCharacter = 
-                    (Element?)plot.Characters.FirstOrDefault(c => c.Name == Console.ReadLine());
+                    (Element?)plot.Elements.FirstOrDefault(c => 
+                        c.Name == Console.ReadLine() && c.Type == ElemType.Character);
                 if (foundCharacter != null)
                 {
-                    Binder.Bind(preparedLocation, foundCharacter);
+                    plot.Bind(preparedLocation, foundCharacter, BaseRelationKeys.Locates, true);
                 }
                 Element location = (Element)await gen.GenerateChainAsync(plot, preparedLocation);
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "33":
@@ -158,13 +177,14 @@ while (true)
                 preparedItem.Name = Console.ReadLine()!;
                 preparedItem.Description = Console.ReadLine()!;
                 Element? foundLocation = 
-                    (Element?)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                    (Element?)plot.Elements.FirstOrDefault(l =>
+                        l.Name == Console.ReadLine() && l.Type == ElemType.Location);
                 if (foundLocation != null)
                 {
-                    Binder.Bind(preparedItem, foundLocation);
+                    plot.Bind(preparedItem, foundLocation, BaseRelationKeys.Located, true);
                 }
                 Element item = (Element)await gen.GenerateChainAsync(plot, preparedItem);
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "34":
@@ -173,17 +193,18 @@ while (true)
                 preparedEvent.Name = Console.ReadLine()!;
                 preparedEvent.Description = Console.ReadLine()!;
                 Element? foundLocation = 
-                    (Element?)plot.Locations.FirstOrDefault(l => l.Name == Console.ReadLine());
+                    (Element?)plot.Elements.FirstOrDefault(l =>
+                        l.Name == Console.ReadLine() && l.Type == ElemType.Location);
                 if (foundLocation != null)
                 {
-                    Binder.Bind(preparedEvent, foundLocation);
+                    plot.Bind(preparedEvent, foundLocation, BaseRelationKeys.Located, true);
                 }
                 Element ev = (Element)await gen.GenerateChainAsync(plot, preparedEvent);
-                Console.WriteLine(plot.FullInfo());
+                Console.WriteLine(Serializer.PrintToString(plot));
                 break;
             }
         case "01":
-            Console.WriteLine(plot.FullInfo());
+            Console.WriteLine(Serializer.PrintToString(plot));
             break;
         case "02":
             {
