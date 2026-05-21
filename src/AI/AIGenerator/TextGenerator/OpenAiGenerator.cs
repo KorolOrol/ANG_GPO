@@ -19,6 +19,9 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Ключ API для OpenAI
         /// </summary>
+        // TODO: CRITICAL SECURITY ISSUE - Remove hardcoded default API key
+        // This should not have a default value. Require explicit initialization via environment variable or property setter.
+        // See analysis: src/AI/AIGenerator/TextGenerator/OpenAiGenerator.cs:22
         private string _apiKey = "YOUR_API_KEY_HERE";
 
         /// <summary>
@@ -164,6 +167,9 @@ namespace AIGenerator.TextGenerator
         /// <summary>
         /// Список токенов, при генерации которых модель должна остановиться.
         /// </summary>
+        // TODO: Potential null reference issue - verify Stop is never null before use.
+        // See line 417: if (Stop.Count > 0) can throw NullReferenceException if Stop is null.
+        // Consider lazy initialization or non-null guarantee in constructor.
         public List<string> Stop { get; set; }
 
         /// <summary>
@@ -270,6 +276,13 @@ namespace AIGenerator.TextGenerator
 
         private static string ExtractFirstJsonObject(string text)
         {
+            // TODO: CODE QUALITY - Excessive complexity in manual JSON parsing
+            // This method has 5+ levels of nested conditions and manual state tracking.
+            // Issues:
+            // - Hard to understand and test
+            // - Doesn't handle edge cases (incomplete JSON, complex escaping)
+            // - Consider using JsonDocument.Parse() with try/catch instead
+            // - Or use a proven library for robust JSON extraction
             if (string.IsNullOrWhiteSpace(text)) return string.Empty;
 
             int start = text.IndexOf('{');
@@ -346,6 +359,13 @@ namespace AIGenerator.TextGenerator
         /// для структурированного вывода.</param>
         /// <returns>Сгенерированный текст</returns>
         /// <exception cref="Exception">Ошибка генерации текста</exception>
+        // TODO: METHOD COMPLEXITY - GenerateTextAsync is 110+ lines with multiple responsibilities.
+        // Consider breaking into:
+        // 1. ValidateMessages()
+        // 2. BuildChatMessages()
+        // 3. ConfigureOptions()
+        // 4. ExecuteWithRetry()
+        // This would improve readability, testability, and maintainability.
         public async Task<string> GenerateTextAsync(List<(PromptEntry, string)> messages)
         {
             if (messages == null) throw new ArgumentNullException(nameof(messages));
@@ -414,7 +434,9 @@ namespace AIGenerator.TextGenerator
             {
                 options.AdditionalProperties["seed"] = Seed;
             }
-            if (Stop.Count > 0)
+            // TODO: POTENTIAL NULL REFERENCE - Stop can be null, causing NullReferenceException
+            // Ensure Stop is never null. Either initialize in constructor or check explicitly.
+            if (Stop != null && Stop.Count > 0)
             {
                 options.StopSequences = Stop;
             }

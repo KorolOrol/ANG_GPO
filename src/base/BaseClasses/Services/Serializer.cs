@@ -17,6 +17,32 @@ namespace BaseClasses.Services
     /// <summary>
     /// Сериализатор.
     /// </summary>
+    // TODO: CRITICAL ARCHITECTURE ISSUE - Significant code duplication with ParamBagJsonConverter
+    // Both files contain identical implementations of:
+    // 1. AliasTypes dictionary (lines 22-39 here, 15-32 in ParamBagJsonConverter)
+    // 2. Assembly normalization regex patterns (lines 41-43 here, 34-36 in ParamBagJsonConverter)
+    // 3. Type name resolution methods (GetFriendlyTypeName, GetFriendlyBaseName, ResolveTypeByName)
+    // 4. FriendlyTypeNameParser nested class (lines 474-611 here, 136-273 in ParamBagJsonConverter)
+    // 
+    // RECOMMENDATION: Extract all type resolution logic into a new static class 'TypeResolutionHelper'
+    // This would:
+    // - Eliminate duplication (DRY principle)
+    // - Ensure consistency of type resolution
+    // - Make changes to type handling affect both correctly
+    // - Enable easier addition of caching
+    // - Reduce maintenance burden
+    //
+    // TODO: PERFORMANCE - No caching of resolved types
+    // ResolveTypeByName() iterates through ALL AppDomain.CurrentDomain.GetAssemblies() for each type.
+    // For ParamBag with many parameters, this is O(n*m) where n=params and m=assemblies.
+    // RECOMMENDATION: Add ConcurrentDictionary<string, Type> cache with cache invalidation strategy.
+    //
+    // TODO: REFLECTION OPTIMIZATION
+    // Multiple calls to:
+    // - GetType() with ignoreCase: true (slower than case-sensitive)
+    // - Activator.CreateInstance() without optimization
+    // - AppDomain assembly iteration (very slow for large domains)
+    // Consider Expression Trees or delegate factories for performance-critical paths.
     public static class Serializer
     {
         private static readonly Dictionary<string, Type> AliasTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
@@ -114,7 +140,8 @@ namespace BaseClasses.Services
         /// Сериализация связи между элементами истории в JSON-строку без записи в файл.
         /// </summary>
         /// <param name="relation">Связь между элементами истории.</param>
-        /// <returns>>JSON-представление связи между элементами истории.</returns>
+        /// <returns>JSON-представление связи между элементами истории.</returns>
+        // TODO: TYPO FIX - Previous version had double '>' in XML comment tag
         public static string SerializeToString(Relation relation)
         {
             return JsonSerializer.Serialize(ToRelationDto(relation), Options);
@@ -347,6 +374,11 @@ namespace BaseClasses.Services
         {
             var re = RequireElement(element);
             
+            // TODO: REFLECTION PERFORMANCE - Using reflection to access private field on every deserialization
+            // Consider:
+            // 1. Making GetId() a public virtual method on Element
+            // 2. Caching the FieldInfo at class initialization
+            // 3. Creating a delegate for faster access than reflection
             if (_ElementIdField == null)
             {
                 throw new JsonException("Element id field was not found.");
@@ -362,6 +394,9 @@ namespace BaseClasses.Services
         
         private static IParamKey CreateParamKey(string name, string @namespace, Type valueType)
         {
+            // TODO: REFLECTION - Activator.CreateInstance is slow
+            // Consider creating and caching delegates for common types, or using Expression Trees
+            // This is called for every parameter during deserialization
             var keyType = typeof(ParamKey<>).MakeGenericType(valueType);
             return (IParamKey?)Activator.CreateInstance(keyType, name, @namespace)
                    ?? throw new JsonException($"Unable to create relation key '{@namespace}.{name}'.");
@@ -369,6 +404,9 @@ namespace BaseClasses.Services
 
         private static object? DeserializeTypedValue(object? valueToken, Type valueType)
         {
+            // TODO: REFACTORING - This method could be simplified
+            // The logic tries to handle JsonElement, null, and other objects
+            // Consider extracting null handling to a separate step
             switch (valueToken)
             {
                 case null:
@@ -386,6 +424,12 @@ namespace BaseClasses.Services
 
         private static Type ResolveType(string typeName)
         {
+            // TODO: PERFORMANCE - Multiple resolution attempts without early exit optimization
+            // This method tries resolution 3 times:
+            // 1. Direct ResolveType call
+            // 2. After normalization
+            // 3. As friendly type name
+            // Consider consolidating these attempts and adding caching.
             var resolved = ResolveTypeByName(typeName)
                           ?? ResolveTypeByName(NormalizeTypeName(typeName));
             
@@ -400,6 +444,8 @@ namespace BaseClasses.Services
 
         private static string NormalizeTypeName(string typeName)
         {
+            // TODO: OPTIMIZATION - Normalization regex replacements could be combined
+            // Or could use a single regex pattern for all replacements at once
             var normalized = AssemblyVersionPart.Replace(typeName, string.Empty);
             normalized = AssemblyCulturePart.Replace(normalized, string.Empty);
             normalized = AssemblyTokenPart.Replace(normalized, string.Empty);
@@ -421,6 +467,9 @@ namespace BaseClasses.Services
 
         private static string GetFriendlyBaseName(Type type)
         {
+            // TODO: OPTIMIZATION - Iteration through AliasTypes for every type lookup
+            // Consider reversing this: build a lookup by type -> alias name at class init
+            // Or use a switch expression with pattern matching for common types
             foreach (var (alias, aliasType) in AliasTypes)
             {
                 if (aliasType == type)
@@ -447,6 +496,16 @@ namespace BaseClasses.Services
 
         private static Type? ResolveTypeByName(string typeName)
         {
+            // TODO: PERFORMANCE - This method is called frequently during deserialization
+            // but performs expensive operations:
+            // 1. Type.GetType() call (can be slow)
+            // 2. Iteration through ALL AppDomain.CurrentDomain.GetAssemblies() (VERY slow)
+            // 
+            // RECOMMENDATION:
+            // 1. Add caching with ConcurrentDictionary<string, Type>
+            // 2. Cache results from each assembly for faster subsequent lookups
+            // 3. Consider limiting assembly search to loaded application assemblies only
+            // 4. Use ignoreCase: false by default for better performance
             var type = Type.GetType(typeName, throwOnError: false, ignoreCase: true);
             if (type != null)
             {

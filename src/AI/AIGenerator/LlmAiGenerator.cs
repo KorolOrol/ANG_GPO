@@ -181,6 +181,12 @@ namespace AIGenerator
             }
             catch (JsonException e)
             {
+                // TODO: ERROR HANDLING - Using generic Exception loses context
+                // Should throw a custom AiResponseParsingException with:
+                // - Original JSON response for debugging
+                // - Inner exception for tracing
+                // - More specific error categorization
+                // This makes error handling and debugging much more difficult
                 throw new Exception(response, e);
             }
         }

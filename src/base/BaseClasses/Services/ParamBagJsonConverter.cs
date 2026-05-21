@@ -10,6 +10,25 @@ using BaseClasses.Model.Params;
 
 namespace BaseClasses.Services
 {
+    // TODO: CRITICAL ARCHITECTURE ISSUE - Significant code duplication with Serializer.cs
+    // Both files contain identical implementations of:
+    // 1. AliasTypes dictionary (lines 15-32 here, 22-39 in Serializer.cs)
+    // 2. Assembly normalization regex patterns (lines 34-36 here, 41-43 in Serializer.cs)
+    // 3. Type name resolution methods (GetFriendlyTypeName, GetFriendlyBaseName, ResolveTypeByName)
+    // 4. FriendlyTypeNameParser nested class (lines 136-273 here, 474-611 in Serializer.cs)
+    // 
+    // RECOMMENDATION: Extract all type resolution logic into a new static class 'TypeResolutionHelper'
+    // This would:
+    // - Eliminate duplication (DRY principle)
+    // - Ensure consistency of type resolution
+    // - Make changes to type handling affect both correctly
+    // - Enable easier addition of caching
+    // - Reduce maintenance burden
+    //
+    // TODO: PERFORMANCE - No caching of resolved types
+    // Type resolution is called for every parameter during deserialization, without caching.
+    // For ParamBag with many parameters, this causes repeated lookups.
+    // RECOMMENDATION: Add ConcurrentDictionary<string, Type> cache in TypeResolutionHelper.
     public class ParamBagJsonConverter : JsonConverter<ParamBag>
     {
         private static readonly Dictionary<string, Type> AliasTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
@@ -308,6 +327,9 @@ namespace BaseClasses.Services
                 var typeName = item.GetProperty("Type").GetString()
                                ?? throw new JsonException("Param type cannot be null.");
 
+                // TODO: CODE QUALITY - Type resolution logic duplicated with Serializer.cs
+                // Multiple attempts to resolve type (direct, normalized, friendly)
+                // Should be extracted into a single method: ResolveTypeFromName()
                 var valueType = ResolveType(typeName);
                 if (valueType == null)
                 {
@@ -323,6 +345,8 @@ namespace BaseClasses.Services
                     throw new JsonException($"Cannot resolve type '{typeName}'.");
                 }
 
+                // TODO: REFLECTION - Activator.CreateInstance is slow
+                // Consider using delegates or Expression Trees for faster instantiation
                 var keyType = typeof(ParamKey<>).MakeGenericType(valueType);
                 var key = (IParamKey?)Activator.CreateInstance(keyType, name, @namespace)
                           ?? throw new JsonException($"Unable to create ParamKey for type '{typeName}'.");
@@ -347,6 +371,9 @@ namespace BaseClasses.Services
 
         public override void Write(Utf8JsonWriter writer, ParamBag value, JsonSerializerOptions options)
         {
+            // TODO: OPTIMIZATION - GetFriendlyTypeName is called for every parameter
+            // Consider caching type names in ParamKey<T> or in this converter
+            // This would avoid repeated reflection-based type name generation
             writer.WriteStartArray();
 
             foreach (var (key, paramValue) in value.Enumerate())
@@ -357,6 +384,8 @@ namespace BaseClasses.Services
                 writer.WriteString("Type",
                     GetFriendlyTypeName(key.ValueType));
                 writer.WritePropertyName("Value");
+                // TODO: ERROR HANDLING - No exception handling for serialization errors
+                // If JsonSerializer.Serialize fails, the error message could be more informative
                 JsonSerializer.Serialize(writer, paramValue, key.ValueType, options);
                 writer.WriteEndObject();
             }
