@@ -25,12 +25,17 @@ LlmAiGenerator Ogen = new(promptPath);
 string promptPath = @"../../../../AIGenerator/ModernSystemPromptExample.json";
 string savingPath = "SavingPath/";
 LlmAiGenerator server = new(promptPath);
-server.TextAiGenerator = new OpenAiGenerator("GHToken", "https://models.github.ai/inference")
+// server.TextAiGenerator = new OpenAiGenerator("GHToken", "https://models.github.ai/inference")
+// {
+//     UseStructuredOutput = true,
+//     Model = "openai/gpt-4.1"
+// };
+server.TextAiGenerator = new OpenAiGenerator("LMStudioKey", "http://127.0.0.1:1234/v1")
 {
     UseStructuredOutput = true,
-    Model = "openai/gpt-4.1"
+    Model = "qwen/qwen3.6-35b-a3b"
 };
-server.DtoProvider = new SimpleDtoProvider();
+server.DtoProvider = new SerializerDtoProvider();
 server.AiPriority = true;
 server.UseStructuredOutput = true;
 

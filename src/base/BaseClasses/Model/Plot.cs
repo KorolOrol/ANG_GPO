@@ -68,7 +68,6 @@ namespace BaseClasses.Model
             {
                 Binder.Unbind(r.Source, r.Target, r.Param, this);
             }
-
             Elements.Remove(element);
         }
 
@@ -121,9 +120,7 @@ namespace BaseClasses.Model
         public void Merge(IElement baseElement, IElement targetElement, bool basePriority = true)
         {
             Add(baseElement);
-            Add(targetElement);
             _mergeAction(baseElement, targetElement, this, basePriority);
-            Remove(targetElement);
         }
     }
 }

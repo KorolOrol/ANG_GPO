@@ -425,7 +425,12 @@ namespace AIGenerator.TextGenerator
                 try
                 {
                     var completion = await Client.GetResponseAsync(chatMessages, options);
-                    string rawText = completion.Text;
+                    string rawText = !string.IsNullOrWhiteSpace(completion.Text) ? completion.Text 
+                        : completion.Messages.SelectMany(m => m.Contents)
+                              .OfType<TextReasoningContent>()
+                              .FirstOrDefault()
+                              ?.Text ??
+                          string.Empty;
                     string trimmedResult = rawText.Trim();
 
                     if (!UseStructuredOutput)
