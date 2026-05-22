@@ -41,18 +41,25 @@ namespace BaseClasses.Tests.Services
         }
 
         /// <summary>
-        /// Проверяет, что попытка связать элементы без зарегистрированной стратегии выбрасывает ArgumentException.
+        /// Проверяет, что попытка связать элементы без зарегистрированной стратегии связывает в одну сторону.
         /// </summary>
         [Fact]
-        public void Bind_NoStrategy_Throws()
+        public void Bind_NoStrategy_BindOneSide()
         {
             var binder = new Binder();
             var plot = new Plot(binder);
             var source = new Element(ElemType.Character, "S");
             var target = new Element(ElemType.Item, "T");
             var key = new ParamKey<bool>("Unregistered");
-
-            Assert.Throws<ArgumentException>(() => binder.Bind(source, target, key, true, plot));
+            plot.Add(source);
+            plot.Add(target);
+            
+            plot.Bind(source, target, key, true);
+            var relation = Assert.Single(plot.Relations);
+            Assert.Equal(source, relation.Source);
+            Assert.Equal(target, relation.Target);
+            Assert.Equal(key, relation.Param);
+            Assert.True((bool)(relation.Value ?? throw new InvalidOperationException()));
         }
 
         /// <summary>
@@ -191,13 +198,22 @@ namespace BaseClasses.Tests.Services
             var source = new Element(ElemType.Character, "S");
             var target = new Element(ElemType.Item, "T");
             var key = new ParamKey<bool>("Custom");
+            plot.Add(source);
+            plot.Add(target);
 
             binder.Register(ElemType.Character, ElemType.Item, key, 
                 (s, t, p, v, pl) => { }, 
                 (s, t, p, v, pl) => { });
+            
+            plot.Bind(source, target, key, true);
+            Assert.Empty(plot.Relations);
             Assert.True(binder.Unregister(ElemType.Character, ElemType.Item, key));
-
-            Assert.Throws<ArgumentException>(() => binder.Bind(source, target, key, true, plot));
+            plot.Bind(source, target, key, true);
+            var relation = Assert.Single(plot.Relations);
+            Assert.Equal(source, relation.Source);
+            Assert.Equal(target, relation.Target);
+            Assert.Equal(key, relation.Param);
+            Assert.True((bool)(relation.Value ?? throw new InvalidOperationException()));
         }
     }
 }

@@ -39,7 +39,7 @@ namespace BaseClasses.Tests.Services
             Assert.Equal(JsonValueKind.String, idProp.ValueKind);
             Assert.False(string.IsNullOrWhiteSpace(idProp.GetString()));
 
-            Assert.Equal((int)ElemType.Character, root.GetProperty("Type").GetInt32());
+            Assert.Equal(nameof(ElemType.Character), root.GetProperty("Type").ToString());
             Assert.Equal("Hero", root.GetProperty("Name").GetString());
             Assert.Equal("Main", root.GetProperty("Description").GetString());
             Assert.Equal(5, root.GetProperty("Time").GetInt32());

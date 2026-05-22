@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace BaseClasses.Services
 {
@@ -19,29 +18,6 @@ namespace BaseClasses.Services
     /// </summary>
     public static class Serializer
     {
-        private static readonly Dictionary<string, Type> AliasTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["string"] = typeof(string),
-            ["bool"] = typeof(bool),
-            ["byte"] = typeof(byte),
-            ["sbyte"] = typeof(sbyte),
-            ["short"] = typeof(short),
-            ["ushort"] = typeof(ushort),
-            ["int"] = typeof(int),
-            ["uint"] = typeof(uint),
-            ["long"] = typeof(long),
-            ["ulong"] = typeof(ulong),
-            ["float"] = typeof(float),
-            ["double"] = typeof(double),
-            ["decimal"] = typeof(decimal),
-            ["char"] = typeof(char),
-            ["object"] = typeof(object)
-        };
-
-        private static readonly Regex AssemblyVersionPart = new Regex(@",\s*Version=[^,\]]+", RegexOptions.Compiled);
-        private static readonly Regex AssemblyCulturePart = new Regex(@",\s*Culture=[^,\]]+", RegexOptions.Compiled);
-        private static readonly Regex AssemblyTokenPart = new Regex(@",\s*PublicKeyToken=[^,\]]+", RegexOptions.Compiled);
-
         private static readonly FieldInfo? _ElementIdField = typeof(Element).GetField("_id",
             BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -242,8 +218,7 @@ namespace BaseClasses.Services
                 string value;
                 if (param.Key.IsCollection)
                 {
-                    var items = param.Value as IEnumerable<object>;
-                    value = items != null ? $"[{string.Join(", ", items)}]" : "null";
+                    value = param.Value is IEnumerable<object> items ? $"[{string.Join(", ", items)}]" : "null";
                 }
                 else
                 {
@@ -262,7 +237,7 @@ namespace BaseClasses.Services
                 Target = GetElementId(RequireElement(relation.Target)),
                 Namespace = relation.Param.Namespace,
                 Name = relation.Param.Name,
-                Type = GetFriendlyTypeName(relation.Param.ValueType),
+                Type = TypeNameHelper.GetTypeName(relation.Param.ValueType),
                 Value = relation.Value
             };
         }
@@ -274,8 +249,8 @@ namespace BaseClasses.Services
                                ?? throw new JsonException($"Relation source with id '{dto.Source}' was not found.")),
                 RequireElement(plot.Elements.FirstOrDefault(e => GetElementId(e) == dto.Target)
                                ?? throw new JsonException($"Relation target with id '{dto.Target}' was not found.")),
-                CreateParamKey(dto.Name, dto.Namespace, ResolveType(dto.Type)),
-                DeserializeTypedValue(dto.Value, ResolveType(dto.Type))
+                CreateParamKey(dto.Name, dto.Namespace, TypeNameHelper.ResolveType(dto.Type)),
+                DeserializeTypedValue(dto.Value, TypeNameHelper.ResolveType(dto.Type))
             );
         }
 
@@ -316,7 +291,7 @@ namespace BaseClasses.Services
                     throw new JsonException($"Relation target '{relationDto.Target}' was not found in Elements.");
                 }
 
-                var valueType = ResolveType(relationDto.Type);
+                var valueType = TypeNameHelper.ResolveType(relationDto.Type);
                 var key = CreateParamKey(relationDto.Name, relationDto.Namespace, valueType);
                 var rawValue = DeserializeTypedValue(relationDto.Value, valueType);
 
@@ -384,232 +359,7 @@ namespace BaseClasses.Services
                 : JsonSerializer.Deserialize(JsonSerializer.Serialize(valueToken, Options), valueType, Options);
         }
 
-        private static Type ResolveType(string typeName)
-        {
-            var resolved = ResolveTypeByName(typeName)
-                          ?? ResolveTypeByName(NormalizeTypeName(typeName));
-            
-            if (resolved == null && TryResolveFriendlyType(typeName, out var friendlyType))
-            {
-                resolved = friendlyType;
-            }
-
-            return resolved
-                   ?? throw new JsonException($"Unable to resolve relation type '{typeName}'.");
-        }
-
-        private static string NormalizeTypeName(string typeName)
-        {
-            var normalized = AssemblyVersionPart.Replace(typeName, string.Empty);
-            normalized = AssemblyCulturePart.Replace(normalized, string.Empty);
-            normalized = AssemblyTokenPart.Replace(normalized, string.Empty);
-            return normalized;
-        }
-
-        private static string GetFriendlyTypeName(Type type)
-        {
-            if (type.IsGenericType)
-            {
-                var definition = type.GetGenericTypeDefinition();
-                var arguments = type.GetGenericArguments();
-                var argsText = string.Join(", ", arguments.Select(GetFriendlyTypeName));
-                return $"{GetFriendlyBaseName(definition)}<{argsText}>";
-            }
-
-            return GetFriendlyBaseName(type);
-        }
-
-        private static string GetFriendlyBaseName(Type type)
-        {
-            foreach (var (alias, aliasType) in AliasTypes)
-            {
-                if (aliasType == type)
-                {
-                    return alias;
-                }
-            }
-
-            var name = type.Name;
-            var genericTick = name.IndexOf('`');
-            if (genericTick >= 0)
-            {
-                name = name[..genericTick];
-            }
-
-            if (string.Equals(type.Namespace, "System", StringComparison.Ordinal) ||
-                string.Equals(type.Namespace, "System.Collections.Generic", StringComparison.Ordinal))
-            {
-                return name;
-            }
-
-            return type.FullName ?? name;
-        }
-
-        private static Type? ResolveTypeByName(string typeName)
-        {
-            var type = Type.GetType(typeName, throwOnError: false, ignoreCase: true);
-            if (type != null)
-            {
-                return type;
-            }
-
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                type = assembly.GetType(typeName, throwOnError: false, ignoreCase: true);
-                if (type != null)
-                {
-                    return type;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool TryResolveFriendlyType(string typeName, out Type? type)
-        {
-            var parser = new FriendlyTypeNameParser(typeName);
-            return parser.TryParse(out type);
-        }
-
-        private sealed class FriendlyTypeNameParser
-        {
-            private readonly string _text;
-            private int _pos;
-
-            public FriendlyTypeNameParser(string text)
-            {
-                _text = text;
-            }
-
-            public bool TryParse(out Type? type)
-            {
-                type = ParseType();
-                SkipWhitespace();
-                return type != null && _pos == _text.Length;
-            }
-
-            private Type? ParseType()
-            {
-                SkipWhitespace();
-                var name = ParseName();
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    return null;
-                }
-
-                SkipWhitespace();
-                if (TryConsume('<'))
-                {
-                    var arguments = new List<Type>();
-                    do
-                    {
-                        var argumentType = ParseType();
-                        if (argumentType == null)
-                        {
-                            return null;
-                        }
-
-                        arguments.Add(argumentType);
-                        SkipWhitespace();
-                    }
-                    while (TryConsume(','));
-                    
-                    if (!TryConsume('>'))
-                    {
-                        return null;
-                    }
-
-                    return ResolveGenericType(name, arguments);
-                }
-
-                return ResolveNonGenericType(name);
-            }
-
-            private string? ParseName()
-            {
-                SkipWhitespace();
-                var start = _pos;
-
-                while (_pos < _text.Length)
-                {
-                    var current = _text[_pos];
-                    if (char.IsLetterOrDigit(current) || current == '_' || current == '.' || current == '+')
-                    {
-                        _pos++;
-                        continue;
-                    }
-
-                    break;
-                }
-
-                if (_pos == start)
-                {
-                    return null;
-                }
-
-                return _text[start.._pos];
-            }
-
-            private static Type? ResolveNonGenericType(string name)
-            {
-                if (AliasTypes.TryGetValue(name, out var aliasType))
-                {
-                    return aliasType;
-                }
-
-                var type = ResolveTypeByName(name);
-                if (type != null)
-                {
-                    return type;
-                }
-
-                if (!name.Contains('.'))
-                {
-                    type = ResolveTypeByName($"System.{name}");
-                    if (type != null)
-                    {
-                        return type;
-                    }
-
-                    return ResolveTypeByName($"System.Collections.Generic.{name}");
-                }
-
-                return null;
-            }
-
-            private static Type? ResolveGenericType(string name, IReadOnlyList<Type> arguments)
-            {
-                var definitionName = $"{name}`{arguments.Count}";
-                var definition = ResolveTypeByName(definitionName);
-                if (definition == null && !name.Contains('.'))
-                {
-                    definition = ResolveTypeByName($"System.Collections.Generic.{definitionName}");
-                }
-
-                return definition?.MakeGenericType(arguments.ToArray());
-            }
-
-            private void SkipWhitespace()
-            {
-                while (_pos < _text.Length && char.IsWhiteSpace(_text[_pos]))
-                {
-                    _pos++;
-                }
-            }
-
-            private bool TryConsume(char expected)
-            {
-                SkipWhitespace();
-                if (_pos < _text.Length && _text[_pos] == expected)
-                {
-                    _pos++;
-                    return true;
-                }
-
-                return false;
-            }
-        }
-
+        
         private sealed class PlotDto
         {
             public int Time { get; set; }
