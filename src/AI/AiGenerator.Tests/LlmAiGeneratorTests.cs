@@ -177,8 +177,13 @@ namespace AiGenerator.Tests
                 var textGenerator = new FakeTextAiGenerator(new[] { "root-response", "child-response" });
                 var relationKey = new ParamKey<int>("Related");
                 var childElement = new Element(ElemType.Item, "Child");
+                var aiElements = new Queue<IElement>(new IElement[]
+                {
+                    new Element(ElemType.Character, "AI-Root"),
+                    new Element(ElemType.Item, "AI-Child")
+                });
                 var dtoProvider = CreateDtoProvider(
-                    (dto, _) => new Element(ElemType.Character, $"AI-{dto}"),
+                    (_, __) => aiElements.Dequeue(),
                     (dto, _) => dto == "root-response"
                         ? new List<(IElement, IParamKey, object)> { (childElement, relationKey, 3) }
                         : new List<(IElement, IParamKey, object)>());
