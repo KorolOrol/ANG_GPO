@@ -1,12 +1,10 @@
-﻿using BaseClasses.Model;
-using BaseClasses.Enum;
-using BaseClasses.Services;
-using AIGenerator;
+﻿using AIGenerator;
 using AIGenerator.DtoProvider;
-using AIGenerator.Prompt;
 using AIGenerator.TextGenerator;
-using BaseClasses.Interface;
+using BaseClasses.Enum;
+using BaseClasses.Model;
 using BaseClasses.Model.Params;
+using BaseClasses.Services;
 using BaseClasses.Services.Binds;
 
 /*
@@ -14,18 +12,6 @@ OpenAIGenerator text = new OpenAIGenerator("NeuroAPIKey", "https://neuroapi.host
 text.Model = "gpt-3.5-turbo-0125";
 List<string> list = new List<string>() {"Привет"};
 Console.WriteLine(await text.GenerateTextAsync(list));
-*/
-
-/*
-Element c = new Element(ElemType.Character, "Вася", "Вася Пупкин");
-Element c2 = new Element(ElemType.Character, "Петя", "");
-Element c3 = new Element(ElemType.Character, "Коля", "");
-Element c4 = new Element(ElemType.Character, "Саша", "");
-Binder.Bind(c, c2, 10);
-Binder.Bind(c, c3, 20);
-Binder.Bind(c, c4, 30);
-
-Serializer.Serialize(c, "relTest.txt");
 */
 
 /*
@@ -50,7 +36,32 @@ server.UseStructuredOutput = true;
 
 LlmAiGenerator gen = server;
 
-Plot plot = new Plot();
+var traitsKey = new ParamKey<List<string>>("Traits");
+
+var c = new Element(ElemType.Character, "Иван", "Главный герой истории")
+{
+    Params = { [traitsKey] = new List<string> { "храбрый", "умный" } }
+};
+var c2 = new Element(ElemType.Character, "Мария", "Второстепенный персонаж")
+{
+    Params = { [traitsKey] = new List<string> { "добрая", "красивая" } }
+};
+var l = new Element(ElemType.Location, "Замок", "Старый замок на холме");
+var it = new Element(ElemType.Item, "Меч", "Древний меч с рунами");
+var e = new Element(ElemType.Event, "Битва", "Эпическая битва между Иваном и драконом");
+var plot = new Plot();
+plot.Add(c);
+plot.Add(c2);
+plot.Add(l);
+plot.Add(it);
+plot.Add(e);
+plot.Bind(c, c2, BaseRelationKeys.Relationship, 75);
+plot.Bind(c, l, BaseRelationKeys.Located, true);
+plot.Bind(c2, l, BaseRelationKeys.Located, true);
+plot.Bind(it, l, BaseRelationKeys.Located, true);
+plot.Bind(e, c, BaseRelationKeys.Involves, true);
+plot.Bind(e, c2, BaseRelationKeys.Involves, true);
+plot.Bind(e, it, BaseRelationKeys.Uses, true);
 
 while (true)
 {
@@ -77,14 +88,13 @@ while (true)
         case "11":
         {
                 Element character = new Element(ElemType.Character);
-                var traitKey = new ParamKey<List<string>>("Traits");
                 var traits = new List<string>();
                 for (int i = 0; i < 3; i++)
                 {
                     string trait = Console.ReadLine() ?? "";
                     traits.Add(trait);
                 }
-                character.Params.Set(traitKey, traits);
+                character.Params.Set(traitsKey, traits);
                 plot.Add(character);
                 character = (Element)await gen.GenerateAsync(plot, character);
                 Console.WriteLine(Serializer.PrintToString(character));

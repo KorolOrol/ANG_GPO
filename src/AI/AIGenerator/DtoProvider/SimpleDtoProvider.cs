@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Unicode;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Model.Params;
+using BaseClasses.Services;
 
 namespace AIGenerator.DtoProvider
 {
@@ -14,6 +17,12 @@ namespace AIGenerator.DtoProvider
     {
         private readonly Dictionary<string, IParamKey> _paramKeys;
         private readonly Dictionary<string, IParamKey> _relationKeys;
+
+        public static JsonSerializerOptions Options { get; } = new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
+        };
 
         public SimpleDtoProvider()
         {
@@ -38,28 +47,28 @@ namespace AIGenerator.DtoProvider
             sb.AppendLine("Param Keys:");
             foreach (var kv in _paramKeys)
             {
-                sb.AppendLine($"- {kv.Key}: {kv.Value.ValueType.FullName}");
+                sb.AppendLine($"- {kv.Key}: {TypeNameHelper.GetTypeName(kv.Value.ValueType)}");
             }
             sb.AppendLine("Relation Keys:");
             foreach (var kv in _relationKeys)
             {
-                sb.AppendLine($"- {kv.Key}: {kv.Value.ValueType.FullName}");
+                sb.AppendLine($"- {kv.Key}: {TypeNameHelper.GetTypeName(kv.Value.ValueType)}");
             }
             foreach (var element in plot.Elements)
             {
-                sb.AppendLine(JsonSerializer.Serialize(new SimpleElementDto(element, plot)));
+                sb.AppendLine(JsonSerializer.Serialize(new SimpleElementDto(element, plot), Options));
             }
             return sb.ToString();
         }
 
         public string ToDto(IElement element)
         {
-            return JsonSerializer.Serialize(new SimpleElementDto(element));
+            return JsonSerializer.Serialize(new SimpleElementDto(element), Options);
         }
 
         public IElement FromDto(string dto, Plot plot)
         {
-            var dtoElement = JsonSerializer.Deserialize<SimpleElementDto>(dto);
+            var dtoElement = JsonSerializer.Deserialize<SimpleElementDto>(dto, Options);
             if (dtoElement == null) throw new JsonException("Failed to deserialize SimpleElementDto.");
             var element = dtoElement.ToElement(plot, _paramKeys, _relationKeys);
             return element;
@@ -130,7 +139,7 @@ namespace AIGenerator.DtoProvider
 
         public List<(IElement, IParamKey, object)> GetNewElements(string dto, Plot plot)
         {
-            var dtoElement = JsonSerializer.Deserialize<SimpleElementDto>(dto);
+            var dtoElement = JsonSerializer.Deserialize<SimpleElementDto>(dto, Options);
             if (dtoElement == null) throw new JsonException("Failed to deserialize SimpleElementDto.");
             return dtoElement.Relations
                 .Where(relation => plot.Elements.All(e => e.Name != relation.Target))
@@ -147,7 +156,7 @@ namespace AIGenerator.DtoProvider
                             .Select(r => r.TargetType)
                             .First();
                         return ((IElement)new Element(expectedType, relation.Target, string.Empty), paramKey, 
-                            JsonSerializer.Deserialize(relation.Value.GetRawText(), paramKey.ValueType));
+                            JsonSerializer.Deserialize(relation.Value.GetRawText(), paramKey.ValueType, Options));
                     }
                     catch (InvalidOperationException)
                     {
@@ -183,14 +192,14 @@ namespace AIGenerator.DtoProvider
                 Description = element.Description;
                 Params = element.Params.Enumerate()
                     .ToDictionary(p => p.Key.Name,
-                        p => JsonSerializer.SerializeToElement(p.Value));
+                        p => JsonSerializer.SerializeToElement(p.Value, Options));
                 if (plot != null)
                     Relations = plot.Relations.Where(r => Equals(r.Source, element))
                         .Select(r => new SimpleRelationDto
                         {
                             Target = r.Target.Name,
                             Param = r.Param.Name,
-                            Value = JsonSerializer.SerializeToElement(r.Value)
+                            Value = JsonSerializer.SerializeToElement(r.Value, Options)
                         }).ToList();
                 else
                     Relations = new List<SimpleRelationDto>();
@@ -210,7 +219,7 @@ namespace AIGenerator.DtoProvider
                     var key = paramKeys.TryGetValue(param.Key, out var foundKey) && foundKey != null
                         ? foundKey
                         : new ParamKey<JsonElement>(param.Key, "AI.Raw");
-                    element.Params.Add(key, JsonSerializer.Deserialize(param.Value.GetRawText(), key.ValueType));
+                    element.Params.Add(key, JsonSerializer.Deserialize(param.Value.GetRawText(), key.ValueType, Options));
                 }
                 foreach (var relation in Relations)
                 {
@@ -220,7 +229,7 @@ namespace AIGenerator.DtoProvider
                         ? foundKey
                         : new ParamKey<JsonElement>(relation.Param, "AI.Raw");
                     plot.Bind(element, target, paramKey,
-                        JsonSerializer.Deserialize(relation.Value.GetRawText(), paramKey.ValueType));
+                        JsonSerializer.Deserialize(relation.Value.GetRawText(), paramKey.ValueType, Options));
                 }
                 return element;
             }
