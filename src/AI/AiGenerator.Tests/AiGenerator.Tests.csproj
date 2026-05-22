@@ -25,4 +25,8 @@
       <Folder Include="TextGenerator\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\AIGenerator\AIGenerator.csproj" />
+    </ItemGroup>
+
 </Project>
