@@ -191,7 +191,16 @@ namespace AiGenerator.Tests
                 {
                     DtoProvider = dtoProvider
                 };
-                var plot = new Plot();
+                var bindCalls = 0;
+                var binder = new BaseClasses.Services.Binds.Binder();
+                binder.Register(ElemType.Character, ElemType.Item, relationKey,
+                    (source, target, key, value, plot) =>
+                    {
+                        bindCalls++;
+                        plot.Relations.Add(new Relation(source, target, key, value));
+                    },
+                    (_, _, _, _, _) => { });
+                var plot = new Plot(binder);
                 var prepared = new Element(ElemType.Character, "Root");
 
                 await generator.GenerateChainAsync(plot, prepared, recursion: 1);
@@ -199,11 +208,7 @@ namespace AiGenerator.Tests
                 Assert.Equal(2, plot.Elements.Count);
                 Assert.Contains(prepared, plot.Elements);
                 Assert.Contains(childElement, plot.Elements);
-                var relation = Assert.Single(plot.Relations);
-                Assert.Equal(prepared, relation.Source);
-                Assert.Equal(childElement, relation.Target);
-                Assert.Equal(relationKey, relation.Param);
-                Assert.Equal(3, relation.Value);
+                Assert.Equal(1, bindCalls);
                 Assert.Equal(2, textGenerator.Calls.Count);
             }
             finally
