@@ -121,7 +121,7 @@ namespace AiGenerator.Tests
                 Assert.Single(mergeCalls);
                 Assert.Same(prepared, mergeCalls[0].BaseElement);
                 Assert.Same(aiElement, mergeCalls[0].TargetElement);
-                Assert.True(mergeCalls[0].BasePriority);
+                Assert.False(mergeCalls[0].BasePriority);
 
                 var prompt = textGenerator.Calls[0];
                 Assert.Collection(prompt,
