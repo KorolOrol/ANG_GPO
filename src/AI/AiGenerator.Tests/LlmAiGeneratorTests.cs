@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text.Json;
-using System.Threading.Tasks;
 using AIGenerator;
 using AIGenerator.DtoProvider;
 using AIGenerator.Prompt;
@@ -11,7 +7,6 @@ using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Model.Params;
-using Xunit;
 
 namespace AiGenerator.Tests
 {

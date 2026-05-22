@@ -122,7 +122,7 @@ namespace AIGenerator
             var prompts = GetPromptForResponse(plot, preparedElement);
             string response = await TextAiGenerator.GenerateTextAsync(prompts);
             var aiElement = DtoProvider.FromDto(response, plot);
-            plot.Merge(preparedElement, aiElement, AiPriority);
+            plot.Merge(preparedElement, aiElement, !AiPriority);
             return preparedElement;
         }
 
@@ -162,7 +162,7 @@ namespace AIGenerator
             try
             {
                 var aiElement = DtoProvider.FromDto(response, plot);
-                plot.Merge(preparedElement, aiElement, AiPriority);
+                plot.Merge(preparedElement, aiElement, !AiPriority);
                 if (recursion > 0)
                 {
                     foreach (var (element, paramKey, value) in DtoProvider.GetNewElements(response, plot))
