@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cassius2", "Cassius2.csproj", "{8849FCD9-1E58-47FC-BFDB-7956E90E19C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses", "..\base\BaseClasses\BaseClasses.csproj", "{49F2EF1B-7614-4848-A2AC-E44E0A9445BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredNarrative", "..\StructuredNarrative\StructuredNarrative.csproj", "{CC004BEF-B3D1-4520-BB95-23DE3C265BD4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIGenerator", "..\AI\AIGenerator\AIGenerator.csproj", "{6D817EB0-528A-4FE9-A7BD-B1A6B6BB7348}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8849FCD9-1E58-47FC-BFDB-7956E90E19C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8849FCD9-1E58-47FC-BFDB-7956E90E19C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8849FCD9-1E58-47FC-BFDB-7956E90E19C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8849FCD9-1E58-47FC-BFDB-7956E90E19C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49F2EF1B-7614-4848-A2AC-E44E0A9445BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49F2EF1B-7614-4848-A2AC-E44E0A9445BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49F2EF1B-7614-4848-A2AC-E44E0A9445BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49F2EF1B-7614-4848-A2AC-E44E0A9445BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC004BEF-B3D1-4520-BB95-23DE3C265BD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC004BEF-B3D1-4520-BB95-23DE3C265BD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC004BEF-B3D1-4520-BB95-23DE3C265BD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC004BEF-B3D1-4520-BB95-23DE3C265BD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D817EB0-528A-4FE9-A7BD-B1A6B6BB7348}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D817EB0-528A-4FE9-A7BD-B1A6B6BB7348}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D817EB0-528A-4FE9-A7BD-B1A6B6BB7348}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D817EB0-528A-4FE9-A7BD-B1A6B6BB7348}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
