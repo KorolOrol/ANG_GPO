@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Cassius2.App"
              xmlns:local="using:Cassius2"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.DataTemplates>
@@ -10,6 +10,24 @@
     </Application.DataTemplates>
   
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Dark" Accent="#88C0D0" 
+                                       
+                                       BaseHigh="#ECEFF4"
+                                       BaseMedium="#D8DEE9"
+                                       BaseLow="#4C566A"
+
+                                       ChromeHigh="#4C566A"
+                                       ChromeMedium="#434C5E"
+                                       ChromeLow="#3B4252"
+
+                                       RegionColor="#2E3440"
+
+                                       AltHigh="#ECEFF4"
+                                       AltMedium="#D8DEE9"
+                                       AltLow="#4C566A"/>
+            </FluentTheme.Palettes>
+        </FluentTheme>
     </Application.Styles>
 </Application>
