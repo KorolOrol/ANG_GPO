@@ -20,7 +20,7 @@ public partial class AiAction : UserControl
         
             var files = await topLevel.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
             {
-                Title = "Выберите файл с промптами",
+                Title = "Choose file with prompts",
                 AllowMultiple = false
             });
 

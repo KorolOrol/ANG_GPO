@@ -19,6 +19,7 @@ public partial class ViewActionViewModel : ViewModelBase
     {
         RefreshElements();
         AppState.PlotChanged += RefreshElements;
+        AppState.EditElementRequested += (element) => SelectedElement = element;
     }
 
     public void RefreshElements()
@@ -46,7 +47,7 @@ public partial class ViewActionViewModel : ViewModelBase
     {
         var newElement = new Element(type, defaultName);
         AppState.Plot.Add(newElement);
-        RefreshElements();
+        AppState.NotifyPlotChanged();
         SelectedElement = newElement;
     }
 
@@ -57,7 +58,7 @@ public partial class ViewActionViewModel : ViewModelBase
         {
             AppState.Plot.Remove(SelectedElement);
             SelectedElement = null;
-            RefreshElements();
+            Cassius2.Models.AppState.NotifyPlotChanged();
         }
     }
 }

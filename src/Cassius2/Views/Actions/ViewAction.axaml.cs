@@ -22,6 +22,7 @@ public partial class ViewAction : UserControl
         if (DataContext is ViewModels.Actions.ViewActionViewModel vm)
         {
             vm.RefreshElements();
+            Cassius2.Models.AppState.NotifyPlotChanged();
         }
     }
 

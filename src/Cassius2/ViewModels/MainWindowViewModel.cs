@@ -14,6 +14,11 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isProppActionVisible;
 
+    public MainWindowViewModel()
+    {
+        Cassius2.Models.AppState.EditElementRequested += (element) => ShowViewAction();
+    }
+
     [RelayCommand]
     private void ShowViewAction()
     {

@@ -31,7 +31,8 @@
                                        RegionColor="#2E3440"
                                        AltHigh="#2E3440"
                                        AltMedium="#3B4252"
-                                       AltLow="#434C5E"/>
+                                       AltLow="#434C5E"
+                                       ErrorText="#BF616A"/>
             </FluentTheme.Palettes>
         </FluentTheme>
         <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
