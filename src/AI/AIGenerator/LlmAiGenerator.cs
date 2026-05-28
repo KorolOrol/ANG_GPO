@@ -71,6 +71,12 @@ namespace AIGenerator
             PromptTemplates = PromptBuilder.DeserializeTemplateDictionary(File.ReadAllText(path)) ?? new Dictionary<string, string>();
         }
 
+        public LlmAiGenerator()
+        {
+            TextAiGenerator = new OpenAiGenerator();
+            DtoProvider = new SerializerDtoProvider();
+        }
+
         /// <summary>
         /// Конструктор со стандартным ИИ.
         /// </summary>
@@ -149,7 +155,7 @@ namespace AIGenerator
         /// <param name="generationQueue">Очередь генерации, следует оставить пустым</param>
         /// <param name="recursion">Глубина рекурсии</param>
         /// <returns>Сгенерированный элемент истории</returns>
-        /// <exception cref="Exception">Нейросеть вернула недействительный json</exception>
+        /// <exception cref="Exception">Нейросеть вернула недействите��ьный json</exception>
         private async Task<IElement> GenerateChainAsync(Plot plot,
             IElement preparedElement,
             Queue<(IElement, IElement, int)>? generationQueue = null,

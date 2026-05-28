@@ -57,7 +57,7 @@ namespace BaseClasses.Services
         /// в формате "GenericType&lt;Arg1, Arg2&gt;".
         /// </summary>
         /// <param name="typeName">Строковое имя типа для разрешения.</param>
-        /// <returns>>Разрешенный тип.</returns>
+        /// <returns>Разрешенный тип.</returns>
         /// <exception cref="TypeLoadException">Выбрасывается, если тип не найден или формат обобщенного типа неверный.</exception>
         public static Type ResolveType(string typeName)
         {

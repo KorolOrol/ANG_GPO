@@ -27,11 +27,10 @@ namespace AIGenerator.DtoProvider
             var newElementJson = raw.GetProperty("NewElement");
             var newRelationsJson = raw.GetProperty("NewRelations");
             var newElement = Serializer.DeserializeString<Element>(newElementJson.GetRawText());
-            plot.Add(newElement);
             foreach (var relationJson in newRelationsJson.EnumerateArray())
             {
                 var relation = Serializer.DeserializeString<Relation>(relationJson.GetRawText(), plot);
-                plot.Bind(relation.Source, relation.Target, relation.Param, relation.Value);
+                plot.Binder.Bind(relation.Source, relation.Target, relation.Param, relation.Value, plot);
             }
             return newElement;
         }

@@ -35,13 +35,14 @@ server.TextAiGenerator = new OpenAiGenerator("LMStudioKey", "http://127.0.0.1:12
     UseStructuredOutput = true,
     Model = "qwen/qwen3.6-35b-a3b"
 };
-server.DtoProvider = new SerializerDtoProvider();
+server.DtoProvider = new SimpleDtoProvider();
 server.AiPriority = true;
 server.UseStructuredOutput = true;
 
 LlmAiGenerator gen = server;
 
-var traitsKey = new ParamKey<List<string>>("Traits");
+var plot = new Plot();
+/*var traitsKey = new ParamKey<List<string>>("Traits");
 
 var c = new Element(ElemType.Character, "Иван", "Главный герой истории")
 {
@@ -54,7 +55,6 @@ var c2 = new Element(ElemType.Character, "Мария", "Второстепенн
 var l = new Element(ElemType.Location, "Замок", "Старый замок на холме");
 var it = new Element(ElemType.Item, "Меч", "Древний меч с рунами");
 var e = new Element(ElemType.Event, "Битва", "Эпическая битва между Иваном и драконом");
-var plot = new Plot();
 plot.Add(c);
 plot.Add(c2);
 plot.Add(l);
@@ -66,7 +66,7 @@ plot.Bind(c2, l, BaseRelationKeys.Located, true);
 plot.Bind(it, l, BaseRelationKeys.Located, true);
 plot.Bind(e, c, BaseRelationKeys.Involves, true);
 plot.Bind(e, c2, BaseRelationKeys.Involves, true);
-plot.Bind(e, it, BaseRelationKeys.Uses, true);
+plot.Bind(e, it, BaseRelationKeys.Uses, true);*/
 
 while (true)
 {
@@ -99,7 +99,7 @@ while (true)
                     string trait = Console.ReadLine() ?? "";
                     traits.Add(trait);
                 }
-                character.Params.Set(traitsKey, traits);
+                //character.Params.Set(traitsKey, traits);
                 plot.Add(character);
                 character = (Element)await gen.GenerateAsync(plot, character);
                 Console.WriteLine(Serializer.PrintToString(character));

@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Cassius2.ViewModels.Controls"
+             x:Class="Cassius2.Views.Controls.RelationListItem"
+             x:DataType="vm:RelationListItemViewModel">
+    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+        <TextBlock Name="RelationInfo" Text="{Binding DisplayText}" Grid.Column="0" Grid.Row="0"
+                   VerticalAlignment="Center" Margin="5,0,0,0" TextWrapping="Wrap" />
+        <Button Name="EditButton" Grid.Column="1" Grid.Row="0" Content="Edit" Margin="5,5,5,5"
+                HorizontalAlignment="Center" VerticalAlignment="Center" Click="EditButton_Click" />
+    </Grid>
+</UserControl>

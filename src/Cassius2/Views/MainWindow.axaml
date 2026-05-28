@@ -1,58 +1,88 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Cassius2.ViewModels"
+        xmlns:actions="using:Cassius2.Views.Actions"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Cassius2.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        x:Name="RootWindow"
+        MinWidth="800" MinHeight="600"
+        Width="1200" Height="800"
+        CanResize="True"
+        WindowStartupLocation="CenterScreen"
         Icon="/Assets/avalonia-logo.ico"
         Title="Cassius2">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
+        <vm:MainWindowViewModel />
     </Design.DataContext>
 
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_New" />
-                <MenuItem Header="_Open" />
-                <MenuItem Header="_Save" />
-                <MenuItem Header="E_xit" />
-            </MenuItem>
-            <MenuItem Header="Export">
-                <MenuItem Header="To JSON" />
-                <MenuItem Header="To Plain Text" />
-            </MenuItem>
-            <MenuItem Header="About" />
-        </Menu>
-        <DrawerPage DrawerLayoutBehavior="CompactInline" CompactDrawerLength="50" DrawerLength="200">
-            <DrawerPage.Drawer>
-                <StackPanel Spacing="2" Margin="0,8, 4, 0">
-                    <Button HorizontalAlignment="Stretch" Background="Transparent" ToolTip.Tip="View" Height="50">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <Svg Path="/Assets/Icons/ViewAction.svg" Width="30" Height="30" />
-                            <TextBlock Text="View" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
-                    <Button HorizontalAlignment="Stretch" Background="Transparent" ToolTip.Tip="AI" Height="50">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <Svg Path="/Assets/Icons/AIAction.svg" Width="30" Height="30" />
-                            <TextBlock Text="AI" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
-                    <Button HorizontalAlignment="Stretch" Background="Transparent" ToolTip.Tip="View" Height="50">
-                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                            <Svg Path="/Assets/Icons/ProppAction.svg" Width="30" Height="30" />
-                            <TextBlock Text="Propp" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </DrawerPage.Drawer>
-        </DrawerPage>
-        
-    </DockPanel>
+    <LayoutTransformControl>
+        <LayoutTransformControl.LayoutTransform>
+            <ScaleTransform ScaleX="1" ScaleY="1" />
+        </LayoutTransformControl.LayoutTransform>
+
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem Header="_New" />
+                    <MenuItem Header="_Open" />
+                    <MenuItem Header="_Save" />
+                    <MenuItem Header="E_xit" />
+                </MenuItem>
+                <MenuItem Header="Export">
+                    <MenuItem Header="To JSON" />
+                    <MenuItem Header="To Plain Text" />
+                </MenuItem>
+                <MenuItem Header="About" />
+            </Menu>
+            <DrawerPage DrawerLayoutBehavior="CompactInline" CompactDrawerLength="50" DrawerLength="200">
+                <DrawerPage.Drawer>
+                    <StackPanel Spacing="2" Margin="0,8, 4, 0" x:DataType="vm:MainWindowViewModel"
+                                DataContext="{Binding #RootWindow.DataContext}">
+                        <Button x:Name="BtnView" Command="{Binding ShowViewActionCommand}"
+                                HorizontalAlignment="Stretch" Background="Transparent" ToolTip.Tip="View" Height="50">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Svg Path="/Assets/Icons/ViewAction.svg" Width="30" Height="30" />
+                                <TextBlock Text="View" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnAi" Command="{Binding ShowAiActionCommand}" HorizontalAlignment="Stretch"
+                                Background="Transparent" ToolTip.Tip="AI" Height="50">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Svg Path="/Assets/Icons/AIAction.svg" Width="30" Height="30" />
+                                <TextBlock Text="AI" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="BtnPropp" Command="{Binding ShowProppActionCommand}"
+                                HorizontalAlignment="Stretch" Background="Transparent" ToolTip.Tip="Propp" Height="50">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Svg Path="/Assets/Icons/ProppAction.svg" Width="30" Height="30" />
+                                <TextBlock Text="Propp" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </DrawerPage.Drawer>
+                <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:DataType="vm:MainWindowViewModel"
+                      DataContext="{Binding #RootWindow.DataContext}">
+                    <Border IsVisible="{Binding IsViewActionVisible}">
+                        <actions:ViewAction x:Name="ViewActionControl" HorizontalAlignment="Stretch"
+                                            VerticalAlignment="Stretch" />
+                    </Border>
+                    <Border IsVisible="{Binding IsAiActionVisible}">
+                        <actions:AiAction x:Name="AiActionControl" HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Stretch" />
+                    </Border>
+                    <Border IsVisible="{Binding IsProppActionVisible}">
+                        <actions:ProppAction x:Name="ProppActionControl" HorizontalAlignment="Stretch"
+                                             VerticalAlignment="Stretch" />
+                    </Border>
+                </Grid>
+            </DrawerPage>
+        </DockPanel>
+    </LayoutTransformControl>
 </Window>

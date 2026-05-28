@@ -9,16 +9,13 @@
 
     <ItemGroup>
         <Folder Include="Assets\Icons\" />
-        <Folder Include="Models\" />
         <AvaloniaResource Include="Assets\**" />
-        <Folder Include="ViewModels\Actions\" />
-        <Folder Include="ViewModels\Controls\" />
-        <Folder Include="Views\Actions\" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="12.0.3" />
         <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
+        <PackageReference Include="Avalonia.FreeDesktop" Version="12.0.3" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
         <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
         <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1">
@@ -27,5 +24,25 @@
         </PackageReference>
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
         <PackageReference Include="Svg.Controls.Skia.Avalonia" Version="12.0.0.11" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\base\BaseClasses\BaseClasses.csproj" />
+        <ProjectReference Include="..\AI\AIGenerator\AIGenerator.csproj" />
+     </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Update="Views\Windows\ConfirmWindow.axaml.cs">
+        <DependentUpon>ConfirmWindow.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\Windows\ParamEditWindow.axaml.cs">
+        <DependentUpon>ParamEditWindow.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Views\Windows\RelationEditWindow.axaml.cs">
+        <DependentUpon>RelationEditWindow.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

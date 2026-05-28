@@ -8,26 +8,41 @@
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
+
+    <Application.Resources>
+        <SolidColorBrush x:Key="NordAuroraRed">#BF616A</SolidColorBrush>
+        <SolidColorBrush x:Key="NordAuroraOrange">#D08770</SolidColorBrush>
+        <SolidColorBrush x:Key="NordAuroraYellow">#EBCB8B</SolidColorBrush>
+        <SolidColorBrush x:Key="NordAuroraGreen">#A3BE8C</SolidColorBrush>
+        <SolidColorBrush x:Key="NordAuroraPurple">#B48EAD</SolidColorBrush>
+    </Application.Resources>
   
     <Application.Styles>
         <FluentTheme>
             <FluentTheme.Palettes>
-                <ColorPaletteResources x:Key="Dark" Accent="#88C0D0" 
-                                       
+                <ColorPaletteResources x:Key="Dark"
+                                       Accent="#88C0D0" 
                                        BaseHigh="#ECEFF4"
                                        BaseMedium="#D8DEE9"
                                        BaseLow="#4C566A"
-
-                                       ChromeHigh="#4C566A"
-                                       ChromeMedium="#434C5E"
-                                       ChromeLow="#3B4252"
-
+                                       ChromeHigh="#434C5E"
+                                       ChromeMedium="#3B4252"
+                                       ChromeLow="#2E3440"
                                        RegionColor="#2E3440"
-
-                                       AltHigh="#ECEFF4"
-                                       AltMedium="#D8DEE9"
-                                       AltLow="#4C566A"/>
+                                       AltHigh="#2E3440"
+                                       AltMedium="#3B4252"
+                                       AltLow="#434C5E"/>
             </FluentTheme.Palettes>
         </FluentTheme>
+        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="#4C566A" />
+            <Setter Property="Foreground" Value="#ECEFF4" />
+        </Style>
+        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3B4252" />
+        </Style>
+        <Style Selector="Window">
+            <Setter Property="Background" Value="#2E3440" />
+        </Style>
     </Application.Styles>
 </Application>
