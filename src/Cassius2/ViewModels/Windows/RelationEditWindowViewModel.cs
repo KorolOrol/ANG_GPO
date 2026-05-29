@@ -12,7 +12,7 @@ namespace Cassius2.ViewModels.Windows;
 public partial class RelationEditWindowViewModel : ViewModelBase
 {
     [ObservableProperty]
-    private IEnumerable<IElement> _availableTargets = Array.Empty<IElement>();
+    private IEnumerable<IElement> _availableTargets = [];
 
     [ObservableProperty]
     private IElement? _selectedTarget;

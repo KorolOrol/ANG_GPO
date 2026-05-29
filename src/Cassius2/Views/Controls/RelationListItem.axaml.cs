@@ -2,6 +2,7 @@ using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System.Text.Json;
+using BaseClasses.Model;
 using Cassius2.Models;
 using Cassius2.ViewModels.Controls;
 using Cassius2.Views.Windows;
@@ -22,13 +23,21 @@ public partial class RelationListItem : UserControl
             if (DataContext is not RelationListItemViewModel vm || vm.RelationData == null) return;
             if (TopLevel.GetTopLevel(this) is not Window window) return;
             
-            var editWindow = new Windows.RelationEditWindow();
-            editWindow.SetupForEdit(vm.RelationData.Target, vm.RelationData.Param, vm.Value != null ? JsonSerializer.Serialize(vm.Value, AppState.JsonOptions) : "null");
+            var editWindow = new RelationEditWindow();
+            editWindow.SetupForEdit(vm.RelationData.Target,
+                vm.RelationData.Param,
+                vm.Value != null
+                    ? JsonSerializer.Serialize(vm.Value,
+                        AppState.JsonOptions)
+                    : "null");
             
             bool result = await editWindow.ShowDialog<bool>(window);
             if (!result) return;
             vm.NotifyEdited(editWindow.ParsedValue);
-            vm.Setup(new BaseClasses.Model.Relation(vm.RelationData.Source, vm.RelationData.Target, vm.RelationData.Param, editWindow.ParsedValue));
+            vm.Setup(new Relation(vm.RelationData.Source,
+                vm.RelationData.Target,
+                vm.RelationData.Param,
+                editWindow.ParsedValue));
         }
         catch (Exception exception)
         {

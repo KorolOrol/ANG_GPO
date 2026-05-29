@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using BaseClasses.Interface;
+using Cassius2.Models;
 using Cassius2.Views.Windows;
 
 namespace Cassius2.Views.Controls;
@@ -45,7 +46,7 @@ public partial class EditableElementListItem : UserControl
         {
             if (Element is null) return;
 
-            Cassius2.Models.AppState.NotifyEditElementRequested(Element);
+            AppState.NotifyEditElementRequested(Element);
         }
         catch (Exception exception)
         {

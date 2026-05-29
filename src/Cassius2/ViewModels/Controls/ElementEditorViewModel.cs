@@ -187,7 +187,10 @@ public partial class ElementEditorViewModel : ViewModelBase
 
         foreach (var p in Element.Params.Enumerate())
         {
-            if (!_tempParams.TryGetValue(p.Key, out var val) || (val != null && !val.Equals(p.Value)) || (val == null && p.Value != null))
+            if (!_tempParams.TryGetValue(p.Key,
+                    out var val) ||
+                (val != null && !val.Equals(p.Value)) ||
+                (val == null && p.Value != null))
                 return true;
         }
 

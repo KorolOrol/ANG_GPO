@@ -3,6 +3,11 @@ using BaseClasses.Interface;
 using Cassius2.Models;
 using Cassius2.ViewModels.Controls;
 using System;
+using System.Reflection;
+using BaseClasses.Model;
+using BaseClasses.Model.Params;
+using BaseClasses.Services;
+using Cassius2.Views.Windows;
 
 namespace Cassius2.Views.Controls;
 
@@ -25,13 +30,13 @@ public partial class ElementEditor : UserControl
             var window = TopLevel.GetTopLevel(this) as Window;
             if (window == null) return null;
 
-            var editWindow = new Windows.ParamEditWindow();
+            var editWindow = new ParamEditWindow();
             editWindow.SetupForAdd();
             bool result = await editWindow.ShowDialog<bool>(window);
             if (!result || editWindow.ParsedValue == null) return null;
-            var valType = BaseClasses.Services.TypeNameHelper.ResolveType(editWindow.ParamValueType);
+            var valType = TypeNameHelper.ResolveType(editWindow.ParamValueType);
             var dynMethod = typeof(ElementEditor).GetMethod(nameof(CreateParamKey), 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+                BindingFlags.NonPublic | BindingFlags.Instance)!;
             var genericMethod = dynMethod.MakeGenericMethod(valType);
                 
             var vm = new ParamListItemViewModel();
@@ -43,31 +48,30 @@ public partial class ElementEditor : UserControl
 
         ViewModel.RequestAddRelationAsync = async () =>
         {
-            var window = TopLevel.GetTopLevel(this) as Window;
-            if (window == null) return null;
+            if (TopLevel.GetTopLevel(this) is not Window window) return null;
 
-            var editWindow = new Windows.RelationEditWindow();
+            var editWindow = new RelationEditWindow();
             editWindow.SetupForAdd(AppState.Plot.Elements);
             bool result = await editWindow.ShowDialog<bool>(window);
             if (!result || editWindow.SelectedTarget == null || editWindow.ParsedValue == null) return null;
-            var valType = BaseClasses.Services.TypeNameHelper.ResolveType(editWindow.ParamValueType);
+            var valType = TypeNameHelper.ResolveType(editWindow.ParamValueType);
             var dynMethod = typeof(ElementEditor).GetMethod(nameof(CreateParamKey), 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+                BindingFlags.NonPublic | BindingFlags.Instance)!;
             var genericMethod = dynMethod.MakeGenericMethod(valType);
 
             if (genericMethod.Invoke(this, [editWindow.ParamNamespace, editWindow.ParamName]) is not IParamKey key)
                 return null;
             if (ViewModel.Element == null) return null;
-            var relation = new BaseClasses.Model.Relation(ViewModel.Element, editWindow.SelectedTarget, key, editWindow.ParsedValue);
+            var relation = new Relation(ViewModel.Element, editWindow.SelectedTarget, key, editWindow.ParsedValue);
             var vm = new RelationListItemViewModel();
             vm.Setup(relation);
             return vm;
         };
     }
 
-    private IParamKey CreateParamKey<T>(string ns, string name)
+    private static IParamKey CreateParamKey<T>(string ns, string name)
     {
-        return new BaseClasses.Model.Params.ParamKey<T>(name, ns);
+        return new ParamKey<T>(name, ns);
     }
     
     public void LoadElement(IElement element)

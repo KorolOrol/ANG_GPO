@@ -30,10 +30,7 @@ public partial class ElementListItem : UserControl
             UpdateData();
         }
     }
-
-    /// <summary>
-    /// Метод обновления UI. Имеет сигнатуру EventHandler для удобной подписки на внешние события
-    /// </summary>
+    
     public void UpdateData(object? sender = null, EventArgs? e = null)
     {
         if (Element is { } element)

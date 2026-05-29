@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using AIGenerator;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using StructuredNarrative.Model;
 
@@ -23,14 +24,14 @@ public static class AppState
     };
 
     public static event Action? PlotChanged;
-    public static event Action<BaseClasses.Interface.IElement>? EditElementRequested;
+    public static event Action<IElement>? EditElementRequested;
 
     public static void NotifyPlotChanged()
     {
         PlotChanged?.Invoke();
     }
 
-    public static void NotifyEditElementRequested(BaseClasses.Interface.IElement element)
+    public static void NotifyEditElementRequested(IElement element)
     {
         EditElementRequested?.Invoke(element);
     }

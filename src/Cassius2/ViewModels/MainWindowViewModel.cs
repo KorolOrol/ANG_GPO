@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Cassius2.Models;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Cassius2.ViewModels;
@@ -16,7 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        Cassius2.Models.AppState.EditElementRequested += (element) => ShowViewAction();
+        AppState.EditElementRequested += (element) => ShowViewAction();
     }
 
     [RelayCommand]

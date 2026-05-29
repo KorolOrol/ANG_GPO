@@ -2,6 +2,8 @@ using System;
 using Avalonia.Controls;
 using Avalonia;
 using BaseClasses.Interface;
+using Cassius2.Models;
+using Cassius2.ViewModels.Actions;
 using Cassius2.Views.Windows;
 using ConfirmWindow = Cassius2.Views.Windows.ConfirmWindow;
 
@@ -19,17 +21,15 @@ public partial class ViewAction : UserControl
 
     private void EditorControl_ElementUpdated()
     {
-        if (DataContext is ViewModels.Actions.ViewActionViewModel vm)
-        {
-            vm.RefreshElements();
-            Cassius2.Models.AppState.NotifyPlotChanged();
-        }
+        if (DataContext is not ViewModels.Actions.ViewActionViewModel vm) return;
+        vm.RefreshElements();
+        AppState.NotifyPlotChanged();
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == DataContextProperty && change.NewValue is ViewModels.Actions.ViewActionViewModel vm)
+        if (change.Property == DataContextProperty && change.NewValue is ViewActionViewModel vm)
         {
             vm.PropertyChanged += (_, e) =>
             {
@@ -56,7 +56,7 @@ public partial class ViewAction : UserControl
                     if (!discard)
                     {
                         _isHandlingSelection = true;
-                        if (DataContext is ViewModels.Actions.ViewActionViewModel vm)
+                        if (DataContext is ViewActionViewModel vm)
                         {
                             vm.SelectedElement = element;
                         }

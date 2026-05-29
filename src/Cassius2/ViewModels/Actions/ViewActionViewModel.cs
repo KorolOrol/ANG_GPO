@@ -58,7 +58,7 @@ public partial class ViewActionViewModel : ViewModelBase
         {
             AppState.Plot.Remove(SelectedElement);
             SelectedElement = null;
-            Cassius2.Models.AppState.NotifyPlotChanged();
+            AppState.NotifyPlotChanged();
         }
     }
 }

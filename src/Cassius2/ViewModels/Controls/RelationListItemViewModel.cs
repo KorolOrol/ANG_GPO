@@ -20,7 +20,8 @@ public partial class RelationListItemViewModel : ViewModelBase
     {
         RelationData = relation;
         Value = relation.Value;
-        DisplayText = $"{relation.Param.Namespace}.{relation.Param.Name} -> {relation.Target.Name}: {relation.Value?.ToString() ?? "null"}";
+        DisplayText = $"{relation.Param.Namespace}.{relation.Param.Name} -> " +
+                      $"{relation.Target.Name}: {relation.Value?.ToString() ?? "null"}";
     }
 
     public void NotifyEdited(object? newValue)

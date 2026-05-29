@@ -22,7 +22,7 @@ public partial class ParamListItem : UserControl
             if (DataContext is not ParamListItemViewModel vm || vm.Key == null) return;
             if (TopLevel.GetTopLevel(this) is not Window window) return;
             
-            var editWindow = new Windows.ParamEditWindow();
+            var editWindow = new ParamEditWindow();
             editWindow.SetupForEdit(vm.Key,
                 vm.Value != null ? JsonSerializer.Serialize(vm.Value, AppState.JsonOptions) : "null");
             

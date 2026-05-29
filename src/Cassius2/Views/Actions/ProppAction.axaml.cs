@@ -1,5 +1,8 @@
 using System;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+using Cassius2.ViewModels.Actions;
 using Cassius2.Views.Windows;
 
 namespace Cassius2.Views.Actions;
@@ -11,20 +14,20 @@ public partial class ProppAction : UserControl
         InitializeComponent();
     }
     
-    private async void BtnLoadData_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void BtnLoadData_OnClick(object? sender, RoutedEventArgs e)
     {
         try
         {
             var topLevel = TopLevel.GetTopLevel(this);
             if (topLevel == null) return;
         
-            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
+            var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
                 Title = "Выберите файл с промптами",
                 AllowMultiple = false
             });
 
-            if (files.Count >= 1 && DataContext is ViewModels.Actions.ProppActionViewModel vm)
+            if (files.Count >= 1 && DataContext is ProppActionViewModel vm)
             {
                 vm.LoadData(files[0].Path.LocalPath);
             }

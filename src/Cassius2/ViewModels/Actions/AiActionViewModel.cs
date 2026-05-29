@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AIGenerator.TextGenerator;
@@ -90,31 +91,29 @@ public partial class AiActionViewModel : ViewModelBase
     [RelayCommand]
     private void UpdateGenerator()
     {
-        if (SelectedGenerator != null)
+        if (SelectedGenerator == null) return;
+        var wrapper = SelectedGenerator;
+        var gen = wrapper.Generator;
+
+        wrapper.UseEnvVar = EditUseEnvVar;
+        wrapper.EnvVarName = EditEnvVarName;
+
+        if (wrapper.UseEnvVar)
         {
-            var wrapper = SelectedGenerator;
-            var gen = wrapper.Generator;
-
-            wrapper.UseEnvVar = EditUseEnvVar;
-            wrapper.EnvVarName = EditEnvVarName;
-
-            if (wrapper.UseEnvVar)
-            {
-                if (!string.IsNullOrEmpty(EditEnvVarName))
-                    gen.GetApiKeyFromEnvironment(EditEnvVarName);
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(EditApiKey))
-                    gen.ApiKey = EditApiKey;
-            }
-
-            gen.Endpoint = EditEndpoint;
-            gen.Model = EditModel;
-            gen.MaxCompletionTokens = EditMaxCompletionTokens;
-            gen.Seed = EditSeed;
-            wrapper.RefreshDisplayName();
+            if (!string.IsNullOrEmpty(EditEnvVarName))
+                gen.GetApiKeyFromEnvironment(EditEnvVarName);
         }
+        else
+        {
+            if (!string.IsNullOrEmpty(EditApiKey))
+                gen.ApiKey = EditApiKey;
+        }
+
+        gen.Endpoint = EditEndpoint;
+        gen.Model = EditModel;
+        gen.MaxCompletionTokens = EditMaxCompletionTokens;
+        gen.Seed = EditSeed;
+        wrapper.RefreshDisplayName();
     }
 
     [ObservableProperty]
@@ -151,19 +150,20 @@ public partial class AiActionViewModel : ViewModelBase
     {
         Generators.Add(new GeneratorWrapper(new OpenAiGenerator 
         { 
-            Model = "gpt-3.5-turbo",
-            Endpoint = "https://api.openai.com/v1/chat/completions"
+            Model = "qwen/qwen3.6-35b-a3b",
+            Endpoint = "http://localhost:1234/v1",
+            ApiKey = "123"
         }));
         Generators.Add(new GeneratorWrapper(new OpenAiGenerator 
         { 
-            Model = "gpt-4",
-            Endpoint = "https://api.openai.com/v1/chat/completions"
-        }));
-        Generators.Add(new GeneratorWrapper(new OpenAiGenerator 
-        { 
-            Model = "local-model",
-            Endpoint = "http://localhost:1234/v1/chat/completions"
-        }));
+            Model = "openai/gpt-4.1",
+            Endpoint = "https://models.github.ai/inference"
+        })
+        {
+            UseEnvVar = true,
+            EnvVarName = "GHToken"
+        }
+        );
         SelectedGenerator = Generators.First();
 
         LoadExistingElements();
@@ -185,7 +185,7 @@ public partial class AiActionViewModel : ViewModelBase
         try
         {
             AppState.AiGenerator.LoadPromptTemplates(path);
-            LoadedPrompt = "Loaded prompt: " + System.IO.Path.GetFileName(path);
+            LoadedPrompt = "Loaded prompt: " + Path.GetFileName(path);
         }
         catch (Exception exception)
         {
