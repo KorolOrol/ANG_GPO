@@ -1,7 +1,7 @@
 using System;
+using System.Text.Json;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using System.Text.Json;
 using Cassius2.Models;
 using Cassius2.ViewModels.Controls;
 using Cassius2.Views.Windows;

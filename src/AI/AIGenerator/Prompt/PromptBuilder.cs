@@ -191,12 +191,11 @@ namespace AIGenerator.Prompt
                 return null;
             }
 
-            if (document.RootElement.TryGetProperty("Templates", out var templatesElement))
-            {
-                return JsonSerializer.Deserialize<Dictionary<string, string>>(templatesElement.GetRawText());
-            }
-
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            return JsonSerializer.Deserialize<Dictionary<string, string>>(document.RootElement.TryGetProperty(
+                "Templates",
+                out var templatesElement)
+                ? templatesElement.GetRawText()
+                : json);
         }
     }
 }

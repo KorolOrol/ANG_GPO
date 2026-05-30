@@ -1,6 +1,6 @@
 using System;
-using CommunityToolkit.Mvvm.ComponentModel;
 using BaseClasses.Model;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Cassius2.ViewModels.Controls;
 

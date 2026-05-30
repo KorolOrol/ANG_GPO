@@ -1,11 +1,10 @@
 using System;
-using Avalonia.Controls;
 using Avalonia;
+using Avalonia.Controls;
 using BaseClasses.Interface;
 using Cassius2.Models;
 using Cassius2.ViewModels.Actions;
 using Cassius2.Views.Windows;
-using ConfirmWindow = Cassius2.Views.Windows.ConfirmWindow;
 
 namespace Cassius2.Views.Actions;
 
@@ -21,7 +20,7 @@ public partial class ViewAction : UserControl
 
     private void EditorControl_ElementUpdated()
     {
-        if (DataContext is not ViewModels.Actions.ViewActionViewModel vm) return;
+        if (DataContext is not ViewActionViewModel vm) return;
         vm.RefreshElements();
         AppState.NotifyPlotChanged();
     }

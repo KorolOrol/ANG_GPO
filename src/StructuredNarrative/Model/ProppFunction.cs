@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
 using BaseClasses.Enum;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Services.Binds;
 using StructuredNarrative.Data;
@@ -75,7 +76,7 @@ namespace StructuredNarrative.Model
         /// конкретных имён и описаний — это скелет для заполнения ИИ или вручную.
         /// </summary>
         /// <returns>Элемент-событие с параметрами функции</returns>
-        public Element CreateEventSkeleton(Plot plot)
+        public IElement CreateEventSkeleton(Plot plot)
         {
             var functionEvent = new Element(ElemType.Event, Name, Description);
             functionEvent.Params.Set(ProppParamKeys.Function, Name);

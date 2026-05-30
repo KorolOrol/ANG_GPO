@@ -1,12 +1,12 @@
-using Avalonia.Controls;
-using BaseClasses.Interface;
-using Cassius2.Models;
-using Cassius2.ViewModels.Controls;
 using System;
 using System.Reflection;
+using Avalonia.Controls;
+using BaseClasses.Interface;
 using BaseClasses.Model;
 using BaseClasses.Model.Params;
 using BaseClasses.Services;
+using Cassius2.Models;
+using Cassius2.ViewModels.Controls;
 using Cassius2.Views.Windows;
 
 namespace Cassius2.Views.Controls;
@@ -27,8 +27,7 @@ public partial class ElementEditor : UserControl
 
         ViewModel.RequestAddParamAsync = async () =>
         {
-            var window = TopLevel.GetTopLevel(this) as Window;
-            if (window == null) return null;
+            if (TopLevel.GetTopLevel(this) is not Window window) return null;
 
             var editWindow = new ParamEditWindow();
             editWindow.SetupForAdd();

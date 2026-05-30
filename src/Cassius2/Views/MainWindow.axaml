@@ -8,7 +8,7 @@
         x:Class="Cassius2.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         x:Name="RootWindow"
-        MinWidth="800" MinHeight="600"
+        MinWidth="700" MinHeight="400"
         Width="1200" Height="800"
         CanResize="True"
         WindowStartupLocation="CenterScreen"

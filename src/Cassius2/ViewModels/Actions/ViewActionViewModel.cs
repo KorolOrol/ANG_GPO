@@ -10,7 +10,7 @@ namespace Cassius2.ViewModels.Actions;
 
 public partial class ViewActionViewModel : ViewModelBase
 {
-    public ObservableCollection<IElement> Elements { get; } = new();
+    public ObservableCollection<IElement> Elements { get; } = [];
 
     [ObservableProperty]
     private IElement? _selectedElement;
@@ -54,11 +54,9 @@ public partial class ViewActionViewModel : ViewModelBase
     [RelayCommand]
     private void DeleteElement()
     {
-        if (SelectedElement != null)
-        {
-            AppState.Plot.Remove(SelectedElement);
-            SelectedElement = null;
-            AppState.NotifyPlotChanged();
-        }
+        if (SelectedElement == null) return;
+        AppState.Plot.Remove(SelectedElement);
+        SelectedElement = null;
+        AppState.NotifyPlotChanged();
     }
 }

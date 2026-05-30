@@ -250,7 +250,10 @@ namespace AIGenerator.TextGenerator
 
         private static bool IsTransient(Exception ex)
         {
-            if (ex is TimeoutException || ex is TaskCanceledException || ex is HttpRequestException || ex is System.IO.IOException)
+            if (ex is TimeoutException ||
+                ex is TaskCanceledException ||
+                ex is HttpRequestException ||
+                ex is System.IO.IOException)
             {
                 return true;
             }
