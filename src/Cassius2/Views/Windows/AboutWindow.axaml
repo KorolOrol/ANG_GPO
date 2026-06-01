@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		mc:Ignorable="d" d:DesignWidth="420" d:DesignHeight="300"
+		x:Class="Cassius2.Views.Windows.AboutWindow"
+		Title="About Cassius2" Width="420" Height="300"
+		WindowStartupLocation="CenterOwner" CanResize="False">
+	<Grid RowDefinitions="Auto,Auto,*,Auto" Margin="20" RowSpacing="10">
+		<TextBlock Grid.Row="0" Text="Cassius2" FontSize="24" FontWeight="Bold" />
+		<TextBlock Grid.Row="1" FontSize="13" Opacity="0.8" xml:space="preserve">Automatic narrative generator</TextBlock>
+
+		<StackPanel Grid.Row="2" Spacing="6">
+			<TextBlock Text="Version:" FontWeight="Bold" />
+			<TextBlock x:Name="VersionText" />
+			<TextBlock Text="Developers:" FontWeight="Bold" Margin="0,10,0,0" />
+			<TextBlock FontSize="13" Opacity="0.8" xml:space="preserve">Zhukovich Mikhail
+Kharlamov Egor
+Nikitin Kirill</TextBlock>
+			<TextBlock Text="(C) 2026, TUSUR, MIT License" FontWeight="Bold" Margin="0,10,0,0" />
+		</StackPanel>
+
+		<Button Grid.Row="3" Content="Close" HorizontalAlignment="Right" Width="90"
+				Click="CloseButton_OnClick" />
+	</Grid>
+</Window>

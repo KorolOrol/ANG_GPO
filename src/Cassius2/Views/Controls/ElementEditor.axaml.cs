@@ -68,7 +68,7 @@ public partial class ElementEditor : UserControl
         };
     }
 
-    private static IParamKey CreateParamKey<T>(string ns, string name)
+    private IParamKey CreateParamKey<T>(string ns, string name)
     {
         return new ParamKey<T>(name, ns);
     }

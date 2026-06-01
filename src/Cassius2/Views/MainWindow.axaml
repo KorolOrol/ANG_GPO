@@ -21,6 +21,10 @@
         <vm:MainWindowViewModel />
     </Design.DataContext>
 
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
     <LayoutTransformControl>
         <LayoutTransformControl.LayoutTransform>
             <ScaleTransform ScaleX="1" ScaleY="1" />
@@ -29,16 +33,17 @@
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
-                    <MenuItem Header="_New" />
-                    <MenuItem Header="_Open" />
-                    <MenuItem Header="_Save" />
-                    <MenuItem Header="E_xit" />
+                    <MenuItem Header="_New" Command="{Binding NewPlot}" />
+                    <MenuItem Header="_Open" Click="OpenPlotMenuItem_OnClick" />
+                    <MenuItem Header="_Save" Click="SavePlotMenuItem_OnClick" />
+                    <Separator />
+                    <MenuItem Header="E_xit" Click="ExitMenuItem_OnClick" />
                 </MenuItem>
                 <MenuItem Header="Export">
-                    <MenuItem Header="To JSON" />
-                    <MenuItem Header="To Plain Text" />
+                    <MenuItem Header="To JSON" Click="ExportJsonPlotMenuItem_OnClick" />
+                    <MenuItem Header="To Plain Text" Click="ExportTextPlotMenuItem_OnClick" />
                 </MenuItem>
-                <MenuItem Header="About" />
+                <MenuItem Header="About" Click="AboutMenuItem_OnClick" />
             </Menu>
             <DrawerPage DrawerLayoutBehavior="CompactInline" CompactDrawerLength="50" DrawerLength="200">
                 <DrawerPage.Drawer>

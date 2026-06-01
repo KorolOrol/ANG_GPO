@@ -1,4 +1,7 @@
-﻿using Cassius2.Models;
+﻿using System.Text.Json;
+using BaseClasses.Model;
+using BaseClasses.Services;
+using Cassius2.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -42,5 +45,47 @@ public partial class MainWindowViewModel : ViewModelBase
         IsViewActionVisible = false;
         IsAiActionVisible = false;
         IsProppActionVisible = true;
+    }
+
+    [RelayCommand]
+    public void NewPlot()
+    {
+        AppState.Plot = new();
+        AppState.NotifyPlotChanged();
+    }
+
+    public void OpenPlot(string path)
+    {
+        var plot = Serializer.Deserialize<Plot>(path);
+        if (plot != null)
+        {
+            AppState.Plot = plot;
+            AppState.NotifyPlotChanged();
+        }
+    }
+
+    public void SavePlot(string path)
+    {
+        var options = new JsonSerializerOptions(AppState.JsonOptions)
+        {
+            WriteIndented = false
+        };
+        Serializer.Options = options;
+        Serializer.Serialize(AppState.Plot, path);
+    }
+    
+    public void ExportJsonPlot(string path)
+    {
+        var options = new JsonSerializerOptions(AppState.JsonOptions)
+        {
+            WriteIndented = true
+        };
+        Serializer.Options = options;
+        Serializer.Serialize(AppState.Plot, path);
+    }
+
+    public void ExportTextPlot(string path)
+    {
+        Serializer.Print(AppState.Plot, path);
     }
 }

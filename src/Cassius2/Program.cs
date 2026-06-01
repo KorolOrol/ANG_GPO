@@ -11,7 +11,7 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        Environment.SetEnvironmentVariable("AVALONIA_GLOBAL_SCALE_FACTOR", "2");
+        Environment.SetEnvironmentVariable("AVALONIA_GLOBAL_SCALE_FACTOR", "1.5");
 
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);

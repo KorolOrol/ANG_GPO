@@ -24,7 +24,7 @@ namespace BaseClasses.Services
         /// <summary>
         /// Настройки сериализации.
         /// </summary>
-        public static JsonSerializerOptions Options { get; } = new JsonSerializerOptions
+        public static JsonSerializerOptions Options { get; set; } = new JsonSerializerOptions
         {
             WriteIndented = true,
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
