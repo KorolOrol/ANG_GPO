@@ -12,7 +12,7 @@
         Width="1200" Height="800"
         CanResize="True"
         WindowStartupLocation="CenterScreen"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/logo_1024.png"
         Title="Cassius2">
 
     <Design.DataContext>
