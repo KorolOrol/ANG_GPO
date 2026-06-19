@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Unicode;
 using BaseClasses.Model;
 using BaseClasses.Services;
 using Cassius2.Models;
@@ -68,7 +70,9 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var options = new JsonSerializerOptions(AppState.JsonOptions)
         {
-            WriteIndented = false
+            WriteIndented = false,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            Converters = { new ParamBagJsonConverter(), new ElementJsonConverter() }
         };
         Serializer.Options = options;
         Serializer.Serialize(AppState.Plot, path);
@@ -78,7 +82,9 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         var options = new JsonSerializerOptions(AppState.JsonOptions)
         {
-            WriteIndented = true
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic),
+            Converters = { new ParamBagJsonConverter(), new ElementJsonConverter() }
         };
         Serializer.Options = options;
         Serializer.Serialize(AppState.Plot, path);

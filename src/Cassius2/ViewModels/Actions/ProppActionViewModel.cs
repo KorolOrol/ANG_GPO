@@ -1,9 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using Cassius2.Models;
+using Cassius2.Views.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StructuredNarrative.Data;
@@ -27,10 +32,23 @@ public partial class ProppActionViewModel : ViewModelBase
     [RelayCommand]
     public void Generate()
     {
-        var oldElements = AppState.Plot.Elements.ToHashSet();
-        AppState.ProppGenerator.SkipProbability = SkipProbability;
-        AppState.ProppGenerator.GenerateChain(AppState.Plot, new Element(ElemType.Event), Recursion);
-        GeneratedElements = AppState.Plot.Elements.Except(oldElements).ToList();
-        AppState.NotifyPlotChanged();
+        try
+        {
+
+            var oldElements = AppState.Plot.Elements.ToHashSet();
+            AppState.ProppGenerator.SkipProbability = SkipProbability;
+            AppState.ProppGenerator.GenerateChain(AppState.Plot, new Element(ElemType.Event), Recursion);
+            GeneratedElements = AppState.Plot.Elements.Except(oldElements).ToList();
+            AppState.NotifyPlotChanged();
+        }
+        catch (Exception exception)
+        {
+            var exceptionWindow = new ExceptionWindow();
+            exceptionWindow.LoadException(exception);
+            exceptionWindow.ShowDialog<bool>((TopLevel.GetTopLevel(
+                Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                    ? desktop.MainWindow
+                    : null) as Window)!);
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using AIGenerator;
+using AIGenerator.DtoProvider;
 using BaseClasses.Interface;
 using BaseClasses.Model;
 using StructuredNarrative.Model;
@@ -13,7 +14,10 @@ public static class AppState
 {
     public static Plot Plot { get; set; } = new();
     
-    public static LlmAiGenerator AiGenerator { get; set; } = new();
+    public static LlmAiGenerator AiGenerator { get; set; } = new()
+    {
+        DtoProvider = new SerializerDtoProvider()
+    };
 
     public static ProppGenerator ProppGenerator { get; set; } = new();
     

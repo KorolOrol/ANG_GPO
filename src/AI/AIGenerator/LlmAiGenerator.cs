@@ -112,6 +112,7 @@ namespace AIGenerator
             pb.AddMessage(PromptEntry.Schema, DtoProvider.GetSchema());
             pb.AddMessageFromTemplate(PromptEntry.Context, "Setting");
             pb.AddMessageFromTemplate(PromptEntry.Context, "Plot", DtoProvider.ToDto(plot));
+            pb.AddMessageFromTemplate(PromptEntry.Context, $"Type{element.Type}");
             pb.AddMessageFromTemplate(PromptEntry.Request, "Element", DtoProvider.ToDto(element));
             return pb.Build();
         }

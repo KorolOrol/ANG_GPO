@@ -133,12 +133,14 @@ namespace BaseClasses.Tests.Model
         public void Plot_Merge_UsesMergerMock_AndRemovesTarget()
         {
             var mergerCalls = 0;
-            var bothElementsAreInPlotOnMergeCall = false;
+            var baseElementIsInPlotOnMergeCall = false;
+            var targetElementIsInPlotOnMergeCall = false;
             Action<IElement, IElement, Plot, bool> mergerMock = (baseElement, targetElement, plot, basePriority) =>
             {
                 mergerCalls++;
-                bothElementsAreInPlotOnMergeCall =
-                    plot.Elements.Contains(baseElement) && plot.Elements.Contains(targetElement) && !basePriority;
+                
+                baseElementIsInPlotOnMergeCall = plot.Elements.Contains(baseElement);
+                targetElementIsInPlotOnMergeCall = plot.Elements.Contains(targetElement);
             };
 
             var plot = new Plot(mergeAction: mergerMock);
@@ -148,7 +150,8 @@ namespace BaseClasses.Tests.Model
             plot.Merge(baseElement, targetElement, false);
 
             Assert.Equal(1, mergerCalls);
-            Assert.True(bothElementsAreInPlotOnMergeCall);
+            Assert.True(baseElementIsInPlotOnMergeCall);
+            Assert.False(targetElementIsInPlotOnMergeCall);
             Assert.Contains(baseElement, plot.Elements);
             Assert.DoesNotContain(targetElement, plot.Elements);
         }
