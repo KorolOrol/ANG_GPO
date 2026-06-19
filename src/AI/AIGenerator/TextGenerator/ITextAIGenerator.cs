@@ -1,26 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AIGenerator.Prompt;
 
 namespace AIGenerator.TextGenerator
 {
     /// <summary>
-    /// Интерфейс для генерации текста с помощью AI
+    /// Интерфейс для генерации текста с помощью AI.
     /// </summary>
     public interface ITextAiGenerator
     {
         /// <summary>
-        /// Ключ API для AI
+        /// Ключ API для AI.
         /// </summary>
         public string ApiKey { set; }
 
         /// <summary>
-        /// Адрес API
+        /// Адрес API.
         /// </summary>
         public string Endpoint { get; set; }
 
         /// <summary>
-        /// Модель для генерации текста
+        /// Модель для генерации текста.
         /// </summary>
         public string Model { get; set; }
 
@@ -29,10 +29,6 @@ namespace AIGenerator.TextGenerator
         /// </summary>
         /// <param name="messages">Список сообщений</param>
         /// <returns>Сгенерированный текст</returns>
-        public async Task<string> GenerateTextAsync(List<string> messages)
-        {
-            await Task.Run(() => { });
-            throw new NotImplementedException();
-        }
+        public Task<string> GenerateTextAsync(List<(PromptEntry, string)> messages);
     }
 }

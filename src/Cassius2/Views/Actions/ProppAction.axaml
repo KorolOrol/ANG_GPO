@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:Cassius2.Views.Controls"
+             xmlns:vm="using:Cassius2.ViewModels.Actions"
+             xmlns:baseClasses="clr-namespace:BaseClasses.Interface;assembly=BaseClasses"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cassius2.Views.Actions.ProppAction"
+             x:DataType="vm:ProppActionViewModel">
+    <UserControl.DataContext>
+        <vm:ProppActionViewModel />
+    </UserControl.DataContext>
+    <Grid ColumnDefinitions="*,2*" >
+        <StackPanel Grid.Column="0" Margin="10">
+            <TextBlock Text="Generation Settings" FontWeight="Bold" FontSize="16" Margin="0,0,0,10" />
+            <TextBlock Text="Skip probability:"/>
+            <TextBox Text="{Binding SkipProbability}"/>
+            <TextBlock Text="Number of generated elements:"/>
+            <TextBox Text="{Binding Recursion}"/>
+            <Button Content="Load Data" Click="BtnLoadData_OnClick" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock Text="{Binding LoadedData}" Foreground="{DynamicResource NordAuroraGreen}" />
+            <Button Content="Generate" Command="{Binding GenerateCommand}" HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Center" Margin="0,10,0,0" /> 
+        </StackPanel>
+        <ListBox Grid.Column="1" Margin="10" ItemsSource="{Binding GeneratedElements}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="baseClasses:IElement">
+                    <controls:EditableElementListItem Element="{Binding}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
+</UserControl>

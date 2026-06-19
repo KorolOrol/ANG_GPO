@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProceduralGenerator", "ProceduralGenerator\ProceduralGenerator.csproj", "{84FAA2A0-E768-4E5D-8D57-55E08B2A67F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseClasses", "..\base\BaseClasses\BaseClasses.csproj", "{724FC632-4D54-4336-ADEB-B950500BB574}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84FAA2A0-E768-4E5D-8D57-55E08B2A67F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84FAA2A0-E768-4E5D-8D57-55E08B2A67F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84FAA2A0-E768-4E5D-8D57-55E08B2A67F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84FAA2A0-E768-4E5D-8D57-55E08B2A67F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{724FC632-4D54-4336-ADEB-B950500BB574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{724FC632-4D54-4336-ADEB-B950500BB574}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{724FC632-4D54-4336-ADEB-B950500BB574}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{724FC632-4D54-4336-ADEB-B950500BB574}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using BaseClasses.Enum;
-using BaseClasses.Model;
-using System.Text.Json.Serialization;
+﻿using BaseClasses.Enum;
+using BaseClasses.Model.Params;
 
 namespace BaseClasses.Interface
 {
@@ -24,22 +22,16 @@ namespace BaseClasses.Interface
         /// Описание элемента
         /// </summary>
         public string Description { get; set; }
-
+        
         /// <summary>
-        /// Параметры элемента
+        /// Типизированные параметры элемента
         /// </summary>
-        public Dictionary<string, object> Params { get; set; }
+        public ParamBag Params { get; }
 
         /// <summary>
         /// Время создания элемента
         /// </summary>
         public int Time { get; set; }
-
-        /// <summary>
-        /// Полная информация об элементе
-        /// </summary>
-        /// <returns>Полная информация об элементе</returns>
-        public string FullInfo();
 
         /// <summary>
         /// Проверка на пустоту

@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Cassius2.ViewModels.Controls"
+        xmlns:windows="clr-namespace:Cassius2.ViewModels.Windows"
+        x:Class="Cassius2.Views.Windows.ParamEditWindow"
+        x:DataType="windows:ParamEditWindowViewModel"
+        Title="Edit Parameter" Width="400" Height="300"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" ColumnDefinitions="Auto,*">
+        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,5">Namespace:</TextBlock>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="NsTextBox" Text="{Binding ParamNamespace}"
+                 IsEnabled="{Binding !IsEditing}" Margin="0,0,0,5" />
+
+        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,5">Name:</TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="NameTextBox" Text="{Binding ParamName}"
+                 IsEnabled="{Binding !IsEditing}" Margin="0,0,0,5" />
+
+        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,10">Type:</TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="TypeTextBox" Text="{Binding ParamValueType}"
+                 IsEnabled="{Binding !IsEditing}" Margin="0,0,0,10" />
+
+        <TextBlock Grid.Row="3" Grid.Column="0" VerticalAlignment="Top" Margin="0,0,10,0">Value (JSON):</TextBlock>
+        <TextBox Grid.Row="3" Grid.Column="1" Name="ValueTextBox" Text="{Binding ParamValueJson}" AcceptsReturn="True"
+                 TextWrapping="Wrap" Margin="0,0,0,10" />
+
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="10">
+            <Button Name="OkButton" Command="{Binding OkCommand}" Content="OK" Width="80"
+                    HorizontalContentAlignment="Center" />
+            <Button Name="CancelBtn" Command="{Binding CancelCommand}" Content="Cancel" Width="80"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Name="ErrorTextBlock" Text="{Binding ErrorMessage}"
+                   Foreground="{DynamicResource NordAuroraRed}" TextWrapping="Wrap" Margin="0,10,0,0"
+                   IsVisible="{Binding IsErrorVisible}" />
+    </Grid>
+</Window>
