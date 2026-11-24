@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Cassius2.ViewModels.Windows"
+        x:Class="Cassius2.Views.Windows.ConfirmWindow"
+        x:DataType="vm:ConfirmWindowViewModel"
+        Title="Unsaved Changes" Width="350" Height="150"
+        WindowStartupLocation="CenterOwner" CanResize="False">
+    <Grid Margin="20" RowDefinitions="*,Auto">
+        <TextBlock Grid.Row="0" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Text="You have unsaved changes. Do you want to discard them?" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+            <Button Name="DiscardBtn" Command="{Binding DiscardCommand}" Content="Discard" Width="80"
+                    HorizontalContentAlignment="Center" Background="{DynamicResource NordAuroraRed}" />
+            <Button Name="CancelBtn" Command="{Binding CancelCommand}" Content="Cancel" Width="80"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,115 +1,78 @@
 ﻿using System;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
+using BaseClasses.Model.Params;
 
 namespace BaseClasses.Model
 {
     /// <summary>
-    /// Элемент истории
+    /// Элемент истории.
     /// </summary>
     public class Element : IElement, IEquatable<Element>
     {
+        private readonly Guid _id = Guid.NewGuid();
+        
         /// <summary>
-        /// Тип элемента
+        /// Тип элемента.
         /// </summary>
-        private readonly ElemType _type;
+        public ElemType Type { get; }
 
         /// <summary>
-        /// Тип элемента
-        /// </summary>
-        public ElemType Type { get { return _type; } }
-
-        /// <summary>
-        /// Название элемента
+        /// Название элемента.
         /// </summary>
         public string Name { get; set; }
 
         /// <summary>
-        /// Описание элемента
+        /// Описание элемента.
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// Параметры элемента
+        /// Типизированные параметры элемента.
         /// </summary>
-        public Dictionary<string, object> Params { get; set; }
+        public ParamBag Params { get; }
 
         /// <summary>
-        /// Время создания элемента
+        /// Время создания элемента.
         /// </summary>
         public int Time { get; set; }
 
         /// <summary>
-        /// Конструктор элемента
+        /// Конструктор элемента.
         /// </summary>
-        /// <param name="type">Тип элемента</param>
-        /// <param name="name">Название элемента</param>
-        /// <param name="description">Описание элемента</param>
-        /// <param name="params">Параметры элемента</param>
-        /// <param name="time">Время создания элемента</param>
-        public Element(ElemType type, string name = "", string description = "",
-                       Dictionary<string, object> @params = null, int time = -1)
+        /// <param name="type">Тип элемента.</param>
+        /// <param name="name">Название элемента.</param>
+        /// <param name="description">Описание элемента.</param>
+        /// <param name="time">Время создания элемента.</param>
+        public Element(ElemType type, string name = "", string description = "", int time = -1)
         {
-            _type = type;
+            Type = type;
             Name = name;
             Description = description;
-            Params = @params ?? new Dictionary<string, object>();
+            Params = new ParamBag();
             Time = time;
         }
 
-        /// <inheritdoc/>
         public override string ToString()
         {
             return $"{Type}: {Name}";
         }
 
         /// <summary>
-        /// Полная информация об элементе
+        /// Проверка на пустоту элемента.
         /// </summary>
-        /// <returns>Полная информация об элементе</returns>
-        public string FullInfo()
-        {
-            return $"{Type}: {Name}\n" +
-                   $"Description: {Description}\n" +
-                   $"{string.Join("\n", Params.Select(kvp => $"{kvp.Key}: {GetValueString(kvp.Value)}"))}\n" +
-                   $"Creation time: {Time}\n";
-        }
-
-        /// <summary>
-        /// Проверка на пустоту элемента
-        /// </summary>
-        /// <returns>True, если элемент пуст, иначе False</returns>
+        /// <returns>True, если элемент пуст, иначе False.</returns>
         public bool IsEmpty()
         {
             return Name == "" && Description == "" &&
-                   (Params.Count == 0 || Params.All(kvp =>
-                   {
-                       if (kvp.Value is null) return true;
-                       if (kvp.Value is string str) return str == "";
-                       return false;
-                   })
+                   (Params.Count == 0 || Params.Keys.All(k => Params[k] == null)
                    ) && Time == -1;
         }
 
-        /// <summary>
-        /// Получение строки значения параметра
-        /// </summary>
-        /// <param name="value">Значение параметра</param>
-        /// <returns>Строка значения параметра</returns>
-        private string GetValueString(object value)
+        public override bool Equals(object? obj)
         {
-            if (value is IEnumerable enumerable && value.GetType() != typeof(string))
-            {
-                return $"[{string.Join(", ", enumerable.Cast<object>().Select(item => item.ToString()))}]";
-            }
-            if (value is null)
-            {
-                return "null";
-            }
-            return value.ToString();
+            return obj?.GetType() == GetType() && Equals((Element)obj);
         }
 
         public bool Equals(Element? other)
@@ -120,6 +83,11 @@ namespace BaseClasses.Model
                    Name == other.Name &&
                    Description == other.Description &&
                    Time == other.Time;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_id);
         }
     }
 }

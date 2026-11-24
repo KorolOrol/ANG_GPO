@@ -1,0 +1,10 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Cassius2.Views.Controls.EditableElementListItem">
+    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto">
+        <TextBlock Name="ParamValue" Grid.Column="0" Grid.Row="0"
+                   VerticalAlignment="Center" Margin="5,0,0,0" />
+        <Button Name="EditButton" Grid.Column="1" Grid.Row="0" Content="Edit" Margin="5,5,5,5"
+                HorizontalAlignment="Center" VerticalAlignment="Center" Click="EditButton_Click" />
+    </Grid>
+</UserControl>

@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Cassius2.ViewModels.Actions"
+             xmlns:controls="using:Cassius2.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cassius2.Views.Actions.AiAction"
+             x:DataType="vm:AiActionViewModel">
+    <UserControl.DataContext>
+        <vm:AiActionViewModel />
+    </UserControl.DataContext>
+
+    <ScrollViewer>
+        <Grid ColumnDefinitions="*,*">
+            <Border Grid.Column="0" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="0,0,1,0"
+                    Padding="10">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Generation Settings" FontWeight="Bold" FontSize="16" />
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                        <ComboBox Grid.Column="0" ItemsSource="{Binding Generators}"
+                                  SelectedItem="{Binding SelectedGenerator}" HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:GeneratorWrapper">
+                                    <TextBlock Text="{Binding DisplayName}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Grid.Column="1" Content="+" Command="{Binding AddGeneratorCommand}" Margin="5,0,0,0" />
+                        <Button Grid.Column="2" Content="-" Command="{Binding RemoveGeneratorCommand}" Margin="5,0,0,0" />
+                    </Grid>
+
+                    <TextBlock Text="API key source:" />
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <RadioButton Content="Environment Variable" IsChecked="{Binding EditUseEnvVar}"
+                                     GroupName="ApiKeySource" />
+                        <RadioButton Content="Direct Input" IsChecked="{Binding !EditUseEnvVar}"
+                                     GroupName="ApiKeySource" />
+                    </StackPanel>
+
+                    <TextBlock Text="Environment Variable Name:" IsVisible="{Binding EditUseEnvVar}" />
+                    <TextBox Text="{Binding EditEnvVarName}" IsVisible="{Binding EditUseEnvVar}" />
+
+                    <TextBlock Text="API Key:" IsVisible="{Binding !EditUseEnvVar}" />
+                    <TextBox Text="{Binding EditApiKey}" PasswordChar="*" IsVisible="{Binding !EditUseEnvVar}" />
+
+                    <TextBlock Text="Endpoint:" />
+                    <TextBox Text="{Binding EditEndpoint}" />
+
+                    <TextBlock Text="Model:" />
+                    <TextBox Text="{Binding EditModel}" />
+
+                    <TextBlock Text="Max Completion Tokens:" />
+                    <NumericUpDown Value="{Binding EditMaxCompletionTokens}" Minimum="1" Maximum="32000" />
+
+                    <TextBlock Text="Seed (-1 = random):" />
+                    <NumericUpDown Value="{Binding EditSeed}" />
+
+                    <Button Content="Update" Command="{Binding UpdateGeneratorCommand}" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center" />
+                    <Button Content="Load Prompt" Click="BtnLoadPrompt_OnClick" HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center" Margin="0,10,0,0" x:Name="BtnLoadPrompt" />
+                    <TextBlock Text="{Binding LoadedPrompt}" Foreground="{DynamicResource NordAuroraGreen}" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Padding="10">
+                <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="0,0,0,10">
+                    <TextBlock Grid.Row="0" Text="Generation Mode" FontWeight="Bold" FontSize="16" Margin="0,0,0,10" />
+
+                    <StackPanel Grid.Row="1" Spacing="5" Margin="0,0,0,10">
+                        <RadioButton Content="New Element" IsChecked="{Binding IsNewElement}" GroupName="ElementType" />
+                        <ComboBox ItemsSource="{Binding ElementTypes}" SelectedItem="{Binding SelectedElementType}"
+                                  IsEnabled="{Binding IsNewElement}" HorizontalAlignment="Stretch" />
+
+                        <RadioButton Content="Existing Element" IsChecked="{Binding IsExistingElement}"
+                                     GroupName="ElementType" Margin="0,10,0,0" />
+
+                        <ComboBox ItemsSource="{Binding ExistingElements}"
+                                  SelectedItem="{Binding SelectedExistingElement}"
+                                  IsEnabled="{Binding IsExistingElement}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Spacing="5" Margin="0,0,0,15">
+                        <RadioButton Content="Single Element" IsChecked="{Binding IsSingleGeneration}"
+                                     GroupName="GenerationMode" />
+                        <RadioButton Content="Chain of Elements" IsChecked="{Binding IsChainGeneration}"
+                                     GroupName="GenerationMode" />
+
+                        <Button Content="Generate" Command="{Binding GenerateCommand}"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="0,10,0,0" />
+                        <TextBlock Text="{Binding GenerationStatus}" Foreground="{DynamicResource NordAuroraRed}" />
+                    </StackPanel>
+
+                    <Border Grid.Row="3" BorderBrush="{DynamicResource SystemBaseLowColor}" BorderThickness="1" CornerRadius="4" Padding="5">
+                        <controls:ElementEditor DataContext="{Binding EditorViewModel}" />
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

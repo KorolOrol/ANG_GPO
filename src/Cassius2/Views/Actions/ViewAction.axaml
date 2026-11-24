@@ -1,0 +1,58 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Cassius2.Views.Controls"
+             xmlns:baseClasses="clr-namespace:BaseClasses.Interface;assembly=BaseClasses"
+             xmlns:vm="using:Cassius2.ViewModels.Actions"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cassius2.Views.Actions.ViewAction"
+             x:DataType="vm:ViewActionViewModel">
+    <UserControl.DataContext>
+        <vm:ViewActionViewModel />
+    </UserControl.DataContext>
+    <SplitView IsPaneOpen="True" DisplayMode="Inline" OpenPaneLength="250">
+        <SplitView.Pane>
+            <Grid RowDefinitions="*,Auto">
+                <ListBox Grid.Row="0" x:Name="ElementsListBox" ItemsSource="{Binding Elements}"
+                         SelectedItem="{Binding SelectedElement}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="baseClasses:IElement">
+                            <controls:ElementListItem Element="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*" Margin="5">
+                    <Button x:Name="BtnAddCharacter" Command="{Binding AddCharacterCommand}"
+                            Background="{DynamicResource NordAuroraGreen}" Grid.Column="0" ToolTip.Tip="Add Character"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Svg Path="/Assets/Icons/AddCharacterIcon.svg" Width="20" Height="20" />
+                    </Button>
+                    <Button x:Name="BtnAddItem" Command="{Binding AddItemCommand}"
+                            Background="{DynamicResource NordAuroraGreen}" Grid.Column="1" ToolTip.Tip="Add Item"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Svg Path="/Assets/Icons/AddItemIcon.svg" Width="20" Height="20" />
+                    </Button>
+                    <Button x:Name="BtnAddLocation" Command="{Binding AddLocationCommand}"
+                            Background="{DynamicResource NordAuroraGreen}" Grid.Column="2" ToolTip.Tip="Add Location"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Svg Path="/Assets/Icons/AddLocationIcon.svg" Width="20" Height="20" />
+                    </Button>
+                    <Button x:Name="BtnAddEvent" Command="{Binding AddEventCommand}"
+                            Background="{DynamicResource NordAuroraGreen}" Grid.Column="3" ToolTip.Tip="Add Event"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Svg Path="/Assets/Icons/AddEventIcon.svg" Width="20" Height="20" />
+                    </Button>
+                    <Button x:Name="BtnDeleteElement" Command="{Binding DeleteElementCommand}"
+                            Background="{DynamicResource NordAuroraRed}" Grid.Column="4" ToolTip.Tip="Delete Element"
+                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center">
+                        <Svg Path="/Assets/Icons/DeleteIcon.svg" Width="20" Height="20" />
+                    </Button>
+                </Grid>
+            </Grid>
+        </SplitView.Pane>
+        <ScrollViewer>
+            <controls:ElementEditor x:Name="EditorControl" IsVisible="False" />
+        </ScrollViewer>
+    </SplitView>
+</UserControl>

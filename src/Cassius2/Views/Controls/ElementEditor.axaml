@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:Cassius2.ViewModels.Controls"
+             xmlns:local="using:Cassius2.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cassius2.Views.Controls.ElementEditor"
+             x:DataType="vm:ElementEditorViewModel">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="5"
+          ColumnSpacing="5" Margin="10">
+        <TextBlock Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">Type:</TextBlock>
+        <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" x:Name="ElementType"
+                   Text="{Binding ElementType}" />
+        <TextBlock Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center">Name:</TextBlock>
+        <TextBox Grid.Column="1" Grid.Row="1" x:Name="ElementName" MaxLines="1" Text="{Binding ElementName}" />
+        <TextBlock Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Description:</TextBlock>
+        <TextBox Grid.Column="1" Grid.Row="2" x:Name="ElementDescription" AcceptsReturn="True" TextWrapping="Wrap"
+                 Text="{Binding ElementDescription}" />
+        <Expander Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="3" Header="Params:" HorizontalAlignment="Stretch">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <ListBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                         x:Name="ParamsListBox" Margin="10,0,0,0" ItemsSource="{Binding Params}"
+                         SelectedItem="{Binding SelectedParam}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ParamListItemViewModel">
+                            <local:ParamListItem />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Grid.Row="1" Grid.Column="0" x:Name="AddParamButton" Command="{Binding AddParamCommand}"
+                        Background="{DynamicResource NordAuroraGreen}" Content="+" Width="30" Height="30"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                <Button Grid.Row="1" Grid.Column="1" x:Name="RemoveParamButton" Command="{Binding RemoveParamCommand}"
+                        Background="{DynamicResource NordAuroraRed}" Content="-" Width="30" Height="30"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+            </Grid>
+        </Expander>
+        <Expander Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Header="Relations:" HorizontalAlignment="Stretch">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*">
+                <ListBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch"
+                         x:Name="RelationsListBox" Margin="10,0,0,0" ItemsSource="{Binding Relations}"
+                         SelectedItem="{Binding SelectedRelation}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RelationListItemViewModel">
+                            <local:RelationListItem />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Grid.Row="1" Grid.Column="0" x:Name="AddRelationButton" Command="{Binding AddRelationCommand}"
+                        Background="{DynamicResource NordAuroraGreen}" Content="+" Width="30" Height="30"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+                <Button Grid.Row="1" Grid.Column="1" x:Name="RemoveRelationButton"
+                        Command="{Binding RemoveRelationCommand}" Background="{DynamicResource NordAuroraRed}"
+                        Content="-" Width="30" Height="30"
+                        HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+            </Grid>
+        </Expander>
+        <TextBlock Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Time:</TextBlock>
+        <TextBlock Grid.Column="1" Grid.Row="5" VerticalAlignment="Center" x:Name="ElementTime"
+                   Text="{Binding ElementTime}" />
+        <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="6" HorizontalAlignment="Center" x:Name="UpdateButton"
+                Command="{Binding UpdateCommand}" Content="Update" HorizontalContentAlignment="Center" />
+    </Grid>
+</UserControl>

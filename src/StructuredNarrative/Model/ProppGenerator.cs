@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using BaseClasses.Enum;
 using BaseClasses.Interface;
 using BaseClasses.Model;
-using BaseClasses.Services;
 using StructuredNarrative.Data;
 
 namespace StructuredNarrative.Model
@@ -29,19 +28,13 @@ namespace StructuredNarrative.Model
         /// <param name="plot">Сюжет</param>
         /// <param name="preparedElement">Начальное событие,
         /// к которому будет добавляться цепочка функций Проппа. Должно быть типа Event.</param>
-        /// <param name="generationQueue">Внутренняя очередь для рекурсивной генерации
-        /// (в данной реализации не используется; обычно не передаётся при первом вызове).</param>
         /// <param name="recursion">Максимальное количество функций Проппа в цепочке (глубина рекурсии).</param>
         /// <returns>Элемент с добавленной цепочкой событий по функциям Проппа.</returns>
         /// <exception cref="ArgumentException">Если preparedElement не является событием.</exception>
-        public Task<IElement> GenerateChainAsync(Plot plot,
-            IElement preparedElement,
-            Queue<(IElement, IElement, int)>? generationQueue = null,
-            int recursion = 3)
+        public IElement GenerateChain(Plot plot, IElement preparedElement, int recursion = 3)
         {
             if (plot == null)
                 throw new ArgumentNullException(nameof(plot));
-
             if (preparedElement == null) 
                 throw new ArgumentNullException(nameof(preparedElement));
             if (preparedElement.Type != ElemType.Event)
@@ -75,7 +68,7 @@ namespace StructuredNarrative.Model
             if (firstFunction != null)
             {
                 var functionEvent = firstFunction.CreateEventSkeleton(plot);
-                Merger.Merge(preparedElement, functionEvent, false);
+                plot.Merge(preparedElement, functionEvent, false);
             }
             plot.Add(preparedElement);
 
@@ -85,9 +78,14 @@ namespace StructuredNarrative.Model
                 plot.Add(functionEvent);
             }
 
-            return Task.FromResult(preparedElement);
+            return preparedElement;
         }
-    
+
+        public Task<IElement> GenerateChainAsync(Plot plot, IElement preparedElement, int recursion = 3)
+        {
+            return Task.FromResult(GenerateChain(plot, preparedElement, recursion));
+        }
+
         /// <summary>
         /// Удаляет из списка функций те, которые имеют в RequiredPreviousFunctions функции, не входящие в chosenFunctions.
         /// </summary>
